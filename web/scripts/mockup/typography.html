@@ -1,0 +1,29 @@
+<!-- typography.html -->
+<!-- Palette section, last part: Inter type scale, buttons and keyboard focus. -->
+<div class="pal-two">
+  <div class="pal-block">
+    <h3>Typographie : Inter, base 14 px <span class="pal-ref">§9.5, AR-40</span></h3>
+    <div class="type-scale">
+      <div class="type-row"><span style="font-size:var(--font-size-display);font-weight:600;letter-spacing:-.018em">Cartographiez vos processus</span><span class="type-meta">--font-size-display · 26 px · 600</span></div>
+      <div class="type-row"><span style="font-size:var(--font-size-h1);font-weight:600">Achats fournisseurs</span><span class="type-meta">--font-size-h1 · 20 px · 600</span></div>
+      <div class="type-row"><span style="font-size:var(--font-size-h2);font-weight:600">Qui participe</span><span class="type-meta">--font-size-h2 · 15 px · 600</span></div>
+      <div class="type-row"><span style="font-size:var(--font-size-base)">Texte courant de l’interface, fiches et dialogues.</span><span class="type-meta">--font-size-base · 14 px</span></div>
+      <div class="type-row"><span style="font-size:var(--font-size-step);font-weight:500">Rédiger la demande d’achat</span><span class="type-meta">--font-size-step · 13 px · 500</span></div>
+      <div class="type-row"><span style="font-size:var(--font-size-small);color:var(--text-muted)">Supprimé le 14/10/2026 par Noah Martin</span><span class="type-meta">--font-size-small · 12 px</span></div>
+      <div class="type-row"><code style="font-size:var(--font-size-lane-code);color:var(--lane-2-ink)">PRJ-C02</code><span class="type-meta">--font-size-lane-code · 11 px</span></div>
+      <div class="type-row"><code style="font-size:var(--font-size-code);color:var(--text-muted)">PRJ-E002 · 1 h 30 · 0123456789</code><span class="type-meta">--font-size-code · 10,5 px</span></div>
+      <div class="type-row"><span style="font-size:var(--font-size-micro);font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted)">Branchements · 1 h 30</span><span class="type-meta">--font-size-micro · 10 px</span></div>
+    </div>
+    <div class="type-weights"><span><b style="font-weight:400">Aa</b>400 normal</span><span><b style="font-weight:500">Aa</b>500 moyen</span><span><b style="font-weight:600">Aa</b>600 demi-gras</span><span><b style="font-weight:600;font-variant-numeric:tabular-nums">1 111</b>chiffres tabulaires</span></div>
+  </div>
+  <div class="pal-block">
+    <h3>Boutons et focus clavier <span class="pal-ref">§9.2, NF08, AR-54</span></h3>
+    <div class="demo-buttons" style="margin-top:0;padding-top:0;border:0">
+      <button class="btn btn--primary" type="button" tabindex="-1">{{icon:circle-check:15}}Je valide ma fiche</button>
+      <button class="btn btn--secondary" type="button" tabindex="-1">{{icon:plus:15}}Nouveau projet</button>
+      <button class="btn btn--secondary is-focus" type="button" tabindex="-1">Focus clavier</button>
+      <button class="btn btn--danger" type="button" tabindex="-1">{{icon:trash-2:15}}Supprimer…</button>
+    </div>
+    <p class="pal-note" style="margin:14px 0 0">Le troisième bouton montre le focus clavier appliqué par <code>:focus-visible</code> : le halo <code>--focus-ring</code> de la charte (accent à 35 %, 1,65:1 seul sur blanc) plus le contour <code>--focus-outline</code> de 2 px en accent (AR-54). Durées des transitions : <code>--duration-fast</code> 150 ms, <code>--duration-base</code> 200 ms, coupées sous <code>prefers-reduced-motion</code>.</p>
+  </div>
+</div>

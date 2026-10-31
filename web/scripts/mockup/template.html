@@ -1,0 +1,91 @@
+<!-- template.html -->
+<!-- Page skeleton of the charter mockup: embedded font and tokens, styles, and the six titled sections. -->
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1366">
+<title>{{productName}} 2.0 · Maquette de la charte graphique</title>
+<style>
+{{fonts}}
+{{tokens}}
+{{css:page.css}}
+{{css:editor.css}}
+{{css:sheet.css}}
+</style>
+</head>
+<body>
+<main class="doc">
+  <header class="doc-head" id="haut">
+    <span class="doc-eyebrow">{{productName}} 2.0 · Phase 1 · P1-T07 · maquette statique à valider (§9.6)</span>
+    <h1 class="doc-title">Charte graphique : maquette de validation</h1>
+    <p class="doc-lead">Page autonome, sans aucun appel réseau : la police Inter, les icônes Lucide et les jetons de <code>tokens.css</code> y sont embarqués. Toutes les données sont fictives (projet « Achats fournisseurs », code PRJ). Les écrans sont dessinés à 1366 × 768, à l’échelle 1, sur la grille de l’annexe B §3.1 avec la marge de 184 px (AR-19).</p>
+    <nav class="doc-nav" aria-label="Sections">
+      <a href="#palette"><span>1</span>Palette et jetons</a>
+      <a href="#accueil"><span>2</span>Accueil</a>
+      <a href="#editeur"><span>3</span>Éditeur de carte</a>
+      <a href="#fiche"><span>4</span>Panneau fiche</a>
+      <a href="#menus"><span>5</span>Menus contextuels</a>
+      <a href="#notifications"><span>6</span>Notifications</a>
+    </nav>
+  </header>
+
+  <section class="doc-section" id="palette" data-capture="01-palette">
+    <div class="doc-section-head">
+      <span class="doc-num">1</span><h2>Palette et jetons</h2>
+      <p>Neutres, couples pastel et encre des huit teintes de couloirs avec leur contraste calculé, jetons d’accessibilité, jetons dérivés, rayons, ombres et typographie. Toutes les valeurs viennent de <code>tokens.css</code>, lu à la construction de la page.</p>
+      <div class="doc-refs"><span class="ref">§9.2</span><span class="ref">§9.5</span><span class="ref">AR-26</span><span class="ref">AR-40</span><span class="ref">AR-41</span><span class="ref">AR-45</span><span class="ref">AR-47</span><span class="ref">AR-53 à AR-59</span></div>
+    </div>
+    <div class="pal">
+      {{palette}}
+      {{include:typography.html}}
+    </div>
+  </section>
+
+  <section class="doc-section" id="accueil" data-capture="02-accueil">
+    <div class="doc-section-head">
+      <span class="doc-num">2</span><h2>Accueil</h2>
+      <p>Bandeau et bouton principal « Décrire un processus » sur le dernier projet ouvert, colonne Projets (2/3), corbeille, colonne « Qui participe » (1/3). Vue de l’animateur, avec le droit d’administrer.</p>
+      <div class="doc-refs"><span class="ref">Annexe B §1.3</span><span class="ref">§10</span><span class="ref">AR-49</span></div>
+    </div>
+    <div class="frame">{{include:home.html}}</div>
+  </section>
+
+  <section class="doc-section" id="editeur" data-capture="03-editeur">
+    <div class="doc-section-head">
+      <span class="doc-num">3</span><h2>Éditeur de carte</h2>
+      <p>En-tête de 48 px avec fil d’Ariane (la carte racine porte le nom du projet), ruban sur une ligne, trois couloirs avec chaque type d’étape et leurs états. PRJ-E009 est coupée (« Coller » est donc actif), PRJ-E021 est une étape étrangère recouverte par le cadre de remontée (hors cadre), PRJ-E014 et PRJ-E020 ne sont reliées à rien (« ! »). L’étape PRJ-E014 est survolée (boutons « + »), l’en-tête « Service Achats » aussi (bouton du menu, « + » d’ajout de couloir), l’infobulle de « Couper » est ouverte.</p>
+      <div class="doc-refs"><span class="ref">§9.3</span><span class="ref">§9.4</span><span class="ref">§9.5</span><span class="ref">§9.7</span><span class="ref">Annexe B §2.1, §2.9 à §2.12, §3.1 à §3.4</span><span class="ref">AR-19</span><span class="ref">AR-24</span><span class="ref">AR-27</span><span class="ref">AR-31</span><span class="ref">AR-53</span><span class="ref">AR-57</span><span class="ref">AR-58</span><span class="ref">AR-59</span></div>
+    </div>
+    <div class="frame" data-capture-frame="03b-editeur-1366x768">{{include:editor.html}}</div>
+  </section>
+
+  <section class="doc-section" id="fiche" data-capture="04-panneau-fiche">
+    <div class="doc-section-head">
+      <span class="doc-num">4</span><h2>Panneau fiche</h2>
+      <p>Fiche de l’étape PRJ-E002 ouverte à droite (440 px) : en haut l’écran tel qu’il apparaît, en dessous le contenu complet du panneau, déroulé.</p>
+      <div class="doc-refs"><span class="ref">§9.5</span><span class="ref">Annexe B §4</span><span class="ref">AR-59</span></div>
+    </div>
+    {{include:sheet.html}}
+  </section>
+
+  <section class="doc-section" id="menus" data-capture="05-menus">
+    <div class="doc-section-head">
+      <span class="doc-num">5</span><h2>Menus contextuels</h2>
+      <p>À gauche, le menu d’un en-tête de couloir avec les vraies pastilles des huit teintes ; à droite, le menu de l’étape PRJ-E008, avec les sept « Changer le type : X » dans le menu même (le type courant est marqué) et les deux « Coller » actifs, puisque PRJ-E009 est coupée. Les deux menus sont montrés ensemble pour la revue : à l’écran, un seul est ouvert à la fois. Le menu d’étape est replacé dans l’écran, au-dessus du pointeur. À l’ouverture, la première entrée active reçoit le focus (« Renommer »).</p>
+      <div class="doc-refs"><span class="ref">§9.5</span><span class="ref">§10</span><span class="ref">Annexe B §2.4</span><span class="ref">AR-39</span></div>
+    </div>
+    <div class="frame">{{include:menus.html}}</div>
+  </section>
+
+  <section class="doc-section" id="notifications" data-capture="06-notifications">
+    <div class="doc-section-head">
+      <span class="doc-num">6</span><h2>Notifications</h2>
+      <p>Coin bas droit, au-dessus de la mini-carte, empilées de la plus ancienne à la plus récente, avec une icône d’état : information (alignement, avec « Annuler »), succès (fiche validée), erreur (modification refusée par la concurrence optimiste, qui reste affichée jusqu’à sa fermeture).</p>
+      <div class="doc-refs"><span class="ref">§9.5</span><span class="ref">Annexe A §2.16</span><span class="ref">Annexe B §2.8</span></div>
+    </div>
+    <div class="frame" data-capture-frame="06b-notifications-1366x768">{{include:notifications.html}}</div>
+  </section>
+</main>
+</body>
+</html>

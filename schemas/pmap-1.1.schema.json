@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pmap-1.1.schema.json",
+  "title": "Fichier .pmap, version 1.1",
+  "description": "Carte de processus en couloirs : couloirs, étapes, flèches, rôles RACI, cartes détaillées, traductions et fiches d'étape facultatives. Le schéma décrit la forme ; docs/format-pmap.md ajoute les règles de cohérence qu'un schéma ne sait pas dire.",
+  "type": "object",
+  "required": ["format", "version", "project", "map"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "topogenia", "description": "Toujours \"topogenia\"." },
+    "version": { "const": "1.1", "description": "Seule la version 1.1 est lue." },
+    "generated_by": { "type": "string", "description": "Logiciel ou personne qui a produit le fichier (informatif)." },
+    "generated_at": { "type": "string", "description": "Date de production, ISO 8601, par exemple 2026-10-25T15:30:00Z (informatif)." },
+    "project": { "$ref": "#/$defs/project" },
+    "map": { "$ref": "#/$defs/map" },
+    "uncertainties": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 500 },
+      "description": "Points à faire vérifier par une personne ; les 50 premiers sont gardés et affichés à l'ouverture."
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^\\S(.*\\S)?$",
+      "description": "Identifiant libre, unique dans tout le fichier (couloirs, étapes et documents confondus)."
+    },
+    "text": { "type": "string", "pattern": "\\S", "not": { "pattern": "<[a-zA-Z!/?]" } },
+    "translations": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Le texte dans les autres langues configurées : { \"en\": \"...\" }."
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "code": { "type": "string", "description": "Code court du projet, 3 à 6 lettres majuscules ; absent ou mal formé, il est demandé à l'ouverture." },
+        "name": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 200 }] },
+        "language": { "type": "string", "description": "Langue des textes du fichier, une langue configurée ; la langue par défaut de l'installation sinon." },
+        "description": { "type": "string", "maxLength": 4000 },
+        "translations": { "$ref": "#/$defs/translations" }
+      }
+    },
+    "map": {
+      "type": "object",
+      "required": ["lanes"],
+      "additionalProperties": false,
+      "properties": {
+        "lanes": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "$ref": "#/$defs/lane" }, "description": "Couloirs de haut en bas." },
+        "steps": { "type": "array", "items": { "$ref": "#/$defs/step" } },
+        "flows": { "type": "array", "items": { "$ref": "#/$defs/flow" } }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 150 }] },
+        "type": { "enum": ["person", "department", "system"] },
+        "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "translations": { "$ref": "#/$defs/translations" }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "lane", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "lane": { "type": "string", "description": "id d'un couloir de la même carte : l'acteur qui réalise l'étape (R du RACI)." },
+        "label": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 150 }] },
+        "type": { "enum": ["task", "decision", "parallel", "inclusive", "wait", "start", "end"] },
+        "column": { "type": "integer", "minimum": 0, "maximum": 10000, "description": "Donnée pour toutes les étapes d'une carte ou pour aucune." },
+        "row": { "type": "integer", "minimum": 0, "maximum": 50 },
+        "automation": { "enum": ["manual", "in_progress", "automated"] },
+        "raci": {
+          "type": "object",
+          "additionalProperties": { "enum": ["A", "S", "C", "I", "R"] },
+          "description": "Rôles des autres couloirs de la carte : { \"id du couloir\": \"A\" }. Interdit sur start, end, parallel et inclusive."
+        },
+        "sub_map": { "$ref": "#/$defs/map", "description": "Carte détaillée de l'étape. Interdite sur start, end, parallel et inclusive." },
+        "translations": { "$ref": "#/$defs/translations" },
+        "sheet": { "$ref": "#/$defs/sheet" }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "required": ["source", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "target": { "type": "string" },
+        "label": { "type": "string", "maxLength": 60 },
+        "translations": { "$ref": "#/$defs/translations" }
+      }
+    },
+    "sheet": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Fiche de l'étape, importée en brouillon ; chaque partie est facultative. Interdite sur start, end, parallel et inclusive.",
+      "properties": {
+        "actor": { "type": "string", "maxLength": 4000 },
+        "purpose": { "type": "string", "maxLength": 4000 },
+        "tools": { "type": "string", "maxLength": 4000 },
+        "frequency": { "enum": ["daily", "weekly", "monthly", "month_end_close", "quarterly", "yearly", "occasional"] },
+        "duration_minutes": { "type": "number", "minimum": 0 },
+        "procedure": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "text": { "type": "string", "maxLength": 1000 },
+              "tool": { "type": "string", "maxLength": 200 },
+              "nature": { "enum": ["extract", "copy_paste", "re_enter", "format", "calculate", "check", "chase", "file", "send", "wait"] }
+            }
+          }
+        },
+        "free_text": { "type": "string", "maxLength": 20000 },
+        "outputs": { "type": "array", "items": { "$ref": "#/$defs/output" } },
+        "inputs": { "type": "array", "items": { "$ref": "#/$defs/input" } },
+        "uses": { "type": "array", "items": { "$ref": "#/$defs/use" } }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 200 }] },
+        "location": { "type": "string", "description": "Adresse web http(s):// ou chemin de fichier." },
+        "share_confirmed": { "type": "boolean" }
+      }
+    },
+    "input": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 200 }] },
+        "location": { "type": "string" },
+        "share_confirmed": { "type": "boolean" },
+        "wait_hours": { "type": "number", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "use": {
+      "type": "object",
+      "required": ["document"],
+      "additionalProperties": false,
+      "properties": {
+        "document": { "type": "string", "description": "id d'une sortie d'une autre étape de la même carte." },
+        "wait_hours": { "type": "number", "minimum": 0, "maximum": 100000 },
+        "percent_complete_accurate": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "pain_point": { "type": "string", "maxLength": 2000 },
+        "lost_hours_per_month": { "type": "number", "minimum": 0, "maximum": 99999.9 }
+      }
+    }
+  }
+}

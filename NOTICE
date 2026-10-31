@@ -1,0 +1,8 @@
+Topogenia
+Copyright 2026 Peter Barcauti
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE),
+except the core of the domain (src/Topogenia.Domain and tests/Topogenia.Domain.Tests),
+which is proprietary and licensed separately (see LICENSE.md in each of these folders).
+
+Third-party components and their licences are listed in THIRD-PARTY-NOTICES.md.

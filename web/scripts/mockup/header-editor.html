@@ -1,0 +1,19 @@
+<!-- header-editor.html -->
+<!-- Application header of the map editor: brand, breadcrumb of the maps (root map = project), File and Members, translations, language, user. -->
+<header class="app-header">
+  <a class="brand" href="#haut" title="{{productName}} 2.0.0">{{include:logo.html}}{{productName}}</a>
+  <span class="head-sep"></span>
+  <nav class="crumbs" aria-label="Fil d’Ariane">
+    <a href="#editeur" aria-current="page">Achats fournisseurs</a><span class="chip-code">PRJ</span>
+  </nav>
+  <div class="head-actions">
+    <button class="btn" type="button" tabindex="-1">{{icon:folder-open:15}}Fichier{{icon:chevron-down:14}}</button>
+    <button class="btn" type="button" tabindex="-1">{{icon:users:15}}Membres</button>
+  </div>
+  <div class="head-right">
+    <button class="btn" type="button" tabindex="-1">{{icon:languages:15}}Traductions</button>
+    <div class="lang-switch" role="group" aria-label="Langue de l’interface"><button aria-pressed="true" tabindex="-1">FR</button><button aria-pressed="false" tabindex="-1">EN</button></div>
+    <span class="head-sep"></span>
+    <span class="user"><span class="avatar">CB</span>Camille Bernard</span>
+  </div>
+</header>

@@ -1,0 +1,153 @@
+/* sheet.css */
+/* The sheet panel of a step as the validated mockup draws it: sticky head, state, saving, completeness, segmented modes, rubrics, sections that fold, procedure, documents, uses and pain points, reading (annex B 4, spec 9.5, AR-89, AR-91). */
+
+.sheet-head { flex-direction: column; align-items: stretch; gap: 0; }
+.sheet-title-row { display: flex; gap: 10px; align-items: flex-start; }
+.sheet-title { flex: 1; margin: 0; font-size: var(--font-size-h2); font-weight: 600; line-height: 1.35; }
+.sheet-title code { font-family: var(--font-mono); font-size: var(--font-size-code); font-weight: 500; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.sheet-meta { margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: var(--font-size-small); color: var(--text-muted); }
+.sheet-loading { padding: 16px 20px; color: var(--text-muted); }
+
+/* B-8.1-35: one class per state, named by its code */
+.state { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; }
+.state::before { content: ''; width: 6px; height: 6px; border-radius: var(--radius-pill); background: currentColor; }
+.state--empty { background: var(--lane-even); color: var(--text-muted); }
+.state--draft { background: var(--warning-soft); color: var(--warning-text); }
+.state--draft::before { background: var(--warning-graphic); }
+.state--validated { background: var(--success-soft); color: var(--success-text); }
+.state--needs_review { background: var(--danger-soft); color: var(--danger); }
+
+/* B-4-42: the saving, « Non enregistré » in red */
+.sheet-saving { margin-left: auto; display: inline-flex; gap: 4px; align-items: center; }
+.sheet-saving--saved .i { color: var(--success); }
+.sheet-saving--failed { color: var(--danger); font-weight: 600; }
+
+.sheet-completeness { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: var(--font-size-small); color: var(--text-muted); }
+.sheet-completeness-bar { flex: 1; height: 6px; border-radius: var(--radius-pill); background: var(--lane-even); border: 1px solid var(--lane-separator); overflow: hidden; }
+.sheet-completeness-bar span { display: block; height: 100%; border-radius: inherit; background: var(--warning-graphic); transition: width var(--duration-base) ease; }
+.sheet-completeness-bar--validated span { background: var(--success); }
+.sheet-completeness-bar--needs_review span { background: var(--danger); }
+.sheet-completeness b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* B-4-12: the clarification asked by the facilitator, in the warning colour */
+.sheet-clarification { margin-top: 12px; padding: 8px 10px; border-radius: var(--radius-ui); background: var(--warning-soft); border-left: 3px solid var(--warning);
+  font-size: 13px; color: var(--text); }
+.sheet-clarification p { margin: 4px 0 0; white-space: pre-wrap; }
+/* the facilitator rewrites or removes the question in place (spec 3.0 section 16) */
+.sheet-clarification-head { display: flex; align-items: baseline; gap: 8px; }
+.sheet-clarification-head strong { flex: 1; }
+.sheet-clarification-actions { display: flex; gap: 2px; }
+.sheet-clarification-action { padding: 1px 6px; border: 0; border-radius: var(--radius-small); background: none; color: var(--warning-text); font: inherit;
+  font-size: var(--font-size-small); font-weight: 600; cursor: pointer; }
+.sheet-clarification-action:hover { background: var(--hover); text-decoration: underline; }
+.sheet-clarification-action:disabled { opacity: 0.5; cursor: default; }
+.sheet-clarification-form { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+
+.sheet-body .field-label small { font-weight: 400; color: var(--text-muted); }
+.sheet-responsible-read { margin: 0; font-size: 13px; color: var(--text-muted); }
+.sheet-divider { height: 1px; margin: 0 -20px; background: var(--border); }
+.sheet-form { display: flex; flex-direction: column; gap: 18px; }
+
+/* B-4-17, AR-59: the segmented choice of the mode, the chosen one outlined in --accent */
+.seg { display: flex; padding: 3px; background: var(--lane-even); border-radius: var(--radius-ui); border: 1px solid var(--border); }
+.seg button { flex: 1; height: 28px; display: inline-flex; gap: 6px; align-items: center; justify-content: center; border: 1px solid transparent;
+  border-radius: var(--radius-small); background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--text-muted); cursor: pointer; }
+.seg [aria-checked="true"] { background: var(--surface); color: var(--text); border-color: var(--accent); box-shadow: var(--shadow-step); }
+
+/* AR-91: the sections that fold, their summary kept in their head */
+.sheet-section { display: flex; flex-direction: column; gap: 8px; }
+.sheet-section-head { margin: 0; }
+.sheet-section-head button { width: 100%; display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 12px;
+  font-weight: 600; color: var(--text); cursor: pointer; text-align: left; }
+.sheet-section-head small { font-weight: 400; color: var(--text-muted); }
+.sheet-section-head .count { margin-left: auto; font-weight: 500; font-size: 11px; color: var(--text-muted); }
+.sheet-section-body { display: flex; flex-direction: column; gap: 8px; }
+
+.input-with-suffix { display: flex; align-items: center; gap: 6px; }
+.input-with-suffix .field-control { flex: 1; min-width: 0; }
+.input-suffix { color: var(--text-muted); font-size: var(--font-size-small); }
+.sheet-tools { display: flex; flex-direction: column; gap: 6px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.suggestions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.suggest { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px 0 6px; border-radius: var(--radius-pill); border: 1px dashed var(--accent-ring);
+  background: var(--surface); color: var(--accent-strong); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+.resume { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px 0 8px; border: 0; border-radius: var(--radius-pill);
+  background: var(--lane-6-pastel); color: var(--lane-6-ink); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+.add-line { align-self: flex-start; display: inline-flex; gap: 6px; align-items: center; height: 28px; padding: 0 8px; border: 0; border-radius: var(--radius-ui);
+  background: none; color: var(--accent-strong); font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer; }
+.add-line:hover { background: var(--hover); }
+
+/* B-4-29 to B-4-38, AR-89: the procedure, its handle, its buttons shown on hover and focus, the checks in green */
+.procedure { display: flex; flex-direction: column; gap: 6px; }
+.procedure-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.procedure-line { display: grid; grid-template-columns: 14px 22px 1fr auto; gap: 4px 6px; align-items: center; padding: 6px 6px 6px 4px; border: 1px solid var(--border);
+  border-radius: var(--radius-ui); background: var(--surface); }
+.procedure-line.is-target { border-color: var(--accent); box-shadow: var(--focus-ring); }
+.procedure-handle { display: grid; place-items: center; color: var(--text-muted); cursor: grab; }
+.procedure-number { width: 22px; height: 22px; display: grid; place-items: center; border-radius: var(--radius-small); background: var(--lane-even); font-size: 11px;
+  font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.procedure-text, .procedure-tool, .procedure-nature { min-width: 0; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: var(--radius-small); }
+.procedure-text { padding: 4px 8px; font-size: 13px; }
+.procedure-buttons { display: flex; opacity: 0; transition: opacity var(--duration-fast) ease; }
+.procedure-buttons .icon-button { width: 24px; height: 24px; }
+.procedure-line:hover .procedure-buttons, .procedure-line:focus-within .procedure-buttons { opacity: 1; }
+.procedure-meta { grid-column: 3 / -1; display: flex; gap: 6px; }
+.procedure-tool, .procedure-nature { height: 24px; padding: 0 6px; font-size: 11.5px; color: var(--text-muted); }
+.procedure-tool { flex: 1; }
+.procedure-line.is-check { border-color: var(--success); border-left: 3px solid var(--success); }
+.procedure-line.is-check .procedure-number { background: var(--success-text); color: var(--surface); }
+.procedure-line.is-check .procedure-nature { color: var(--success-text); border-color: var(--success); background: var(--success-soft); }
+
+/* B-4-62 to B-4-81: the documents, the inputs from elsewhere in their colour, the use and its pain point */
+.documents { display: flex; flex-direction: column; gap: 8px; }
+.documents-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.documents-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.entry, .output { display: flex; flex-direction: column; gap: 6px; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-ui); font-size: 13px; }
+.entry--used { border-color: var(--accent-ring); }
+.entry--other { background: var(--other-input-bg); border-color: var(--other-input-bg); }
+.entry-row { display: flex; align-items: center; gap: 8px; }
+.entry-check { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.entry-check input { accent-color: var(--accent); }
+.document-name { flex: 1; min-width: 0; font-weight: 500; overflow-wrap: anywhere; }
+a.document-name { color: var(--accent-strong); }
+.from { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.entry--other .from { color: var(--other-input-border); }
+.entry-details { font-size: var(--font-size-small); color: var(--text-muted); overflow-wrap: anywhere; }
+.link-btns { display: flex; gap: 2px; }
+.document-pain { margin: 0; font-size: var(--font-size-small); color: var(--danger); }
+.document-pain .i { display: inline-block; margin-right: 4px; vertical-align: -2px; }
+.usage { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-left: 24px; }
+.usage .field-label { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+.usage .field-control { font-variant-numeric: tabular-nums; }
+.irritant { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px; padding: 8px 10px 10px; border-radius: var(--radius-ui); background: var(--danger-soft);
+  border-left: 3px solid var(--danger-muted); }
+.irritant .field-label { display: inline-flex; gap: 4px; align-items: center; color: var(--danger); font-weight: 600; }
+/* --text-muted is 4.35:1 on --danger-soft: the help takes its darker shade (NF08) */
+.irritant .field-hint { color: var(--text-muted-on-danger-soft); }
+.lost { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text); }
+.lost .field-control { width: 80px; }
+.document-form { margin: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--border); border-radius: var(--radius-ui); }
+.document-form legend { padding: 0 4px; font-size: 12px; font-weight: 600; }
+.sheet-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.table-scroll { max-height: 60vh; overflow: auto; }
+.documents-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.documents-table th { background: var(--table-header-bg); text-align: left; font-weight: 600; }
+.documents-table th, .documents-table td { padding: 6px 10px; border: 1px solid var(--border); vertical-align: top; }
+.documents-table .code { font-family: var(--font-mono); font-size: var(--font-size-code); }
+.documents-table .cell-check { text-align: center; }
+.sheet-empty { margin: 0; color: var(--text-muted); }
+
+.sheet-foot { justify-content: space-between; align-items: center; }
+.sheet-foot small { flex: 1; font-size: var(--font-size-small); color: var(--text-muted); }
+.sheet-ask { align-self: flex-start; }
+.sheet-ask-form { display: flex; flex-direction: column; gap: 8px; }
+
+/* B-4-58 to B-4-61: the reading */
+.sheet-read-fields { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.sheet-read-fields dt { font-size: 12px; font-weight: 600; }
+.sheet-read-fields dd { margin: 2px 0 0; white-space: pre-wrap; }
+.procedure-read { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 4px; }
+.procedure-read .is-check { color: var(--success-text); }
+.sheet-read-free strong { font-size: 12px; }
+.sheet-read-free p { margin: 4px 0 0; white-space: pre-wrap; }

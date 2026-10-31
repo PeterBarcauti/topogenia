@@ -1,0 +1,82 @@
+{
+  "format": "topogenia",
+  "version": "1.2",
+  "generated_by": "Exemple de la documentation",
+  "project": {
+    "code": "VTE",
+    "name": "Clôture mensuelle des ventes",
+    "language": "fr",
+    "description": "Du chargement des ventes de l'ERP à la validation du reporting par la direction.",
+    "translations": { "en": "Monthly sales closing" }
+  },
+  "map": {
+    "lanes": [
+      { "id": "cdg", "name": "Contrôle de gestion Nord", "type": "department", "translations": { "en": "Controlling North" } },
+      { "id": "erp", "name": "ERP", "type": "system" },
+      { "id": "sud", "name": "Contrôle de gestion Sud", "type": "department" },
+      { "id": "dir", "name": "Direction", "type": "person" }
+    ],
+    "steps": [
+      { "id": "debut", "lane": "cdg", "label": "Début de clôture", "type": "start", "column": 0 },
+      { "id": "extraire", "lane": "erp", "label": "Extraire les ventes du mois", "column": 1, "automation": "automated" },
+      {
+        "id": "tcd", "lane": "cdg", "label": "Construire le tableau croisé", "column": 2,
+        "raci": { "dir": "A", "sud": "I" },
+        "sub_map": {
+          "lanes": [
+            { "id": "tcd-cdg", "name": "Contrôle de gestion Nord", "type": "department" }
+          ],
+          "steps": [
+            { "id": "tcd-1", "lane": "tcd-cdg", "label": "Importer l'extraction dans le tableur" },
+            { "id": "tcd-2", "lane": "tcd-cdg", "label": "Mettre en forme le tableau" },
+            { "id": "tcd-3", "lane": "tcd-cdg", "label": "Comparer au mois précédent" }
+          ],
+          "flows": [
+            { "source": "tcd-1", "target": "tcd-2" },
+            { "source": "tcd-2", "target": "tcd-3" }
+          ]
+        },
+        "translations": { "en": "Build the pivot table" },
+        "sheet": {
+          "purpose": "Donner à la direction les ventes du mois par région.",
+          "tools": "Tableur",
+          "frequency": "month_end_close",
+          "duration_minutes": 90,
+          "procedure": [
+            { "text": "Ouvrir l'extraction du mois", "tool": "Tableur", "nature": "extract" },
+            { "text": "Recopier les totaux par région", "nature": "copy_paste" },
+            { "text": "Vérifier le total général", "nature": "check" }
+          ],
+          "outputs": [
+            { "id": "tableau", "name": "Tableau croisé des ventes", "location": "https://intranet.example/ventes/tableau.xlsx" }
+          ]
+        }
+      },
+      {
+        "id": "complet", "lane": "sud", "label": "Compléter le fichier du mois", "column": 3, "raci": { "cdg": "C" },
+        "sheet": {
+          "uses": [
+            { "document": "tableau", "wait_hours": 24, "percent_complete_accurate": 80, "pain_point": "Le tableau arrive sans les ventes de la veille.", "lost_hours_per_month": 3 }
+          ]
+        }
+      },
+      { "id": "ecart", "lane": "cdg", "label": "Écart supérieur à 5 % ?", "type": "decision", "column": 4 },
+      { "id": "analyser", "lane": "cdg", "label": "Analyser les écarts", "column": 5 },
+      { "id": "valider", "lane": "dir", "label": "Valider le reporting", "column": 6, "raci": { "cdg": "I", "sud": "I" } },
+      { "id": "fin", "lane": "dir", "label": "Reporting publié", "type": "end", "column": 7 }
+    ],
+    "flows": [
+      { "source": "debut", "target": "extraire" },
+      { "source": "extraire", "target": "tcd" },
+      { "source": "tcd", "target": "complet" },
+      { "source": "complet", "target": "ecart" },
+      { "source": "ecart", "target": "analyser", "label": "oui", "translations": { "en": "yes" } },
+      { "source": "ecart", "target": "valider", "label": "non", "translations": { "en": "no" } },
+      { "source": "analyser", "target": "valider" },
+      { "source": "valider", "target": "fin" }
+    ]
+  },
+  "uncertainties": [
+    "Le seuil de 5 % est à confirmer avec la direction."
+  ]
+}

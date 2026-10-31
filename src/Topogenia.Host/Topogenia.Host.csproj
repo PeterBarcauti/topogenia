@@ -1,0 +1,40 @@
+<!-- Topogenia.Host.csproj -->
+<!-- Host: HTTP endpoints, authentication per mode, OpenAPI, security headers, static files, command line -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>$(ProductName)</AssemblyName>
+    <RootNamespace>Topogenia.Host</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Topogenia.Application/Topogenia.Application.csproj" />
+    <ProjectReference Include="../Topogenia.Persistence.SqlServer/Topogenia.Persistence.SqlServer.csproj" />
+    <ProjectReference Include="../Topogenia.Persistence.Sqlite/Topogenia.Persistence.Sqlite.csproj" />
+    <ProjectReference Include="../Topogenia.Interchange/Topogenia.Interchange.csproj" />
+    <ProjectReference Include="../Topogenia.Assistant/Topogenia.Assistant.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- WithCulture false: messages.fr.json is not a satellite resource of the culture fr -->
+    <EmbeddedResource Include="Errors/messages.*.json" LogicalName="Topogenia.Host.Errors.%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="Startup/messages.*.json" LogicalName="Topogenia.Host.Startup.%(Filename)%(Extension)" WithCulture="false" />
+    <!-- The sample project of the first launch of the desktop mode (spec 6.1): the package of samples/ itself, one source -->
+    <EmbeddedResource Include="../../samples/conges.$(ProductName.ToLowerInvariant())" LogicalName="Samples/sample-project" WithCulture="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Read from the assembly alone: never published beside it -->
+    <Content Update="Errors/messages.*.json;Startup/messages.*.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" />
+  </ItemGroup>
+  <!-- The OpenAPI generator reads the documentation of the project references only: in the public repository, the core is
+       a package and brings the documentation of its public API (ADR 074), read the same way -->
+  <Target Name="CoreDocumentationForOpenApi" AfterTargets="ResolveReferences" Condition="'$(UseCorePackage)' == 'true'">
+    <ItemGroup>
+      <AdditionalFiles Include="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).xml')"
+        Condition="'%(ReferencePath.Filename)' == 'Topogenia.Domain' And Exists('%(ReferencePath.RootDir)%(ReferencePath.Directory)%(ReferencePath.Filename).xml')"
+        KeepMetadata="Identity" />
+    </ItemGroup>
+  </Target>
+</Project>

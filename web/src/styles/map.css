@@ -1,0 +1,411 @@
+/* map.css */
+/* Styles of the editor of the map after the validated mockup: ribbon, banners, canvas, lanes, steps, flows, frame of a dissolution, RACI badges, lane headers, controls, mini map, the states and gestures of the edition (spec 9.3 to 9.5). */
+
+/* screen and banners (annex B 2.1) */
+.map-screen { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+.map-banner { margin: 0; padding: 8px 16px; font-size: 13px; line-height: 18px; color: var(--text-muted); background: var(--surface); border-bottom: 1px solid var(--border); }
+.map-banner--warning { color: var(--warning-text); background: var(--warning-soft); }
+.map-banner--link { color: var(--accent-strong); background: var(--accent-soft); }
+/* a map shown in another language than its own: the version of origin locked (ADR 083) */
+.map-banner--translation { display: flex; align-items: center; gap: 10px; color: var(--warning-text); background: var(--warning-soft); }
+.map-banner--translation p { flex: 1; margin: 0; }
+.translation-lock { display: inline-flex; }
+.translation-missing { font-weight: 600; }
+.translation-actions { display: flex; gap: 6px; }
+/* a text not written in the language shown: its original, to translate */
+.untranslated { color: var(--text-muted); font-style: italic; text-decoration: underline dotted var(--warning); text-underline-offset: 3px; }
+
+/* ribbon (spec 9.5, AR-90): the bar of the map on one line, its fold button at the end; folded, a thin line with the button */
+.map-screen > .toolbar { position: relative; z-index: 6; flex: none; }
+.ribbon-fold { margin-left: auto; align-self: center; width: 28px; height: 28px; display: grid; place-items: center; padding: 0; border: 1px solid transparent;
+  border-radius: var(--radius-ui); background: none; color: var(--text-muted); }
+.ribbon-fold:hover { background: var(--hover); color: var(--text); }
+.ribbon-folded { flex: none; display: flex; justify-content: flex-end; padding: 0 12px; height: var(--ribbon-folded-height); align-items: center;
+  background: var(--surface); border-bottom: 1px solid var(--border); }
+.ribbon-folded .ribbon-fold { width: 24px; height: 18px; }
+
+/* the workspace: the canvas and, docked on its right, a side panel (spec 9.5, validated mockup) */
+.map-workspace { position: relative; flex: 1; min-height: 0; display: flex; }
+
+/* canvas: dot grid every 24 px (AR-41), React Flow drawn with the tokens of the charter */
+.map-canvas { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; background: var(--bg-app); }
+.map-canvas .react-flow { font-family: var(--font-sans); }
+.map-canvas .react-flow__background { background-color: var(--bg-app); }
+.map-canvas .react-flow__selection { background: var(--accent-soft); border: 1px dashed var(--accent); }
+/* the tools (B-2.1-10): the Hand moves the view, Selection draws a rectangle; the link mode aims at steps */
+.map-canvas.tool-hand .react-flow__pane { cursor: grab; }
+.map-canvas.tool-hand .react-flow__pane.dragging { cursor: grabbing; }
+.map-canvas.tool-select .react-flow__pane { cursor: default; }
+/* the link mode (AR-153): the spool of thread on the whole map, its active point at the end of the thread (2, 2); once the start is
+   chosen, the thread unwound; the cross where an image cannot be read */
+.map-canvas.is-linking .react-flow__pane, .map-canvas.is-linking .react-flow__node-step, .map-canvas.is-linking .react-flow__node-step *,
+.map-canvas.is-linking .react-flow__handle.step-handle, .map-canvas.is-linking .react-flow__edge { cursor: url('./cursors/link-spool.svg') 2 2, crosshair; }
+.map-canvas.is-linking.has-link-source .react-flow__pane, .map-canvas.is-linking.has-link-source .react-flow__node-step,
+.map-canvas.is-linking.has-link-source .react-flow__node-step *, .map-canvas.is-linking.has-link-source .react-flow__handle.step-handle,
+.map-canvas.is-linking.has-link-source .react-flow__edge { cursor: url('./cursors/link-thread.svg') 2 2, crosshair; }
+.map-empty { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 4; margin: 0; max-width: 420px; padding: 14px 18px; text-align: center;
+  font-size: 13px; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-large); pointer-events: none; }
+.map-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* lane bodies: white and --lane-even in alternation, a 1 px separator (spec 9.3); the margin of the exports under the headers (B-2.12-25) */
+.lane-body { width: 100%; height: 100%; border-bottom: 1px solid var(--lane-separator); }
+.lane-body--odd { background: var(--lane-odd); }
+.lane-body--even { background: var(--lane-even); }
+/* on the page the fixed headers stand there (the view starts 8 px right of the margin): the margin is drawn for the exports only */
+.lane-body-margin { width: var(--lane-header-width); height: 100%; padding: 12px 16px 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 5px;
+  background: var(--pastel); color: var(--ink); border-right: 4px solid var(--ink); visibility: hidden; }
+.lane-body-name { font-size: var(--font-size-lane-name); font-weight: 600; line-height: 17px; }
+.lane-body-type { font-size: var(--font-size-small); }
+
+/* flows (annex B 3.4): stroke of 1.6 in --edge, the chosen one in the colour of the selection, closed arrow, labels */
+.map-canvas .react-flow__edge-path { fill: none; stroke: var(--edge); stroke-width: var(--edge-stroke); }
+.map-canvas .react-flow__edge.selected .react-flow__edge-path { stroke: var(--accent); }
+.map-arrow polyline { fill: var(--edge); stroke: var(--edge); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+.edge-label {
+  position: absolute; left: 0; top: 0; pointer-events: all; display: flex; align-items: center; justify-content: center; gap: var(--edge-label-documents-gap);
+  padding: var(--edge-label-padding); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-small);
+  font-size: var(--edge-label-font-size); font-weight: 500; line-height: var(--edge-label-line-height); color: var(--text-muted); text-align: center;
+}
+.edge-label-text { min-width: 0; overflow-wrap: anywhere; }
+.edge-documents { display: inline-flex; align-items: center; gap: var(--edge-label-icon-gap); flex: none; font-variant-numeric: tabular-nums; }
+
+/* steps (spec 9.4): white card, 1 px border, radius 10, left stripe of 3 px in the ink of the lane */
+.react-flow__node-step { animation: step-in var(--duration-base) ease-out; }
+@keyframes step-in { from { opacity: 0; } to { opacity: 1; } }
+.step {
+  position: relative; width: 100%; height: 100%;
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ink); border-radius: var(--radius-step); box-shadow: var(--shadow-step);
+  padding: 2px 10px 2px 11px; display: flex; flex-direction: column; justify-content: safe center;
+  transition: box-shadow var(--duration-fast);
+}
+.react-flow__node:hover .step { box-shadow: var(--shadow-raised); }
+.step-code { font-family: var(--font-mono); font-size: var(--font-size-code); line-height: 12px; flex: none; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.step-label { font-size: var(--font-size-step); font-weight: 500; line-height: 15px; color: var(--text); flex: none; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden; letter-spacing: -.003em; }
+/* annex B 2.10: with the pictograms always shown, the label moves up by 12 px so as not to run under them */
+.map-canvas:not(.pictos-on-hover) .step.has-pictos { padding-bottom: calc(2px + var(--pictos-rise)); }
+.step.is-selected { box-shadow: var(--shadow-raised); outline: 2px solid var(--accent); outline-offset: 1px; }
+.step--wait { border-style: dashed; border-color: var(--edge); border-left-style: solid; border-left-color: var(--ink); }
+.step--start, .step--end { border-radius: var(--radius-pill); align-items: center; text-align: center; padding: 2px 18px 2px 16px; }
+/* the double border carries the type of the step: --edge, as the dashes of the wait step (AR-59) */
+.step--end { border-top: 3px double var(--edge); border-right: 3px double var(--edge); border-bottom: 3px double var(--edge); padding: 0 16px; }
+.step--end .step-label { line-height: 14px; }
+
+/* pictograms, gauge, warning (annex B 2.10, spec 9.4) */
+.step-pictos { position: absolute; right: 9px; bottom: 5px; display: flex; gap: 8px; font-size: var(--font-size-micro); line-height: 10px; font-weight: 500; color: var(--text-muted);
+  font-variant-numeric: tabular-nums; transition: opacity var(--duration-fast); }
+.step-pictos span { display: inline-flex; align-items: center; gap: 3px; }
+.step-pictos .picto-irritant { color: var(--danger-muted); }
+.pictos-on-hover .step-pictos { opacity: 0; }
+.pictos-on-hover .react-flow__node:hover .step-pictos { opacity: 1; }
+.step-gauge { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; overflow: hidden; border-radius: 0 0 calc(var(--radius-step) - 1px) calc(var(--radius-step) - 3px); }
+.step-gauge span { display: block; height: 100%; transition: width var(--duration-base); }
+.gauge--draft { background: var(--warning-graphic); }
+.gauge--validated { background: var(--success); }
+.gauge--needs_review { background: var(--danger); }
+.step-warning { position: absolute; left: -10px; top: -9px; width: 17px; height: 17px; border-radius: var(--radius-pill); background: var(--warning-graphic); color: var(--text);
+  font-size: 11px; font-weight: 700; line-height: 17px; text-align: center; outline: 2px solid var(--surface); }
+/* a gateway writes its code above its box, where the corner of a card is: the warning goes on the middle of the upper left
+   side of the diamond, (42.5, 16) of the box of 170 x 64 */
+.step--gateway .step-warning { left: 34px; top: 7.5px; }
+
+/* detailed step: a second card 3 px behind (stack), the « detailed » badge, the frequency under the step (spec 9.4) */
+/* placed from the padding box of the card (left stripe 3 px, border 1 px): its outer box 3 px right and down of the card */
+.step-stack { position: absolute; left: 0; top: 2px; width: calc(100% + 4px); height: calc(100% + 2px); z-index: -1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-step); box-shadow: var(--shadow-step); }
+.step-detailed { position: absolute; top: -9px; right: 10px; height: 18px; padding: 0 7px 0 5px; display: inline-flex; gap: 4px; align-items: center; border-radius: var(--radius-pill);
+  background: var(--frame-label-bg); color: var(--accent-strong); font-size: 10.5px; font-weight: 600; outline: 2px solid var(--surface); }
+.step-frequency { position: absolute; top: calc(100% + var(--frequency-top)); left: 50%; transform: translateX(-50%); height: var(--frequency-height); padding: 0 8px 0 6px; white-space: nowrap; display: inline-flex;
+  gap: 4px; align-items: center; border-radius: var(--radius-pill); background: var(--lane-6-pastel); color: var(--lane-6-ink); font-size: 10.5px; font-weight: 600; }
+
+/* the frame of a dissolution (annex B 2.9, AR-26, validated mockup): dashes of --frame round its steps, its label in the top right
+   corner; the pointer goes through the frame but its label (B-2.3-08) */
+.react-flow__node-frame { pointer-events: none; }
+.dissolution-frame { position: relative; width: 100%; height: 100%; border: 1.5px dashed var(--frame); border-radius: var(--radius-large); }
+.dissolution-label {
+  position: absolute; top: -12px; right: 12px; height: 22px; display: inline-flex; gap: 5px; align-items: center; padding: 0 9px 0 7px; white-space: nowrap;
+  border-radius: var(--radius-pill); border: 1px solid var(--frame); background: var(--frame-label-bg); color: var(--accent-strong); font: inherit; font-size: 11.5px;
+  font-weight: 600; pointer-events: auto; cursor: pointer; transition: box-shadow var(--duration-fast);
+}
+.dissolution-label:hover { box-shadow: var(--shadow-raised); }
+
+/* the RACI layer (annex B 2.11): badges « A lane » under the step, below its gateway label or its frequency; « A ? » in the warning colours */
+.raci-badges { position: absolute; top: calc(100% + var(--raci-top)); left: -14px; right: -14px; display: flex; flex-wrap: wrap; justify-content: center; gap: 3px;
+  pointer-events: none; z-index: 1; }
+.raci-badge { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; border: 1px solid var(--border); border-radius: var(--radius-small);
+  background: var(--surface); color: var(--text); font-size: var(--font-size-micro); line-height: 15px; }
+.raci-badge b { font-weight: 700; }
+.raci-badge--A { background: var(--raci-a-bg); }
+.raci-badge--S { background: var(--raci-s-bg); }
+.raci-badge--C { background: var(--raci-c-bg); }
+.raci-badge--I { background: var(--raci-i-bg); }
+.raci-badge--missing { background: var(--warning-soft); border-color: var(--warning-graphic); color: var(--warning-text); font-weight: 700; }
+
+/* gateways (spec 9.4, annex B 3.2, AR-57): white diamond, contour of 1.5 px in the ink, marker centred, label under the shape, code above left */
+.step--gateway { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; display: block; }
+.react-flow__node:hover .step--gateway { box-shadow: none; }
+.gateway-shape { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.gateway-shape polygon { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; stroke-linejoin: round; }
+.step--gateway.is-selected { outline: 0; box-shadow: none; }
+.step--gateway.is-selected .gateway-shape polygon { stroke: var(--accent); stroke-width: 2; }
+/* cut, waiting for its paste (B-2.7-09, B-3.2-16), and covered by the frame of a dissolution (B-2.9-19, B-3.2-17): AR-53 and the validated
+   mockup, the card alone is dimmed to --step-cut-opacity by a layer under the text, the text stays at full opacity in --text-muted;
+   the dashes mark the cut. A detailed step keeps its stack under that layer. */
+.step.is-cut, .step.is-outside { isolation: isolate; background: var(--lane-bg); border-color: transparent; box-shadow: none; }
+.step.is-cut::before, .step.is-outside::before {
+  content: ''; position: absolute; inset: -1px -1px -1px -3px; z-index: -1; opacity: var(--step-cut-opacity); pointer-events: none;
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ink); border-radius: inherit; box-shadow: var(--shadow-step);
+}
+.step.is-cut::before { border-style: dashed; border-color: var(--edge); border-left: 3px dashed var(--ink); }
+.step.is-cut .step-label, .step.is-outside .step-label { color: var(--text-muted); }
+.step.is-cut .step-stack, .step.is-outside .step-stack { z-index: -2; opacity: var(--step-cut-opacity); }
+.step--gateway.is-cut, .step--gateway.is-outside { background: none; }
+.step--gateway.is-cut::before, .step--gateway.is-outside::before { content: none; }
+.step--gateway.is-cut .gateway-shape, .step--gateway.is-outside .gateway-shape, .step--gateway.is-cut .gateway-marker, .step--gateway.is-outside .gateway-marker { opacity: var(--step-cut-opacity); }
+.step--gateway.is-cut .gateway-shape polygon { stroke-dasharray: 5 3; }
+/* the source of the link mode: a ring of its token (B-3.2-15, AR-26) */
+.step.is-link-source { outline: 2px solid var(--link-source-ring); outline-offset: 2px; }
+.step--gateway.is-link-source { outline: 0; }
+.step--gateway.is-link-source .gateway-shape polygon { stroke: var(--link-source-ring); stroke-width: 2; }
+.step--gateway .step-code { position: absolute; left: 0; bottom: calc(100% + 1px); }
+.gateway-marker { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--ink); line-height: 0; }
+.step--gateway .step-label {
+  position: absolute; top: calc(100% + var(--gateway-label-top)); left: 50%; transform: translateX(-50%); width: max-content; max-width: var(--gateway-label-max-width);
+  padding: 0 var(--gateway-label-padding-x); background: var(--lane-bg); text-align: center; line-height: var(--gateway-label-line-height); -webkit-line-clamp: 2; overflow-wrap: anywhere;
+}
+/* AR-58, AR-128: when a flow leaves or reaches the bottom point, what hangs under the step goes 10 px aside of the vertical axis,
+   right of it, or left of it when the flows run to the right under the step */
+.step--gateway.is-under-right .step-label { left: calc(50% + var(--under-shift)); transform: none; text-align: left; padding: 0 var(--gateway-label-padding-x) 0 0; }
+.step--gateway.is-under-left .step-label { left: auto; right: calc(50% + var(--under-shift)); transform: none; text-align: right; padding: 0 0 0 var(--gateway-label-padding-x); }
+.step.is-under-right .step-frequency { left: calc(50% + var(--under-shift)); transform: none; }
+.step.is-under-left .step-frequency { left: auto; right: calc(50% + var(--under-shift)); transform: none; }
+.step.is-under-right .raci-badges { left: calc(50% + var(--under-shift)); justify-content: flex-start; }
+.step.is-under-left .raci-badges { right: calc(50% + var(--under-shift)); justify-content: flex-end; }
+/* annex B 2.10: the pictograms of a gateway are centred at the bottom */
+/* on a white ground: the narrow bottom of the diamond would leave the muted red of a pain point on the grey of an even lane */
+.step--gateway .step-pictos { right: auto; left: 50%; bottom: 8px; transform: translateX(-50%); padding: 1px 4px; background: var(--surface); border-radius: var(--radius-small); }
+.step--parallel .step-label, .step--inclusive .step-label { color: var(--text-muted); }
+
+/* handles (annex B 3.3): dots of 10 px bordered with white, shown on hover or when the step is chosen */
+.react-flow__handle.step-handle { width: var(--handle-size); height: var(--handle-size); background-color: var(--accent); border: 2px solid var(--surface); border-radius: var(--radius-pill); opacity: 0;
+  transition: opacity var(--duration-fast); }
+.react-flow__node:hover .step-handle, .step.is-selected .step-handle { opacity: 1; }
+.react-flow__handle.step-handle.connectable { cursor: crosshair; }
+
+/* the name typed in place (B-2.5-28 to B-2.5-32) */
+.label-input { width: 100%; min-height: 34px; resize: none; padding: 3px 5px; font: inherit; font-size: var(--font-size-step); line-height: 15px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--accent); border-radius: var(--radius-small); outline: 0; box-shadow: var(--focus-ring); }
+.step--gateway .label-input { position: absolute; top: calc(100% + var(--gateway-label-top)); left: 50%; width: var(--gateway-label-max-width); transform: translateX(-50%); }
+
+/* the quick add (B-2.3-41 to B-2.3-45): four round « + » of 20 px shown on hover, held by an invisible bridge */
+/* The bridge exists only while the step is hovered (1.x): else its 30 px round each step would take the pointer from the flows and the rectangle of selection */
+.quick-add-bridge { position: absolute; inset: -30px; z-index: -2; display: none; }
+.react-flow__node:hover .quick-add-bridge { display: block; }
+.quick-add { position: absolute; width: var(--quick-add-size); height: var(--quick-add-size); padding: 0; display: grid; place-items: center; border-radius: var(--radius-pill);
+  border: 1px solid var(--accent); background: var(--surface); color: var(--accent-strong); opacity: 0; pointer-events: none; transition: opacity var(--duration-fast); z-index: 2; }
+/* a « + » reached by the keyboard shows while it holds the focus, the others of its step staying hidden (NF08, S-NF-11) */
+.react-flow__node:hover .quick-add, .quick-add:focus-visible { opacity: 1; pointer-events: auto; }
+.quick-add:hover { background: var(--accent); color: var(--surface); }
+.quick-add--after { right: calc(var(--quick-add-size) * -1.4); top: calc(50% - var(--quick-add-size) / 2); }
+.quick-add--before { left: calc(var(--quick-add-size) * -1.4); top: calc(50% - var(--quick-add-size) / 2); }
+.quick-add--below { bottom: calc(var(--quick-add-size) * -1.4); left: calc(50% - var(--quick-add-size) / 2); }
+.quick-add--above { top: calc(var(--quick-add-size) * -1.4); left: calc(50% - var(--quick-add-size) / 2); }
+
+/* lane headers in the fixed margin of 184 px (spec 9.3, AR-19, AR-47) */
+.lane-heads { position: absolute; left: 0; top: 0; bottom: 0; width: var(--lane-header-width); z-index: 5; pointer-events: none; }
+.lane-head {
+  position: absolute; left: 0; width: var(--lane-header-width); overflow: hidden; color: var(--ink); background: var(--pastel); pointer-events: auto;
+  border-right: 4px solid var(--ink); border-bottom: 1px solid var(--surface);
+  padding: 12px 16px 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 5px; transition: box-shadow var(--duration-fast);
+}
+.lane-head:hover { box-shadow: var(--shadow-raised); z-index: 1; }
+/* a header dragged carries a shadow, the lane aimed is underlined in dashes (B-2.12-17, B-2.12-18) */
+.lane-head.is-dragging { box-shadow: var(--shadow-raised); z-index: 2; cursor: grabbing; }
+.lane-head.is-drop-target { border-bottom: 2px dashed var(--ink); }
+.lane-head .label-input { font-size: var(--font-size-lane-name); font-weight: 600; }
+.lane-more { position: absolute; top: 6px; right: 8px; width: 24px; height: 24px; padding: 0; display: grid; place-items: center; border: 0; border-radius: var(--radius-small);
+  background: none; color: var(--ink); opacity: 0; transition: opacity var(--duration-fast); }
+.lane-head:hover .lane-more, .lane-more:focus-visible { opacity: 1; }
+.lane-more:hover { background: var(--surface); }
+/* « + » between the lanes, discreet round dots shown on hover of the headers (B-2.12-20) */
+.lane-add { position: absolute; left: calc(var(--lane-header-width) / 2 - var(--quick-add-size) / 2); width: var(--quick-add-size); height: var(--quick-add-size);
+  margin-top: calc(var(--quick-add-size) / -2); padding: 0; display: grid; place-items: center; border-radius: var(--radius-pill); border: 1px solid var(--accent);
+  background: var(--surface); color: var(--accent-strong); pointer-events: auto; opacity: 0; transition: opacity var(--duration-fast); z-index: 3; }
+.lane-heads:hover .lane-add, .lane-add:focus-visible { opacity: 1; }
+.lane-add:hover { background: var(--accent); color: var(--surface); }
+
+/* the field of the label of a flow (B-2.3-33) */
+.floating-field { position: fixed; z-index: 25; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-ui);
+  box-shadow: var(--shadow-menu); }
+.floating-field label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); }
+.floating-field input { width: 240px; font: inherit; font-size: 13px; color: var(--text); padding: 5px 8px; border: 1px solid var(--field-border); border-radius: var(--radius-small); }
+.lane-head-name { display: flex; gap: 8px; align-items: flex-start; font-size: var(--font-size-lane-name); font-weight: 600; line-height: 17px; }
+.lane-head-name span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lane-head-name .i { flex: none; }
+.lane-head-code { font-size: var(--font-size-lane-code); line-height: 14px; padding-left: 24px; }
+
+/* the command bar, fixed at 18 % of the height, 560 px wide, its field at fixed pitch (B-2.13-01, B-2.13-02) */
+.command-bar { position: fixed; z-index: 30; top: var(--command-bar-top); left: 50%; transform: translateX(-50%); width: var(--command-bar-width);
+  max-width: calc(100vw - 32px); padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-large); box-shadow: var(--shadow-raised); }
+.command-bar-title { font-weight: 600; }
+.command-bar textarea { font-family: var(--font-mono); font-size: 13px; line-height: 20px; color: var(--text); padding: 6px 8px; resize: none;
+  border: 1px solid var(--field-border); border-radius: var(--radius-small); }
+.command-bar p { margin: 0; font-size: var(--font-size-small); }
+.command-bar-error { color: var(--danger); font-size: var(--font-size-small); }
+.command-bar-error ul { margin: 4px 0 0; padding-left: 18px; font-family: var(--font-mono); }
+.command-bar-foot { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* zoom controls left of the mini map, offset from geometry/constants.ts (B-2.1-41), and the mini map (B-2.1-45) */
+.map-canvas .react-flow__panel.map-controls { margin: 0; right: var(--controls-right); bottom: var(--canvas-inset); display: flex; flex-direction: row; align-items: center; gap: 2px;
+  padding: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-ui); box-shadow: var(--shadow-raised); }
+.map-controls .react-flow__controls-button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--radius-small); background: none; color: var(--text-muted); cursor: pointer; }
+.map-controls .react-flow__controls-button:hover { background: var(--hover); color: var(--text); }
+.map-controls .react-flow__controls-button:disabled { opacity: .38; cursor: default; }
+.map-controls .react-flow__controls-button svg { max-width: 12px; max-height: 12px; }
+.map-controls .react-flow__controls-button .i { max-width: 16px; max-height: 16px; fill: none; }
+.map-canvas .react-flow__panel.map-minimap { margin: 0; right: var(--canvas-inset); bottom: var(--canvas-inset); width: var(--minimap-width); border: 1px solid var(--border);
+  border-radius: var(--radius-ui); box-shadow: var(--shadow-raised); overflow: hidden; }
+.map-minimap .react-flow__minimap-svg { width: 100%; }
+.map-canvas .react-flow__minimap { background: var(--surface); }
+.map-canvas .react-flow__minimap-mask { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+
+/* the panel of the remainder (annex B 2.9): sections, a line an element with its choice and its deletion, the sheet read only */
+.remainder-nothing { margin: 0; color: var(--text-muted); }
+.remainder-section h3 { margin: 0 0 8px; font-size: var(--font-size-small); font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--text-muted); }
+.remainder-section h4 { margin: 10px 0 4px; font-size: 13px; font-weight: 600; }
+.remainder-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.remainder-line { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; font-size: 13px; }
+.remainder-name { overflow-wrap: anywhere; }
+.remainder-name small { font-size: var(--font-size-small); color: var(--text-muted); }
+.remainder-assign { max-width: 170px; padding: 4px 6px; font: inherit; font-size: var(--font-size-small); color: var(--text); background: var(--surface);
+  border: 1px solid var(--field-border); border-radius: var(--radius-small); }
+.remainder-delete { padding: 3px 6px; border: 0; border-radius: var(--radius-small); background: none; font: inherit; font-size: var(--font-size-small); color: var(--danger); }
+.remainder-delete:hover { background: var(--danger-soft); }
+.remainder-sheet dl { margin: 0; display: grid; gap: 6px; font-size: 13px; }
+.remainder-sheet dt { font-size: var(--font-size-small); color: var(--text-muted); }
+.remainder-sheet dd { margin: 0; }
+.remainder-sheet ol { margin: 0; padding-left: 20px; font-size: 13px; }
+.remainder-free-text { margin: 10px 0 0; font-size: 13px; white-space: pre-wrap; }
+.arrangement-list { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+/* the RACI panel next to the click (annex B 2.11): the lane R on --raci-r-bg, a button a letter, the pressed one in --accent-strong */
+.raci-panel { position: fixed; z-index: 25; max-width: 330px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-ui);
+  box-shadow: var(--shadow-menu); font-size: 13px; }
+/* the panel itself focused from the keyboard (no letter to give: a step of the only lane): its outline inside, its shadow kept */
+.raci-panel:focus-visible { outline-offset: -2px; box-shadow: var(--shadow-menu); }
+.raci-panel-title { margin: 0 0 8px; font-weight: 600; }
+.raci-panel th { padding: 3px 10px 3px 0; max-width: 140px; text-align: left; font-weight: 400; overflow-wrap: anywhere; }
+.raci-panel td { padding: 3px 0; white-space: nowrap; }
+.raci-panel-performs, .raci-panel-help { color: var(--text-muted); }
+.raci-panel-help { margin: 8px 0 0; font-size: var(--font-size-small); }
+.raci-letter { width: 28px; height: 28px; margin-right: 4px; padding: 0; display: inline-grid; place-items: center; vertical-align: middle; border: 1px solid var(--border);
+  border-radius: var(--radius-small); background: var(--surface); color: var(--text-muted); font: inherit; font-weight: 700; }
+.raci-letter:hover { background: var(--hover); color: var(--text); }
+.raci-letter.is-active { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--surface); }
+.raci-letter--R { background: var(--raci-r-bg); border-color: var(--raci-r-bg); color: var(--text); }
+
+/* the RACI matrix (annex B 2.11): headers on --table-header-bg (B-6-30), codes at fixed pitch, letters centred on the ground of their role */
+.raci-matrix-scroll { max-height: 60vh; overflow: auto; }
+.raci-matrix { border-collapse: collapse; font-size: 13px; }
+.raci-matrix th, .raci-matrix td { padding: 4px 8px; border: 1px solid var(--border); }
+.raci-matrix thead th { position: sticky; top: 0; background: var(--table-header-bg); text-align: left; font-weight: 600; }
+.raci-matrix-code { font-family: var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.raci-cell { min-width: 40px; text-align: center; font-weight: 700; }
+.raci-cell--R { background: var(--raci-r-bg); }
+.raci-cell--A { background: var(--raci-a-bg); }
+.raci-cell--S { background: var(--raci-s-bg); }
+.raci-cell--C { background: var(--raci-c-bg); }
+.raci-cell--I { background: var(--raci-i-bg); }
+.raci-matrix-empty { margin: 0; color: var(--text-muted); }
+.raci-matrix-legend { margin: 0; font-size: var(--font-size-small); color: var(--text-muted); }
+
+/* the image of an export (annex B 2.14): nothing moves, the selection is neutral, the frame is hidden (B-2.9-20), the margin of the lanes
+   is drawn (B-2.12-25), the line of the classification stands under the map of a PNG (S-4.1-08) */
+.map-canvas.is-exporting *, .map-canvas.is-exporting *::before, .map-canvas.is-exporting *::after { animation-name: none; transition-property: none; }
+.map-canvas.is-exporting .step.is-selected { outline: 0; box-shadow: var(--shadow-step); }
+.map-canvas.is-exporting .step--gateway.is-selected { box-shadow: none; }
+.map-canvas.is-exporting .step--gateway.is-selected .gateway-shape polygon { stroke: var(--ink); stroke-width: 1.5; }
+.map-canvas.is-exporting .react-flow__edge.selected .react-flow__edge-path { stroke: var(--edge); }
+.map-canvas.is-exporting .react-flow__nodesselection, .map-canvas.is-exporting .react-flow__selection, .map-canvas.is-exporting .react-flow__node-frame { display: none; }
+.map-canvas.is-exporting .lane-body-margin { visibility: visible; }
+.export-caption { position: absolute; left: 0; top: 0; margin: 0; line-height: 24px; font-size: var(--font-size-small); font-weight: 600; color: var(--text); white-space: nowrap; }
+
+/* the value stream layer (spec 14.5, ADR 085): a cartouche of four cases under each step with content, under the flows; the computed values in the accent, a value of a draft underlined dotted; the entry and the exit of the events; the share of the exits; the block under the lanes */
+.stream-card { position: relative; width: var(--stream-card-width); height: var(--stream-card-height); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-small); color: var(--text); font-size: var(--font-size-micro); line-height: 1;
+  font-variant-numeric: tabular-nums; }
+.stream-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.stream-case { display: flex; align-items: center; gap: 3px; min-width: 0; padding: 0 5px; overflow: hidden; white-space: nowrap; }
+.stream-case:nth-of-type(odd) { border-right: 1px solid var(--border); }
+.stream-case:nth-of-type(-n+2) { border-bottom: 1px solid var(--border); }
+.stream-case svg { flex: none; color: var(--text-muted); }
+.stream-value { font-size: 11px; font-weight: 600; }
+.stream-unit { color: var(--text-muted); }
+.stream-case.is-computed .stream-value { color: var(--accent-strong); }
+.stream-case.is-draft .stream-value { text-decoration: underline dotted var(--warning-graphic); text-underline-offset: 2px; }
+.stream-na { color: var(--text-muted); }
+.stream-card-detail { visibility: hidden; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); width: 280px; padding: 6px 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-small); box-shadow: var(--shadow-raised);
+  color: var(--text); font-size: var(--font-size-micro); line-height: 1.35; white-space: pre-line; pointer-events: none; }
+.stream-card-detail p { margin: 0 0 4px; }
+.stream-card:focus-within .stream-card-detail { visibility: visible; }
+/* a cartouche that holds the focus comes over the steps and the flows, so that its formulas are read whole */
+.react-flow__node-card:focus-within { z-index: 1000 !important; }
+.stream-event { width: var(--stream-card-width); height: 18px; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 6px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-small); color: var(--text-muted); font-size: var(--font-size-micro);
+  white-space: nowrap; font-variant-numeric: tabular-nums; }
+.stream-event .stream-value { color: var(--accent-strong); }
+.stream-event.is-missing { background: var(--warning-soft); border-color: var(--warning-graphic); color: var(--warning-text); font-weight: 600; }
+.edge-share { font-weight: 600; color: var(--text); }
+.edge-share.is-remainder { font-style: italic; font-weight: 500; }
+.edge-share.is-unknown { color: var(--warning-text); font-weight: 700; }
+.lane-stream { display: flex; flex-direction: column; font-size: var(--font-size-small); line-height: 15px; color: var(--text-muted); padding-left: 24px;
+  font-variant-numeric: tabular-nums; }
+.lane-body-margin .lane-stream { padding-left: 0; }
+.lane-stream .is-missing { color: var(--warning-text); font-weight: 600; }
+/* the panel of the value stream (spec 3.0 section 15.3, ADR 086): tiles, main path, check grouped by code; short texts */
+.stream-panel-title { flex: 1; min-width: 0; }
+.stream-panel-title h2 { margin: 0; font-size: var(--font-size-h2); font-weight: 600; line-height: 1.35; }
+.stream-quantified { margin: 2px 0 0; font-size: var(--font-size-small); color: var(--text-muted); }
+.stream-panel .side-panel-body { gap: 22px; font-variant-numeric: tabular-nums; }
+.stream-section h3 { margin: 0 0 8px; font-size: var(--font-size-micro); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.stream-tiles { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.stream-tile { min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-ui); background: var(--surface); }
+.stream-tile dt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-micro); color: var(--text-muted); }
+/* a precision goes onto a second line rather than be cut: it says on how much a figure stands (spec 14.1, principle 3) */
+.stream-tile-note { font-size: var(--font-size-micro); line-height: 1.3; color: var(--text-muted); }
+.stream-tile dd { margin: 0; }
+.stream-tile-value { font-size: var(--font-size-h2); font-weight: 700; line-height: 1.4; color: var(--accent-strong); white-space: nowrap; }
+.stream-basis { margin: 8px 0 0; font-size: var(--font-size-micro); color: var(--text-muted); }
+.stream-path-totals { margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: var(--font-size-small); }
+.stream-path-totals div { display: flex; gap: 6px; align-items: baseline; }
+.stream-path-totals dt { color: var(--text-muted); }
+.stream-path-totals dd { margin: 0; font-weight: 700; }
+.stream-path { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }
+.stream-path th { padding: 4px 6px; border-bottom: 1px solid var(--border); font-weight: 500; color: var(--text-muted); text-align: left; }
+.stream-path th:not(:first-child) { width: 76px; text-align: right; }
+.stream-path td { height: 28px; padding: 0 6px; border-bottom: 1px solid var(--border); }
+.stream-path td:not(:first-child) { text-align: right; white-space: nowrap; }
+.stream-step { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; padding: 0; border: 0; background: none; color: var(--text); font: inherit; text-align: left;
+  cursor: pointer; }
+.stream-step code { flex: none; font-family: var(--font-mono); font-size: var(--font-size-code); color: var(--text-muted); }
+.stream-step span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stream-step:hover span { text-decoration: underline; }
+.stream-none { margin: 0; color: var(--text-muted); }
+.stream-check-none { margin: 0; color: var(--success-text); font-weight: 600; }
+.stream-checks { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.stream-group-head { display: flex; align-items: center; gap: 6px; font-size: var(--font-size-small); font-weight: 600; }
+.stream-group.is-warning .stream-group-head svg { color: var(--warning-graphic); }
+.stream-group.is-information .stream-group-head { font-weight: 500; color: var(--text-muted); }
+.stream-group-count { margin-left: auto; min-width: 22px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--hover); font-size: var(--font-size-micro);
+  text-align: center; }
+.stream-chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0 20px; }
+.stream-chip { padding: 1px 7px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); font: inherit;
+  font-family: var(--font-mono); font-size: var(--font-size-micro); cursor: pointer; }
+.stream-chip:hover { border-color: var(--accent); background: var(--hover); }
+.stream-entry { max-width: 300px; }
+.stream-entry-row { display: flex; gap: 6px; }
+.stream-entry .stream-entry-row input { width: 130px; }
+.stream-entry select { font: inherit; font-size: 13px; color: var(--text); padding: 4px 6px; border: 1px solid var(--field-border); border-radius: var(--radius-small); background: var(--surface); }
+.stream-entry-help { margin: 6px 0 0; font-size: var(--font-size-micro); color: var(--text-muted); }

@@ -1,0 +1,117 @@
+# ci.yml
+# Continuous integration: build with 0 warning, tests on SQLite and SQL Server, dependency audit, interface checks, CodeQL.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  dotnet:
+    # The tests need Windows (access rules of the data folder, NTLM of the server mode, named events of the desktop
+    # mode): a Windows runner, with SQL Server Express installed on it for the matrix of the two engines, reached by the
+    # Windows account of the runner (no password).
+    runs-on: windows-2025
+    env:
+      TEST_SQLSERVER_CONNECTION: "Server=.\\SQLEXPRESS;Integrated Security=true;TrustServerCertificate=true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Packages of the interface (the rules of the third-party components read them; their scripts are not run)
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: SQL Server Express on the runner
+        run: choco install sql-server-express --no-progress -y
+      # ADR 074: the public repository builds on the package of the core, which git leaves out (it goes to the holders of
+      # a written licence only): its holder gives a private address of the package and its SHA-256 (secret
+      # CORE_PACKAGE_URL, variable CORE_PACKAGE_SHA256). The copy that has the sources of the core skips this step.
+      - name: Package of the core (public repository)
+        if: ${{ hashFiles('src/Topogenia.Domain/*.csproj') == '' }}
+        shell: pwsh
+        env:
+          CORE_PACKAGE_URL: ${{ secrets.CORE_PACKAGE_URL }}
+          CORE_PACKAGE_SHA256: ${{ vars.CORE_PACKAGE_SHA256 }}
+        run: |
+          if (-not $env:CORE_PACKAGE_URL -or -not $env:CORE_PACKAGE_SHA256) { Write-Error 'The package of the core is given to the holders of a written licence (ADR 074): set the secret CORE_PACKAGE_URL and the variable CORE_PACKAGE_SHA256'; exit 1 }
+          $version = (([xml](Get-Content -Raw Directory.Packages.props)).Project.ItemGroup.PackageVersion | Where-Object { $_.Include -eq 'Topogenia.Core' }).Version
+          New-Item -ItemType Directory -Force artifacts/core-feed | Out-Null
+          $file = "artifacts/core-feed/Topogenia.Core.$version.nupkg"
+          Invoke-WebRequest -Uri $env:CORE_PACKAGE_URL -OutFile $file
+          if ((Get-FileHash -Algorithm SHA256 $file).Hash -ne $env:CORE_PACKAGE_SHA256) { Write-Error 'The package of the core is not the one of its SHA-256'; exit 1 }
+      - name: Restore (locked)
+        run: dotnet restore Topogenia.sln --locked-mode
+      - name: Build (warnings are errors)
+        run: dotnet build Topogenia.sln --no-restore -c Release
+      - name: Vulnerable packages (blocking)
+        shell: pwsh
+        run: |
+          $report = dotnet list Topogenia.sln package --vulnerable --include-transitive --format json | Out-String | ConvertFrom-Json
+          $found = @($report.projects | ForEach-Object { $_.frameworks } | ForEach-Object { @($_.topLevelPackages) + @($_.transitivePackages) } | Where-Object { $_ })
+          if ($found.Count -gt 0) { $found | Format-Table | Out-String | Write-Host; exit 1 }
+      - name: Third-party notices are up to date
+        run: node build/third-party-notices.mjs --check
+      - name: Tests (SQLite and SQL Server matrix)
+        run: dotnet test --solution Topogenia.sln --no-build -c Release
+
+  web:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Audit (blocking)
+        run: npm audit --audit-level=low
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  codeql:
+    # ADR 049: GitHub Code Security is not enabled on the private repository; the analysis runs locally
+    # (build/codeql-local.mjs, phase 7). Remove this condition once the option is enabled.
+    if: false
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      matrix:
+        language: [csharp, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.language == 'csharp' && 'manual' || 'none' }}
+      - if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - if: matrix.language == 'csharp'
+        run: dotnet build Topogenia.sln -c Release
+      - uses: github/codeql-action/analyze@v4

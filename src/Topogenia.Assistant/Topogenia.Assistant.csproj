@@ -1,0 +1,21 @@
+<!-- Topogenia.Assistant.csproj -->
+<!-- Assistant: the connectors to the models of the AI (Claude by the API of Anthropic, Claude by AWS Bedrock), behind the port of the application -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Topogenia.Application/Topogenia.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The instructions of the product and the documentation of the formats, the files of the repository embedded: one source (spec 3.0 section 5) -->
+    <EmbeddedResource Include="Instructions/*.md" LogicalName="$(MSBuildProjectName).Instructions.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../docs/pmap/PMAP_GUIDE_IA.md;../../docs/format-*.md;../../schemas/*.schema.json" LogicalName="$(MSBuildProjectName).Formats.%(Filename)%(Extension)"
+      Link="Formats/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Anthropic" />
+    <PackageReference Include="AWSSDK.BedrockRuntime" />
+    <!-- A named AWS profile signed in by SSO: the credentials of the profile, read by the AWS SDK, need its SSO packages -->
+    <PackageReference Include="AWSSDK.Core" />
+    <PackageReference Include="AWSSDK.SSO" />
+    <PackageReference Include="AWSSDK.SSOOIDC" />
+  </ItemGroup>
+</Project>

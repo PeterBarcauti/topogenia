@@ -1,0 +1,30 @@
+<!-- Directory.Packages.props -->
+<!-- Central, pinned versions of every NuGet package (licence and maintenance checked, see THIRD-PARTY-NOTICES.md) -->
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
+    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.13" />
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+    <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.4" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <!-- The closed core, packed by build/core (ADR 048, ADR 074), and its obfuscator, a tool of that chain never shipped -->
+    <PackageVersion Include="Topogenia.Core" Version="3.0.0" />
+    <PackageVersion Include="Obfuscar" Version="2.2.50" />
+    <!-- The connectors of the assistant (3.0): the official SDK of Anthropic; Bedrock Runtime by the AWS SDK, which reads a
+         named profile signed in by SSO (its SSO packages) and the inference profiles of the account -->
+    <PackageVersion Include="Anthropic" Version="13.3.0" />
+    <PackageVersion Include="AWSSDK.BedrockRuntime" Version="4.0.101.14" />
+    <PackageVersion Include="AWSSDK.Core" Version="4.0.102.15" />
+    <PackageVersion Include="AWSSDK.SSO" Version="4.0.100.23" />
+    <PackageVersion Include="AWSSDK.SSOOIDC" Version="4.0.100.22" />
+    <!-- Transitive pins: patched versions of packages pulled by the SQL Server provider -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+  </ItemGroup>
+</Project>

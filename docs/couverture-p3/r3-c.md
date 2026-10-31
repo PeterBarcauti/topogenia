@@ -1,0 +1,46 @@
+<!-- r3-c.md -->
+<!-- Couverture de la correction C de la porte de la phase 3, round 3 : restauration SQLite, atomicité des migrations, historique du schéma -->
+
+# Couverture phase 3, porte round 3, correction C : restauration SQLite, atomicité des migrations, historique du schéma
+
+Constats traités : Données B1 et M3 (fichier copié à la main pendant l'exécution ou à côté du journal d'une exécution
+arrêtée), Données B2 (migration SQLite `TextGuardsAndIntegerBounds` non atomique), Données M2 (descente d'une migration
+puis remontée refusée), Fidélité m5 (`MigrationRollbackTests`), Sécurité MAJ-2 (restauration du fichier sur lui-même),
+Données m1 et m2 (sauvegarde en lecture seule, copie en WAL avec son journal), Sécurité m2 et m3 (lien physique,
+caractère NUL). Décisions : ADR 029 (révision du round 3), ADR 027 (révision du round 3), ADR 035 (lien physique, NUL),
+ADR 038 (paragraphe des migrations) ; `docs/modele-donnees.md` § 7.1, 7.3, 7.6. Les tests ci-dessous s'ajoutent à ceux
+déjà cités dans `docs/couverture.md`.
+
+| ID | État | Test 2.0 | Remarque |
+|---|---|---|---|
+| A-4-34 | couvert | `Topogenia.Persistence.Tests.Sqlite.AtomicMigrationTests.A_migration_stopped_before_any_of_its_statements_or_commits_is_taken_again_by_the_next_start_with_its_data` ; `Topogenia.Persistence.Tests.Sqlite.AtomicMigrationTests.Every_sqlite_migration_runs_in_a_transaction` ; `Topogenia.Persistence.Tests.Schema.SnapshotIsolationTests.Every_migration_recorded_outside_a_transaction_is_followed_by_one_in_a_transaction` (attente SQLite changée : liste vide, fait vérifié modifié) | SQLite : fichier à la migration initiale avec un graphe de projet (carte détaillée comprise), migration arrêtée avant chacune des instructions de ses transactions, puis avant chacune de ses validations : aucune table `ef_temp_*`, contrôle « en retard », migration suivante `UpToDate`, schéma égal à celui d'un fichier migré d'un coup, chaque ligne présente, `integrity_check` et `foreign_key_check` vides. Toute reconstruction dans la transaction de sa migration (`AtomicRebuildSqlGenerator`). La ligne du verrou d'EF Core qu'un arrêt laisse (ADR 041) est retirée comme l'hôte le dit avant le démarrage suivant, chaque étape bornée à 20 s. Rouge avant correction (génération d'EF Core : `SCHEMA_MODIFIE`, copies `ef_temp_*`). Mutations : voir plus bas |
+| A-4-35 | couvert | `Topogenia.Persistence.Tests.Schema.MigrationDescentTests.A_database_taken_down_one_migration_is_behind_and_migrated_up_again_with_its_data` ; `Topogenia.Persistence.Tests.Schema.MigrationDescentTests.A_database_taken_down_to_the_migration_before_the_text_guards_is_behind_and_migrated_up_again` ; `Topogenia.Persistence.Tests.Sqlite.MigrationRollbackTests.A_database_with_a_detailed_map_goes_down_on_sql_server_and_is_refused_by_sqlite_with_its_lock_given_back` (renforcé, Fidélité m5) | Les deux moteurs : descente par les outils d'EF Core d'une migration, et jusqu'à la migration d'avant les gardes de texte (SQLite : la migration initiale), avec des données ; contrôle « en retard » avec les migrations attendues, remontée `UpToDate`, historique complet aux empreintes des sources, données intactes. Le `Down` de chaque migration écrite depuis retire sa ligne de `schema_history` ; le `Down` SQLite de la reconstruction rend les instructions de la migration initiale. Descente complète SQLite refusée par une carte détaillée : le démarrage dit « en retard » (migration initiale appliquée, deux en attente, code annoncé par `modele-donnees` § 7.1), remigre, données intactes. Rouges avant correction (`SCHEMA_MODIFIE` sur les deux moteurs). Écart nommé : les huit migrations SQL Server antérieures ne retirent pas leur ligne (ADR 027) |
+| A-4-29 | couvert | `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_backup_copied_over_the_data_file_while_the_application_runs_is_refused_at_the_next_start` (deux dispositions) ; `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_copy_of_the_data_file_from_an_earlier_run_put_next_to_the_log_of_a_stopped_run_is_refused_and_the_true_file_is_read_whole` (deux dispositions) ; `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_copy_of_the_data_file_taken_during_the_run_is_read_with_the_log_of_that_run_and_nothing_is_lost` ; `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_data_file_replaced_by_a_copy_while_the_application_runs_is_never_written_back_and_is_refused` ; `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_damaged_data_file_is_refused_at_its_first_opening_before_anything_is_written` ; `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_clean_stop_leaves_no_log_and_a_backup_put_back_by_hand_then_is_the_data_file` ; `Topogenia.Persistence.Tests.Sqlite.HandCopyTests.A_run_written_back_by_the_engine_and_stopped_without_closing_is_read_again_whole` ; `Topogenia.Persistence.Tests.Sqlite.RestoreSourceTests.The_data_file_given_as_the_backup_under_another_path_is_refused_and_its_journal_is_kept` (`\\?\`, `\\.\`, lien physique) ; `Topogenia.Persistence.Tests.Sqlite.RestoreSourceTests.A_backup_named_by_a_path_of_another_form_is_refused_by_its_code_and_never_opened` ; `Topogenia.Persistence.Tests.Sqlite.RestoreSourceTests.A_read_only_backup_is_restored_and_leaves_neither_a_partial_file_nor_a_read_only_data_file` ; `Topogenia.Persistence.Tests.Sqlite.RestoreSourceTests.A_copy_in_the_write_ahead_log_with_its_own_log_is_restored_with_the_work_of_its_log` | Scénarios de la sonde de la porte : refusés `BASE_INACCESSIBLE` par leur code étendu (26/26, 26/282, 26/794, 26/1050) fichier et journal intacts, ou lus sans perte. Fichier et journal liés par un tampon (`SqliteDataFileGuard`, ADR 029 révision du round 3) : le fichier n'est réécrit que par le moteur, sous un tampon nouveau ; `integrity_check` et `foreign_key_check` à la première ouverture ; arrêt propre `SqliteEngine.CloseAsync`. Restauration : identité du fichier par descripteur, formes de chemin refusées par un code, copie par l'API de sauvegarde (journal de la source compris), aucun fichier partiel. Rouges avant correction : fermeture qui réécrivait le journal dans la copie, journal étranger rejoué, fichier abîmé accepté, restauration sur lui-même (journal perdu), un projet sur deux restauré, exception sur la sauvegarde en lecture seule. Limites nommées dans l'ADR 029, aucune sans signal |
+| S-5.2-09 | couvert (persistance) | `Topogenia.Persistence.Tests.Files.DesktopDataFileTests.A_path_with_a_character_that_no_path_holds_is_refused_with_a_code` | Chemin avec un NUL refusé `FICHIER_CHEMIN_NON_PRIS_EN_CHARGE`, jamais levé (Sécurité m3). Rouge avant correction (`ArgumentException`) |
+| S-5.2-10 | couvert (persistance) | `Topogenia.Persistence.Tests.Files.DesktopDataFileTests.A_file_with_more_than_one_name_is_refused_whatever_its_names` ; `Topogenia.Persistence.Tests.Files.DesktopDataFileTests.A_hard_link_made_on_the_disk_is_seen_by_the_check_of_the_machine` | Un fichier à plusieurs noms (lien physique) est refusé `FICHIER_LIENS_PHYSIQUES` (Sécurité m2, ADR 035) : lien fictif, et vrai lien physique fait dans un dossier temporaire (`nNumberOfLinks` lu par descripteur) ; accepté de nouveau sans son second nom. Rouge avant correction |
+
+Mutations (script du bloc-notes de la porte, chaque mutation remise après) :
+
+| Mutation | Tests rouges |
+|---|---|
+| Générateur atomique non enregistré (génération d'EF Core, état d'avant B2) | `AtomicMigrationTests` : 2 sur 2 |
+| `PRAGMA foreign_keys` gardé hors transaction | `AtomicMigrationTests` : 2 sur 2 |
+| Point de contrôle de SQLite à la fermeture rendu (état d'avant B1) | `HandCopyTests` : 6 sur 9 |
+| Journal d'un autre fichier non contrôlé à la première ouverture | `HandCopyTests` : 3 |
+| Pas d'`integrity_check` à la première ouverture | `HandCopyTests` : 1 (fichier abîmé) |
+| Tampon non testé avant l'arrêt propre | `HandCopyTests` : 1 (fichier remplacé en marche) |
+| Tampon constant (jamais nouveau) | `HandCopyTests` : 3 |
+| `Down` de `TextGuardsCheck` sans retrait de sa ligne | `MigrationDescentTests` : 2 (SQLite) |
+| `Down` SQLite de la reconstruction rendu à celui de l'outil (ligne retirée gardée) | `MigrationDescentTests` (descente à la migration initiale) et `MigrationRollbackTests` (carte détaillée) |
+| `Down` SQL Server sans retrait de sa ligne | `MigrationDescentTests` : 2 (SQL Server) |
+| Chemins comparés comme du texte (état d'avant MAJ-2) | `RestoreSourceTests` : 3 (`\\?\`, `\\.\`, lien physique) |
+| Forme du chemin de la sauvegarde non contrôlée | `RestoreSourceTests` : 3 |
+| Sauvegarde copiée comme un fichier (état d'avant m1, m2) | `RestoreSourceTests` : 2 (lecture seule, copie en WAL) |
+| Fichier partiel supprimé en levant, attributs gardés | `RestoreSourceTests` : 2 |
+| Nombre de noms du fichier non lu | `DesktopDataFileTests` : 2 |
+| NUL et chemin invalide levés | `DesktopDataFileTests` : 3 |
+
+Écarts nommés : les huit migrations SQL Server antérieures à `TextGuardsAndIntegerBounds` ne retirent pas leur ligne
+d'historique (descente en dessous refusée `SCHEMA_MODIFIE`, ADR 027) ; limites du tampon dans l'ADR 029 (journal sans
+page 1 après une panne dans un instant précis : refus 26/538, aucune perte ; outil tiers ; lecture d'une copie WAL posée
+pendant l'exécution jusqu'au point de contrôle suivant, jamais réécrite ni acceptée au démarrage).

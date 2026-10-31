@@ -1,0 +1,19 @@
+<!-- Topogenia.Interchange.csproj -->
+<!-- Interchange: full-fidelity exchange package, .pmap format and the JSON schemas they publish -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Topogenia.Application/Topogenia.Application.csproj" />
+  </ItemGroup>
+  <!-- The core: its source project, or its package in the public repository (ADR 074) -->
+  <ItemGroup Condition="'$(UseCorePackage)' != 'true'">
+    <ProjectReference Include="../Topogenia.Domain/Topogenia.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseCorePackage)' == 'true'">
+    <PackageReference Include="Topogenia.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The published schema of the package lives at the root of the repository (spec 7.2) and is embedded to validate the
+         imports; the schema of the .pmap is only published, its reader checks a file by its own rules (annex A 2.17) -->
+    <EmbeddedResource Include="../../schemas/*-package-*.schema.json" LogicalName="Schemas/%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

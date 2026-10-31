@@ -1,0 +1,81 @@
+<!-- home.html -->
+<!-- Home screen of the mockup: banner with the main button, projects, trash and participants columns. -->
+<div class="home">
+  <header class="app-header">
+    <a class="brand" href="#haut" title="{{productName}} 2.0.0">{{include:logo.html}}{{productName}}</a>
+    <span class="head-sep"></span>
+    <span class="brand-sign">Boostez vos processus avec l’IA</span>
+    <div class="head-right">
+      <div class="lang-switch" role="group" aria-label="Langue de l’interface"><button aria-pressed="true" tabindex="-1">FR</button><button aria-pressed="false" tabindex="-1">EN</button></div>
+      <span class="head-sep"></span>
+      <span class="user"><span class="avatar">CB</span>Camille Bernard</span>
+    </div>
+  </header>
+  <div class="home-body">
+    <section class="banner" aria-labelledby="home-title">
+      <div class="banner-text">
+        <span class="banner-eyebrow">{{icon:sparkles:14}}Pour booster vos processus avec l’IA, commencez par les décrire.</span>
+        <h1 id="home-title">Cartographiez vos processus réels pour automatiser les actions répétitives et gagner en efficacité.</h1>
+      </div>
+      <div class="banner-cta">
+        <button class="btn btn--primary btn--lg" type="button" tabindex="-1">Décrire un processus{{icon:arrow-right:18}}</button>
+        <small>{{icon:clock:13}}Achats fournisseurs · dernier projet ouvert</small>
+      </div>
+    </section>
+
+    <div class="home-cols">
+      <div>
+        <div class="home-col-head">
+          <h2>Projets</h2><span class="count">3</span><span class="spacer"></span>
+          <button class="btn btn--secondary" type="button" tabindex="-1">{{icon:folder-open:15}}Ouvrir un fichier .pmap…</button>
+          <button class="btn btn--secondary" type="button" tabindex="-1">{{icon:plus:15}}Nouveau projet</button>
+        </div>
+        <div class="project-list">
+          <article class="project is-hover">
+            <div class="project-title"><a href="#editeur">Achats fournisseurs</a><span class="chip-code">PRJ</span><span class="tag tag--accent">Dernier ouvert</span></div>
+            <p>De l’expression du besoin au paiement de la facture : demande, choix du fournisseur, commande, réception.</p>
+            <div class="project-meta"><span>{{icon:square-stack:13}}24 étapes</span><span>{{icon:map:13}}3 cartes</span><span>{{icon:user:13}}Animateur</span></div>
+            <div class="project-actions">
+              <button class="btn" type="button" tabindex="-1">{{icon:users:15}}Membres</button>
+              <button class="btn btn--danger" type="button" tabindex="-1">{{icon:trash-2:15}}Supprimer…</button>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-title"><a href="#accueil">Facturation clients</a><span class="chip-code">FAC</span></div>
+            <p>Émission, envoi et relance des factures, jusqu’au lettrage des encaissements.</p>
+            <div class="project-meta"><span>{{icon:square-stack:13}}17 étapes</span><span>{{icon:map:13}}2 cartes</span><span>{{icon:user:13}}Contributeur</span></div>
+          </article>
+          <article class="project">
+            <div class="project-title"><a href="#accueil">Inventaire annuel</a><span class="chip-code">INV</span></div>
+            <p>Préparation, comptage, recomptage des écarts et validation des stocks en fin d’exercice.</p>
+            <div class="project-meta"><span>{{icon:square-stack:13}}9 étapes</span><span>{{icon:map:13}}1 carte</span><span>{{icon:user:13}}Lecteur</span></div>
+          </article>
+        </div>
+        <section class="trash" aria-labelledby="trash-title">
+          <div class="trash-head"><h2 id="trash-title">{{icon:trash-2:15}}Corbeille</h2><p>Projets supprimés, restaurables jusqu’à leur effacement définitif.</p></div>
+          <div class="trash-row">
+            <div class="grow">
+              <b>Notes de frais<span class="chip-code">NDF</span><span class="tag tag--neutral">6 étapes</span></b>
+              <small>Supprimé le 14/10/2026 par Noah Martin · effacé définitivement le 13/11/2026</small>
+            </div>
+            <button class="btn btn--secondary" type="button" tabindex="-1">{{icon:rotate-ccw:15}}Restaurer</button>
+            <button class="btn btn--danger" type="button" tabindex="-1">Supprimer définitivement</button>
+          </div>
+        </section>
+      </div>
+
+      <aside>
+        <div class="home-col-head"><h2>Qui participe</h2></div>
+        <div class="people">
+          <div class="people-head">{{icon:map:13}}Achats fournisseurs · 6 personnes</div>
+          <div class="person"><span class="initials">CB</span><span class="who"><b>Camille Bernard</b><small>Animateur</small></span></div>
+          <div class="person"><span class="initials">NM</span><span class="who"><b>Noah Martin</b><small>Contributeur</small></span><span class="tag tag--sponsor">Sponsor</span></div>
+          <div class="person"><span class="initials">LP</span><span class="who"><b>Léa Petit</b><small>Contributeur</small></span></div>
+          <div class="person"><span class="initials">HM</span><span class="who"><b>Hugo Moreau</b><small>Contributeur</small></span></div>
+          <div class="person"><span class="initials">IG</span><span class="who"><b>Inès Garnier</b><small>Contributeur</small></span></div>
+          <div class="person"><span class="initials">SR</span><span class="who"><b>Sacha Robin</b><small>Lecteur</small></span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>

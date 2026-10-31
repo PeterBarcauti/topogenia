@@ -1,0 +1,87 @@
+<!-- sheet-panel.html -->
+<!-- Content of the step sheet panel of PRJ-E002: sticky header, form fields in the tested order, validation. -->
+<div class="sheet-head">
+  <div class="sheet-title-row">
+    <h2 class="sheet-title"><code>PRJ-E002</code> · Rédiger la demande d’achat</h2>
+    <button class="icon-btn" type="button" aria-label="Fermer la fiche" tabindex="-1">{{icon:x:18}}</button>
+  </div>
+  <div class="sheet-meta"><span>Couloir : Demandeur</span><span aria-hidden="true">·</span><span>Fiche :</span><span class="state state--draft">brouillon</span><span class="saved">{{icon:check:14:2.5}}Enregistré</span></div>
+  <div class="completeness"><span>Complétude</span><div class="completeness-bar" role="progressbar" aria-label="Complétude de la fiche" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62"><span style="width:62%"></span></div><b>62 %</b></div>
+</div>
+<div class="sheet-body">
+  <div class="field">
+    <span class="field-label">Responsable de la fiche</span>
+    <div class="input input--select"><span style="display:flex;gap:8px;align-items:center"><span class="avatar" style="width:22px;height:22px;font-size:10px">CB</span>Camille Bernard</span>{{icon:chevron-down:15}}</div>
+  </div>
+  <div class="seg" role="radiogroup" aria-label="Mode de saisie">
+    <button role="radio" aria-checked="true" tabindex="-1">{{icon:list-checks:14}}Formulaire</button>
+    <button role="radio" aria-checked="false" tabindex="-1">{{icon:pencil-line:14}}Écrire librement</button>
+  </div>
+  <div class="field"><span class="field-label">Acteur</span><div class="input">Chef d’équipe de l’atelier</div></div>
+  <div class="field"><span class="field-label">Finalité</span><div class="input input--area is-focus">Formaliser le besoin pour que les Achats puissent consulter les fournisseurs sans relance.</div></div>
+  <div class="sheet-divider"></div>
+
+  <div class="field">
+    <span class="field-label">Entrées <span class="count">3 documents</span></span>
+    <div class="entry entry--used">
+      <div class="entry-row"><span class="check is-on">{{icon:check:12:3}}</span><span class="name">Précisions sur la demande</span><span class="from">PRJ-E006</span></div>
+      <div class="usage">
+        <div class="field"><span class="field-label">Attente avant réception</span><div class="input">4<span class="input-suffix">h</span></div></div>
+        <div class="field"><span class="field-label">Utilisable tel quel (%C&amp;A)</span><div class="input">70<span class="input-suffix">%</span></div></div>
+        <div class="irritant">
+          <span class="field-label">{{icon:flame:13}}Irritant</span>
+          <div class="input input--area">Les précisions arrivent par courriel, sans le numéro de la demande : il faut les rapprocher à la main.</div>
+          <div class="lost">Temps perdu<div class="input">3</div>heures par mois</div>
+        </div>
+      </div>
+    </div>
+    <div class="entry entry--other">
+      <div class="entry-row"><span class="check is-on">{{icon:check:12:3}}</span><span class="name">Liste des centres de coût</span><span class="from">PRJ-E012 · d’ailleurs</span></div>
+    </div>
+    <div class="entry">
+      <div class="entry-row">{{icon:link-2:15}}<span class="name">Modèle de demande d’achat<br><small style="font-weight:400;color:var(--text-muted);font-size:12px">Partage Achats › Modèles › demande.xlsx</small></span><span class="link-btns"><button class="icon-btn" aria-label="Modifier" tabindex="-1">{{icon:pencil-line:14}}</button><button class="icon-btn" aria-label="Retirer" tabindex="-1">{{icon:x:14}}</button></span></div>
+    </div>
+    <div style="display:flex;gap:4px"><button class="add-line" tabindex="-1">{{icon:plus:14}}Autre…</button><button class="add-line" tabindex="-1">{{icon:plus:14}}Entrée extérieure</button></div>
+  </div>
+
+  <div class="field">
+    <span class="field-label">Déroulé <small>micro-tâches</small><span class="count">3 opérations</span></span>
+    <div class="micro-list">
+      <div class="micro"><span class="micro-num">1</span><span class="micro-text">Extraire la liste des articles du catalogue</span><span class="micro-tools"><button class="icon-btn" aria-label="Monter" tabindex="-1">{{icon:arrow-up:14}}</button><button class="icon-btn" aria-label="Descendre" tabindex="-1">{{icon:arrow-down:14}}</button><button class="icon-btn" aria-label="Retirer" tabindex="-1">{{icon:x:14}}</button></span>
+        <span class="micro-meta"><span class="pill-select">Logiciel de gestion{{icon:chevron-down:12}}</span><span class="pill-select nature">Extraire{{icon:chevron-down:12}}</span></span></div>
+      <div class="micro"><span class="micro-num">2</span><span class="micro-text">Compléter le modèle de demande</span><span class="micro-tools"><button class="icon-btn" aria-label="Monter" tabindex="-1">{{icon:arrow-up:14}}</button><button class="icon-btn" aria-label="Descendre" tabindex="-1">{{icon:arrow-down:14}}</button><button class="icon-btn" aria-label="Retirer" tabindex="-1">{{icon:x:14}}</button></span>
+        <span class="micro-meta"><span class="pill-select">Tableur{{icon:chevron-down:12}}</span><span class="pill-select nature">Mettre en forme{{icon:chevron-down:12}}</span></span></div>
+      <div class="micro micro--control"><span class="micro-num">3</span><span class="micro-text">Contrôler les montants et le centre de coût</span><span class="micro-tools"><button class="icon-btn" aria-label="Monter" tabindex="-1">{{icon:arrow-up:14}}</button><button class="icon-btn" aria-label="Descendre" tabindex="-1">{{icon:arrow-down:14}}</button><button class="icon-btn" aria-label="Retirer" tabindex="-1">{{icon:x:14}}</button></span>
+        <span class="micro-meta"><span class="pill-select">Outil{{icon:chevron-down:12}}</span><span class="pill-select nature">Contrôler{{icon:chevron-down:12}}</span></span></div>
+    </div>
+    <button class="add-line" tabindex="-1">{{icon:plus:14}}Ajouter une opération</button>
+  </div>
+
+  <div class="field">
+    <span class="field-label">Sorties <span class="count">2 documents</span></span>
+    <div class="output"><b>{{icon:file-text:14}}Demande d’achat</b><small>utilisé par PRJ-E006 (<span class="ok">90 %</span> utilisable tel quel)</small></div>
+    <div class="output"><b>{{icon:file-text:14}}Bon de besoin signé</b><small>pas encore utilisé</small></div>
+  </div>
+
+  <div class="field">
+    <span class="field-label">Outils</span>
+    <div class="input">Tableur, messagerie</div>
+    <div class="suggestions"><span class="suggest">{{icon:plus:12:2.5}}Logiciel de gestion</span><span class="suggest">{{icon:plus:12:2.5}}Portail fournisseurs</span></div>
+  </div>
+
+  <div class="two">
+    <div class="field">
+      <span class="field-label">Fréquence</span>
+      <div class="input input--select is-placeholder">Choisir…{{icon:chevron-down:15}}</div>
+    </div>
+    <div class="field">
+      <span class="field-label">Durée par exécution</span>
+      <div class="input">20<span class="input-suffix">minutes</span></div>
+    </div>
+  </div>
+  <button class="resume" type="button" tabindex="-1">{{icon:clock:13}}Reprendre « Hebdomadaire » (étape PRJ-E012)</button>
+</div>
+<div class="sheet-foot">
+  <small>La fiche reste en brouillon tant qu’elle n’est pas validée.</small>
+  <button class="btn btn--primary" type="button" tabindex="-1">{{icon:circle-check:15}}Je valide ma fiche</button>
+</div>
