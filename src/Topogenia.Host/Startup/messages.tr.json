@@ -26,6 +26,8 @@
   "QUITTER": "Uygulamadan çıkmak için bu pencereyi kapatın.",
   "DEJA_LANCEE_OUVERTE": "Uygulama zaten çalışıyor: tarayıcıda açılıyor.",
   "REOUVERTE": "İkinci kez başlatıldı: tarayıcı uygulamayı açıyor.",
+  "ICONE_OUVRIR": "{product} uygulamasını aç",
+  "ICONE_QUITTER": "{product} uygulamasından çık",
   "SAUVEGARDES_DOSSIER": "Yedeklerin bulunduğu klasör: {folder}.",
   "RESTAURATION_PROPOSEE": "Kullanılabilir yedekler, en yeniden en eskiye. Seçilen yedekten sonra yapılan değişiklikler yedekte yoktur; mevcut dosya ve günlüğü silinmeden yanında saklanacak:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

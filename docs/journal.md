@@ -2465,3 +2465,77 @@ Reste au porteur du projet : la validation de la démonstration (`docs/recette/d
   falsifié, autre numéro, autre secret, sans empreinte) puis paquet du titulaire archivé ; empreinte authentifiée
   jusque dans l'exécutable du mode Poste ; ZIP `dd1b21a7...` décompressé dans le dossier d'essai du lot 7d, aucun ZIP
   livré, aucun commit.
+
+### 3.0 - Lot Store : le paquet MSIX du Microsoft Store (01/11/2026)
+
+- **Demande du porteur** : « on enchaîne par la version du programme publiable sur le store Microsoft », pour effacer
+  l'avertissement SmartScreen ; compte développeur individuel créé et nom « Topogenia » réservé le même jour. ADR 088.
+- **Paquet** : `node build/package.mjs Store` reprend la publication du mode Poste et y ajoute le manifeste (identité
+  réservée dans Partner Center, confiance totale seule, anglais et français déclarés), 62 logos tirés de la marque et
+  leur index `resources.pri` (`makepri`) ; `makeappx` écrit le paquet puis le dépaquette pour le comparer octet pour
+  octet ; signé seulement avec `--certificate`, pour un essai ; SBOM « MSIX package for the Microsoft Store ».
+- **Données** : avec une identité de paquet (`GetCurrentPackageFamilyName`), le dossier du produit est celui des
+  données du paquet, jamais celui de la version portable (sous MSIX, la base existante se serait ouverte en place et
+  les sauvegardes nouvelles dans un dossier privé) ; effacé à la désinstallation.
+- **Politique 11.16** : un lien « Signaler » sous chaque réponse d'un modèle, courriel à l'éditeur avec un objet
+  prérempli, rien de la réponse joint ; deux textes en dix-huit langues. Règle d'architecture nouvelle : l'identité du
+  manifeste et la chaîne du paquet.
+- **Essai du porteur** : paquet d'essai installé (certificat d'essai dans les « Personnes autorisées » de l'ordinateur),
+  projet créé et relancé depuis le menu Démarrer, données dans le dossier du paquet, version portable intacte. Défaut
+  vu : l'icône générique dans la recherche de Windows. `makepri` nommait les logos depuis `Assets` (`Files/Square44x44Logo.png`)
+  quand le manifeste demande `Assets\Square44x44Logo.png` : l'index part désormais de la racine d'un dossier qui ne
+  tient que `Assets`, et la construction vérifie chaque logo du manifeste dans un vidage de l'index (règle
+  d'architecture de plus).
+- **Windows App Certification Kit** (porteur) : réussi avec avertissement. Deux tests facultatifs en échec, sans suite
+  (les `.gz` précompressés de l'interface ; les noms d'outils système des bibliothèques embarquées et l'ouverture du
+  navigateur) ; un avertissement, l'exécutable sans `PerMonitorV2` : il porte désormais son manifeste
+  (`app.manifest`, `asInvoker`), règle d'architecture de plus.
+- **Message rouge en traçant un lien** (vu dans le journal de l'essai, et déjà le 29/10) : une création partait deux
+  fois d'un même geste, la seconde refusée (`LIEN_DOUBLON`), d'où un message d'erreur et la carte relue. Le geste en
+  cause n'a pas été reproduit par l'automate (35 tracés et clics essayés, un envoi chacun) ; `addFlow` n'envoie plus
+  rien quand la carte, lue après l'écriture d'avant, a déjà ce lien dans ce sens. Test et mutant.
+- **Projet d'exemple en anglais** (fiche du Store, choix du porteur) : sous une interface en anglais, l'exemple
+  s'affichait en français, puis, traduit, comme une traduction verrouillée avec ses fiches en français. `SampleProject`
+  s'écrit aussi en anglais (`LEAVE`, `SampleProjectEnglish` : un dictionnaire pour l'exemple anglais et les traductions
+  du français) ; `samples/leave.topogenia`, embarqué à côté de `conges` ; `SampleProjectApi` choisit selon la langue de
+  l'interface. Tests : les deux paquets à jour et au schéma, aucun texte français dans l'anglais, la route en anglais.
+
+### 3.0 - Lot audit : les corrections de l'audit externe (01/11/2026)
+
+- **Demande du porteur** : un auditeur externe a lu une copie du projet ; lire son rapport et apporter les corrections.
+  Chaque constat vérifié dans les sources avant toute correction ; verdict par constat dans `Travail\audit-plan.md`
+  (hors du dépôt). ADR 089. Le paquet soumis au Store n'est pas touché.
+- **Interface** : glisser-déposer, double-clic et collage sur la grille telle qu'elle est dessinée sous le calque du
+  flux de valeur (rangées de 156 px, lues à 120) ; « Réessayer » d'une traduction garde sa langue et la carte racine ;
+  le résumé d'une fiche passe par la carte reçue de l'hôte (un changement de langue ou d'aperçu le gardait mal) ; les
+  trois actions de la question de l'animateur enregistrent d'abord ce qui attend ; l'issue d'une proposition (appliquée,
+  écartée) reste à la réouverture du volet, « Écarter » n'efface que l'aperçu de sa carte, un aperçu de structure
+  retire l'aperçu d'une traduction ; le projet d'une fiche est relu après un échec.
+- **Hôte** : port stable par compte et fichier de données en mode Poste (préférences gardées), cookie
+  `desktop_session_<port>` ; dossier de clés `Server:KeysFolder` protégé par DPAPI en mode Serveur ; l'échange de
+  l'assistant attend la fin de son exécution, une session disposée refuse une connexion ; le navigateur et la réponse
+  à un second lancement passent avant l'écriture de la console.
+- **Échange et assistant** : la lecture du `.pmap` 1.2 contrôle les entrées du flux de valeur (bornes et place), l'IA
+  corrige sa proposition ; fichiers Office hors norme illisibles, jamais une erreur du serveur ; coût estimé sur
+  Bedrock ; versions des formats justes dans la consigne (2.1, 1.2).
+- **Domaine** : l'import contrôle l'effectif et le volume des enregistrements supprimés comme la base.
+- **Cœur** : `licence.mjs verify` compare les octets (paquet, puis assemblage) ; les deux constructions du 31/10 ont le
+  même assemblage, leurs paquets diffèrent par la licence.
+- **Gardés** : F-69 (console), F-73 à F-77.
+
+### 3.0.2 - Contre-visite et mode Poste sans console (02/11/2026)
+
+- **Demande du porteur** : « prépare la 3.0.2 avec le masquage de la console. Je demanderai une nouvelle contre-visite. »
+  La certification du Store est passée (3.0.0 en ligne) ; la 3.0.1, essayée, n'est pas publiée : la 3.0.2 la remplace.
+  ADR 090 ; verdict par constat dans `Travail\lot-3.0.2-plan.md` (hors du dépôt).
+- **Cœur** : traductions reprises par une flèche refaite (insertion, ancre, regroupement, couture, dissolution, une règle
+  `TranslationRules.Carry`) ; part reportée une seule fois à la dissolution ; suppression d'une carte qui porte
+  une remontée ouverte refusée, lot d'une telle carte gardé par la purge ; la purge retire l'irritant et garde l'usage ;
+  usage entre deux cartes modifiable ; une proposition garde la traduction manuelle de la carte racine et l'aperçu refuse
+  un type sans contenu sur une étape détaillée ; l'import contrôle les usages (une carte sans couloir reste admise :
+  l'exemple en contient une, un détail vide).
+- **Hôte** : dossier des clés du mode Serveur à côté d'un dossier des journaux écrit avec un séparateur final ; mode Poste
+  sans console (manifeste `detached`, console libérée avant 24H2), icône près de l'horloge (ouvrir, quitter), refus dans
+  une boîte de Windows, console pour la seule question de la restauration, arrêt propre en fin de session ; icône de
+  l'exécutable faite des logos du Store.
+- **Gardés** : F-79 (boucles à 99,9 %), F-80 (Windows 10, restauration essayée en test), 4.1 de la contre-visite (ADR 035).

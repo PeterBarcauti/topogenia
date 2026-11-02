@@ -1013,6 +1013,8 @@
       },
       "pasted": "Antwort eingefügt",
       "copy_reply": "Antwort kopieren",
+      "report": "Unangemessenen Inhalt dem Herausgeber melden ({{address}})",
+      "report_subject": "$t(app.name): Meldung einer KI-Antwort",
       "failures": {
         "refused": "Der Anbieter lehnt den Schlüssel oder die Identität ab: Prüfen Sie die KI-Einstellungen.",
         "key_missing": "Kein API-Schlüssel gespeichert: Der Administrator gibt ihn in den KI-Einstellungen ein.",

@@ -19,6 +19,7 @@ public sealed class StoreSession : IAsyncDisposable
     private readonly IInterceptor[] interceptors;
     private readonly CommitWatch commits = new();
     private AppDbContext? context;
+    private bool disposed;
 
     public StoreSession(DatabaseEngine engine, EngineDialect dialect, RetryPolicy? retry = null, params IInterceptor[] interceptors)
     {
@@ -44,8 +45,18 @@ public sealed class StoreSession : IAsyncDisposable
 
     public RetryPolicy Retry { get; }
 
-    /// <summary>The context of the request, created at the first use.</summary>
-    internal AppDbContext Context => context ??= Engine.CreateContext(interceptors);
+    /// <summary>
+    /// The context of the request, created at the first use; never after the session is disposed, which would open a
+    /// connection that nothing closes (audit 4.3).
+    /// </summary>
+    internal AppDbContext Context
+    {
+        get
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+            return context ??= Engine.CreateContext(interceptors);
+        }
+    }
 
     /// <summary>The write transaction of the current unit of work, null outside a unit.</summary>
     internal StoreTransaction? Transaction { get; set; }
@@ -76,7 +87,11 @@ public sealed class StoreSession : IAsyncDisposable
         }
     }
 
-    public ValueTask DisposeAsync() => ResetAsync();
+    public ValueTask DisposeAsync()
+    {
+        disposed = true;
+        return ResetAsync();
+    }
 
     /// <summary>Notes the commits of the engine, told by EF Core before it cleans up the transaction.</summary>
     private sealed class CommitWatch : DbTransactionInterceptor

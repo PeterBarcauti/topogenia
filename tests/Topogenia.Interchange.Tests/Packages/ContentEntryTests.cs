@@ -103,15 +103,25 @@ public sealed class ContentEntryTests
     {
         var translations = Entry("translations.json")["translations"]!.AsArray();
 
+        // By kind of object, then by code: the sample is in English whole (the step dissolved E012 keeps its own).
         Assert.Equal(
             [
-                "project||Leave request|manual", "map||Leave request|auto", "map|CONGES-E002|Enter the request|auto",
-                "lane|CONGES-C01|Employee|manual", "step|CONGES-E002|Enter the request|auto", "step|CONGES-E012|Check the balances|manual",
-                "flow|CONGES-E003>CONGES-E004|yes|manual",
+                "project||Leave request|manual", "map||Leave request|auto", "map|CONGES-E002|Enter the request|auto", "map|CONGES-E004|Approve the request|auto",
+                "lane|CONGES-C01|Employee|manual", "lane|CONGES-C02|Manager|auto", "lane|CONGES-C03|Human resources|auto", "lane|CONGES-C04|Payroll software|auto",
+                "lane|CONGES-C05|Employee|auto", "lane|CONGES-C06|Financial control|auto",
+                "step|CONGES-E001|Leave needed|auto", "step|CONGES-E002|Enter the request|auto", "step|CONGES-E003|Request compliant?|auto",
+                "step|CONGES-E004|Approve the request|auto", "step|CONGES-E006|Record in payroll|auto", "step|CONGES-E007|Leave booked|auto",
+                "step|CONGES-E008|Correct the request|auto", "step|CONGES-E009|Start of entry|auto", "step|CONGES-E010|Fill in the form|auto",
+                "step|CONGES-E011|Request sent|auto", "step|CONGES-E012|Check the balances|manual", "step|CONGES-E013|Read the balance|auto",
+                "step|CONGES-E014|Compare with the request|auto", "step|CONGES-E017|At the same time|auto", "step|CONGES-E018|Attach the supporting document|auto",
+                "step|CONGES-E019|Notify the team|auto", "step|CONGES-E020|End of parallel tasks|auto", "step|CONGES-E021|Documents to provide?|auto",
+                "step|CONGES-E022|Wait for the acknowledgement|auto", "step|CONGES-E023|End of documents|auto",
+                "flow|CONGES-E003>CONGES-E004|yes|manual", "flow|CONGES-E003>CONGES-E008|no|auto", "flow|CONGES-E021>CONGES-E022|supporting document|auto",
+                "flow|CONGES-E021>CONGES-E023|none|auto",
             ],
             translations.Select(item => string.Join('|', (string?)item!["object"], Reference(item), (string?)item["text"], (string?)item["source"])));
         Assert.All(translations, item => Assert.Equal("en", (string?)item!["language"]));
-        Assert.Equal(["label", "label", "label"], translations.Where(item => (string?)item!["object"] is "step" or "flow").Select(item => (string?)item!["field"]));
+        Assert.All(translations.Where(item => (string?)item!["object"] is "step" or "flow"), item => Assert.Equal("label", (string?)item!["field"]));
         Assert.Equal("EXEMPLE\\alice", (string?)translations[0]!["updatedBy"]);
         Assert.False(translations[1]!.AsObject().ContainsKey("updatedBy"));
         Assert.Equal("2026-09-01T09:00:00.0000000Z", (string?)translations[1]!["updatedAt"]);

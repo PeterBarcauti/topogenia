@@ -6,7 +6,7 @@ import { readLaunchAddress } from './host.ts';
 import { BROWSER_OPTIONS, LAUNCH_FILE, SESSION_FILE, VIEWPORT } from './run.ts';
 
 /**
- * Desktop mode: the real exchange of the launch token (spec 5.2), the cookie `desktop_session`, then `/` without the
+ * Desktop mode: the real exchange of the launch token (spec 5.2), the cookie `desktop_session_<port>`, then `/` without the
  * token. Server mode: the application opens under the Windows identity of the browser (Negotiate), no cookie to keep.
  */
 export default async function globalSetup(): Promise<void> {

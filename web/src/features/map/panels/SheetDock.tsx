@@ -25,11 +25,10 @@ export function useSheetProject(projectId: string, wanted: boolean): SheetProjec
   useEffect(() => {
     if (!wanted || known) return;
     let alive = true;
+    // A failed reading is not kept: the sheet opened again reads the project again (audit 5.5).
     api.get('/api/projects/{id}', { path: { id: projectId } }).then((detail) => {
       if (alive) setRead({ projectId, project: { members: detail.members, sharingGroupLabel: detail.sharing_group_label } });
-    }, () => {
-      if (alive) setRead({ projectId, project: null });
-    });
+    }, () => undefined);
     return () => {
       alive = false;
     };

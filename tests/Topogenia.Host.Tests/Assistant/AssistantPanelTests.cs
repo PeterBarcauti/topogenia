@@ -255,6 +255,41 @@ public sealed class AssistantPanelTests(ApiHosts hosts) : IClassFixture<ApiHosts
         Assert.Equal(before, connector.Prompts.Count);
     }
 
+    [Theory]
+    [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
+    public async Task An_exchange_given_up_by_the_person_is_audited_as_cancelled_once_the_request_ends(EngineKind kind)
+    {
+        var host = await hosts.OfAsync(kind);
+        var project = await ApiProject.CreateAsync(host);
+        await SetAsync(host, "anthropic");
+        var connector = Anthropic(host);
+        connector.Delay = TimeSpan.FromSeconds(5);
+        // The connector takes a second to give up, as a call over the network does: the request of the person ends meanwhile.
+        connector.CancelDelay = TimeSpan.FromSeconds(1);
+        try
+        {
+            // No reply queued: the exchange is stopped before it reads one, which would be left to the next test.
+            using var facilitator = project.Facilitator;
+            Assert.True(await facilitator.AbandonAsync($"/api/maps/{project.RootMapId}/assistant/exchanges", Ask("Bonjour"), TimeSpan.FromMilliseconds(600)));
+            // The request ends once its run has written the event of the exchange, with the services of the request (audit 4.3).
+            using var admin = host.As(Logins.Admin);
+            var cancelled = false;
+            for (var attempt = 0; attempt < 50 && !cancelled; attempt++)
+            {
+                var events = (await admin.GetAsync("/api/admin/audit?kind=assistant.exchanged")).Ok().EnumerateArray();
+                cancelled = events.Any(item => item.GetProperty("details").GetString()!.Contains("\"failure\":\"cancelled\"", StringComparison.Ordinal));
+                if (!cancelled)
+                    await Task.Delay(100, TestContext.Current.CancellationToken);
+            }
+            Assert.True(cancelled);
+        }
+        finally
+        {
+            connector.Delay = TimeSpan.Zero;
+            connector.CancelDelay = TimeSpan.Zero;
+        }
+    }
+
     [Fact]
     public async Task A_long_exchange_tells_it_works_at_least_every_two_seconds()
     {

@@ -15,7 +15,9 @@ namespace Topogenia.Interchange.Tests.Support;
 /// (draft, validated twice, needs review), documents and uses, pain points and their history, RACI roles (the hidden S
 /// included), members, manual and automatic translations. And what the package must leave out: a deleted step and lane
 /// with what hangs on them, a closed frame, deletion batches and an operation log entry. Identifiers are predictable;
-/// codes are those of the counters.
+/// codes are those of the counters. Written in French (CONGES), with its English translations; or written in English
+/// (LEAVE), the sample of an interface in another language than French, with its French translations
+/// (<see cref="SampleProjectEnglish"/>).
 /// </summary>
 public sealed class SampleProject
 {
@@ -26,21 +28,24 @@ public sealed class SampleProject
 
     private readonly bool valueStream;
 
+    private readonly bool english;
+
     /// <summary>
     /// The fictional project; without <paramref name="valueStream"/>, none of the entries of the value stream (ADR 085) and
-    /// the work time by default: what a package 2.0 could carry.
+    /// the work time by default: what a package 2.0 could carry. With <paramref name="english"/>, every text in English.
     /// </summary>
-    public SampleProject(bool valueStream = true)
+    public SampleProject(bool valueStream = true, bool english = false)
     {
         this.valueStream = valueStream;
+        this.english = english;
         Project = Id();
         Alice = User("EXEMPLE\\alice", "Alice Martin");
         Bruno = User("EXEMPLE\\bruno", "Bruno Lefort");
         Chloe = User("EXEMPLE\\chloe", "Chloé Duval");
         Denis = User("EXEMPLE\\denis", "Denis Morel");
-        records.Add(new Project(Project, "CONGES", "Demande de congés", "fr", "Du besoin du salarié à l'enregistrement en paie.",
-            "\\\\partage-fictif\\conges", Classification.Confidential, "Équipe RH",
-            "congé payé = paid leave\nsolde de congés = leave balance", 12, At(0), Alice, At(40), Bruno, null, null, 7)
+        records.Add(new Project(Project, Prefix, T("Demande de congés"), Language, T("Du besoin du salarié à l'enregistrement en paie."),
+            T("\\\\partage-fictif\\conges"), Classification.Confidential, T("Équipe RH"),
+            T("congé payé = paid leave\nsolde de congés = leave balance"), 12, At(0), Alice, At(40), Bruno, null, null, 7)
         {
             WorkdayHours = valueStream ? 7.5m : WorkTime.DefaultWorkdayHours,
         });
@@ -58,6 +63,12 @@ public sealed class SampleProject
     }
 
     public Guid Project { get; }
+
+    /// <summary>The code of the project, the start of every code of its objects.</summary>
+    public string Prefix => english ? "LEAVE" : "CONGES";
+
+    /// <summary>The language the project is written in.</summary>
+    public string Language => english ? "en" : "fr";
 
     public Guid Alice { get; }
 
@@ -106,6 +117,12 @@ public sealed class SampleProject
 
     private Guid Id() => new($"00000000-0000-0000-0000-{next++:x12}");
 
+    /// <summary>A text of the sample, in the language it is written in.</summary>
+    private string T(string french) => english ? SampleProjectEnglish.Of(french) : french;
+
+    /// <summary>A text of the sample in the language of its translations: English for the French sample, French for the English one.</summary>
+    private string Other(string french) => english ? french : SampleProjectEnglish.Of(french);
+
     private Guid User(string login, string name)
     {
         var id = Id();
@@ -123,7 +140,7 @@ public sealed class SampleProject
     private Guid Map(Guid? parent, string name, Guid author, int minute)
     {
         var id = Id();
-        records.Add(new ProcessMap(id, Project, parent, name, "fr", At(minute), author, null, null, null, null, 1));
+        records.Add(new ProcessMap(id, Project, parent, T(name), Language, At(minute), author, null, null, null, null, 1));
         return id;
     }
 
@@ -132,7 +149,7 @@ public sealed class SampleProject
     {
         var id = Id();
         Lanes[number] = id;
-        records.Add(new Lane(id, map, "CONGES-" + number, name, "fr", type, actor, LaneColors.ForIndex(order), order, source,
+        records.Add(new Lane(id, map, $"{Prefix}-{number}", T(name), Language, type, actor, LaneColors.ForIndex(order), order, source,
             At(order + 1), Alice, null, null, deletedAt, batch, 1));
         return id;
     }
@@ -143,7 +160,7 @@ public sealed class SampleProject
         var id = Id();
         Steps[number] = id;
         var map = records.OfType<Lane>().Single(item => item.Id == Lanes[lane]).MapId;
-        records.Add(new Step(id, map, Lanes[lane], "CONGES-" + number, label, "fr", type, column, row, assignee, automation, null,
+        records.Add(new Step(id, map, Lanes[lane], $"{Prefix}-{number}", T(label), Language, type, column, row, assignee, automation, null,
             At(10 + column), Bruno, At(50 + column), Alice, deletedAt, batch, 2));
         return id;
     }
@@ -163,7 +180,7 @@ public sealed class SampleProject
     {
         var id = Id();
         var map = records.OfType<Step>().Single(step => step.Id == Steps[source]).MapId;
-        records.Add(new Flow(id, map, Steps[source], Steps[target], label, At(20), Bruno, null, null, deletedAt, batch, 1));
+        records.Add(new Flow(id, map, Steps[source], Steps[target], label is null ? null : T(label), At(20), Bruno, null, null, deletedAt, batch, 1));
         return id;
     }
 
@@ -251,62 +268,81 @@ public sealed class SampleProject
         foreach (var flow in new[] { created, entry, exit })
             records.Add(new DissolutionObject(frame, DissolutionObjectTypes.Flow, flow));
         records.Add(new DissolutionObject(frame, DissolutionObjectTypes.Lane, Lanes["C06"]));
-        records.Add(new Document(Id(), dissolved, DocumentDirection.Output, "Relevé des soldes", null, null, null, false, "fr", At(15), Bruno, null, null, 1));
-        records.Add(new PainPoint(Id(), Project, dissolved, "CONGES-I002", "Soldes recalculés à la main", "fr", 2m, PainPointStatus.Reported,
+        records.Add(new Document(Id(), dissolved, DocumentDirection.Output, T("Relevé des soldes"), null, null, null, false, Language, At(15), Bruno, null, null, 1));
+        records.Add(new PainPoint(Id(), Project, dissolved, $"{Prefix}-I002", T("Soldes recalculés à la main"), Language, 2m, PainPointStatus.Reported,
             At(16), Bruno, null, null, 1));
-        records.Add(new StepSheet(Id(), dissolved, SheetStatus.Draft, "Gestionnaire RH", null, null, valueStream ? Frequency.PerCase : null, null, null, "fr", null,
+        records.Add(new StepSheet(Id(), dissolved, SheetStatus.Draft, T("Gestionnaire RH"), null, null, valueStream ? Frequency.PerCase : null, null, null, Language, null,
             At(17), Bruno, null, null, 1));
     }
 
     private void Content()
     {
         var validated = Id();
-        records.Add(new StepSheet(validated, Steps["E004"], SheetStatus.Validated, "Manager direct", "Accorder ou refuser la demande",
-            "Messagerie", Frequency.Weekly, 15.50m, "Vérifier le planning de l'équipe avant de répondre.\nRépondre sous 48 h.", "fr", null,
+        records.Add(new StepSheet(validated, Steps["E004"], SheetStatus.Validated, T("Manager direct"), T("Accorder ou refuser la demande"),
+            T("Messagerie"), Frequency.Weekly, 15.50m, T("Vérifier le planning de l'équipe avant de répondre.\nRépondre sous 48 h."), Language, null,
             At(70), Bruno, At(75), Alice, 5)
         {
             LeadTime = valueStream ? 1m : null,
             LeadTimeUnit = valueStream ? LeadTimeUnit.Day : null,
         });
-        records.Add(new SheetOperation(validated, 1, "Ouvrir la demande", "Messagerie", OperationNature.Check));
-        records.Add(new SheetOperation(validated, 2, "Consulter le planning", null, null));
-        records.Add(new StepSheetVersion(Id(), validated, 2, SheetJson.Freeze(new SheetContent(null, "Accorder ou refuser", null, Frequency.Weekly, 15m,
-            [new ProcedureTask("Ouvrir la demande", "Messagerie", OperationNature.Check)], null) { LeadTime = valueStream ? new LeadTime(2m, LeadTimeUnit.Hour) : null }),
+        records.Add(new SheetOperation(validated, 1, T("Ouvrir la demande"), T("Messagerie"), OperationNature.Check));
+        records.Add(new SheetOperation(validated, 2, T("Consulter le planning"), null, null));
+        records.Add(new StepSheetVersion(Id(), validated, 2, SheetJson.Freeze(new SheetContent(null, T("Accorder ou refuser"), null, Frequency.Weekly, 15m,
+            [new ProcedureTask(T("Ouvrir la demande"), T("Messagerie"), OperationNature.Check)], null) { LeadTime = valueStream ? new LeadTime(2m, LeadTimeUnit.Hour) : null }),
             Frequency.Weekly, 15m, Alice, At(74)) { LeadTime = valueStream ? 2m : null, LeadTimeUnit = valueStream ? LeadTimeUnit.Hour : null });
-        records.Add(new StepSheetVersion(Id(), validated, 1, "{\"fields\":{},\"procedure\":[{\"text\":\"Ouvrir\"}],\"filled_count\":1}",
+        records.Add(new StepSheetVersion(Id(), validated, 1, $"{{\"fields\":{{}},\"procedure\":[{{\"text\":\"{T("Ouvrir")}\"}}],\"filled_count\":1}}",
             null, null, Denis, At(72)));
         var review = Id();
-        records.Add(new StepSheet(review, Steps["E010"], SheetStatus.NeedsReview, null, "Décrire la demande", null, Frequency.Occasional, 5m, null,
-            "fr", "Préciser le délai de prévenance", At(76), Chloe, null, null, 2));
-        records.Add(new SheetOperation(review, 1, "Choisir les dates", "Formulaire", OperationNature.ReEnter));
+        records.Add(new StepSheet(review, Steps["E010"], SheetStatus.NeedsReview, null, T("Décrire la demande"), null, Frequency.Occasional, 5m, null,
+            Language, T("Préciser le délai de prévenance"), At(76), Chloe, null, null, 2));
+        records.Add(new SheetOperation(review, 1, T("Choisir les dates"), T("Formulaire"), OperationNature.ReEnter));
         var form = Id();
-        records.Add(new Document(form, Steps["E002"], DocumentDirection.Output, "Formulaire de demande", "https://exemple.invalid/formulaire",
-            LocationType.Url, null, true, "fr", At(80), Chloe, At(81), Bruno, 2));
-        records.Add(new Document(Id(), Steps["E010"], DocumentDirection.Input, "Planning d'équipe", "\\\\partage-fictif\\planning.xlsx",
-            LocationType.Path, 2.0m, false, "fr", At(80), Chloe, null, null, 1));
+        records.Add(new Document(form, Steps["E002"], DocumentDirection.Output, T("Formulaire de demande"), T("https://exemple.invalid/formulaire"),
+            LocationType.Url, null, true, Language, At(80), Chloe, At(81), Bruno, 2));
+        records.Add(new Document(Id(), Steps["E010"], DocumentDirection.Input, T("Planning d'équipe"), T("\\\\partage-fictif\\planning.xlsx"),
+            LocationType.Path, 2.0m, false, Language, At(80), Chloe, null, null, 1));
         var relances = Id();
-        records.Add(new PainPoint(relances, Project, Steps["E004"], "CONGES-I001", "Relances multiples du manager", "fr", 3.50m, PainPointStatus.Scored,
+        records.Add(new PainPoint(relances, Project, Steps["E004"], $"{Prefix}-I001", T("Relances multiples du manager"), Language, 3.50m, PainPointStatus.Scored,
             At(82), Chloe, At(83), Alice, 2));
-        records.Add(new PainPointStatusChange(Id(), relances, PainPointStatus.Reported, PainPointStatus.Scored, "Chiffré en atelier", Alice, At(83)));
+        records.Add(new PainPointStatusChange(Id(), relances, PainPointStatus.Reported, PainPointStatus.Scored, T("Chiffré en atelier"), Alice, At(83)));
         records.Add(new PainPointStatusChange(Id(), relances, null, PainPointStatus.Reported, null, Chloe, At(82)));
-        records.Add(new PainPoint(Id(), Project, null, "CONGES-I003", "Aucun outil unique pour les absences", "fr", null, PainPointStatus.UnderReview,
+        records.Add(new PainPoint(Id(), Project, null, $"{Prefix}-I003", T("Aucun outil unique pour les absences"), Language, null, PainPointStatus.UnderReview,
             At(84), Denis, null, null, 1));
         records.Add(new DocumentUse(form, Steps["E004"], 4m, 80, relances, At(85), Bruno, At(86), Bruno) { Version = 2 });
         records.Add(new DocumentUse(form, Steps["E003"], null, null, null, At(85), Bruno, null, null));
     }
 
+    /// <summary>
+    /// The translations into the other language, a few manual, the others automatic: every live text, so that the sample
+    /// shows translated under an interface in that language (ADR 083, half of the texts at least).
+    /// </summary>
     private void Translations()
     {
-        void Add(TranslationObject type, Guid id, TranslationField field, string text, TranslationSource source, Guid? author) =>
-            records.Add(new Translation(type, id, field, "en", text, source, At(90), author));
-        Add(TranslationObject.Project, Project, TranslationField.Name, "Leave request", TranslationSource.Manual, Alice);
-        Add(TranslationObject.Map, RootMap, TranslationField.Name, "Leave request", TranslationSource.Auto, null);
-        Add(TranslationObject.Map, DetailMap, TranslationField.Name, "Enter the request", TranslationSource.Auto, null);
-        Add(TranslationObject.Lane, Lanes["C01"], TranslationField.Name, "Employee", TranslationSource.Manual, Bruno);
-        Add(TranslationObject.Step, Steps["E002"], TranslationField.Label, "Enter the request", TranslationSource.Auto, null);
-        Add(TranslationObject.Step, Steps["E012"], TranslationField.Label, "Check the balances", TranslationSource.Manual, Bruno);
-        var yes = records.OfType<Flow>().Single(flow => flow.Label == "oui").Id;
-        Add(TranslationObject.Flow, yes, TranslationField.Label, "yes", TranslationSource.Manual, Bruno);
+        var language = english ? "fr" : "en";
+        void Add(TranslationObject type, Guid id, TranslationField field, string french, TranslationSource source, Guid? author) =>
+            records.Add(new Translation(type, id, field, language, Other(french), source, At(90), author));
+        Add(TranslationObject.Project, Project, TranslationField.Name, "Demande de congés", TranslationSource.Manual, Alice);
+        Add(TranslationObject.Map, RootMap, TranslationField.Name, "Demande de congés", TranslationSource.Auto, null);
+        Add(TranslationObject.Map, DetailMap, TranslationField.Name, "Saisir la demande", TranslationSource.Auto, null);
+        Add(TranslationObject.Lane, Lanes["C01"], TranslationField.Name, "Salarié", TranslationSource.Manual, Bruno);
+        Add(TranslationObject.Step, Steps["E002"], TranslationField.Label, "Saisir la demande", TranslationSource.Auto, null);
+        Add(TranslationObject.Step, Steps["E012"], TranslationField.Label, "Contrôler les soldes", TranslationSource.Manual, Bruno);
+        Guid FlowLabelled(string french) => records.OfType<Flow>().Single(flow => flow.Label == T(french)).Id;
+        Add(TranslationObject.Flow, FlowLabelled("oui"), TranslationField.Label, "oui", TranslationSource.Manual, Bruno);
+        Add(TranslationObject.Map, EmptySubMap, TranslationField.Name, "Valider la demande", TranslationSource.Auto, null);
+        foreach (var (lane, name) in new[] { ("C02", "Manager"), ("C03", "Ressources humaines"), ("C04", "Logiciel de paie"), ("C05", "Salarié"), ("C06", "Contrôle de gestion") })
+            Add(TranslationObject.Lane, Lanes[lane], TranslationField.Name, name, TranslationSource.Auto, null);
+        foreach (var (step, label) in new[]
+        {
+            ("E001", "Besoin de congés"), ("E003", "Demande conforme ?"), ("E004", "Valider la demande"), ("E008", "Corriger la demande"),
+            ("E006", "Enregistrer dans la paie"), ("E007", "Congés posés"), ("E013", "Lire le solde"), ("E014", "Comparer à la demande"),
+            ("E009", "Début de saisie"), ("E010", "Remplir le formulaire"), ("E017", "En même temps"), ("E018", "Joindre le justificatif"),
+            ("E019", "Prévenir l'équipe"), ("E020", "Fin des tâches simultanées"), ("E021", "Pièces à fournir ?"), ("E022", "Attendre l'accusé de réception"),
+            ("E023", "Fin des pièces"), ("E011", "Demande envoyée"),
+        })
+            Add(TranslationObject.Step, Steps[step], TranslationField.Label, label, TranslationSource.Auto, null);
+        foreach (var label in new[] { "non", "justificatif", "aucun" })
+            Add(TranslationObject.Flow, FlowLabelled(label), TranslationField.Label, label, TranslationSource.Auto, null);
     }
 
     /// <summary>What the package leaves out: a deleted lane, a deleted step and what hangs on it, a closed frame, the log.</summary>
@@ -317,10 +353,10 @@ public sealed class SampleProject
         Lane(RootMap, "C07", "Prestataire", LaneType.Department, 5, deletedAt: At(95), batch: batch);
         var deleted = Step("E015", "C07", 6, "Archiver le papier", deletedAt: At(95), batch: batch);
         records.Add(new Flow(Id(), RootMap, Steps["E004"], deleted, "archive", At(20), Bruno, null, null, At(95), batch, 1));
-        records.Add(new StepSheet(Id(), deleted, SheetStatus.Draft, "Archiviste", null, null, null, null, null, "fr", null, At(18), Bruno, null, null, 1));
-        records.Add(new Document(Id(), deleted, DocumentDirection.Output, "Bordereau d'archive", null, null, null, false, "fr", At(19), Bruno, null, null, 1));
-        records.Add(new PainPoint(Id(), Project, deleted, "CONGES-I004", "Papier égaré", "fr", null, PainPointStatus.Dropped, At(19), Bruno, null, null, 1));
-        records.Add(new Translation(TranslationObject.Step, deleted, TranslationField.Label, "en", "Archive the paper", TranslationSource.Manual, At(90), Bruno));
+        records.Add(new StepSheet(Id(), deleted, SheetStatus.Draft, T("Archiviste"), null, null, null, null, null, Language, null, At(18), Bruno, null, null, 1));
+        records.Add(new Document(Id(), deleted, DocumentDirection.Output, T("Bordereau d'archive"), null, null, null, false, Language, At(19), Bruno, null, null, 1));
+        records.Add(new PainPoint(Id(), Project, deleted, $"{Prefix}-I004", T("Papier égaré"), Language, null, PainPointStatus.Dropped, At(19), Bruno, null, null, 1));
+        records.Add(new Translation(TranslationObject.Step, deleted, TranslationField.Label, english ? "fr" : "en", Other("Archiver le papier"), TranslationSource.Manual, At(90), Bruno));
         records.Add(new StepRaci(Steps["E004"], Lanes["C07"], RaciRole.C, At(34), Bruno));
         var closedBatch = Id();
         records.Add(new DeletionBatch(closedBatch, Project, null, At(96), Bruno, null, null));

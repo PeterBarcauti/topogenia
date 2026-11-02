@@ -655,17 +655,17 @@
           "Microsoft.AspNetCore.Authentication.Negotiate": "[10.0.13, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.13, )",
           "System.DirectoryServices.AccountManagement": "[10.0.13, )",
-          "Topogenia.Application": "[3.0.0, )",
-          "Topogenia.Assistant": "[3.0.0, )",
-          "Topogenia.Interchange": "[3.0.0, )",
-          "Topogenia.Persistence.SqlServer": "[3.0.0, )",
-          "Topogenia.Persistence.Sqlite": "[3.0.0, )"
+          "Topogenia.Application": "[3.0.2, )",
+          "Topogenia.Assistant": "[3.0.2, )",
+          "Topogenia.Interchange": "[3.0.2, )",
+          "Topogenia.Persistence.SqlServer": "[3.0.2, )",
+          "Topogenia.Persistence.Sqlite": "[3.0.2, )"
         }
       },
       "topogenia.application": {
         "type": "Project",
         "dependencies": {
-          "Topogenia.Core": "[3.0.0, )"
+          "Topogenia.Core": "[3.0.2, )"
         }
       },
       "topogenia.assistant": {
@@ -676,36 +676,36 @@
           "AWSSDK.SSO": "[4.0.100.23, )",
           "AWSSDK.SSOOIDC": "[4.0.100.22, )",
           "Anthropic": "[13.3.0, )",
-          "Topogenia.Application": "[3.0.0, )"
+          "Topogenia.Application": "[3.0.2, )"
         }
       },
       "topogenia.interchange": {
         "type": "Project",
         "dependencies": {
-          "Topogenia.Application": "[3.0.0, )",
-          "Topogenia.Core": "[3.0.0, )"
+          "Topogenia.Application": "[3.0.2, )",
+          "Topogenia.Core": "[3.0.2, )"
         }
       },
       "topogenia.persistence": {
         "type": "Project",
         "dependencies": {
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
-          "Topogenia.Application": "[3.0.0, )",
-          "Topogenia.Core": "[3.0.0, )"
+          "Topogenia.Application": "[3.0.2, )",
+          "Topogenia.Core": "[3.0.2, )"
         }
       },
       "topogenia.persistence.sqlite": {
         "type": "Project",
         "dependencies": {
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.13, )",
-          "Topogenia.Persistence": "[3.0.0, )"
+          "Topogenia.Persistence": "[3.0.2, )"
         }
       },
       "topogenia.persistence.sqlserver": {
         "type": "Project",
         "dependencies": {
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.13, )",
-          "Topogenia.Persistence": "[3.0.0, )"
+          "Topogenia.Persistence": "[3.0.2, )"
         }
       },
       "Anthropic": {
@@ -860,9 +860,9 @@
       },
       "Topogenia.Core": {
         "type": "CentralTransitive",
-        "requested": "[3.0.0, )",
-        "resolved": "3.0.0",
-        "contentHash": "hfx0hy4vzDIMX/SfTXj7ZLK9Gq2Srbj139zZd2u1qXXKo5XcBLu3vi+SK1cskmoyUQj3qO4bVTSsmSCZGh+a+A=="
+        "requested": "[3.0.2, )",
+        "resolved": "3.0.2",
+        "contentHash": "wUbUj02m4bXoUiqHMqJj91QQc2yYQ/+N6dW1NMmcFtPovYN3QBVpb9jqq0xXOeKckBALYLS8XDRe1DeOWzzunA=="
       }
     }
   }

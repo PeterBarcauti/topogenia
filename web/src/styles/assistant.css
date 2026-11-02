@@ -97,6 +97,8 @@
   color: var(--text-muted); cursor: pointer; }
 .reply-time + .reply-copy { margin-left: 0; }
 .reply-copy:hover { background: var(--hover); color: var(--text); }
+.reply-report { width: 26px; height: 26px; display: grid; place-items: center; border-radius: var(--radius-small); color: var(--text-muted); }
+.reply-report:hover { background: var(--hover); color: var(--text); }
 .reply-message { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
 .reply-cost { margin: 2px 0 0; padding-top: 8px; border-top: 1px dashed var(--border); font-size: var(--font-size-micro); line-height: 1.5; color: var(--text-muted); }
 .reply-cost strong { color: var(--text); font-weight: 600; }

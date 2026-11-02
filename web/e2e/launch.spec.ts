@@ -45,7 +45,8 @@ test('the launch address opens the application once, without the token in the ad
   await expect(page.getByTestId('home-empty')).toBeVisible();
   const [cookie, ...others] = await context.cookies(ORIGIN);
   expect(others).toEqual([]);
-  expect(cookie).toMatchObject({ name: 'desktop_session', httpOnly: true, sameSite: 'Strict', path: '/', expires: -1 });
+  // Named by the port of its run: two runs of the machine at once keep their cookies apart (ADR 089, audit 3.4).
+  expect(cookie).toMatchObject({ name: `desktop_session_${String(OWN_HOST_PORT)}`, httpOnly: true, sameSite: 'Strict', path: '/', expires: -1 });
   // The page reads the profile with the cookie; the cookie is out of reach of its scripts.
   expect(await page.evaluate(() => document.cookie)).toBe('');
   expect((await context.request.get(`${ORIGIN}/api/me`)).status()).toBe(200);

@@ -42,10 +42,11 @@ public sealed class DesktopRun : IAsyncDisposable
 
     /// <summary>
     /// Starts the run; <paramref name="browser"/>, when given, is the browser the application opens (spec 6.1);
-    /// <paramref name="owners"/>, when given, tells the owner of each connection in place of Windows (ADR 075).
+    /// <paramref name="owners"/>, when given, tells the owner of each connection in place of Windows (ADR 075);
+    /// <paramref name="window"/>, when given, makes the run one without a console that tells its start there (F-69).
     /// </summary>
     public static async Task<DesktopRun> StartAsync(IReadOnlyDictionary<string, string?>? settings = null, IBrowserLauncher? browser = null,
-        IConnectionOwners? owners = null)
+        IConnectionOwners? owners = null, IStartupWindow? window = null)
     {
         var folder = Directory.CreateTempSubdirectory($"{TestDatabase.FolderPrefix}{Environment.ProcessId}-");
         var section = ProductOptions.Section;
@@ -70,6 +71,8 @@ public sealed class DesktopRun : IAsyncDisposable
                 builder.Services.AddSingleton(browser);
             if (owners is not null)
                 builder.Services.AddSingleton(owners);
+            if (window is not null)
+                builder.Services.AddSingleton(provider => StartupConsole.Without(provider.GetRequiredService<Domain.Values.LanguageSettings>(), window));
         });
         try
         {

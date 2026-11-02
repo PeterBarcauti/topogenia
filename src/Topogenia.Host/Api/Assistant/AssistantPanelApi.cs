@@ -156,13 +156,28 @@ public sealed class AssistantPanelApi(AssistantExchanges exchanges, ErrorMessage
                 lines.Writer.TryComplete(failure);
             }
         }, CancellationToken.None);
+        try
+        {
+            await StreamAsync(response, lines.Reader, clock, cancellationToken);
+        }
+        finally
+        {
+            // The run works with the services of the request (its unit of work, its audit): the request ends once the run
+            // has ended, a cancelled exchange too, whose audit is still to write (audit 4.3). The run never throws.
+            await run;
+        }
+    }
+
+    /// <summary>Writes the lines of the run as they come, and the last progress again at each heartbeat while none comes.</summary>
+    private async Task StreamAsync(HttpResponse response, ChannelReader<AssistantEvent> lines, Stopwatch clock, CancellationToken cancellationToken)
+    {
         var last = new AssistantEvent("progress", Phase: Codes.Of(AssistantPhase.Waiting), Characters: 0);
         Task<bool>? waiting = null;
         try
         {
             while (true)
             {
-                waiting ??= lines.Reader.WaitToReadAsync(cancellationToken).AsTask();
+                waiting ??= lines.WaitToReadAsync(cancellationToken).AsTask();
                 if (await Task.WhenAny(waiting, Task.Delay(Heartbeat, cancellationToken)) != waiting)
                 {
                     await WriteAsync(response, last with { ElapsedMilliseconds = Elapsed(clock) }, cancellationToken);
@@ -172,7 +187,7 @@ public sealed class AssistantPanelApi(AssistantExchanges exchanges, ErrorMessage
                 waiting = null;
                 if (!more)
                     break;
-                while (lines.Reader.TryRead(out var line))
+                while (lines.TryRead(out var line))
                 {
                     if (line.Type == "progress")
                         last = line;
@@ -186,7 +201,6 @@ public sealed class AssistantPanelApi(AssistantExchanges exchanges, ErrorMessage
             logger.LogError(failure, "The exchange of the assistant failed after its start.");
             await WriteAsync(response, new AssistantEvent("failure", Failure: AssistantFailures.Other, ElapsedMilliseconds: Elapsed(clock)), CancellationToken.None);
         }
-        await run;
     }
 
     /// <summary>The messages of the faults of a proposal, in the language of the person.</summary>

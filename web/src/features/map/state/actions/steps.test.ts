@@ -4,7 +4,7 @@
 import { i18next } from '../../../../shared/i18n/i18n.ts';
 import { callsTo, fakeApi } from '../../../../test/fakeApi.ts';
 import { editorOf } from '../../../../test/editorStore.ts';
-import { laneOf, MAP_ID, mapOf, replyOf, sampleMap, stepOf } from '../../../../test/maps.ts';
+import { flowOf, laneOf, MAP_ID, mapOf, replyOf, sampleMap, stepOf } from '../../../../test/maps.ts';
 import { addFlow, relabelFlow, reverseFlow } from './flows.ts';
 import { addLane, deleteLane, deleteLaneWith, orderLanes, updateLane } from './lanes.ts';
 import { createStep, deleteDetail, deleteMacro, detailStep, groupSteps, insertStep } from './steps.ts';
@@ -111,6 +111,20 @@ describe('the flows (B-2.3-17, B-2.3-21, B-2.3-33, B-2.3-34)', () => {
     await addFlow(editor, 's1', 's1');
     await addFlow(editor, 's1', 's4');
     expect(callsTo(sent, 'POST', `/api/maps/${MAP_ID}/flows`).map((call) => call.body)).toEqual([{ source_step_id: 's1', target_step_id: 's4', label: null }]);
+  });
+
+  it('a flow the map already has sends nothing: two creations of one gesture make one flow and no refusal is shown', async () => {
+    const linked = sampleMap({ flows: [...sampleMap().flows, flowOf('f5', 's1', 's4')] });
+    const sent = fakeApi({ [`POST /api/maps/${MAP_ID}/flows`]: { json: replyOf(linked) } });
+    const { editor, notes } = await editorOf(sampleMap());
+    await Promise.all([addFlow(editor, 's1', 's4'), addFlow(editor, 's1', 's4')]);
+    await addFlow(editor, 's1', 's2');
+    expect(callsTo(sent, 'POST', `/api/maps/${MAP_ID}/flows`)).toHaveLength(1);
+    expect(notes).toEqual([]);
+    // The other direction is another flow (AR-155).
+    await addFlow(editor, 's4', 's1');
+    expect(callsTo(sent, 'POST', `/api/maps/${MAP_ID}/flows`).map((call) => call.body)).toEqual([
+      { source_step_id: 's1', target_step_id: 's4', label: null }, { source_step_id: 's4', target_step_id: 's1', label: null }]);
   });
 
   it('an empty label removes the label; the same label sends nothing', async () => {

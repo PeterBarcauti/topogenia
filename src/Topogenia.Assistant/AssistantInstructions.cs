@@ -20,6 +20,12 @@ public sealed class AssistantInstructions : IAssistantInstructions
     /// <summary>The name of the package of exchange in its files, the root identifier of the solution (ADR 051).</summary>
     private static readonly string Package = nameof(Topogenia).ToLowerInvariant();
 
+    /// <summary>The version of the exchange package the schema of a project is written in (PackageFormat.Version).</summary>
+    public const string PackageVersion = "2.1";
+
+    /// <summary>The version of the `.pmap` the map open and the schema of a map are written in (PmapFormat.Version).</summary>
+    public const string PmapVersion = "1.2";
+
     /// <summary>The files of the documentation of the formats, in the order they are given (spec 3.0 section 5).</summary>
     public static readonly IReadOnlyList<string> FormatFiles =
     [
@@ -47,9 +53,10 @@ public sealed class AssistantInstructions : IAssistantInstructions
         ArgumentNullException.ThrowIfNull(prompt);
         if (prompt.Schema is not { } schema)
             return null;
+        // The versions written by the formats of the exchange (PackageFormat, PmapFormat), which a test holds equal (audit 4.8).
         var heading = prompt.SchemaFormat == AssistantSchemaFormat.Package
-            ? $"# The schema of the project\n\nThe whole project as the entries of its exchange package (format .{Package} 2.0), without the people and the translations; each entry under a line `=== name ===`.\n\n"
-            : "# The schema of the project\n\nThe whole project as one .pmap 1.1 document of all its maps, the sheets as the person may see them.\n\n";
+            ? $"# The schema of the project\n\nThe whole project as the entries of its exchange package (format .{Package} {PackageVersion}), without the people and the translations; each entry under a line `=== name ===`.\n\n"
+            : $"# The schema of the project\n\nThe whole project as one .pmap {PmapVersion} document of all its maps, the sheets as the person may see them.\n\n";
         return heading + schema;
     }
 
@@ -70,7 +77,7 @@ public sealed class AssistantInstructions : IAssistantInstructions
         ArgumentNullException.ThrowIfNull(prompt);
         var text = new StringBuilder();
         if (prompt.OpenMap is { } map)
-            text.Append("<map name=\"").Append(Attribute(prompt.MapName ?? "")).Append("\" format=\"pmap 1.1\">\n").Append(map).Append("\n</map>\n\n");
+            text.Append("<map name=\"").Append(Attribute(prompt.MapName ?? "")).Append("\" format=\"pmap ").Append(PmapVersion).Append("\">\n").Append(map).Append("\n</map>\n\n");
         else
             text.Append("<map>none: the project does not exist yet</map>\n\n");
         text.Append("<selection>").Append(prompt.Selection.Count == 0 ? "none" : string.Join(", ", prompt.Selection)).Append("</selection>\n\n");

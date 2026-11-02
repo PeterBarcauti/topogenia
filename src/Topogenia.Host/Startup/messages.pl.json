@@ -26,6 +26,8 @@
   "QUITTER": "Zamknij to okno, aby zakończyć działanie aplikacji.",
   "DEJA_LANCEE_OUVERTE": "Aplikacja jest już uruchomiona: otwiera się w przeglądarce.",
   "REOUVERTE": "Ponowne uruchomienie: przeglądarka otwiera aplikację.",
+  "ICONE_OUVRIR": "Otwórz aplikację {product}",
+  "ICONE_QUITTER": "Zamknij aplikację {product}",
   "SAUVEGARDES_DOSSIER": "Folder kopii zapasowych: {folder}.",
   "RESTAURATION_PROPOSEE": "Dostępne kopie zapasowe, od najnowszej do najstarszej. Zmiany wprowadzone po wybranej kopii nie są w niej zawarte; bieżący plik i jego dziennik zostaną zachowane obok, bez usuwania:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

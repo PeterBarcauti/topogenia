@@ -41,6 +41,21 @@ describe('the sheet docked on the right (B-4-01, B-4-05, B-2.1-39, B-2.1-40)', (
     expect(callsTo(sent, 'GET', `/api/projects/${PROJECT_ID}`)).toHaveLength(1);
   });
 
+  it('a project that could not be read is read again when a sheet opens again, then kept (audit 5.5)', async () => {
+    const sent = fakeApi({
+      'GET /api/steps/s2/sheet': { json: sheetViewOf() },
+      [`GET /api/projects/${PROJECT_ID}`]: [{ refused: 503, code: 'SERVICE_INDISPONIBLE' }, project],
+    });
+    const { canvas } = await showEditor(sampleMap());
+    for (let opening = 0; opening < 3; opening += 1) {
+      openSheetOf(canvas, 's2');
+      await screen.findByTestId('sheet-panel');
+      await vi.waitFor(() => { expect(callsTo(sent, 'GET', `/api/projects/${PROJECT_ID}`).length).toBeGreaterThan(Math.min(opening, 1)); });
+      fireEvent.click(pane(canvas));
+    }
+    expect(callsTo(sent, 'GET', `/api/projects/${PROJECT_ID}`)).toHaveLength(2);
+  });
+
   it('the step and its lane named in the language shown', async () => {
     fakeApi({ 'GET /api/steps/s2/sheet': { json: sheetViewOf() }, [`GET /api/projects/${PROJECT_ID}`]: project });
     await i18next.changeLanguage('en');

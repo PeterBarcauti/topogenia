@@ -89,6 +89,8 @@ function proposalsOf(editor: ReturnType<typeof useEditor>): NonNullable<ThreadCo
       const marks: Record<string, StepMark> = {};
       for (const change of preview.changes)
         if (change.kind === 'step' && change.id !== null && (change.action === 'changed' || change.action === 'removed')) marks[change.id] = change.action;
+      // A translation previewed by another card leaves the map first: the marks are on the map as it is (audit 5.5).
+      editor.store.getState().preview(null);
       editor.store.setState({ marks });
       return preview;
     },

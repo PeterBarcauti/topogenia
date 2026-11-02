@@ -1,5 +1,5 @@
 // sbom.mjs
-// Writes the SBOM (CycloneDX 1.5, JSON) of a published mode from its deps.json and the components of build/components.mjs; arguments: <Desktop|Server> <deps.json> <runtimeconfig.json or -> <out.cdx.json> (spec 5.4, ADR 073).
+// Writes the SBOM (CycloneDX 1.5, JSON) of a published mode from its deps.json and the components of build/components.mjs; arguments: <Desktop|Server|Store> <deps.json> <runtimeconfig.json or -> <out.cdx.json> (spec 5.4, ADR 073).
 
 import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -7,8 +7,8 @@ import { join } from 'node:path';
 import { components, nugetLicence, root } from './components.mjs';
 
 const [mode, depsFile, runtimeConfig, out] = process.argv.slice(2);
-if (!['Desktop', 'Server'].includes(mode) || !depsFile || !runtimeConfig || !out) {
-  console.error('arguments: <Desktop|Server> <deps.json> <runtimeconfig.json or -> <out.cdx.json>');
+if (!['Desktop', 'Server', 'Store'].includes(mode) || !depsFile || !runtimeConfig || !out) {
+  console.error('arguments: <Desktop|Server|Store> <deps.json> <runtimeconfig.json or -> <out.cdx.json>');
   process.exit(2);
 }
 
@@ -56,13 +56,20 @@ const interfaceComponents = npm.filter((item) => item.usage === 'livré').map((i
   } : {}),
 }));
 
+/** What the package of each mode is (ADR 088: the desktop mode also as an MSIX package for the Microsoft Store). */
+const DESCRIPTIONS = {
+  Desktop: 'Desktop mode, portable ZIP (self-contained, win-x64)',
+  Server: 'Server mode, ZIP for IIS (Hosting Bundle .NET 10)',
+  Store: 'Desktop mode, MSIX package for the Microsoft Store (self-contained, win-x64)',
+};
+
 const bom = {
   bomFormat: 'CycloneDX', specVersion: '1.5', serialNumber: `urn:uuid:${randomUUID()}`, version: 1,
   metadata: {
     timestamp: new Date().toISOString(),
     component: {
       type: 'application', 'bom-ref': `${product}@${version}`, name: product, version,
-      description: mode === 'Desktop' ? 'Desktop mode, portable ZIP (self-contained, win-x64)' : 'Server mode, ZIP for IIS (Hosting Bundle .NET 10)',
+      description: DESCRIPTIONS[mode],
       licenses: [{ license: { id: 'Apache-2.0' } }, { license: { name: 'Proprietary licence of the core (licenses/CORE-LICENSE.md)' } }],
     },
   },

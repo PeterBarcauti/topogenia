@@ -139,4 +139,45 @@ public sealed class BatchPurgeTests(MigratedDatabases databases) : IClassFixture
         Assert.Equal(before.StepsOf(map).OrderBy(step => step.Id), after.StepsOf(map).OrderBy(step => step.Id));
         Assert.Equal(before.FlowsOf(map).OrderBy(flow => flow.Id), after.FlowsOf(map).OrderBy(flow => flow.Id));
     }
+
+    /// <summary>
+    /// Producer P, user U and holder H; U uses the output of P with a pain point that a lift moved onto H; H is deleted.
+    /// Past the retention, the purge takes H and the pain point, and keeps the use of U, which loses the pain point only
+    /// (audit 3.4).
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
+    public async Task A_use_kept_by_the_purge_loses_its_purged_pain_point_and_keeps_its_values(EngineKind kind)
+    {
+        var database = await databases.OfAsync(kind);
+        var scenario = await StoreScenario.CreateAsync(database);
+        var steps = new Guid[3];
+        var document = Guid.Empty;
+        await scenario.RunAsync((workspace, context) =>
+        {
+            var map = workspace.RootMap.Id;
+            var lane = workspace.LanesOf(map)[0].Id;
+            for (var i = 0; i < steps.Length; i++)
+                steps[i] = StepOperations.Create(workspace, context, new CreateStepRequest(map, lane, i, $"Step {i}")).Id;
+            document = Topogenia.Domain.Documents.DocumentEdits.Add(workspace, context, steps[0],
+                new Topogenia.Domain.Documents.DocumentInput("output", "Extraction", null, null, null));
+            Topogenia.Domain.Documents.DocumentUses.Use(workspace, context, steps[1], document,
+                new Topogenia.Domain.Documents.DocumentUseInput(3m, 80, "Colonnes en double"));
+        });
+        // The state a lift leaves (Remainder.Move of a pain point): the pain point of the use held by another step.
+        await scenario.RunAsync((workspace, _) => workspace.Put(Assert.Single(workspace.All<PainPoint>()) with { StepId = steps[2] }));
+        await scenario.RunAsync((workspace, context) =>
+            GroupDeletion.Delete(workspace, context, workspace.RootMap.Id, new GroupDeletionRequest([steps[2]], null)));
+        var before = await scenario.LoadAsync();
+        var used = before.Find<DocumentUse>(DocumentUse.KeyOf(document, steps[1]))!;
+        var plan = PurgePlanner.Expired(before, PurgeBench.AfterRetention(FixedClock.Time.AddDays(1)), AppSettings.Default);
+
+        await PurgeBench.PurgeAsync(database, scenario.ProjectId, plan, 2);
+
+        var after = await scenario.LoadAsync();
+        Assert.Empty(after.All<PainPoint>());
+        Assert.Null(after.Step(steps[2]));
+        Assert.Equal(used with { PainPointId = null }, after.Find<DocumentUse>(DocumentUse.KeyOf(document, steps[1])));
+        Assert.NotNull(after.Document(document));
+    }
 }

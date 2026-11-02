@@ -6,6 +6,7 @@ import { useReactFlow, type Connection, type EdgeChange, type NodeChange, type O
 import { useStore } from 'zustand';
 import type { Schema } from '../../../api/client.ts';
 import { paths } from '../../../app/router.ts';
+import { bandOf } from '../model/geometry/constants.ts';
 import type { Point } from '../model/geometry/grid.ts';
 import { cellAtPoint, dropCells } from '../model/moves.ts';
 import { hasContent, isMacro } from '../model/stepFacts.ts';
@@ -75,7 +76,9 @@ function dragHandlers(editor: MapEditor, map: MapView, setDragged: (update: (bef
     if (chosen.length > 0) editor.store.setState((state) => ({ selection: { ...state.selection, flows: withChoices(state.selection.flows, chosen) } }));
   };
   const onNodeDragStop = (_event: unknown, _node: MapNode, nodes: MapNode[]) => {
-    const moves = dropCells(map, nodes.filter((node) => node.type === 'step').map((node) => ({ id: node.id, position: node.position })));
+    // On the grid as it is drawn: with the band of the value stream layer when it is on (spec 14.5, audit 5.1).
+    const band = bandOf(editor.preferences.getState().showValueStream);
+    const moves = dropCells(map, nodes.filter((node) => node.type === 'step').map((node) => ({ id: node.id, position: node.position })), band);
     void moveSteps(editor, moves).finally(() => {
       setDragged(() => new Map());
     });
@@ -163,7 +166,7 @@ function clickHandlers(editor: MapEditor, map: MapView, toFlow: (point: Point) =
     },
     onPaneDoubleClick: (event: MouseEvent) => {
       if (!canEdit || !(event.target instanceof Element) || !event.target.classList.contains('react-flow__pane')) return;
-      const cell = cellAtPoint(map, toFlow({ x: event.clientX, y: event.clientY }));
+      const cell = cellAtPoint(map, toFlow({ x: event.clientX, y: event.clientY }), bandOf(editor.preferences.getState().showValueStream));
       if (cell !== null) void createStep(editor, cell);
     },
     onEdgeDoubleClick: (event: MouseEvent, edge: FlowEdge) => {

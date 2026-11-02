@@ -53,7 +53,37 @@ public sealed class DesktopServerTests
         using var client = run.Client();
         foreach (var url in new[] { "/api/health", "/api/me", "/api/projects", "/" })
             Assert.Equal(401, (await SendAsync(client, HttpMethod.Get, url, null)).Status);
-        Assert.Equal(401, (await SendAsync(client, HttpMethod.Get, "/api/me", "desktop_session=forged")).Status);
+        Assert.Equal(401, (await SendAsync(client, HttpMethod.Get, "/api/me", $"{DesktopSession.CookieNameOf(run.Origin.Port)}=forged")).Status);
+    }
+
+    /// <summary>
+    /// Two runs of the machine at once (the portable version and the one of the Store, two data files): the browser keeps
+    /// both cookies for 127.0.0.1, since a cookie is not tied to a port; each run reads its own, named by its port, and the
+    /// launch of the second never signs the first out (audit 3.4).
+    /// </summary>
+    [Fact]
+    public async Task Two_runs_at_once_each_keep_their_session_cookie_named_by_their_port()
+    {
+        await using var first = await DesktopRun.StartAsync();
+        await using var second = await DesktopRun.StartAsync();
+        Assert.NotEqual(first.Origin.Port, second.Origin.Port);
+        var cookies = new List<string>();
+        foreach (var run in new[] { first, second })
+        {
+            using var client = run.Client();
+            var (_, _, response) = await SendAsync(client, HttpMethod.Get, $"/launch?token={run.LaunchToken}", null);
+            var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie")).Split(';')[0];
+            Assert.StartsWith($"{DesktopSession.CookieNameOf(run.Origin.Port)}=", cookie, StringComparison.Ordinal);
+            cookies.Add(cookie);
+        }
+        var jar = string.Join("; ", cookies);
+        foreach (var run in new[] { first, second })
+        {
+            using var client = run.Client();
+            Assert.Equal(200, (await SendAsync(client, HttpMethod.Get, "/api/me", jar)).Status);
+        }
+        using (var firstClient = first.Client())
+            Assert.Equal(401, (await SendAsync(firstClient, HttpMethod.Get, "/api/me", cookies[1])).Status);
     }
 
     /// <summary>Security m-1 of the gate P7: no answer names the server, whatever its status (ASVS V14.3.3).</summary>
@@ -81,7 +111,7 @@ public sealed class DesktopServerTests
         var (status, _, response) = await SendAsync(client, HttpMethod.Get, $"/launch?token={token}", null);
         Assert.Equal((302, "/"), (status, response.Headers.Location!.OriginalString));
         var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie")).ToLowerInvariant();
-        Assert.StartsWith("desktop_session=", cookie, StringComparison.Ordinal);
+        Assert.StartsWith($"{DesktopSession.CookieNameOf(run.Origin.Port)}=", cookie, StringComparison.Ordinal);
         Assert.Contains("httponly", cookie, StringComparison.Ordinal);
         Assert.Contains("samesite=strict", cookie, StringComparison.Ordinal);
         Assert.Contains("path=/", cookie, StringComparison.Ordinal);

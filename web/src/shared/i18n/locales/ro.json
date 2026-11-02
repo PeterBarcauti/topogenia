@@ -1044,6 +1044,8 @@
       },
       "pasted": "Răspuns lipit",
       "copy_reply": "Copiere răspuns",
+      "report": "Raportare conținut nepotrivit către editor ({{address}})",
+      "report_subject": "$t(app.name): raportarea unui răspuns al IA",
       "failures": {
         "refused": "Furnizorul refuză cheia sau identitatea: verificați setările IA.",
         "key_missing": "Nu este salvată nicio cheie API: administratorul o introduce în setările IA.",

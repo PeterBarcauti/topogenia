@@ -1,6 +1,6 @@
 // package.mjs
-// Builds the ZIP of a mode, the single entry point of the packages (spec 5.4, 6.1, 6.2, ADR 048, ADR 049, ADR 071 to 074, ADR 076): the interface built, the notices checked, the publication of its profile against the package of the core, signed when a certificate is given, then the ZIP with its readme, licences and SBOM, written and read back by the SDK, its content checked, and its SHA-256.
-// node build/package.mjs <Desktop|Server> [--certificate <file.pfx> [--certificate-password <password>] [--timestamp-url <address>]]
+// Builds the ZIP of a mode, the single entry point of the packages (spec 5.4, 6.1, 6.2, ADR 048, ADR 049, ADR 071 to 074, ADR 076): the interface built, the notices checked, the publication of its profile against the package of the core, signed when a certificate is given, then the ZIP with its readme, licences and SBOM, written and read back by the SDK, its content checked, and its SHA-256. Store: the desktop mode as an MSIX package for the Microsoft Store instead of a ZIP (ADR 088).
+// node build/package.mjs <Desktop|Server|Store> [--certificate <file.pfx> [--certificate-password <password>] [--timestamp-url <address>]]
 
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -14,7 +14,7 @@ const fail = (message) => {
   process.exit(1);
 };
 
-const USAGE = 'node build/package.mjs <Desktop|Server> [--certificate <file.pfx> [--certificate-password <password>] [--timestamp-url <address>]]';
+const USAGE = 'node build/package.mjs <Desktop|Server|Store> [--certificate <file.pfx> [--certificate-password <password>] [--timestamp-url <address>]]';
 const OPTIONS = { certificate: { type: 'string' }, 'certificate-password': { type: 'string' }, 'timestamp-url': { type: 'string' } };
 const parsed = (() => {
   try {
@@ -24,15 +24,18 @@ const parsed = (() => {
   }
 })();
 const { positionals: [mode, ...extra], values: signing } = parsed;
-if (!['Desktop', 'Server'].includes(mode) || extra.length > 0) fail(USAGE);
+if (!['Desktop', 'Server', 'Store'].includes(mode) || extra.length > 0) fail(USAGE);
 if (!signing.certificate && (signing['certificate-password'] || signing['timestamp-url'])) fail(`A password or a timestamp server without a certificate\n${USAGE}`);
+// ADR 088: the MSIX package of the Store is the publication of the desktop mode.
+const profile = mode === 'Store' ? 'Desktop' : mode;
 
 // ADR 076: the tools this script starts, each one directly, never through a shell nor an interpreter of scripts of the
 // system: node itself (TypeScript, Vite and the scripts of build/), dotnet (MSBuild, NuGet, the archives of
-// build/archive.proj), and signtool of the Windows SDK when a certificate is given. No archiver nor hasher of Windows.
+// build/archive.proj), and signtool of the Windows SDK when a certificate is given; for the Store (ADR 088), makepri and
+// makeappx of the Windows SDK. No archiver nor hasher of Windows.
 const env = { ...process.env, DOTNET_CLI_TELEMETRY_OPTOUT: '1', DOTNET_NOLOGO: '1' };
 
-/** A tool judged on its exit code alone (a warning of Vite on its error output does not stop the build), its output shown as it comes. */
+/** A tool judged on its exit code alone (a warning of Vite on its error output does not stop the build), its output shown as it comes, or kept (capture: the version of MSBuild, the list of files of makeappx). */
 function run(what, command, args, options = {}) {
   const stdio = options.capture ? ['ignore', 'pipe', 'inherit'] : 'inherit';
   const result = spawnSync(command, args, { cwd: options.cwd ?? root, env, stdio, encoding: 'utf8', shell: false, windowsHide: true });
@@ -118,14 +121,65 @@ function copyTemplate(source, target, product) {
   writeFileSync(target, text);
 }
 
-/** The folder of the ZIP: the publication, its readme and its files, the licences (the bundles of the interface have no banner), the SBOM. */
+/** The folders of the Windows SDK that hold its tools, the newest version first. */
+function kitFolders() {
+  const bin = join(process.env['ProgramFiles(x86)'] ?? 'C:\\Program Files (x86)', 'Windows Kits', '10', 'bin');
+  if (!existsSync(bin)) return [];
+  const parts = (name) => name.split('.').map(Number);
+  return readdirSync(bin).filter((name) => /^10\.0\.\d+\.\d+$/.test(name))
+    .sort((a, b) => parts(b).reduce((order, part, index) => order || part - parts(a)[index], 0))
+    .map((name) => join(bin, name, 'x64'));
+}
+
+/** A tool of the Windows SDK, found in the PATH, else in the newest x64 folder of the kit (ADR 088). */
+function kitTool(name) {
+  const tool = [...(process.env.PATH ?? '').split(delimiter).filter(Boolean), ...kitFolders()].map((folder) => join(folder, name)).find(existsSync);
+  if (!tool) fail(`${name} (Windows SDK) is neither in the PATH nor in the folder of the Windows Kits`);
+  return tool;
+}
+
+/**
+ * ADR 088: what the MSIX package adds to the publication of the desktop mode: its manifest (the identity reserved in
+ * Partner Center, the product and the version in four parts, the last one kept for the Store), the logos, and the index
+ * of their scales and target sizes written by makepri.
+ */
+function storeFiles(stage, product, version) {
+  if (!/^\d+\.\d+\.\d+$/.test(version)) fail(`The version ${version} is not of three numbers: the Store takes four, the last one 0`);
+  const manifest = readFileSync(join(root, 'build', 'store', 'AppxManifest.xml'), 'utf8')
+    .replaceAll('{{VERSION}}', `${version}.0`).replaceAll('{{PRODUCT}}', product);
+  if (manifest.includes('{{')) fail('build/store/AppxManifest.xml keeps a token of its own');
+  writeFileSync(join(stage, 'AppxManifest.xml'), manifest);
+  cpSync(join(root, 'build', 'store', 'Assets'), join(stage, 'Assets'), { recursive: true });
+  // makepri names a resource by its path from the folder it indexes: a folder of the logos alone, laid as in the package,
+  // never the publication (its folders of languages would read as qualifiers).
+  const logos = `${stage}-resources`;
+  rmSync(logos, { recursive: true, force: true });
+  cpSync(join(root, 'build', 'store', 'Assets'), join(logos, 'Assets'), { recursive: true });
+  const index = join(stage, 'resources.pri');
+  run('makepri', kitTool('makepri.exe'), ['new', '/pr', logos, '/cf', join(root, 'build', 'store', 'priconfig.xml'),
+    '/mn', join(stage, 'AppxManifest.xml'), '/of', index, '/o'], { capture: true });
+  checkLogos(index, manifest, join(logos, 'resources.xml'));
+  rmSync(logos, { recursive: true, force: true });
+}
+
+/** Each logo the manifest names must be a resource of the index, else Windows shows its default icon in the Start menu and the search. */
+function checkLogos(index, manifest, dump) {
+  run('makepri dump', kitTool('makepri.exe'), ['dump', '/if', index, '/of', dump, '/dt', 'detailed', '/o'], { capture: true });
+  const resources = readFileSync(dump, 'utf8');
+  const named = [...new Set(manifest.match(/Assets\\[\w.]+\.png/g) ?? [])];
+  if (named.length === 0) fail('The manifest of the MSIX package names no logo');
+  const missing = named.filter((logo) => !resources.includes(`/Files/${logo.replaceAll('\\', '/')}"`));
+  if (missing.length > 0) fail(`The index of the MSIX package does not name ${missing.join(', ')}`);
+}
+
+/** The folder of the package: the publication, its readme and its files, the licences (the bundles of the interface have no banner), the SBOM. */
 function stageOf(published, deps, core, product, version) {
-  const stage = join(artifacts, `${product}-${version}-${mode === 'Desktop' ? 'portable' : 'server'}`);
+  const stage = join(artifacts, `${product}-${version}-${{ Desktop: 'portable', Server: 'server', Store: 'store' }[mode]}`);
   rmSync(stage, { recursive: true, force: true });
   cpSync(published, stage, { recursive: true });
   if (mode === 'Desktop') {
     copyTemplate('build/portable-readme.txt', join(stage, 'README.txt'), product);
-  } else {
+  } else if (mode === 'Server') {
     copyTemplate('build/server/server-readme.txt', join(stage, 'README.txt'), product);
     copyTemplate('build/server/appsettings.Production.example.json', join(stage, 'appsettings.Production.example.json'), product);
     cpSync(join(root, 'docs', 'exploitation-serveur.md'), join(stage, 'exploitation-serveur.md'));
@@ -143,15 +197,19 @@ function stageOf(published, deps, core, product, version) {
   const runtime = mode === 'Server' ? join(published, `${product}.runtimeconfig.json`) : '-';
   run('The SBOM', process.execPath, [join(root, 'build', 'sbom.mjs'), mode, deps, runtime, sbom]);
   cpSync(sbom, join(stage, 'sbom.cdx.json'));
+  if (mode === 'Store') storeFiles(stage, product, version);
   return stage;
 }
 
-/** What each ZIP must carry, and never carry (no script, no symbols, no source, no key, nothing of the test bench). */
-const REQUIRED = ['README.txt', 'sbom.cdx.json', 'appsettings.json', 'wwwroot/index.html', 'licenses/LICENSE.txt', 'licenses/NOTICE.txt',
+/** What each package must carry, and never carry (no script, no symbols, no source, no key, nothing of the test bench). */
+const REQUIRED = ['sbom.cdx.json', 'appsettings.json', 'wwwroot/index.html', 'licenses/LICENSE.txt', 'licenses/NOTICE.txt',
   'licenses/THIRD-PARTY-NOTICES.md', 'licenses/CORE-LICENSE.md', 'licenses/Inter-OFL-1.1.md', 'licenses/Lucide-ISC.txt'];
 const REQUIRED_BY_MODE = {
-  Desktop: (name) => [`${name}.exe`, 'e_sqlite3.dll', 'Microsoft.Data.SqlClient.SNI.dll'],
-  Server: (name) => [`${name}.dll`, `${name}.exe`, 'Topogenia.Domain.dll', 'web.config', 'appsettings.Production.example.json', 'exploitation-serveur.md'],
+  Desktop: (name) => ['README.txt', `${name}.exe`, 'e_sqlite3.dll', 'Microsoft.Data.SqlClient.SNI.dll'],
+  Server: (name) => ['README.txt', `${name}.dll`, `${name}.exe`, 'Topogenia.Domain.dll', 'web.config', 'appsettings.Production.example.json', 'exploitation-serveur.md'],
+  // ADR 088: no readme in the package of the Store, whose listing presents it; its manifest, its index and its logos.
+  Store: (name) => [`${name}.exe`, 'e_sqlite3.dll', 'Microsoft.Data.SqlClient.SNI.dll', 'AppxManifest.xml', 'resources.pri', 'Assets/StoreLogo.scale-100.png',
+    'Assets/Square44x44Logo.scale-100.png', 'Assets/Square44x44Logo.targetsize-256.png', 'Assets/Square150x150Logo.scale-100.png', 'Assets/Wide310x150Logo.scale-100.png'],
 };
 const FORBIDDEN = /\.(pdb|ps1|psm1|bat|cmd|vbs|wsf|cs|csproj|snk)$|EndToEnd|appsettings\.Development/i;
 
@@ -177,10 +235,41 @@ function zip(stage, product) {
   return file;
 }
 
-/** ADR 049: the executable signed when a certificate is given, by signtool of the Windows SDK found in the PATH. */
+/** The files makeappx adds to a package of its own: its map of blocks, the types of its content; and signtool, when signed: the signature and its catalogue. */
+const PACKAGE_FILES = ['AppxBlockMap.xml', '[Content_Types].xml', 'AppxSignature.p7x', 'AppxMetadata/CodeIntegrity.cat'];
+
+/**
+ * ADR 088: the MSIX package written by makeappx, signed when a certificate is given (for a trial on a machine: the Store
+ * signs the package it receives), then unpacked by makeappx: it must give the staged files, byte for byte, and its
+ * manifest must name the executable it carries.
+ */
+function msix(stage, product, version) {
+  const file = join(artifacts, `${product}-${version}.msix`);
+  rmSync(file, { force: true });
+  const makeappx = kitTool('makeappx.exe');
+  run('makeappx pack', makeappx, ['pack', '/d', stage, '/p', file, '/o'], { capture: true });
+  if (signing.certificate) sign(file);
+  const back = `${stage}-read`;
+  rmSync(back, { recursive: true, force: true });
+  run('makeappx unpack', makeappx, ['unpack', '/p', file, '/d', back, '/o'], { capture: true });
+  const names = namesOf(back).filter((name) => !PACKAGE_FILES.includes(name));
+  if (JSON.stringify(names) !== JSON.stringify(namesOf(stage))) fail('The MSIX package does not give back the files of its folder');
+  const hashes = names.map((name) => [name, digest(join(back, name))]);
+  const changed = hashes.filter(([name, hash]) => hash !== digest(join(stage, name))).map(([name]) => name);
+  if (changed.length > 0) fail(`The MSIX package gives back other bytes for ${changed.join(', ')}`);
+  if (!readFileSync(join(back, 'AppxManifest.xml'), 'utf8').includes(`Executable="${product}.exe"`)) fail('The manifest of the MSIX package does not name its executable');
+  rmSync(back, { recursive: true, force: true });
+  const missing = [...REQUIRED, ...REQUIRED_BY_MODE[mode](product)].filter((name) => !names.includes(name));
+  if (missing.length > 0) fail(`The MSIX package lacks ${missing.join(', ')}`);
+  const forbidden = names.filter((name) => FORBIDDEN.test(name));
+  if (forbidden.length > 0) fail(`The MSIX package carries ${forbidden.join(', ')}`);
+  writeFileSync(`${stage}.files.sha256`, hashes.map(([name, hash]) => `${hash}  ${name}\n`).join(''));
+  return file;
+}
+
+/** ADR 049: the executable (the MSIX package for the Store, ADR 088) signed when a certificate is given, by signtool of the Windows SDK. */
 function sign(file) {
-  const signtool = (process.env.PATH ?? '').split(delimiter).filter(Boolean).map((folder) => join(folder, 'signtool.exe')).find(existsSync);
-  if (!signtool) fail('A certificate is given but signtool (Windows SDK) is not in the PATH');
+  const signtool = kitTool('signtool.exe');
   const args = ['sign', '/fd', 'SHA256', '/f', signing.certificate];
   if (signing['certificate-password']) args.push('/p', signing['certificate-password']);
   if (signing['timestamp-url']) args.push('/tr', signing['timestamp-url'], '/td', 'SHA256');
@@ -196,7 +285,7 @@ function assemble(published, locks, product, version) {
   checkCore(published, deps, core, locks);
   checkPaths(published);
   const stage = stageOf(published, deps, core, product, version);
-  const file = zip(stage, product);
+  const file = mode === 'Store' ? msix(stage, product, version) : zip(stage, product);
   const hash = digest(file);
   // Its SHA-256, to check a copy taken from the shared folder (ADR 049).
   writeFileSync(`${file}.sha256`, `${hash}  ${basename(file)}\n`);
@@ -226,8 +315,8 @@ run('The check of THIRD-PARTY-NOTICES.md (to rewrite: node build/third-party-not
 // (signed by strong name, obfuscated), never on the sources of the domain; its lock files are written in obj, the ones
 // of the repository stay as the build wrote them; no symbols, so that no path of the machine of the build ships.
 const locks = prepare();
-const published = join(artifacts, mode.toLowerCase());
+const published = join(artifacts, profile.toLowerCase());
 rmSync(published, { recursive: true, force: true });
-run('dotnet publish', 'dotnet', ['publish', host, `-p:PublishProfile=${mode}`, '-p:UseCorePackage=true', '-p:NuGetLockFilePath=obj/packages.publish.lock.json', '-p:DebugType=none']);
-if (signing.certificate) sign(join(published, `${product}.exe`));
+run('dotnet publish', 'dotnet', ['publish', host, `-p:PublishProfile=${profile}`, '-p:UseCorePackage=true', '-p:NuGetLockFilePath=obj/packages.publish.lock.json', '-p:DebugType=none']);
+if (signing.certificate && mode !== 'Store') sign(join(published, `${product}.exe`));
 assemble(published, locks, product, version);

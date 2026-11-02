@@ -26,6 +26,8 @@
   "QUITTER": "Schließen Sie dieses Fenster, um die Anwendung zu beenden.",
   "DEJA_LANCEE_OUVERTE": "Die Anwendung läuft bereits: Sie wird im Browser geöffnet.",
   "REOUVERTE": "Zweiter Start: Der Browser öffnet die Anwendung.",
+  "ICONE_OUVRIR": "{product} öffnen",
+  "ICONE_QUITTER": "{product} beenden",
   "SAUVEGARDES_DOSSIER": "Die Sicherungen liegen in {folder}.",
   "RESTAURATION_PROPOSEE": "Verfügbare Sicherungen, von der neuesten zur ältesten. Änderungen nach der gewählten Sicherung sind darin nicht enthalten; die aktuelle Datei und ihr Journal werden daneben aufbewahrt und nicht gelöscht:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

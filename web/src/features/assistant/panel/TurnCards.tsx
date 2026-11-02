@@ -2,7 +2,7 @@
 // The cards of the thread of the assistant: the request of the person, the model at work, the reply in its form with its cost, the failure, the prompt copied for the copy and paste (spec 3.0 section 3.4).
 
 import { useState } from 'react';
-import { Check, ClipboardCopy, Copy, RotateCcw, Sparkles, TriangleAlert } from 'lucide-react';
+import { Check, ClipboardCopy, Copy, Flag, RotateCcw, Sparkles, TriangleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
 import { Icon } from '../../../shared/ui/Icon.tsx';
@@ -63,6 +63,25 @@ function CostLine({ turn }: { turn: ReplyTurn }) {
   );
 }
 
+/**
+ * The address of the publisher, at the domain of the product: the reports of the replies of a model go there (Microsoft
+ * Store policy 11.16, ADR 088). Built from the name of the product, which lives in the translation files only (D13).
+ */
+export function reportAddress(product: string): string {
+  return `peter.barcauti@${product.toLowerCase()}.com`;
+}
+
+/** A reply of a model reported by a mail to the publisher: the subject only, nothing of the reply joined (the person quotes what they choose). */
+function ReportLink() {
+  const { t } = useTranslation();
+  const address = reportAddress(t('app.name'));
+  const label = t('assistant.panel.report', { address });
+  return (
+    <a className="reply-report" data-testid="assistant-reply-report" href={`mailto:${address}?subject=${encodeURIComponent(t('assistant.panel.report_subject'))}`}
+      title={label} aria-label={label}><Icon icon={Flag} size={14} /></a>
+  );
+}
+
 export function ReplyCard({ turn, context }: { turn: ReplyTurn; context: ThreadContext }) {
   const { t } = useTranslation();
   const { reply } = turn;
@@ -70,6 +89,8 @@ export function ReplyCard({ turn, context }: { turn: ReplyTurn; context: ThreadC
     const done = await copyText(reply.message);
     notify(t(done ? 'assistant.panel.copied' : 'assistant.panel.copy_refused'), done ? 'success' : 'error');
   };
+  // A reply pasted from the AI of the person was not made by a model of the application: nothing to report here.
+  const reportable = !turn.pasted;
   return (
     <article className={`turn-reply is-${reply.form}`} data-testid="assistant-reply" data-form={reply.form}>
       <header className="reply-head">
@@ -78,11 +99,12 @@ export function ReplyCard({ turn, context }: { turn: ReplyTurn; context: ThreadC
         {turn.elapsed > 0 && <span className="reply-time">{t('assistant.panel.seconds', { count: Math.round(turn.elapsed / 1000) })}</span>}
         <button type="button" className="reply-copy" data-testid="assistant-reply-copy" title={t('assistant.panel.copy_reply')} aria-label={t('assistant.panel.copy_reply')}
           onClick={() => void copy()}><Icon icon={Copy} size={14} /></button>
+        {reportable && <ReportLink />}
       </header>
       {reply.message !== '' && <p className="reply-message"><TextWithCodes text={reply.message} objects={reply.objects} reveal={context.reveal} /></p>}
       {reply.form === 'questions' && <Questions reply={reply} context={context} />}
       {reply.form === 'findings' && <Findings reply={reply} context={context} />}
-      {reply.form === 'proposal' && <Proposal reply={reply} context={context} translation={turn.translation} />}
+      {reply.form === 'proposal' && <Proposal reply={reply} context={context} translation={turn.translation} turnId={turn.id} />}
       <CostLine turn={turn} />
     </article>
   );
@@ -99,7 +121,7 @@ export function FailureCard({ turn, context }: { turn: FailureTurn; context: Thr
       {turn.detail !== null && turn.detail !== '' && <p className="failure-detail">{turn.detail}</p>}
       {retry !== null && (
         <button type="button" className="reply-action" data-testid="assistant-retry" disabled={running}
-          onClick={() => void context.store.getState().send(retry.text, retry.intent, retry.files)}>
+          onClick={() => void context.store.getState().send(retry.text, retry.intent, retry.files, retry.translation)}>
           <Icon icon={RotateCcw} size={14} />{t('assistant.panel.retry')}
         </button>
       )}

@@ -26,6 +26,8 @@
   "QUITTER": "Feche esta janela para sair da aplicação.",
   "DEJA_LANCEE_OUVERTE": "A aplicação já está em execução: abre-se no browser.",
   "REOUVERTE": "Segundo arranque: o browser abre-se na aplicação.",
+  "ICONE_OUVRIR": "Abrir o {product}",
+  "ICONE_QUITTER": "Sair do {product}",
   "SAUVEGARDES_DOSSIER": "As cópias de segurança estão em {folder}.",
   "RESTAURATION_PROPOSEE": "Cópias de segurança disponíveis, da mais recente para a mais antiga. As alterações feitas depois da cópia escolhida não estão incluídas; o ficheiro atual e o respetivo diário serão mantidos ao lado, sem serem apagados:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

@@ -1013,6 +1013,8 @@
       },
       "pasted": "Respuesta pegada",
       "copy_reply": "Copiar la respuesta",
+      "report": "Informar al editor de un contenido inapropiado ({{address}})",
+      "report_subject": "$t(app.name): aviso sobre una respuesta de la IA",
       "failures": {
         "refused": "El proveedor rechaza la clave o la identidad: revísalo en la configuración de la IA.",
         "key_missing": "No hay ninguna clave de API guardada: el administrador la introduce en la configuración de la IA.",

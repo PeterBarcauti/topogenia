@@ -179,6 +179,35 @@ public sealed class DocumentTextReaderTests
     }
 
     [Fact]
+    public void A_drawing_that_repeats_an_identifier_or_leaves_one_out_is_read_its_links_naming_the_first_shape_of_an_identifier()
+    {
+        // Written by another tool: two shapes « 1 », one shape without identifier (audit 4.4: refused by an error of the server).
+        var shapes = Shape("1", "Recevoir", null, 1, 1, 1, 1) + Shape("1", "Doublon", null, 2, 2, 1, 1) + Shape("", "Sans numéro", null, 3, 3, 1, 1)
+            + Shape("", "Autre sans numéro", null, 4, 4, 1, 1) + Shape("2", "Valider", null, 5, 5, 1, 1) + Shape("9", null);
+        const string connects = """<Connects><Connect FromSheet="9" FromCell="BeginX" ToSheet="1"/><Connect FromSheet="9" FromCell="EndX" ToSheet="2"/></Connects>""";
+        var content = Visio([("Page-1", $"<Shapes>{shapes}</Shapes>{connects}", false)]);
+
+        var text = Read(AttachmentKind.Visio, content)!;
+
+        Assert.Contains("\"Doublon\"", text, StringComparison.Ordinal);
+        Assert.Contains("\"Autre sans numéro\"", text, StringComparison.Ordinal);
+        Assert.EndsWith("- 1 \"Recevoir\" -> 2 \"Valider\"", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_negative_style_reads_the_cell_as_a_number_and_a_date_past_the_calendar_of_its_workbook_as_its_number()
+    {
+        // 2 958 000 days: 22/09/9998 from 1899, past 31/12/9999 from 1904; 2 958 465.9999999: 10000-01-01 once rounded to the second.
+        const string styles = """<cellXfs count="2"><xf numFmtId="0"/><xf numFmtId="14"/></cellXfs>""";
+        const string row = """<row r="1"><c r="A1" s="-1"><v>12.5</v></c><c r="B1" s="1"><v>2958000</v></c><c r="C1" s="1"><v>2958465.9999999</v></c></row>""";
+
+        Assert.Equal("## Sheet \"Dates\"\n1\t12.5\t2958000\t2958465.9999999",
+            Read(AttachmentKind.Excel, Excel([("Dates", row, false)], styles: styles, date1904: true)));
+        Assert.Equal("## Sheet \"Dates\"\n1\t12.5\t9998-09-22\t2958465.9999999",
+            Read(AttachmentKind.Excel, Excel([("Dates", row, false)], styles: styles)));
+    }
+
+    [Fact]
     public void A_connector_glued_at_one_end_and_a_shape_linked_without_text_are_said()
     {
         var shapes = Shape("1", null, null, 1, 1, 1, 1) + Shape("2", null);

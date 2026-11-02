@@ -193,7 +193,7 @@ internal static class ExcelText
         public string? Value(XmlReader xml)
         {
             var type = xml.GetAttribute("t");
-            var format = int.TryParse(xml.GetAttribute("s"), CultureInfo.InvariantCulture, out var index) && index < formats.Count ? formats[index] : NumberKind.Number;
+            var format = int.TryParse(xml.GetAttribute("s"), CultureInfo.InvariantCulture, out var index) && index >= 0 && index < formats.Count ? formats[index] : NumberKind.Number;
             if (xml.IsEmptyElement)
                 return null;
             string? value = null;

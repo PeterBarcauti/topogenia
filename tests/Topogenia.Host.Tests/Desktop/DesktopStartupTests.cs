@@ -280,6 +280,20 @@ public sealed class DesktopStartupTests
     }
 
     /// <summary>
+    /// ADR 088: installed from the Store, the process has the identity of its package and the folder of the product is under
+    /// the folder of the data of the package, never the one of the portable version; the tests run without a package.
+    /// </summary>
+    [Fact]
+    public void Installed_from_its_package_the_product_keeps_its_data_under_the_local_folder_of_the_package()
+    {
+        const string local = @"C:\Users\camille\AppData\Local";
+        Assert.Equal(@"C:\Users\camille\AppData\Local\Topogenia", DesktopPackage.DefaultFolderOf(local, null));
+        Assert.Equal(@"C:\Users\camille\AppData\Local\Packages\PeterBarcauti.Topogenia_0a1b2c3d4e5f6\LocalState\Topogenia",
+            DesktopPackage.DefaultFolderOf(local, "PeterBarcauti.Topogenia_0a1b2c3d4e5f6"));
+        Assert.Null(DesktopPackage.FamilyName);
+    }
+
+    /// <summary>
     /// A missing setting takes the safest value (spec 5.1): a configuration that names neither `Mode` nor the port (only
     /// the folder of the product, and no browser) starts the desktop mode, listening on a port chosen free at the start, on
     /// the loopback only. Two hosts so started at once listen on two ports: a fixed port by default would refuse the second.

@@ -28,6 +28,16 @@ scripts n'est livré ni exécuté par l'application (AR-37).
   relire par le SDK, exige qu'il rende les fichiers de son dossier octet pour octet, vérifie ses entrées (présentes et
   interdites) et écrit, à côté de lui, son SHA-256 (`.zip.sha256`) et celui de chacun de ses fichiers
   (`.files.sha256`, pour la liste blanche d'un antivirus).
+- `node build/package.mjs Store` (ADR 088) : le mode Poste en paquet MSIX pour le Microsoft Store, dans `artifacts/`
+  (`<produit>-<version>.msix`). La même publication que `Desktop`, sans `README.txt`, plus le manifeste
+  `store/AppxManifest.xml` (identité réservée dans Partner Center, écrite telle quelle ; produit et version en quatre
+  parties par jetons), les logos de `store/Assets` (dessinés une fois hors du dépôt, tirés de la marque) et leur index
+  `resources.pri` (`makepri` selon `store/priconfig.xml`, sur un dossier qui ne tient que `Assets`, pour que les noms
+  du manifeste `Assets\...` soient ceux de l'index ; vérifié dans un vidage de l'index, sinon Windows montre son icône
+  par défaut). `makeappx` écrit le paquet, puis le dépaquette : il doit
+  rendre ses fichiers octet pour octet. `makepri`, `makeappx` et `signtool` sont pris dans le PATH, sinon dans le
+  dossier le plus récent des Windows Kits. `--certificate` ne sert qu'à un essai sur un poste (certificat d'essai au
+  nom de l'éditeur, `CN=` de l'identité) : le paquet remis au Store part sans signature, Microsoft le signe.
 - `archive.proj` : les archives par les tâches `ZipDirectory` et `Unzip` de MSBuild, code signé de Microsoft :
   `dotnet msbuild build/archive.proj -t:Zip -p:Folder=<dossier> -p:Archive=<fichier.zip>`, ou `-t:Unzip`.
 - `sbom.mjs` : la SBOM CycloneDX 1.5 d'une publication, depuis son `deps.json` et les composants de l'interface.

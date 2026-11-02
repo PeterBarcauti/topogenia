@@ -1013,6 +1013,8 @@
       },
       "pasted": "Beillesztett válasz",
       "copy_reply": "Válasz másolása",
+      "report": "Nem megfelelő tartalom jelentése a kiadónak ({{address}})",
+      "report_subject": "$t(app.name): MI-válasz jelentése",
       "failures": {
         "refused": "A szolgáltató elutasítja a kulcsot vagy az identitást: ellenőrizze az MI-beállításokat.",
         "key_missing": "Nincs mentett API-kulcs: a rendszergazda adja meg az MI-beállításokban.",

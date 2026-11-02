@@ -69,7 +69,7 @@ internal sealed partial class PmapReading
         stepCount += steps.Count;
         Cells(steps, stepPaths, path);
         Uses(steps, stepPaths);
-        var flows = Flows(map, path, stepIds);
+        var flows = Flows(map, path, stepIds, steps);
         return lanes.Count == 0 ? null : new PmapMap(lanes, steps, flows);
     }
 
@@ -113,6 +113,13 @@ internal sealed partial class PmapReading
         }
         var translations = Translations(element, path, PmapFormat.LaneNameMax);
         var headcount = Whole(element, "headcount", path);
+        // The rules of the domain, said where they are broken: the model corrects its proposal before anyone sees it (audit 4.5).
+        // In a file 1.1, the property is already unknown (a fault of its own).
+        if (valueStream && headcount is not null && (!Headcount.IsValid(headcount) || !Topogenia.Domain.Values.LaneTypes.IsHuman(Codes.Parse<LaneType>(type, "type"))))
+        {
+            Fault(Join(path, Headcount.Field), DomainException.InvalidValue(Headcount.Field));
+            headcount = null;
+        }
         return id is null || name is null ? null : new PmapLane(id, name, type, parsed, translations) { Headcount = headcount };
     }
 
@@ -145,6 +152,11 @@ internal sealed partial class PmapReading
         currentStep = id ?? string.Empty;
         var sheet = Sheet(element, path, noContent);
         var volume = Volume(element, path);
+        if (valueStream && volume is not null && Codes.Parse<StepType>(type, "type") != StepType.Start)
+        {
+            Fault(Join(path, IncomingVolume.Field), DomainException.InvalidValue(IncomingVolume.Field));
+            volume = null;
+        }
         if (id is null || lane is null || label is null)
             return null;
         // A sub-map without a step details nothing: it is left out (A-2.17-25).
@@ -165,6 +177,16 @@ internal sealed partial class PmapReading
         if (quantity is null || period is null)
         {
             Fault(place, FileErrorCodes.InvalidValue, ("value", volume.ToString()), ("possible", "{ \"quantity\", \"period\": " + string.Join(", ", Periods) + " }"));
+            return null;
+        }
+        try
+        {
+            if (valueStream)
+                IncomingVolume.Parse(quantity, period);
+        }
+        catch (DomainException refusal)
+        {
+            Fault(place, refusal);
             return null;
         }
         return new PmapVolume(quantity.Value, period);
@@ -243,11 +265,14 @@ internal sealed partial class PmapReading
         return roles;
     }
 
-    private List<PmapFlow> Flows(JsonElement map, string path, HashSet<string> stepIds)
+    private List<PmapFlow> Flows(JsonElement map, string path, HashSet<string> stepIds, List<PmapStep> steps)
     {
         var flows = new List<PmapFlow>();
         if (List(map, "flows", path, required: false) is not { } list)
             return flows;
+        var types = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var step in steps)
+            types.TryAdd(step.Id, step.Type);
         var pairs = new HashSet<(string, string)>();
         var i = 0;
         foreach (var element in list.EnumerateArray())
@@ -260,9 +285,32 @@ internal sealed partial class PmapReading
                 Fault(place, FileErrorCodes.DuplicateFlow, ("source", flow.Source), ("target", flow.Target));
                 continue;
             }
-            flows.Add(flow);
+            flows.Add(ShareChecked(flow, place, types));
         }
         return flows;
+    }
+
+    /// <summary>
+    /// The share of the cases of a flow, by the rules of the domain: within its bounds, and only out of a decision or an
+    /// inclusive gateway (audit 4.5); a share refused is a fault, and leaves the flow.
+    /// </summary>
+    private PmapFlow ShareChecked(PmapFlow flow, string path, Dictionary<string, string> types)
+    {
+        if (!valueStream || flow.Share is not { } share)
+            return flow;
+        try
+        {
+            CaseShare.Parse(share);
+            if (types.TryGetValue(flow.Source, out var source) && StepTypes.SharesItsCases(Codes.Parse<StepType>(source, "type")))
+                return flow;
+            // At the path of the flow, as the building of the project says it (PmapBuild).
+            Fault(path, DomainException.InvalidValue(CaseShare.Field));
+        }
+        catch (DomainException refusal)
+        {
+            Fault(path, refusal);
+        }
+        return flow with { Share = null };
     }
 
     private PmapFlow? Flow(JsonElement element, string path, HashSet<string> stepIds)

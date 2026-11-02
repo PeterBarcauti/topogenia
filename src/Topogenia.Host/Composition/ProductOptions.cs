@@ -66,6 +66,12 @@ public sealed class ServerOptions
     public List<string> AllowedHosts { get; set; } = [];
 
     public string? LogsFolder { get; set; }
+
+    /// <summary>
+    /// The folder of the keys that protect the secret of the assistant in the database (ADR 089, audit 4.1); by default
+    /// `keys` beside the folder of the daily log.
+    /// </summary>
+    public string? KeysFolder { get; set; }
 }
 
 /// <summary>

@@ -9,10 +9,7 @@ import type { MapEditor } from '../editor.ts';
  * duration (B-4-50, B-2.6-11: the only change of the map that is not a reply of the host for the map).
  */
 export function showSheetSummary(editor: MapEditor, stepId: string, summary: Schema<'SheetSummary'>): void {
-  const map = editor.store.getState().map;
-  const step = map?.steps.find((candidate) => candidate.id === stepId);
-  if (map === null || step === undefined || JSON.stringify(step.sheet) === JSON.stringify(summary)) return;
-  editor.store.setState({ map: { ...map, steps: map.steps.map((candidate) => (candidate === step ? { ...step, sheet: summary } : candidate)) } });
+  editor.store.getState().summarize(stepId, summary);
 }
 
 /** Gives the sheet of a step to a member, or to nobody in particular (null), with the version of the step; true once the map took the reply (B-4-15). */

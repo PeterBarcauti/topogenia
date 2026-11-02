@@ -40,7 +40,7 @@ public sealed class DesktopAuthenticationHandler(
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!session.IsSession(Request.Cookies[DesktopSession.CookieName]))
+        if (!session.IsSession(Request.Cookies[DesktopSession.CookieNameOf(Context.Connection.LocalPort)]))
             return Task.FromResult(AuthenticateResult.NoResult());
         var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, account.Login)], Name);
         return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), Name)));
@@ -68,7 +68,7 @@ public sealed class LaunchMiddleware(RequestDelegate next)
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             return;
         }
-        context.Response.Cookies.Append(DesktopSession.CookieName, secret, new CookieOptions
+        context.Response.Cookies.Append(DesktopSession.CookieNameOf(context.Connection.LocalPort), secret, new CookieOptions
         {
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,

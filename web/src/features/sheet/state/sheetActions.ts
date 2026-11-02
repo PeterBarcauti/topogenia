@@ -17,34 +17,42 @@ async function attempt(sheet: SheetValue, write: () => Promise<void>): Promise<b
 }
 
 /**
+ * A write with the version of the sheet: what waits is saved first, so that both never leave with the same version
+ * (audit 5.4); when that saving failed, nothing more is sent (its message is already said).
+ */
+async function afterSaving(sheet: SheetValue, write: () => Promise<void>): Promise<boolean> {
+  await sheet.save.flush();
+  if (sheet.save.failed()) return false;
+  return attempt(sheet, write);
+}
+
+/**
  * Validates the sheet: what waits is saved first; when that saving failed, nothing is validated, since the host would
  * fix another content than the one shown (B-4-53). The message of the failure is already said.
  */
-export async function validateSheet(sheet: SheetValue): Promise<boolean> {
-  await sheet.save.flush();
-  if (sheet.save.failed()) return false;
-  return attempt(sheet, async () => {
+export function validateSheet(sheet: SheetValue): Promise<boolean> {
+  return afterSaving(sheet, async () => {
     sheet.apply(await api.post('/api/steps/{id}/sheet/validate', { path: { id: sheet.props.step.id }, version: sheet.save.version() }));
   });
 }
 
 /** The facilitator asks the author a question on a validated sheet, which goes « à revoir » (B-4-56, B-4-57). */
 export function askClarification(sheet: SheetValue, text: string): Promise<boolean> {
-  return attempt(sheet, async () => {
+  return afterSaving(sheet, async () => {
     sheet.apply(await api.post('/api/steps/{id}/sheet/clarification', { path: { id: sheet.props.step.id }, body: { text: text.trim() }, version: sheet.save.version() }));
   });
 }
 
 /** The facilitator rewrites the question asked; the state of the sheet stays (spec 3.0 section 16). */
 export function changeClarification(sheet: SheetValue, text: string): Promise<boolean> {
-  return attempt(sheet, async () => {
+  return afterSaving(sheet, async () => {
     sheet.apply(await api.put('/api/steps/{id}/sheet/clarification', { path: { id: sheet.props.step.id }, body: { text: text.trim() }, version: sheet.save.version() }));
   });
 }
 
 /** The facilitator removes the question asked; a sheet « à revoir » is validated again (spec 3.0 section 16). */
 export function withdrawClarification(sheet: SheetValue): Promise<boolean> {
-  return attempt(sheet, async () => {
+  return afterSaving(sheet, async () => {
     sheet.apply(await api.delete('/api/steps/{id}/sheet/clarification', { path: { id: sheet.props.step.id }, version: sheet.save.version() }));
   });
 }

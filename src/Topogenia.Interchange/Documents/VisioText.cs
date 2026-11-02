@@ -83,7 +83,11 @@ internal static class VisioText
         var (shapes, connects) = Contents(archive, part);
         var connectors = connects.GroupBy(connect => connect.From).ToDictionary(group => group.Key, group => group.ToList(), StringComparer.Ordinal);
         var linked = connects.Select(connect => connect.To).ToHashSet(StringComparer.Ordinal);
-        var byId = shapes.ToDictionary(shape => shape.Id, StringComparer.Ordinal);
+        // A drawing written by another tool may repeat an identifier or leave one out: the first shape of an identifier is
+        // the one a connection names (audit 4.4: a duplicate refused the whole file with an error of the server).
+        var byId = new Dictionary<string, Shape>(StringComparer.Ordinal);
+        foreach (var shape in shapes.Where(shape => shape.Id.Length > 0))
+            byId.TryAdd(shape.Id, shape);
         text.EndLine().Append("\n## Page \"").Append(name).Append("\"\n");
         text.Append("Shapes (identifier, text, master, centre x and y and size in inches, y growing upwards):\n");
         foreach (var shape in shapes.Where(shape => !connectors.ContainsKey(shape.Id) && (shape.Text.Length > 0 || linked.Contains(shape.Id))))

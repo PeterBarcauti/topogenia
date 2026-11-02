@@ -16,9 +16,9 @@
       },
       "Topogenia.Core": {
         "type": "Direct",
-        "requested": "[3.0.0, )",
-        "resolved": "3.0.0",
-        "contentHash": "hfx0hy4vzDIMX/SfTXj7ZLK9Gq2Srbj139zZd2u1qXXKo5XcBLu3vi+SK1cskmoyUQj3qO4bVTSsmSCZGh+a+A=="
+        "requested": "[3.0.2, )",
+        "resolved": "3.0.2",
+        "contentHash": "wUbUj02m4bXoUiqHMqJj91QQc2yYQ/+N6dW1NMmcFtPovYN3QBVpb9jqq0xXOeKckBALYLS8XDRe1DeOWzzunA=="
       },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
@@ -106,7 +106,7 @@
       "topogenia.application": {
         "type": "Project",
         "dependencies": {
-          "Topogenia.Core": "[3.0.0, )"
+          "Topogenia.Core": "[3.0.2, )"
         }
       },
       "Microsoft.EntityFrameworkCore": {

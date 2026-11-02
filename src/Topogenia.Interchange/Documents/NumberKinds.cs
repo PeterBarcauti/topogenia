@@ -69,10 +69,9 @@ internal static class NumberKinds
             return value;
         switch (kind)
         {
-            case NumberKind.Date when number is >= 0 and < 2_958_466:
+            case NumberKind.Date when IsDay(number, date1904):
                 // A day of Excel counts from its first day, the 30th of December 1899 (or of 1904): a date written as read, the zone of no use.
-                var date = new DateTime(date1904 ? 1904 : 1899, date1904 ? 1 : 12, date1904 ? 1 : 30, 0, 0, 0, DateTimeKind.Utc)
-                    .AddSeconds(Math.Round(number * 86_400));
+                var date = FirstDay(date1904).AddSeconds(Math.Round(number * 86_400));
                 return date.TimeOfDay == TimeSpan.Zero
                     ? date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
                     : date.ToString(date.Second == 0 ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
@@ -86,6 +85,17 @@ internal static class NumberKinds
                 return number.ToString("G15", CultureInfo.InvariantCulture);
         }
     }
+
+    /// <summary>The first day of the calendar of a workbook: the 30th of December 1899, or the 1st of January 1904.</summary>
+    private static DateTime FirstDay(bool date1904) =>
+        date1904 ? new DateTime(1904, 1, 1, 0, 0, 0, DateTimeKind.Utc) : new DateTime(1899, 12, 30, 0, 0, 0, DateTimeKind.Utc);
+
+    /// <summary>
+    /// A number of days that falls within the calendar from the first day of the workbook, to its last second rounded: the
+    /// bound depends on that first day (audit 4.4: a date of 1904 near 9999 overflowed the calendar).
+    /// </summary>
+    private static bool IsDay(double number, bool date1904) =>
+        number >= 0 && Math.Round(number * 86_400) <= (DateTime.MaxValue - FirstDay(date1904)).Ticks / TimeSpan.TicksPerSecond;
 
     /// <summary>Hours and minutes, and the seconds when there are some.</summary>
     private static string Clock(long hours, long seconds)

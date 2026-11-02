@@ -14,8 +14,16 @@ namespace Topogenia.Host.Desktop;
 /// </summary>
 public sealed class DesktopSession
 {
-    /// <summary>The name of the session cookie (no product name, D13).</summary>
-    public const string CookieName = "desktop_session";
+    /// <summary>The name of the session cookie before its port (no product name, D13).</summary>
+    public const string CookiePrefix = "desktop_session_";
+
+    /// <summary>
+    /// The name of the session cookie of the run that listens on a port. A cookie is not tied to a port (RFC 6265, 8.5):
+    /// two runs of the machine at once (the portable version and the one of the Store during a move by export and import,
+    /// two data files) would replace each other's cookie under one name, each tab of the other run then refused 401
+    /// (audit 3.4). Named by its port, each run reads its own.
+    /// </summary>
+    public static string CookieNameOf(int port) => CookiePrefix + port.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>The path of the exchange, and the name of its parameter.</summary>
     public const string LaunchPath = "/launch";

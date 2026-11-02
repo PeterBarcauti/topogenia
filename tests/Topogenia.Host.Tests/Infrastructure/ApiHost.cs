@@ -59,6 +59,7 @@ public sealed class ApiHost : IAsyncDisposable
                 builder.UseSetting($"{section}:Database:ConnectionString", database.ConnectionString);
                 builder.UseSetting($"{section}:Server:AllowedHosts:0", ServerHost);
                 builder.UseSetting($"{section}:Server:LogsFolder", Path.Combine(Path.GetTempPath(), $"{TestDatabase.FolderPrefix}{Environment.ProcessId}-logs"));
+                builder.UseSetting($"{section}:Server:KeysFolder", Path.Combine(Path.GetTempPath(), $"{TestDatabase.FolderPrefix}{Environment.ProcessId}-keys"));
             }
             builder.UseSetting($"{section}:Administrators:0", Logins.Admin);
             builder.UseSetting($"{section}:Administrators:1", Logins.Owner);

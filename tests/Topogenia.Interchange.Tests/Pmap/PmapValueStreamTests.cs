@@ -95,7 +95,9 @@ public sealed class PmapValueStreamTests
             .Replace(" PROPERTY_FLOW", flow, StringComparison.Ordinal));
         var fault = Assert.Single(Faults(text));
         Assert.Equal((path, FileErrorCodes.UnknownProperty), (fault.Path, fault.Code));
-        Read(text.Replace("\"version\": \"1.1\"", "\"version\": \"1.2\"", StringComparison.Ordinal));
+        // Read in a file 1.2, each in its place: a share out of a decision (audit 4.5: the reading checks the place too).
+        var placed = flow.Length == 0 ? text : text.Replace("\"type\": \"start\"", "\"type\": \"decision\"", StringComparison.Ordinal);
+        Read(placed.Replace("\"version\": \"1.1\"", "\"version\": \"1.2\"", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -108,14 +110,41 @@ public sealed class PmapValueStreamTests
     }
 
     [Theory]
-    [InlineData("\"type\": \"department\", \"headcount\": 3", "\"type\": \"system\", \"headcount\": 3", "map.lanes[0].headcount", "headcount")]
-    [InlineData("\"label\": \"Note reçue\", \"type\": \"start\"", "\"label\": \"Note reçue\", \"type\": \"task\"", "map.steps[0].volume", "volume")]
-    [InlineData("{ \"source\": \"e1\", \"target\": \"e2\" }", "{ \"source\": \"e1\", \"target\": \"e2\", \"share\": 50 }", "map.flows[0]", "share")]
-    [InlineData("\"workday_hours\": 7.5", "\"workday_hours\": 25", "project", "workday_hours")]
-    public void An_entry_out_of_its_place_or_its_bounds_is_a_fault_of_the_file_at_its_path(string valid, string invalid, string path, string field)
+    [InlineData(0, "map.lanes[0].headcount", "headcount")]
+    [InlineData(1, "map.steps[0].volume", "volume")]
+    [InlineData(2, "map.flows[0]", "share")]
+    [InlineData(3, "project", "workday_hours")]
+    public void An_entry_out_of_its_place_or_its_bounds_is_a_fault_of_the_file_at_its_path(int change, string path, string field)
     {
-        var refusal = Assert.Throws<DomainException>(() => Build(Read(Claims.Replace(valid, invalid, StringComparison.Ordinal))));
+        // The reading refuses these files (below); the building keeps its own guard for a document made otherwise.
+        var document = Read(Claims);
+        var map = document.Map;
+        var changed = change switch
+        {
+            0 => document with { Map = map with { Lanes = [map.Lanes[0] with { Type = "system" }, .. map.Lanes.Skip(1)] } },
+            1 => document with { Map = map with { Steps = [map.Steps[0] with { Type = "task" }, .. map.Steps.Skip(1)] } },
+            2 => document with { Map = map with { Flows = [map.Flows[0] with { Share = 50 }, .. map.Flows.Skip(1)] } },
+            _ => document with { Project = document.Project with { WorkdayHours = 25 } },
+        };
+        var refusal = Assert.Throws<DomainException>(() => Build(changed));
         var fault = Assert.Single((IEnumerable<FileError>)refusal.Details[FileError.DetailsKey]!);
+        Assert.Equal((path, ErrorCodes.InvalidValue, (object?)field), (fault.Path, fault.Code, fault.Values["field"]));
+    }
+
+    [Theory]
+    [InlineData("\"type\": \"department\", \"headcount\": 3", "\"type\": \"department\", \"headcount\": 100001", "map.lanes[0].headcount", "headcount")]
+    [InlineData("\"type\": \"department\", \"headcount\": 3", "\"type\": \"system\", \"headcount\": 3", "map.lanes[0].headcount", "headcount")]
+    [InlineData("\"quantity\": 120", "\"quantity\": 1000001", "map.steps[0].volume", "volume")]
+    [InlineData("\"label\": \"Note reçue\", \"type\": \"start\"", "\"label\": \"Note reçue\", \"type\": \"task\"", "map.steps[0].volume", "volume")]
+    [InlineData("\"share\": 15", "\"share\": 101", "map.flows[2]", "share")]
+    [InlineData("{ \"source\": \"e1\", \"target\": \"e2\" }", "{ \"source\": \"e1\", \"target\": \"e2\", \"share\": 50 }", "map.flows[0]", "share")]
+    [InlineData("\"workday_hours\": 7.5", "\"workday_hours\": 0", "project", "workday_hours")]
+    [InlineData("\"fte_hours_per_month\": 160", "\"fte_hours_per_month\": 745", "project", "fte_hours_per_month")]
+    public void The_reading_alone_finds_an_entry_out_of_its_place_or_its_bounds_so_that_the_model_corrects_its_proposal(string valid, string invalid, string path, string field)
+    {
+        // What the exchange of the assistant calls to send a proposal back to the model (audit 4.5): no building needed.
+        Assert.Contains(invalid, Claims.Replace(valid, invalid, StringComparison.Ordinal), StringComparison.Ordinal);
+        var fault = Assert.Single(Faults(Claims.Replace(valid, invalid, StringComparison.Ordinal)));
         Assert.Equal((path, ErrorCodes.InvalidValue, (object?)field), (fault.Path, fault.Code, fault.Values["field"]));
     }
 }

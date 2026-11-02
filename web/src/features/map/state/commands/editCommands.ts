@@ -4,7 +4,6 @@
 import { ClipboardPaste, Copy, CopyPlus, Group, PencilLine, Redo2, Scissors, SquareDashed, SquareStack, Trash2, Undo2, Ungroup, WandSparkles } from 'lucide-react';
 import type { Command } from '../../../../shared/commands/commands.ts';
 import { endOfMap } from '../../model/clipboard.ts';
-import { cellAtPoint } from '../../model/moves.ts';
 import { hasContent, isMacro } from '../../model/stepFacts.ts';
 import { dissolveStep } from '../actions/dissolution.ts';
 import { canReplay, replay } from '../actions/history.ts';
@@ -12,7 +11,7 @@ import { align, moveByKeys } from '../actions/layout.ts';
 import { duplicate, giveUpCut, paste, takeToClipboard } from '../actions/paste.ts';
 import { deleteChosen, selectAll } from '../actions/selection.ts';
 import { detailStep, groupSteps } from '../actions/steps.ts';
-import { isCut, stepOf, stepsOf, type MapContext } from './context.ts';
+import { cellAimed, isCut, stepOf, stepsOf, type MapContext } from './context.ts';
 
 const chosen = (context: MapContext) => stepsOf(context).length > 0;
 
@@ -26,7 +25,7 @@ function pasteWhereAimed(context: MapContext): void {
     void paste(context.editor, { stepId: only, position: 'after' });
     return;
   }
-  const cell = (context.pointer === null ? null : cellAtPoint(context.map, context.pointer)) ?? endOfMap(context.map);
+  const cell = (context.pointer === null ? null : cellAimed(context, context.pointer)) ?? endOfMap(context.map);
   if (cell !== null) void paste(context.editor, { cell });
 }
 

@@ -137,7 +137,16 @@ export interface AssistantState {
   readonly restart: () => void;
   /** Reads the reply pasted from the AI of the person, for the prompt copied of a turn. */
   readonly paste: (turnId: number, reply: string) => Promise<void>;
+  /**
+   * What became of the proposal of each turn on the map, applied or put aside: kept with the thread, so that a card shown
+   * again (the panel closed then opened) does not offer it again (audit 5.5).
+   */
+  readonly outcomes: Readonly<Record<number, ProposalOutcome>>;
+  readonly settle: (turnId: number, outcome: ProposalOutcome) => void;
 }
+
+/** A proposal applied on the map, or put aside. */
+export type ProposalOutcome = 'applied' | 'dismissed';
 
 /** What the steps of an exchange share: the state, the turns written, the body of a request, the numbers of the turns, the call that runs. */
 interface Kit {
@@ -283,7 +292,8 @@ export function createAssistantStore(target: AssistantTarget): StoreApi<Assistan
     const kit: Kit = { get: getState, set: setState, target, next: () => number++, calls };
     return {
       open: false, status: null, statusError: null, turns: [], history: [], running: false, draft: '', intent: null, selectionDropped: false, mode: 'model',
-      files: [], bounds: null,
+      files: [], bounds: null, outcomes: {},
+      settle: (turnId, outcome) => { setState({ outcomes: { ...getState().outcomes, [turnId]: outcome } }); },
       setMode: (mode) => { setState({ mode }); },
       setBounds: (bounds) => { setState({ bounds }); },
       addFiles: (added) => { setState({ files: [...getState().files, ...added.map((file) => ({ ...file, id: number++ }))] }); },
@@ -318,7 +328,7 @@ export function createAssistantStore(target: AssistantTarget): StoreApi<Assistan
       stop: () => { calls.running?.abort(); },
       restart() {
         calls.running?.abort();
-        setState({ turns: [], history: [], draft: '', intent: null, selectionDropped: false, files: [] });
+        setState({ turns: [], history: [], draft: '', intent: null, selectionDropped: false, files: [], outcomes: {} });
       },
       paste: (turnId, pasted) => readPasted(kit, turnId, pasted),
     };

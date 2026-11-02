@@ -124,7 +124,7 @@ export function Findings({ reply, context }: { reply: AssistantReply; context: T
 }
 
 /** A proposal: what it holds, the points to check, the faults of its file, and the gestures that keep it. */
-export function Proposal({ reply, context, translation }: { reply: AssistantReply; context: ThreadContext; translation?: Translation | undefined }) {
+export function Proposal({ reply, context, translation, turnId }: { reply: AssistantReply; context: ThreadContext; translation?: Translation | undefined; turnId: number }) {
   const { t } = useTranslation();
   const proposal = reply.proposal;
   if (proposal === null) return null;
@@ -156,7 +156,7 @@ export function Proposal({ reply, context, translation }: { reply: AssistantRepl
         </div>
       )}
       {/* On a map, the preview and the application first; the new project and the file stay at hand. */}
-      {onMap && <ProposalOnMap pmap={proposal.pmap} context={context} translation={translation} />}
+      {onMap && <ProposalOnMap pmap={proposal.pmap} context={context} translation={translation} turnId={turnId} />}
       <div className="reply-actions">
         {valid && translation === undefined && context.createProject !== undefined && (
           <button type="button" className={`reply-action${onMap ? '' : ' is-primary'}`} data-testid="assistant-create-project" onClick={() => context.createProject?.(proposal.pmap)}>

@@ -14,7 +14,7 @@
     <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <!-- The closed core, packed by build/core (ADR 048, ADR 074), and its obfuscator, a tool of that chain never shipped -->
-    <PackageVersion Include="Topogenia.Core" Version="3.0.0" />
+    <PackageVersion Include="Topogenia.Core" Version="3.0.2" />
     <PackageVersion Include="Obfuscar" Version="2.2.50" />
     <!-- The connectors of the assistant (3.0): the official SDK of Anthropic; Bedrock Runtime by the AWS SDK, which reads a
          named profile signed in by SSO (its SSO packages) and the inference profiles of the account -->

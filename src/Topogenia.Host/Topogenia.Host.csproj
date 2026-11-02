@@ -4,6 +4,10 @@
   <PropertyGroup>
     <AssemblyName>$(ProductName)</AssemblyName>
     <RootNamespace>Topogenia.Host</RootNamespace>
+    <!-- Embedded in the executable: aware of the scale of each screen (ADR 088) -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- The icon of the executable, made of the logos of the Store (build/store/icon.mjs): Explorer, taskbar, notification area (F-69) -->
+    <ApplicationIcon>Topogenia.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Topogenia.Application/Topogenia.Application.csproj" />
@@ -16,8 +20,10 @@
     <!-- WithCulture false: messages.fr.json is not a satellite resource of the culture fr -->
     <EmbeddedResource Include="Errors/messages.*.json" LogicalName="Topogenia.Host.Errors.%(Filename)%(Extension)" WithCulture="false" />
     <EmbeddedResource Include="Startup/messages.*.json" LogicalName="Topogenia.Host.Startup.%(Filename)%(Extension)" WithCulture="false" />
-    <!-- The sample project of the first launch of the desktop mode (spec 6.1): the package of samples/ itself, one source -->
+    <!-- The sample project of the first launch of the desktop mode (spec 6.1): the packages of samples/ themselves, one source;
+         written in French, and in English for an interface in another language -->
     <EmbeddedResource Include="../../samples/conges.$(ProductName.ToLowerInvariant())" LogicalName="Samples/sample-project" WithCulture="false" />
+    <EmbeddedResource Include="../../samples/leave.$(ProductName.ToLowerInvariant())" LogicalName="Samples/sample-project-en" WithCulture="false" />
   </ItemGroup>
   <ItemGroup>
     <!-- Read from the assembly alone: never published beside it -->

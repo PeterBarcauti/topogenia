@@ -26,6 +26,8 @@
   "QUITTER": "Fermer cette fenêtre pour quitter l'application.",
   "DEJA_LANCEE_OUVERTE": "L'application est déjà lancée : elle s'ouvre dans le navigateur.",
   "REOUVERTE": "Un second lancement : le navigateur s'ouvre sur l'application.",
+  "ICONE_OUVRIR": "Ouvrir {product}",
+  "ICONE_QUITTER": "Quitter {product}",
   "SAUVEGARDES_DOSSIER": "Les sauvegardes sont dans {folder}.",
   "RESTAURATION_PROPOSEE": "Sauvegardes disponibles, de la plus récente à la plus ancienne. Les modifications faites après la sauvegarde choisie n'y sont pas ; le fichier actuel et son journal seront gardés à côté, sans être effacés :",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

@@ -1073,6 +1073,8 @@
       },
       "pasted": "Odpověď vložena",
       "copy_reply": "Kopírovat odpověď",
+      "report": "Nahlásit nevhodný obsah vydavateli ({{address}})",
+      "report_subject": "$t(app.name): nahlášení odpovědi AI",
       "failures": {
         "refused": "Poskytovatel odmítá klíč nebo identitu: zkontrolujte nastavení AI.",
         "key_missing": "Není uložen žádný klíč API: správce ho zadá v nastavení AI.",

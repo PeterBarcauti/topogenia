@@ -262,6 +262,17 @@ public sealed class AssistantExchangeConnectorTests
     }
 
     [Fact]
+    public void The_prompt_names_the_versions_the_formats_of_the_exchange_write()
+    {
+        // The map open and the schemas come from the formats of the exchange: the prompt names their versions (audit 4.8).
+        Assert.Equal((Interchange.Packages.PackageFormat.Version, Interchange.Pmap.PmapFormat.Version), (AssistantInstructions.PackageVersion, AssistantInstructions.PmapVersion));
+        Assert.Contains($"(format .topogenia {Interchange.Packages.PackageFormat.Version})", AssistantInstructions.SchemaOf(Prompt()), StringComparison.Ordinal);
+        Assert.Contains($"one .pmap {Interchange.Pmap.PmapFormat.Version} document", AssistantInstructions.SchemaOf(Prompt() with { SchemaFormat = AssistantSchemaFormat.Pmap }),
+            StringComparison.Ordinal);
+        Assert.Contains($"format=\"pmap {Interchange.Pmap.PmapFormat.Version}\"", AssistantInstructions.MessageOf(Prompt()), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void The_message_says_the_language_of_origin_and_the_languages_configured_that_a_translation_takes()
     {
         Assert.DoesNotContain("<languages", AssistantInstructions.MessageOf(Prompt()), StringComparison.Ordinal);

@@ -55,6 +55,9 @@ public sealed class TestConnector(AssistantConnector kind) : IAssistantConnector
     /// <summary>The time the next exchanges wait before their reply (to see the heartbeats of the stream, or to stop one).</summary>
     public TimeSpan Delay { get; set; } = TimeSpan.Zero;
 
+    /// <summary>The time an exchange stopped takes to give up, as a call over the network does (the request of the person is gone meanwhile).</summary>
+    public TimeSpan CancelDelay { get; set; } = TimeSpan.Zero;
+
     /// <summary>Gives the text of the next reply of the model.</summary>
     public void Next(string reply)
     {
@@ -74,7 +77,17 @@ public sealed class TestConnector(AssistantConnector kind) : IAssistantConnector
             prompts.Add(prompt);
         progress.Report(new AssistantProgress(AssistantPhase.Thinking, "Je lis la carte.", 0));
         if (Delay > TimeSpan.Zero)
-            await Task.Delay(Delay, cancellationToken);
+        {
+            try
+            {
+                await Task.Delay(Delay, cancellationToken);
+            }
+            catch (OperationCanceledException) when (CancelDelay > TimeSpan.Zero)
+            {
+                await Task.Delay(CancelDelay, CancellationToken.None);
+                throw;
+            }
+        }
         if (connection.Settings.Model == RefusedModel)
             return AssistantExchangeOutcome.Failed(AssistantFailures.Refused, 5, null, "invalid x-api-key");
         string text;

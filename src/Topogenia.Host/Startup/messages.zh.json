@@ -26,6 +26,8 @@
   "QUITTER": "关闭此窗口即可退出应用程序。",
   "DEJA_LANCEE_OUVERTE": "应用程序已在运行：将在浏览器中打开。",
   "REOUVERTE": "再次启动：浏览器将打开应用程序。",
+  "ICONE_OUVRIR": "打开 {product}",
+  "ICONE_QUITTER": "退出 {product}",
   "SAUVEGARDES_DOSSIER": "备份位于 {folder}。",
   "RESTAURATION_PROPOSEE": "可用的备份，从最新到最旧排列。所选备份之后所做的修改不包含在其中；当前文件及其日志将保留在旁边，不会被删除：",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

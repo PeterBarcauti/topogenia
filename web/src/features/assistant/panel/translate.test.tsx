@@ -99,6 +99,25 @@ describe('a translation by the assistant (ADR 083)', () => {
   }, 15_000);
 });
 
+describe('a translation that failed (audit 5.2)', () => {
+  it('« Réessayer » asks the same translation again: its language and the root map, never a change of the structure', async () => {
+    const failed = [{ type: 'started', destination: null }, { type: 'failure', failure: 'timeout' }].map((line) => JSON.stringify(line)).join('\n');
+    const sent = translationApi({ [`POST /api/maps/${MAP_ID}/assistant/exchanges`]: { text: failed } });
+    const editor = createMapEditor({ source: sourceOf(sampleMap()), storage: memoryStorage(), languages: ['fr', 'en', 'pt'], admin: true });
+    renderMapScreen({ mapId: MAP_ID, editor });
+    await screen.findByTestId('map-canvas');
+    editor.floating.getState().open({ kind: 'translations' });
+    await userEvent.click(await screen.findByTestId('translations-assistant-pt'));
+    await userEvent.click(screen.getByRole('button', { name: 'Traduire en Português' }));
+    await userEvent.click(await screen.findByTestId('assistant-retry'));
+    await waitFor(() => {
+      expect(callsTo(sent, 'POST', `/api/maps/${MAP_ID}/assistant/exchanges`)).toHaveLength(2);
+    });
+    expect(callsTo(sent, 'POST', `/api/maps/${MAP_ID}/assistant/exchanges`)[1]?.body)
+      .toMatchObject({ intent: 'translate', request: 'Traduire tout le processus en Português.', selection: [], language: 'pt' });
+  }, 15_000);
+});
+
 describe('the preview of a translation by the assistant (ADR 083)', () => {
   it('shows its texts in place in its language without frames, the map locked, sums them up and lists them beside their originals', async () => {
     translationApi();

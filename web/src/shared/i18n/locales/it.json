@@ -1013,6 +1013,8 @@
       },
       "pasted": "Risposta incollata",
       "copy_reply": "Copiare la risposta",
+      "report": "Segnalare un contenuto inappropriato all’editore ({{address}})",
+      "report_subject": "$t(app.name): segnalazione di una risposta dell’IA",
       "failures": {
         "refused": "Il fornitore rifiuta la chiave o l’identità: verificare le impostazioni dell’IA.",
         "key_missing": "Nessuna chiave API salvata: l’amministratore la inserisce nelle impostazioni dell’IA.",

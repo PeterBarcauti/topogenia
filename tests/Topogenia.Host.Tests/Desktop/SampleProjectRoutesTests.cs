@@ -1,5 +1,5 @@
 // SampleProjectRoutesTests.cs
-// The sample project of the first launch: imported from the package of the samples for the user of the desktop mode, by the chain of every import; nothing in server mode (spec 6.1, 7.3).
+// The sample project of the first launch: imported from a package of the samples for the user of the desktop mode, by the chain of every import, written in the language of the interface; nothing in server mode (spec 6.1, 7.3).
 
 using Topogenia.Application.Audit;
 using Topogenia.Host.Api.Exchange;
@@ -14,8 +14,37 @@ public sealed class SampleProjectRoutesTests(ApiHosts hosts) : IClassFixture<Api
     private const string Route = "/api/desktop/sample-project";
 
     [Fact]
-    public void The_package_embedded_in_the_host_is_the_file_of_the_samples_itself() =>
-        Assert.Equal(File.ReadAllBytes(RepositoryPaths.Of("samples", "conges.topogenia")), SampleProjectApi.Package());
+    public void The_packages_embedded_in_the_host_are_the_files_of_the_samples_themselves()
+    {
+        Assert.Equal(File.ReadAllBytes(RepositoryPaths.Of("samples", "conges.topogenia")), SampleProjectApi.Package(SampleProjectApi.ResourceName));
+        Assert.Equal(File.ReadAllBytes(RepositoryPaths.Of("samples", "leave.topogenia")), SampleProjectApi.Package(SampleProjectApi.EnglishResourceName));
+    }
+
+    [Fact]
+    public async Task An_interface_in_another_language_than_french_gets_the_sample_written_in_english()
+    {
+        var host = await hosts.OfAsync(EngineKind.Sqlite);
+        using var admin = host.As(Logins.Admin);
+        var me = (await admin.GetAsync("/api/me")).Ok();
+        // The profile may hold no language of its own (the default of the application, French here): it is given French back.
+        var french = me.GetProperty("language").GetString() is { Length: > 0 } own ? own : "fr";
+        (await admin.PatchAsync("/api/me", new { language = "en" }, me.GetProperty("version").GetInt32())).Ok();
+        try
+        {
+            var created = (await admin.PostAsync(Route)).Ok(201);
+            Assert.Equal("LEAVE", created.GetProperty("code").GetString());
+            var detail = (await admin.GetAsync($"/api/projects/{created.GetProperty("id").GetGuid()}")).Ok();
+            Assert.Equal(("Leave request", "en", "HR team"),
+                (detail.GetProperty("name").GetString(), detail.GetProperty("source_language").GetString(), detail.GetProperty("sharing_group_label").GetString()));
+            var map = (await admin.GetAsync($"/api/maps/{detail.GetProperty("root_map_id").GetGuid()}")).Ok().GetProperty("map");
+            Assert.Contains(map.GetProperty("steps").EnumerateArray(), step => step.GetProperty("label").GetString() == "Approve the request");
+        }
+        finally
+        {
+            var back = (await admin.GetAsync("/api/me")).Ok();
+            (await admin.PatchAsync("/api/me", new { language = french }, back.GetProperty("version").GetInt32())).Ok();
+        }
+    }
 
     [Fact]
     public async Task The_administrator_of_the_desktop_mode_creates_the_sample_project_once_as_its_only_facilitator_and_the_import_is_audited()

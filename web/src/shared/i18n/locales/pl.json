@@ -1075,6 +1075,8 @@
       },
       "pasted": "Wklejona odpowiedź",
       "copy_reply": "Kopiuj odpowiedź",
+      "report": "Zgłoś nieodpowiednią treść wydawcy ({{address}})",
+      "report_subject": "$t(app.name): zgłoszenie odpowiedzi AI",
       "failures": {
         "refused": "Dostawca odrzuca klucz lub tożsamość: sprawdź ustawienia AI.",
         "key_missing": "Nie zapisano klucza API: wpisuje go administrator w ustawieniach AI.",

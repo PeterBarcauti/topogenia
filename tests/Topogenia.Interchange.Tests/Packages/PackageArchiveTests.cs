@@ -45,7 +45,7 @@ public sealed class PackageArchiveTests
 
         Assert.Equal("topogenia-package", (string?)manifest["format"]);
         Assert.Equal("2.1", (string?)manifest["formatVersion"]);
-        Assert.Equal("3.0.0", (string?)manifest["appVersion"]);
+        Assert.Equal("3.0.2", (string?)manifest["appVersion"]);
         Assert.Equal("2.1", (string?)manifest["schemaVersion"]);
         Assert.Equal("2026-10-25T18:05:30.1234567Z", (string?)manifest["exportedAt"]);
         Assert.Equal("EXEMPLE\\alice", (string?)manifest["exportedBy"]);

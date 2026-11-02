@@ -1,9 +1,10 @@
 <!-- securite.md -->
-<!-- The security of the product: the requirements of section 5 checked with their proofs, the review of OWASP ASVS 4.0 level 2 and of TISAX / VDA ISA, what remains -->
+<!-- The security of the product: the requirements of section 5 checked with their proofs, the review of OWASP ASVS 4.0 level 2 and of TISAX / VDA ISA, the assistant of the 3.0, what remains -->
 
-# Sécurité de Topogenia 2.0
+# Sécurité de Topogenia 3.0
 
-État au 29/10/2026 (phase 7). Ce document répond à la section 5 de la spécification : chaque exigence, cochée avec ses
+État au 29/10/2026 (phase 7 de la 2.0), complété pour la 3.0 le 01/11/2026 : l'assistant IA (section 4) et les
+corrections de l'ADR 089. Ce document répond à la section 5 de la spécification : chaque exigence, cochée avec ses
 preuves (tests nommés, ADR), puis la revue des deux référentiels de la section 5.1 et ce qui reste à faire ou à vérifier
 à l'installation. La liste est écrite par `node build/security-list.mjs` depuis les lignes `S-5.x` de
 `docs/couverture.md` : elle dit ce que dit la couverture (`--check` refuse un écart). Une case cochée est une exigence
@@ -23,7 +24,7 @@ couverte par un test vert ou par une revue écrite ; une case vide dit son état
 ### 5.2 Mode Poste (15 sur 16)
 
 - [x] **S-5.2-01** Écoute sur `127.0.0.1` uniquement, jamais `0.0.0.0` ni `::` : *couvert*. Preuves : `Topogenia.Host.Tests.Desktop.DesktopServerTests.The_host_listens_on_the_loopback_only_on_a_free_port_chosen_at_the_start` (API : Kestrel réel, une seule adresse, `http://127.0.0.1`, port non nul) ; `Topogenia.Host.Tests.Desktop.DesktopServerTests.A_kestrel_section_of_the_configuration_adds_no_address_and_the_keys_stay_in_the_folder_of_the_product` (sécurité : une section `Kestrel` de la configuration qui ajoute `http://0.0.0.0:0` n'ajoute aucune adresse, seule la boucle locale écoute).
-- [x] **S-5.2-02** Port libre choisi au lancement, ou fixé dans la configuration : *couvert*. Preuves : `Topogenia.Host.Tests.Desktop.DesktopServerTests.The_host_listens_on_the_loopback_only_on_a_free_port_chosen_at_the_start` (API : port 0 : port libre ; port fixé : les tests de l'API (`ApiHost.DesktopPort`)).
+- [x] **S-5.2-02** Port libre choisi au lancement, ou fixé dans la configuration : *couvert*. Preuves : `Topogenia.Host.Tests.Desktop.DesktopServerTests.The_host_listens_on_the_loopback_only_on_a_free_port_chosen_at_the_start` (API : port 0 : port libre ; port fixé : les tests de l'API (`ApiHost.DesktopPort`)) ; `Topogenia.Host.Tests.Desktop.DesktopPortTests.A_port_configured_is_kept_and_a_stable_port_taken_or_refused_gives_a_free_port_chosen_at_the_start` ; `Topogenia.Host.Tests.Desktop.DesktopServerTests.Two_runs_at_once_each_keep_their_session_cookie_named_by_their_port` (ADR 089 : sans port fixé, le port propre au compte et au fichier de données quand il est libre, sinon un port libre ; un cookie de session par port).
 - [x] **S-5.2-03** Aucune règle de pare-feu n'est demandée : *couvert*. Preuves : `Topogenia.Host.Tests.Desktop.DesktopServerTests.The_host_listens_on_the_loopback_only_on_a_free_port_chosen_at_the_start` ; `Topogenia.Host.Tests.Desktop.DesktopServerTests.A_kestrel_section_of_the_configuration_adds_no_address_and_the_keys_stay_in_the_folder_of_the_product` (écoute sur la seule boucle locale : aucune règle de pare-feu ; exécutable publié : `docs/couverture-p7/verification-poste.md`).
 - [x] **S-5.2-04** Jeton de lancement aléatoire de 256 bits, généré à nouveau à chaque démarrage : *couvert*. Preuves : `Topogenia.Host.Tests.Desktop.DesktopServerTests.Each_start_draws_a_new_launch_token_of_256_bits_that_is_not_the_session_secret` (API : deux démarrages, deux jetons ; 32 octets décodés).
 - [x] **S-5.2-05** Le jeton est passé au navigateur une seule fois, par l'adresse d'ouverture, puis échangé contre le cookie : *couvert*. Preuves : `Topogenia.Host.Tests.Desktop.DesktopServerTests.The_launch_token_is_exchanged_once_for_an_http_only_strict_session_cookie_and_the_browser_sent_to_the_application` (API : jeton dépensé au premier échange contre le cookie, second échange 401 sans cookie).
@@ -120,7 +121,32 @@ La conformité TISAX est celle de l'entreprise ; Topogenia ne doit pas la mettre
 | Journalisation | Journal d'audit des événements de sécurité (spec 5.5, et le changement de classification, AR-133), conservation paramétrable, lecture par l'administrateur ; journaux techniques quotidiens sans contenu métier. |
 | Fournisseurs de logiciel | Composants tiers figés, licences permissives vérifiées par test, SBOM CycloneDX par version, empreintes SHA-256 des livrables (ADR 073) ; cœur fermé sous licence propriétaire (ADR 048). |
 
-## 4. Ce qui reste
+## 4. L'assistant IA (3.0)
+
+La seule exception à « aucun appel sortant » (D14), décidée pour la 3.0 (spécification 3.0, section 6, ADR 077) :
+
+- **Éteint par défaut.** Sans réglage, aucun moteur (`AssistantSettings.Default`) : rien ne part. Le moteur
+  « copier-coller » prépare la consigne et la demande, que la personne colle elle-même dans son IA : aucun réseau.
+  Seul un administrateur choisit un moteur qui appelle un modèle (API Anthropic, AWS Bedrock), son modèle, son plafond
+  de réponse et les classifications de projet qui peuvent lui être envoyées (par défaut, « interne » seule) ; un projet
+  d'une autre classification n'est pas envoyé.
+- **Le code qui appelle un modèle vit dans un seul projet** (`src/Topogenia.Assistant/`) : une règle d'architecture
+  le vérifie sur les symboles résolus de tout le code livré
+  (`SourceRulesTests.Shipped_code_opens_no_outgoing_connection`, `Only_the_connectors_of_the_assistant_call_a_model`).
+  Les tests n'appellent jamais un vrai modèle (faux connecteurs).
+- **La clé de l'API Anthropic** est saisie dans les paramètres et jamais relue par l'interface ; elle est gardée dans la
+  base, protégée par la protection des données d'ASP.NET Core : en mode Poste par les clés du dossier du produit,
+  protégées par DPAPI pour le compte de l'utilisateur ; en mode Serveur par celles de `Server:KeysFolder`, protégées
+  par DPAPI pour la machine (ADR 089). Bedrock ne prend pas de clé : le profil AWS du poste (connexion SSO).
+- **Ce qui part** : la demande, la sélection, la carte ouverte ou le projet tels que la personne peut les voir (sans les
+  personnes), les fichiers qu'elle joint ; une borne de taille refuse un contenu trop gros avant tout envoi.
+- **Ce qui revient** n'écrit rien d'office : une proposition est relue par les mêmes règles qu'un fichier ouvert,
+  renvoyée au modèle avec ses fautes, puis appliquée seulement par le clic de la personne, en une opération qu'un
+  Ctrl+Z défait. Sous chaque réponse d'un modèle, un lien « Signaler » ouvre un courriel à l'éditeur (ADR 088).
+- **Journal d'audit** : chaque échange y est écrit sans ses textes ni ses fichiers (moteur, modèle, portée, jetons,
+  issue, nombre et sortes de fichiers), l'abandon par la personne compris.
+
+## 5. Ce qui reste
 
 - **Écarts décidés** : exécutable et ZIP non signés, faute de certificat (S-5.4-19, ADR 049 ; la signature est prête
   dans `build/package.mjs`) ; audits `dotnet list package --vulnerable` et `npm audit` écrits dans l'intégration

@@ -22,6 +22,18 @@ describe('the gauge of the step (B-4-50, B-2.6-11)', () => {
     showSheetSummary(editor, 'gone', summary);
     expect(editor.store.getState().map).toBe(map);
   });
+
+  it('keeps the summary when the map is shown in another language, then when a translation previewed ends (audit 5.3)', async () => {
+    const { editor } = await editorOf(sampleMap());
+    const summary = sheetOf({ status: 'validated', completeness: 100, frequency: 'daily', duration_minutes: 15 });
+    showSheetSummary(editor, 's2', summary);
+    const sheetOfS2 = () => editor.store.getState().map?.steps.find((step) => step.id === 's2')?.sheet;
+    editor.store.getState().show({ language: 'en', origin: 'fr', locked: true });
+    expect([sheetOfS2(), editor.store.getState().map?.rights.structure]).toEqual([summary, false]);
+    editor.store.getState().preview({ language: 'pt', texts: {} });
+    editor.store.getState().preview(null);
+    expect(sheetOfS2()).toEqual(summary);
+  });
 });
 
 describe('the person responsible (B-4-15)', () => {

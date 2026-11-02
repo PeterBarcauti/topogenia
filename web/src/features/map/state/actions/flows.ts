@@ -7,10 +7,15 @@ import type { MapEditor } from '../editor.ts';
 /** The longest label of a flow (B-2.3-33). */
 export const FLOW_LABEL_MAX = 60;
 
-/** A flow from a step to another; never from a step to itself (B-2.3-21). */
+/**
+ * A flow from a step to another; never from a step to itself (B-2.3-21), nor one the map already has in that direction:
+ * nothing is sent. The writes are serialised, so a second creation of one gesture is read once the first is answered,
+ * and finds it (it was refused by the host before, a red message for a flow drawn once).
+ */
 export async function addFlow(editor: MapEditor, sourceId: string, targetId: string): Promise<void> {
   if (sourceId === targetId) return;
-  await editor.write((map) => api.post('/api/maps/{id}/flows', { path: { id: map.id }, body: { source_step_id: sourceId, target_step_id: targetId, label: null } }));
+  await editor.write((map) => map.flows.some((flow) => flow.source_step_id === sourceId && flow.target_step_id === targetId) ? null
+    : api.post('/api/maps/{id}/flows', { path: { id: map.id }, body: { source_step_id: sourceId, target_step_id: targetId, label: null } }));
 }
 
 /** The label of a flow; an empty text removes it (B-2.3-34); nothing is sent when it does not change. */

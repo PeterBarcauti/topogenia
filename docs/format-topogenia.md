@@ -42,7 +42,7 @@ l'import ; le paquet n'est pas signé (ADR 011). Il se transmet par les canaux d
 
 ```json
 {
-  "appVersion": "3.0.0",
+  "appVersion": "3.0.2",
   "entries": [
     { "path": "project.json", "sha256": "63d2...be1d", "size": 507 }
   ],

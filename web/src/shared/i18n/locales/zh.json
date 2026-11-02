@@ -1011,6 +1011,8 @@
       },
       "pasted": "已粘贴的回复",
       "copy_reply": "复制回复",
+      "report": "向发布者举报不当内容 ({{address}})",
+      "report_subject": "$t(app.name)：举报 AI 回复",
       "failures": {
         "refused": "提供商拒绝了该密钥或身份：请检查 AI 设置。",
         "key_missing": "未保存 API 密钥：请管理员在 AI 设置中输入。",

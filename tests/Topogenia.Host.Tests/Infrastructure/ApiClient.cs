@@ -64,6 +64,32 @@ public sealed class ApiClient(HttpClient client) : IDisposable
         return await ReplyAsync(request);
     }
 
+    /// <summary>
+    /// Posts a body and gives the request up after <paramref name="after"/>, as a tab closed or the button that stops an
+    /// exchange do, while its reply streams: true when it was given up before its end.
+    /// </summary>
+    public async Task<bool> AbandonAsync(string url, object body, TimeSpan after)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(body, Written), Encoding.UTF8, new MediaTypeHeaderValue("application/json")),
+        };
+        request.Headers.Add("X-Requested-With", "XMLHttpRequest");
+        using var giveUp = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        giveUp.CancelAfter(after);
+        try
+        {
+            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, giveUp.Token);
+            await using var stream = await response.Content.ReadAsStreamAsync(giveUp.Token);
+            await stream.CopyToAsync(Stream.Null, giveUp.Token);
+            return false;
+        }
+        catch (OperationCanceledException) when (giveUp.IsCancellationRequested && !TestContext.Current.CancellationToken.IsCancellationRequested)
+        {
+            return true;
+        }
+    }
+
     private async Task<ApiResponse> ReplyAsync(HttpRequestMessage request)
     {
         using var response = await client.SendAsync(request, TestContext.Current.CancellationToken);

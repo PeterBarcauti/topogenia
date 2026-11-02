@@ -65,7 +65,7 @@ public sealed class SchemaMigrationTests
         Assert.All(history, entry => Assert.Equal(SchemaMigrations.ApplicationVersion, entry.ApplicationVersion));
         Assert.All(history, entry => Assert.Equal(FixedClock.Time, entry.AppliedAt));
         Assert.Equal(Fingerprints.OfLines(await DescribeAsync(database)), history[^1].SchemaFingerprint);
-        Assert.Equal("3.0.0", SchemaMigrations.ApplicationVersion);
+        Assert.Equal("3.0.2", SchemaMigrations.ApplicationVersion);
     }
 
     [Theory]

@@ -83,7 +83,22 @@ public sealed class AssistantRepliesTests
         var usage = new AssistantUsage(1_000_000, 1_000_000, 1_000_000, 1_000_000);
         Assert.Equal(4m + 0.20m + 5m + 20m, AssistantPrices.Estimate("claude-opus-5-5", usage));
         Assert.Equal(0.4728m, AssistantPrices.Estimate("claude-opus-5-5", new AssistantUsage(4309, 0, 86079, 1256)));
-        Assert.Null(AssistantPrices.Estimate("global.anthropic.claude-sonnet-5-5", usage));
+        Assert.Null(AssistantPrices.Estimate("claude-sonnet-9", usage));
         Assert.Null(AssistantPrices.Estimate(null, usage));
+    }
+
+    [Theory]
+    [InlineData("global.anthropic.claude-sonnet-5-5", "claude-sonnet-5-5")]
+    [InlineData("eu.anthropic.claude-opus-5-5", "claude-opus-5-5")]
+    [InlineData("anthropic.claude-haiku-5-5-v1:0", "claude-haiku-5-5")]
+    [InlineData("us.anthropic.claude-opus-5-v1", "claude-opus-5")]
+    [InlineData("claude-sonnet-5-5", "claude-sonnet-5-5")]
+    [InlineData("claude-sonnet-5-v2-preview", "claude-sonnet-5-v2-preview")]
+    public void A_model_of_bedrock_is_estimated_as_the_model_of_the_api_it_names(string model, string named)
+    {
+        // The spec (section 6) shows the estimated cost of every call to the administrator, Bedrock included (audit 4.8).
+        var usage = new AssistantUsage(1_000_000, 0, 0, 1_000_000);
+        Assert.Equal(named, AssistantPrices.ModelOf(model));
+        Assert.Equal(AssistantPrices.Estimate(named, usage), AssistantPrices.Estimate(model, usage));
     }
 }

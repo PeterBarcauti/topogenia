@@ -8,6 +8,7 @@ import { i18next } from '../../../shared/i18n/i18n.ts';
 import { callsTo, fakeApi, type FakeReply, type FakeRoutes } from '../../../test/fakeApi.ts';
 import { MAP_ID, sampleMap } from '../../../test/maps.ts';
 import { openSheetOf, showEditor } from '../../../test/editor.tsx';
+import { reportAddress } from './TurnCards.tsx';
 
 const STATUS = `GET /api/maps/${MAP_ID}/assistant`;
 
@@ -97,6 +98,13 @@ describe('the panel of the assistant on the map', () => {
       intent: 'ask', request: 'Quelle est la première étape ?', selection: ['VTE-E002'], history: [], files: [],
     });
     expect(screen.getByTestId('assistant-field')).toHaveValue('');
+    // Store policy 11.16 (ADR 088): a reply of a model is reported by a mail to the publisher, its subject only.
+    const product = i18next.t('app.name');
+    const report = within(card).getByTestId('assistant-reply-report');
+    const [address, query] = (report.getAttribute('href') ?? '').replace(/^mailto:/, '').split('?subject=');
+    expect(address).toBe(reportAddress(product));
+    expect(decodeURIComponent(query ?? '')).toBe(`${product} : signalement d’une réponse de l’IA`);
+    expect(report).toHaveAttribute('aria-label', `Signaler un contenu inapproprié à l’éditeur (${reportAddress(product)})`);
     await userEvent.click(within(card).getByTestId('assistant-code'));
     expect(editor.store.getState().selection.steps).toEqual(['s1']);
     await userEvent.type(screen.getByTestId('assistant-field'), 'Et la suivante ?{Enter}');
@@ -161,8 +169,15 @@ describe('the replies, the copy and paste and the other panels', () => {
     expect(writeText).toHaveBeenCalledWith('LA CONSIGNE');
     await userEvent.type(screen.getByTestId('assistant-pasted'), '{{"form":"answer","message":"Lu."}');
     await userEvent.click(screen.getByTestId('assistant-read-pasted'));
-    expect(await screen.findByTestId('assistant-reply')).toHaveTextContent('Réponse collée');
+    const pasted = await screen.findByTestId('assistant-reply');
+    expect(pasted).toHaveTextContent('Réponse collée');
+    // Not made by a model of the application: nothing to report to its publisher.
+    expect(within(pasted).queryByTestId('assistant-reply-report')).toBeNull();
     expect(callsTo(sent, 'POST', `/api/maps/${MAP_ID}/assistant/replies`)[0]?.body).toMatchObject({ request: 'Résume.', reply: '{"form":"answer","message":"Lu."}' });
+  });
+
+  it('reports to the address of the publisher at the domain of the product, in lower case', () => {
+    expect(reportAddress('Atlas')).toBe('peter.barcauti@atlas.com');
   });
 
   it('says the classification is refused and lets nothing be written', async () => {

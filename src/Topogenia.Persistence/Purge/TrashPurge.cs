@@ -64,6 +64,10 @@ public sealed class TrashPurge : ITrashPurge
         var logEntries = await unit.RunAsync(async token =>
         {
             var context = await LockedAsync(unit, guard, projectId, plan.Records, token);
+            // The uses kept lose their purged pain point before it goes (audit 3.4); a use changed since the plan refuses
+            // the purge with CONFLIT_VERSION, taken again at the next run.
+            if (plan.Detached.Count > 0)
+                await store.SaveAsync(new ChangeSet(plan.Detached), token);
             if (plan.PurgesProject)
                 return await OperationLogLinks.DeleteOfProjectAsync(context, projectId, token);
             var operations = plan.Records.OfType<DeletionBatch>().Where(batch => batch.OperationId is not null).Select(batch => batch.OperationId!.Value);

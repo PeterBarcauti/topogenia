@@ -2,6 +2,7 @@
 // The parts of the server mode: SQL Server, Windows authentication, names of the server, HTTPS and HSTS, directory, daily log (spec 5.3, 6.2).
 
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using Topogenia.Application.Ports;
 using Topogenia.Host.Composition;
@@ -45,6 +46,24 @@ public static class ServerServices
         services.AddHsts(hsts => hsts.MaxAge = HstsMaxAge);
         services.AddHttpsRedirection(redirection => redirection.RedirectStatusCode = StatusCodes.Status308PermanentRedirect);
         services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+        // ADR 089: the keys that protect the secret of the assistant kept in the database live in a folder of the server,
+        // protected for the machine by DPAPI. Without it, a pool of IIS without a profile kept them in memory: the key of
+        // the assistant became unreadable at each recycling of the pool or restart (audit 4.1).
+        var protection = services.AddDataProtection().SetApplicationName(Application.ProductIdentity.Name)
+            .PersistKeysToFileSystem(new DirectoryInfo(KeysFolder(options, builder.Environment.ContentRootPath)));
+        if (OperatingSystem.IsWindows())
+            protection.ProtectKeysWithDpapi(protectToLocalMachine: true);
+    }
+
+    /// <summary>The folder of the keys: the configured one, relative to the folder of the application when it is not rooted; by default `keys` beside the folder of the daily log.</summary>
+    public static string KeysFolder(ServerOptions options, string contentRoot)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!string.IsNullOrWhiteSpace(options.KeysFolder))
+            return Path.GetFullPath(options.KeysFolder, contentRoot);
+        // A folder of the logs written with a final separator is the same folder: `keys` goes beside it (audit 4.2).
+        var logs = Path.TrimEndingDirectorySeparator(LogsFolder(options, contentRoot));
+        return Path.Combine(Path.GetDirectoryName(logs) ?? contentRoot, "keys");
     }
 
     /// <summary>The folder of the daily log: the configured one, relative to the folder of the application when it is not rooted.</summary>

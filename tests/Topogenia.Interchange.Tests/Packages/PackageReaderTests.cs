@@ -29,7 +29,7 @@ public sealed class PackageReaderTests
         Assert.Equal(["EXEMPLE\\alice", "EXEMPLE\\bruno", "EXEMPLE\\chloe"], read.Members.Select(member => member.Login));
         Assert.Equal("Alice Martin", read.Members[0].DisplayName);
         // Maps: root, detail, empty sub-map; the dissolved step of the open frame is not a live step.
-        Assert.Equal(new Application.Ports.PackageCounts(3, 6, 19, 20, 3, 3, 3, 7), read.Counts);
+        Assert.Equal(new Application.Ports.PackageCounts(3, 6, 19, 20, 3, 3, 3, 34), read.Counts);
     }
 
     [Fact]

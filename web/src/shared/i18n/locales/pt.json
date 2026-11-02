@@ -1013,6 +1013,8 @@
       },
       "pasted": "Resposta colada",
       "copy_reply": "Copiar a resposta",
+      "report": "Denunciar conteúdo impróprio ao editor ({{address}})",
+      "report_subject": "$t(app.name): denúncia de uma resposta da IA",
       "failures": {
         "refused": "O fornecedor recusa a chave ou a identidade: verifique as definições da IA.",
         "key_missing": "Não há nenhuma chave de API guardada: o administrador introduz a chave nas definições da IA.",

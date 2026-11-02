@@ -31,7 +31,9 @@ public sealed class DocumentTextReader(OfficeLimits? limits = null, int textMax 
             };
             return read ? text.ToString() : null;
         }
-        catch (Exception failure) when (failure is InvalidDataException or XmlException or IOException or FormatException or OverflowException)
+        // ArgumentException too: a value of a file out of what a reader expects is a file that cannot be read, never an
+        // error of the server (audit 4.4).
+        catch (Exception failure) when (failure is InvalidDataException or XmlException or IOException or FormatException or OverflowException or ArgumentException)
         {
             return null;
         }

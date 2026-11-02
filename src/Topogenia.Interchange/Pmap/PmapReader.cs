@@ -149,9 +149,33 @@ internal sealed partial class PmapReading(PmapReadSettings settings)
         }
         var description = Entered(project, "description", "project", PmapFormat.DescriptionMax, required: false);
         var translations = Translations(project, "project", PmapFormat.ProjectNameMax);
-        var workday = Number(project, "workday_hours", "project");
-        var fte = Number(project, "fte_hours_per_month", "project");
+        var workday = WorkNumber(project, WorkTime.WorkdayField, WorkTime.ParseWorkday);
+        var fte = WorkNumber(project, WorkTime.FteField, WorkTime.ParseFte);
         return name is null ? null : new PmapProject(code, name, language, description, translations) { WorkdayHours = workday, FteHoursPerMonth = fte };
+    }
+
+    /// <summary>
+    /// A setting of the work time of the project, null when absent or refused by the rule of the domain that the opening
+    /// applies (a fault where it is broken: the model corrects its proposal, audit 4.5).
+    /// </summary>
+    private decimal? WorkNumber(JsonElement project, string name, Func<decimal, decimal> rule)
+    {
+        if (Number(project, name, "project") is not { } hours)
+            return null;
+        // In a file 1.1, the setting is already unknown (a fault of its own).
+        if (!valueStream)
+            return hours;
+        try
+        {
+            rule(hours);
+            return hours;
+        }
+        catch (DomainException refusal)
+        {
+            // At the path of the project, as the building of the project says it (PmapBuild); the field names the setting.
+            Fault("project", refusal);
+            return null;
+        }
     }
 
     private List<string> Uncertainties(JsonElement root)

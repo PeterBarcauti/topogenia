@@ -157,8 +157,8 @@ public sealed class PublicationRulesTests
     public void The_zip_carries_the_licences_and_its_sbom_and_is_checked_at_each_build()
     {
         var assembly = Build("package.mjs");
-        Assert.Contains("['Desktop', 'Server'].includes(mode)", assembly, StringComparison.Ordinal);
-        Assert.Contains("`-p:PublishProfile=${mode}`", assembly, StringComparison.Ordinal);
+        Assert.Contains("['Desktop', 'Server', 'Store'].includes(mode)", assembly, StringComparison.Ordinal);
+        Assert.Contains("`-p:PublishProfile=${profile}`", assembly, StringComparison.Ordinal);
         // Spec 5.4, ADR 073: the interface built from its sources as `npm run build` does, the notices checked against it,
         // the entry point of the signature.
         Assert.Contains("\"build\": \"tsc -b && vite build\"", File.ReadAllText(Path.Combine(RepositoryFiles.Root, "web", "package.json")), StringComparison.Ordinal);
@@ -170,6 +170,62 @@ public sealed class PublicationRulesTests
             Assert.Contains(entry, assembly, StringComparison.Ordinal);
         foreach (var step in new[] { "join(core, 'LICENSE.md')", "'build', 'sbom.mjs'", "The ZIP lacks", "The ZIP carries", "createHash('sha256')", "`${file}.sha256`" })
             Assert.Contains(step, assembly, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// ADR 088: the MSIX package of the Store is the publication of the desktop mode with its manifest, its logos and their
+    /// index. The manifest keeps the identity reserved in Partner Center as it is, declares a desktop application in full
+    /// trust and no other capability, and the product and the version as tokens; build/package.mjs writes the package by
+    /// makeappx, unpacks it again and checks it, and signs it only when a certificate is given.
+    /// </summary>
+    [Fact]
+    public void The_package_of_the_store_keeps_its_reserved_identity_and_asks_full_trust_only()
+    {
+        var manifest = XDocument.Load(Path.Combine(RepositoryFiles.Root, "build", "store", "AppxManifest.xml")).Root!;
+        XNamespace foundation = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
+        var identity = manifest.Element(foundation + "Identity")!;
+        Assert.Equal(("PeterBarcauti." + Topogenia.Application.ProductIdentity.Name, "CN=2AA7CE71-2550-41D9-812A-A5E5AC8EC7CA", "{{VERSION}}", "x64"),
+            (identity.Attribute("Name")?.Value, identity.Attribute("Publisher")?.Value, identity.Attribute("Version")?.Value, identity.Attribute("ProcessorArchitecture")?.Value));
+        Assert.Equal("Peter Barcauti", manifest.Element(foundation + "Properties")!.Element(foundation + "PublisherDisplayName")?.Value);
+        var application = manifest.Descendants(foundation + "Application").Single();
+        Assert.Equal(("{{PRODUCT}}.exe", "Windows.FullTrustApplication"), (application.Attribute("Executable")?.Value, application.Attribute("EntryPoint")?.Value));
+        Assert.Equal(["runFullTrust"], manifest.Element(foundation + "Capabilities")!.Elements().Select(capability => capability.Attribute("Name")!.Value));
+        Assert.Equal(["en-US", "fr-FR"], manifest.Element(foundation + "Resources")!.Elements().Select(resource => resource.Attribute("Language")!.Value));
+        var assembly = Build("package.mjs");
+        foreach (var step in new[] { "const profile = mode === 'Store' ? 'Desktop' : mode;", "kitTool('makepri.exe')", "kitTool('makeappx.exe')", "['unpack', '/p', file",
+            "The MSIX package gives back other bytes for", "The MSIX package lacks", "if (signing.certificate) sign(file);", "`${version}.0`" })
+            Assert.Contains(step, assembly, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// ADR 088: makepri names a logo by its path from the folder it indexes. The index starts at the root of a folder of the
+    /// logos alone, so that each name of the manifest (Assets\...) is a resource of resources.pri, else Windows shows its
+    /// default icon in the Start menu and the search; build/package.mjs looks for each one in a dump of the index.
+    /// </summary>
+    [Fact]
+    public void The_index_of_the_store_package_names_each_logo_of_its_manifest()
+    {
+        var index = XDocument.Load(Path.Combine(RepositoryFiles.Root, "build", "store", "priconfig.xml")).Root!.Element("index")!;
+        Assert.Equal(("\\", "\\"), (index.Attribute("root")?.Value, index.Attribute("startIndexAt")?.Value));
+        var assembly = Build("package.mjs");
+        foreach (var step in new[] { "['new', '/pr', logos,", "checkLogos(index, manifest,", "['dump', '/if', index,", "The index of the MSIX package does not name" })
+            Assert.Contains(step, assembly, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// ADR 088: the executable carries its own manifest, aware of the scale of each screen (PerMonitorV2, a warning of the
+    /// Windows App Certification Kit without it) and run with the rights of the person who starts it, never more.
+    /// </summary>
+    [Fact]
+    public void The_executable_is_aware_of_the_scale_of_each_screen_and_asks_no_more_rights()
+    {
+        var host = Path.Combine(RepositoryFiles.Root, "src", "Topogenia.Host");
+        Assert.Equal("app.manifest", XDocument.Load(Path.Combine(host, "Topogenia.Host.csproj")).Root!.Elements("PropertyGroup").Elements("ApplicationManifest").Single().Value);
+        var manifest = XDocument.Load(Path.Combine(host, "app.manifest")).Root!;
+        XNamespace settings = "http://schemas.microsoft.com/SMI/2016/WindowsSettings";
+        XNamespace security = "urn:schemas-microsoft-com:asm.v3";
+        Assert.Equal("PerMonitorV2", manifest.Descendants(settings + "dpiAwareness").Single().Value);
+        Assert.Equal(("asInvoker", "false"), manifest.Descendants(security + "requestedExecutionLevel").Select(level => (level.Attribute("level")?.Value, level.Attribute("uiAccess")?.Value)).Single());
     }
 
     /// <summary>Spec 6.2: the server mode depends on the Hosting Bundle of .NET 10 and ships the web.config of IIS, its example of settings and its guide.</summary>

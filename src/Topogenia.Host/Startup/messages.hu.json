@@ -26,6 +26,8 @@
   "QUITTER": "Az alkalmazásból való kilépéshez zárja be ezt az ablakot.",
   "DEJA_LANCEE_OUVERTE": "Az alkalmazás már fut: megnyílik a böngészőben.",
   "REOUVERTE": "Ismételt indítás: a böngésző megnyitja az alkalmazást.",
+  "ICONE_OUVRIR": "{product} megnyitása",
+  "ICONE_QUITTER": "{product} bezárása",
   "SAUVEGARDES_DOSSIER": "A biztonsági mentések helye: {folder}.",
   "RESTAURATION_PROPOSEE": "Elérhető biztonsági mentések, a legújabbtól a legrégebbiig. A kiválasztott mentés után végzett módosítások nincsenek benne; a jelenlegi fájl és a naplója mellette megmarad, nem törlődik:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

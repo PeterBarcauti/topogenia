@@ -3,7 +3,9 @@
 
 import type { Schema } from '../../../../api/client.ts';
 import type { ClipboardContent } from '../../model/clipboard.ts';
-import type { Point } from '../../model/geometry/grid.ts';
+import { bandOf } from '../../model/geometry/constants.ts';
+import type { GridCell, Point } from '../../model/geometry/grid.ts';
+import { cellAtPoint } from '../../model/moves.ts';
 import { clipboard, cutSteps } from '../clipboard.ts';
 import type { MapEditor } from '../editor.ts';
 import type { MenuTarget } from '../floating.ts';
@@ -50,6 +52,13 @@ export function stepOf(context: MapContext): StepView | undefined {
   const ids = stepsOf(context);
   return ids.length === 1 ? context.map.steps.find((step) => step.id === ids[0]) : undefined;
 }
+
+/**
+ * The cell aimed at a point of the canvas on the grid as it is drawn: with the band of the value stream layer when it is
+ * on, as the layout (spec 14.5; audit 5.1: rows of 156 px drawn, 120 px read).
+ */
+export const cellAimed = (context: MapContext, point: Point): GridCell | null =>
+  cellAtPoint(context.map, point, bandOf(context.preferences.showValueStream));
 
 /** Whether a step is cut and waits for its paste (B-2.4-24). */
 export const isCut = (context: MapContext, stepId: string): boolean => cutSteps(context.clipboard, context.map.id).has(stepId);

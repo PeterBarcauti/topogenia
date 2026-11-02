@@ -26,6 +26,8 @@
   "QUITTER": "アプリケーションを終了するには、このウィンドウを閉じてください。",
   "DEJA_LANCEE_OUVERTE": "アプリケーションはすでに起動しています。ブラウザーで開きます。",
   "REOUVERTE": "2 回目の起動です。ブラウザーでアプリケーションを開きます。",
+  "ICONE_OUVRIR": "{product} を開く",
+  "ICONE_QUITTER": "{product} を終了",
   "SAUVEGARDES_DOSSIER": "バックアップは {folder} にあります。",
   "RESTAURATION_PROPOSEE": "使用できるバックアップ（新しい順）です。選択したバックアップより後の変更は含まれません。現在のファイルとそのジャーナルは、削除されずに横に保管されます：",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

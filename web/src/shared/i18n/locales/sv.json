@@ -1013,6 +1013,8 @@
       },
       "pasted": "Svar inklistrat",
       "copy_reply": "Kopiera svaret",
+      "report": "Rapportera olämpligt innehåll till utgivaren ({{address}})",
+      "report_subject": "$t(app.name): rapport om ett AI-svar",
       "failures": {
         "refused": "Leverantören nekar nyckeln eller identiteten: kontrollera AI-inställningarna.",
         "key_missing": "Ingen API-nyckel är sparad: administratören anger den i AI-inställningarna.",

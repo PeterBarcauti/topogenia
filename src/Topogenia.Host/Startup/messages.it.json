@@ -26,6 +26,8 @@
   "QUITTER": "Chiudere questa finestra per uscire dall'applicazione.",
   "DEJA_LANCEE_OUVERTE": "L'applicazione è già in esecuzione: si apre nel browser.",
   "REOUVERTE": "Secondo avvio: il browser si apre sull'applicazione.",
+  "ICONE_OUVRIR": "Aprire {product}",
+  "ICONE_QUITTER": "Uscire da {product}",
   "SAUVEGARDES_DOSSIER": "I backup si trovano in {folder}.",
   "RESTAURATION_PROPOSEE": "Backup disponibili, dal più recente al più vecchio. Le modifiche fatte dopo il backup scelto non sono incluse; il file attuale e il suo journal saranno conservati accanto, senza essere cancellati:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

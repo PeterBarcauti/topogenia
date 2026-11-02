@@ -270,14 +270,40 @@ public static class AssistantPrices
         ["claude-fable-5-1"] = (10m, 50m, 0.25m),
     };
 
-    /// <summary>The cost of the tokens of an exchange with a model, rounded to the ten-thousandth of a dollar; null for an unknown model.</summary>
+    /// <summary>
+    /// The cost of the tokens of an exchange with a model, rounded to the ten-thousandth of a dollar; null for an unknown
+    /// model. A model of Bedrock is named by its identifier there (`anthropic.claude-sonnet-5-5`, behind an inference
+    /// profile `global.`, `eu.`..., with a version `-v1:0` at times): it is read as the model of the API of Anthropic it is
+    /// (audit 4.8), and its cost estimated at those public prices, the prices of Bedrock being its own.
+    /// </summary>
     public static decimal? Estimate(string? model, AssistantUsage usage)
     {
         ArgumentNullException.ThrowIfNull(usage);
-        if (model is null || !Prices.TryGetValue(model, out var price))
+        if (model is null || !Prices.TryGetValue(ModelOf(model), out var price))
             return null;
         var dollars = (usage.InputTokens * price.Input + usage.CacheWriteTokens * price.Input * 1.25m + usage.CacheReadTokens * price.CacheRead
             + usage.OutputTokens * price.Output) / 1_000_000m;
         return Math.Round(dollars, 4, MidpointRounding.AwayFromZero);
+    }
+
+    /// <summary>
+    /// The model of the API of Anthropic an identifier names: what follows `anthropic.` (an identifier of Bedrock, its
+    /// inference profile before), without a version of Bedrock (`-v1`, `-v1:0`) at its end; any other identifier as it is.
+    /// </summary>
+    public static string ModelOf(string model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        const string Provider = "anthropic.";
+        var at = model.IndexOf(Provider, StringComparison.Ordinal);
+        var name = at < 0 ? model : model[(at + Provider.Length)..];
+        var version = name.LastIndexOf("-v", StringComparison.Ordinal);
+        return at >= 0 && version > 0 && IsBedrockVersion(name[(version + 2)..]) ? name[..version] : name;
+    }
+
+    /// <summary>A version of Bedrock after `-v`: digits, then `:` and digits at times (`1`, `1:0`).</summary>
+    private static bool IsBedrockVersion(string text)
+    {
+        var parts = text.Split(':');
+        return parts.Length <= 2 && parts.All(part => part.Length > 0 && part.All(char.IsAsciiDigit));
     }
 }

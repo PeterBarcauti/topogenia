@@ -25,7 +25,8 @@ namespace Topogenia.Host.Desktop;
 /// the processes of its own account (<see cref="DesktopConnectionGuard"/>, ADR 075); the session cookie authenticates the
 /// account of the process, administrator of its file; the logs go to the `logs` folder of the product (ADR 021); the
 /// data file of the folder of the product is opened by the SQLite engine, backed up by the online backup of SQLite, and
-/// opened at the start by <see cref="DesktopDatabase"/>; the browser is opened once the server listens.
+/// opened at the start by <see cref="DesktopDatabase"/>; the browser is opened once the server listens; without a console,
+/// an icon near the clock opens and quits the application (<see cref="DesktopTrayService"/>, F-69).
 /// </summary>
 public static class DesktopServices
 {
@@ -41,7 +42,9 @@ public static class DesktopServices
             // No header names the server (ASVS V14.3.3), as the web.config of the server mode does under IIS.
             kestrel.AddServerHeader = false;
             // ADR 075: a connection whose client process runs under another account is closed before a byte is read.
-            kestrel.Listen(IPAddress.Loopback, options.Port,
+            // ADR 089: the port configured, else the one of the account and its data file, the same at each start.
+            var port = DesktopPort.Of(options, DesktopPaths.Of(options).DataFile, DesktopPort.AccountOfProcess());
+            kestrel.Listen(IPAddress.Loopback, port,
                 listen => listen.Use(next => listen.ApplicationServices.GetRequiredService<DesktopConnectionGuard>().Use(next)));
         });
         builder.Logging.AddDailyLogFile(DesktopPaths.Of(options).LogsFolder);
@@ -68,6 +71,9 @@ public static class DesktopServices
         services.TryAddSingleton<IBrowserLauncher, ShellBrowserLauncher>();
         services.AddHostedService<DesktopLaunchService>();
         services.AddHostedService<DesktopReopenService>();
+        // F-69: without a console, the icon near the clock (nothing otherwise).
+        services.AddSingleton<DesktopTrayService>();
+        services.AddHostedService(provider => provider.GetRequiredService<DesktopTrayService>());
         // Spec 6.1: nothing written outside the folder of the product; the keys that ASP.NET Core may create are kept there,
         // protected for the account of the user.
         var protection = services.AddDataProtection().SetApplicationName(Application.ProductIdentity.Name)

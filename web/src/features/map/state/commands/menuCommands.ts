@@ -8,7 +8,6 @@ import type { Command } from '../../../../shared/commands/commands.ts';
 import { i18next } from '../../../../shared/i18n/i18n.ts';
 import { LANE_TINTS } from '../../../../shared/theme/laneTints.ts';
 import { LANE_ICONS, SHAPE_ICONS } from '../../chrome/shapeIcons.ts';
-import { cellAtPoint } from '../../model/moves.ts';
 import { hasContent, isMacro } from '../../model/stepFacts.ts';
 import { deleteLane, updateLane } from '../actions/lanes.ts';
 import { reverseFlow } from '../actions/flows.ts';
@@ -16,7 +15,7 @@ import { paste } from '../actions/paste.ts';
 import { deleteChosen, deleteSelection } from '../actions/selection.ts';
 import { raciPanelPoint } from '../actions/stepActivation.ts';
 import { deleteDetail, detailStep, insertStep, updateStep, type InsertPosition } from '../actions/steps.ts';
-import { isCut, stepOf, stepsOf, type MapContext } from './context.ts';
+import { cellAimed, isCut, stepOf, stepsOf, type MapContext } from './context.ts';
 import { groupable, groupChosen, ungroupable, ungroupChosen } from './editCommands.ts';
 
 type StepType = Schema<'StepType'>;
@@ -129,9 +128,9 @@ const SELECTION_COMMANDS: readonly Command<MapContext>[] = [
       deleteChosen(context.editor, stepsOf(context), []);
     } },
   { id: 'paste.here', label: 'menu.paste_here', icon: ClipboardPaste, shortcuts: ['Ctrl+V'],
-    enabled: (context) => context.canEdit && context.clipboard !== null && context.target?.kind === 'pane' && cellAtPoint(context.map, context.target.point) !== null,
+    enabled: (context) => context.canEdit && context.clipboard !== null && context.target?.kind === 'pane' && cellAimed(context, context.target.point) !== null,
     run: (context) => {
-      const cell = context.target?.kind === 'pane' ? cellAtPoint(context.map, context.target.point) : null;
+      const cell = context.target?.kind === 'pane' ? cellAimed(context, context.target.point) : null;
       if (cell !== null) void paste(context.editor, { cell });
     } },
   { id: 'flow.label', label: 'menu.flow_label', icon: Pencil, enabled: editing,

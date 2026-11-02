@@ -77,6 +77,21 @@ describe('the question of the facilitator, rewritten or removed (spec 3.0 sectio
     expect([screen.getByTestId('sheet-state').textContent, record.notes]).toEqual(['validée', [['Question retirée.', 'success']]]);
   });
 
+  it('what was typed just before leaves first; the question is then removed with the version given back, never both with one version (audit 5.4)', async () => {
+    const { sent } = await renderSheet(asked(), {
+      'PUT /api/steps/s2/sheet': { json: asked({ version: 7 }) },
+      'DELETE /api/steps/s2/sheet/clarification': { json: sheetViewOf({ status: 'validated', validated, clarification_request: null, permissions: facilitator, version: 8 }) },
+    });
+    fireEvent.change(screen.getByTestId('sheet-purpose'), { target: { value: 'Envoyer la facture au client' } });
+    await press('sheet-clarification-withdraw');
+    await vi.waitFor(() => {
+      expect(callsTo(sent, 'DELETE', '/api/steps/s2/sheet/clarification')).toHaveLength(1);
+    });
+    expect(sent.filter((call) => call.method !== 'GET').map((call) => [call.method, call.path, call.headers.get('If-Match')])).toEqual([
+      ['PUT', '/api/steps/s2/sheet', '"6"'], ['DELETE', '/api/steps/s2/sheet/clarification', '"7"'],
+    ]);
+  });
+
   it('a refusal of the host is said, the question kept; who is not facilitator reads it without the buttons', async () => {
     const first = await renderSheet(asked(), {
       'DELETE /api/steps/s2/sheet/clarification': { refused: 409, code: 'CONFLIT_VERSION', message: 'La fiche a changé entre-temps.' },

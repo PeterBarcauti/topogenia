@@ -97,8 +97,12 @@ public sealed class DesktopReopenService(IHostApplicationLifetime lifetime, IOpt
         var token = session.Renew();
         if (options.Value.Desktop.OpenBrowser)
             browser.Open(address.LaunchAddress(token));
-        console.Write("REOUVERTE");
+        // The second start is answered before the console is written: a console held by a selection of its window (the
+        // quick edit of Windows) waits, the answer never (audit 3.1).
         lock (gate)
             answer?.Set();
+        // Without a console, the browser that opens says it.
+        if (!console.Windowed)
+            console.Write("REOUVERTE");
     }
 }

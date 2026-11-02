@@ -99,6 +99,35 @@ describe('a proposal on a map with content', () => {
     expect(editor.store.getState().marks).toEqual({});
   });
 
+  it('stays applied when the panel is closed then opened again, and a proposal put aside stays aside (audit 5.5)', async () => {
+    await proposed();
+    await userEvent.type(screen.getByTestId('assistant-field'), 'Une autre version.{Enter}');
+    await waitFor(() => { expect(screen.getAllByTestId('assistant-proposal')).toHaveLength(2); });
+    await userEvent.click(screen.getAllByTestId('assistant-preview')[0] as HTMLElement);
+    await screen.findByTestId('assistant-changes');
+    await userEvent.click(screen.getByTestId('assistant-apply'));
+    await screen.findByTestId('assistant-applied');
+    await userEvent.click(screen.getByTestId('assistant-dismiss'));
+    await userEvent.click(screen.getByTestId('ribbon-assistant'));
+    await userEvent.click(screen.getByTestId('ribbon-assistant'));
+    await waitFor(() => { expect(screen.getAllByTestId('assistant-proposal')).toHaveLength(2); });
+    expect([screen.queryAllByTestId('assistant-applied').length, screen.queryAllByText('Proposition écartée.').length, screen.queryAllByTestId('assistant-preview').length])
+      .toEqual([1, 1, 0]);
+  }, 20_000);
+
+  it('« Écarter » on another card leaves the marks of the card previewed; a preview takes a translation previewed off the map first (audit 5.5)', async () => {
+    const { editor } = await proposed();
+    await userEvent.type(screen.getByTestId('assistant-field'), 'Une autre version.{Enter}');
+    await waitFor(() => { expect(screen.getAllByTestId('assistant-proposal')).toHaveLength(2); });
+    editor.store.getState().preview({ language: 'pt', texts: {} });
+    await userEvent.click(screen.getAllByTestId('assistant-preview')[0] as HTMLElement);
+    await screen.findByTestId('assistant-changes');
+    expect([editor.store.getState().previewed, editor.store.getState().marks]).toEqual([null, { s2: 'changed', s3: 'removed' }]);
+    await userEvent.click(screen.getAllByTestId('assistant-dismiss')[1] as HTMLElement);
+    expect(screen.getByText('Proposition écartée.')).toBeInTheDocument();
+    expect(editor.store.getState().marks).toEqual({ s2: 'changed', s3: 'removed' });
+  }, 20_000);
+
   it('offers to refine the proposal in the field', async () => {
     await proposed();
     await userEvent.click(screen.getByTestId('assistant-refine'));

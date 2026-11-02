@@ -261,10 +261,14 @@ public sealed class SourceRulesTests
         "src/Topogenia.Host/Composition/HostApplication.cs",
         // The daily log, in the folder of the settings (ADR 045).
         "src/Topogenia.Host/Logging/FileLoggerProvider.cs",
+        // The server mode: the folder of the keys that protect the secret of the assistant (ADR 089).
+        "src/Topogenia.Host/Server/ServerServices.cs",
         // The files named on the command line by the operator (--export, --import, --check).
         "src/Topogenia.Host/Startup/ExchangeCommands.cs", "src/Topogenia.Host/Startup/HostCommands.cs",
         // The browser of the user, opened by the shell on the local address of the desktop mode (spec 2 D10).
         "src/Topogenia.Host/Startup/StartupService.cs",
+        // The console opened, without a console, for the question of the restore only: its standard streams (ADR 090).
+        "src/Topogenia.Host/Startup/ConsoleWindow.cs",
         // The scripts of the migrations, embedded in the assembly.
         "src/Topogenia.Persistence/Schema/MigrationSources.cs",
         // The instructions of the assistant and the documentation of the formats, embedded in the assembly of the connectors (3.0).

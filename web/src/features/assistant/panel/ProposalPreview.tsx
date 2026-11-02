@@ -18,9 +18,13 @@ type State = { kind: 'idle' } | { kind: 'loading' } | { kind: 'preview'; preview
 
 const ACTIONS = ['added', 'changed', 'removed'] as const;
 
-export function ProposalOnMap({ pmap, context, translation }: { pmap: string; context: ThreadContext; translation?: Translation | undefined }) {
+export function ProposalOnMap({ pmap, context, translation, turnId }: { pmap: string; context: ThreadContext; translation?: Translation | undefined; turnId: number }) {
   const { t } = useTranslation();
-  const [state, setState] = useState<State>({ kind: 'idle' });
+  // Applied or put aside before the panel was closed: the card shown again says so (audit 5.5).
+  const [state, setState] = useState<State>(() => {
+    const kept = context.store.getState().outcomes[turnId];
+    return kept === undefined ? { kind: 'idle' } : { kind: kept };
+  });
   const proposals = context.proposals;
   // A card that leaves with its preview shown (the panel closed, the conversation started again) takes it off the map.
   const leave = useRef<(() => void) | null>(null);
@@ -42,10 +46,13 @@ export function ProposalOnMap({ pmap, context, translation }: { pmap: string; co
   const apply = async (version: number) => {
     setState({ kind: 'loading' });
     const done = await proposals.apply(pmap, version, translation);
+    if (done) context.store.getState().settle(turnId, 'applied');
     setState(done ? { kind: 'applied' } : { kind: 'idle' });
   };
+  // Only the preview of this card leaves the map: the one of another card stays (audit 5.5).
   const close = () => {
-    proposals.unmark();
+    if (state.kind === 'preview') proposals.unmark();
+    context.store.getState().settle(turnId, 'dismissed');
     setState({ kind: 'dismissed' });
   };
   return (

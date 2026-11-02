@@ -1013,6 +1013,8 @@
       },
       "pasted": "Antwoord geplakt",
       "copy_reply": "Antwoord kopiëren",
+      "report": "Ongepaste inhoud melden aan de uitgever ({{address}})",
+      "report_subject": "$t(app.name): melding van een AI-antwoord",
       "failures": {
         "refused": "De aanbieder weigert de sleutel of de identiteit: controleer de AI-instellingen.",
         "key_missing": "Er is geen API-sleutel opgeslagen: de beheerder voert die in bij de AI-instellingen.",

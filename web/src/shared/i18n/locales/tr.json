@@ -1013,6 +1013,8 @@
       },
       "pasted": "Yapıştırılan yanıt",
       "copy_reply": "Yanıtı kopyala",
+      "report": "Uygunsuz içeriği yayıncıya bildir ({{address}})",
+      "report_subject": "$t(app.name): yapay zekâ yanıtı bildirimi",
       "failures": {
         "refused": "Sağlayıcı anahtarı veya kimliği reddediyor: yapay zeka ayarlarını kontrol edin.",
         "key_missing": "Kayıtlı API anahtarı yok: yönetici anahtarı yapay zeka ayarlarına girer.",

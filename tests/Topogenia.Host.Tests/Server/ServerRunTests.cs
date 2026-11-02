@@ -289,6 +289,46 @@ public sealed class ServerRunTests
     }
 
     [Fact]
+    public void The_keys_folder_defaults_to_keys_beside_the_logs_folder_and_a_relative_folder_is_resolved_in_the_folder_of_the_application()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "application");
+        Assert.Equal(Path.Combine(root, "keys"), ServerServices.KeysFolder(new Composition.ServerOptions(), root));
+        var logs = Path.Combine(Path.GetTempPath(), "topogenia-data", "logs");
+        Assert.Equal(Path.Combine(Path.GetTempPath(), "topogenia-data", "keys"), ServerServices.KeysFolder(new Composition.ServerOptions { LogsFolder = logs }, root));
+        // A folder of the logs written with a final separator is the same folder: the keys stay beside it (audit 4.2).
+        Assert.Equal(Path.Combine(Path.GetTempPath(), "topogenia-data", "keys"),
+            ServerServices.KeysFolder(new Composition.ServerOptions { LogsFolder = logs + Path.DirectorySeparatorChar }, root));
+        Assert.Equal(Path.Combine(Path.GetTempPath(), "topogenia-data", "keys"),
+            ServerServices.KeysFolder(new Composition.ServerOptions { LogsFolder = logs + Path.AltDirectorySeparatorChar }, root));
+        Assert.Equal(Path.Combine(root, "cles"), ServerServices.KeysFolder(new Composition.ServerOptions { KeysFolder = "cles" }, root));
+    }
+
+    /// <summary>
+    /// The key of the assistant, kept protected in the database, is read again by the next host (a recycling of the pool
+    /// of IIS, a restart of the server): the keys of its protection live in their folder (ADR 089, audit 4.1).
+    /// </summary>
+    [Fact]
+    public async Task A_secret_protected_by_a_host_of_the_server_mode_is_read_by_the_next_host_from_the_keys_folder()
+    {
+        var folder = Directory.CreateTempSubdirectory($"{TestDatabase.FolderPrefix}{Environment.ProcessId}-");
+        try
+        {
+            var keys = Path.Combine(folder.FullName, "keys");
+            var settings = new Dictionary<string, string?> { [$"{ProductOptions.Section}:Server:KeysFolder"] = keys };
+            string protectedSecret;
+            await using (var first = await ServerRun.StartAsync(settings))
+                protectedSecret = first.Services.GetRequiredService<ISecretProtector>().Protect("sk-ant-test-keys-0123456789");
+            Assert.NotEmpty(Directory.GetFiles(keys, "key-*.xml"));
+            await using var second = await ServerRun.StartAsync(settings);
+            Assert.Equal("sk-ant-test-keys-0123456789", second.Services.GetRequiredService<ISecretProtector>().Unprotect(protectedSecret));
+        }
+        finally
+        {
+            folder.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task The_directory_knows_the_account_of_the_tests_and_nothing_of_an_unknown_login()
     {
         var directory = new WindowsDirectory(NullLogger<WindowsDirectory>.Instance);

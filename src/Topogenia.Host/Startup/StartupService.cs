@@ -127,7 +127,8 @@ public sealed class ShellBrowserLauncher : IBrowserLauncher
 /// <summary>
 /// Once the server listens in desktop mode: the console says the address (without the launch token, which only the
 /// browser receives) and how to quit, and the default browser is opened on the exchange of the launch token, unless the
-/// configuration says not to (spec 5.2, 6.1).
+/// configuration says not to (spec 5.2, 6.1). Without a console, the icon of the application says how to quit
+/// (<see cref="DesktopTrayService"/>, F-69).
 /// </summary>
 public sealed class DesktopLaunchService(IHostApplicationLifetime lifetime, IOptions<ProductOptions> options, DesktopAddress address,
     DesktopSession session, IBrowserLauncher browser, StartupConsole console) : IHostedService
@@ -136,10 +137,14 @@ public sealed class DesktopLaunchService(IHostApplicationLifetime lifetime, IOpt
     {
         lifetime.ApplicationStarted.Register(() =>
         {
-            console.Write("PRET", new Dictionary<string, object?> { ["address"] = address.Origin });
-            console.Write("QUITTER");
+            // The browser first: a console held by a selection of its window (the quick edit of Windows) never keeps the
+            // application from opening (audit 3.1).
             if (options.Value.Desktop.OpenBrowser && session.LaunchToken is { } token)
                 browser.Open(address.LaunchAddress(token));
+            if (console.Windowed)
+                return;
+            console.Write("PRET", new Dictionary<string, object?> { ["address"] = address.Origin });
+            console.Write("QUITTER");
         });
         return Task.CompletedTask;
     }

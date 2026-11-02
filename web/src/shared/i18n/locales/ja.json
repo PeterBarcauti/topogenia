@@ -1011,6 +1011,8 @@
       },
       "pasted": "貼り付けた回答",
       "copy_reply": "回答をコピー",
+      "report": "不適切な内容を発行元に報告 ({{address}})",
+      "report_subject": "$t(app.name)：AI の回答の報告",
       "failures": {
         "refused": "プロバイダーがキーまたは ID を拒否しました。AI の設定を確認してください。",
         "key_missing": "API キーが保存されていません。管理者が AI の設定で入力します。",

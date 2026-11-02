@@ -26,6 +26,8 @@
   "QUITTER": "Închideți această fereastră pentru a ieși din aplicație.",
   "DEJA_LANCEE_OUVERTE": "Aplicația este deja pornită: se deschide în browser.",
   "REOUVERTE": "A doua pornire: browserul se deschide pe aplicație.",
+  "ICONE_OUVRIR": "Deschidere {product}",
+  "ICONE_QUITTER": "Ieșire din {product}",
   "SAUVEGARDES_DOSSIER": "Copiile de rezervă se află în {folder}.",
   "RESTAURATION_PROPOSEE": "Copii de rezervă disponibile, de la cea mai recentă la cea mai veche. Modificările făcute după copia aleasă nu sunt incluse; fișierul actual și jurnalul lui vor fi păstrate alături, fără a fi șterse:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

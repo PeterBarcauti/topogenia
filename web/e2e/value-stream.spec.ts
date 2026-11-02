@@ -4,7 +4,7 @@
 import type { Page } from '@playwright/test';
 import type { Api } from './support/api.ts';
 import { expect, openMap, stepOf, test } from './support/journey.ts';
-import { middleOfFlow } from './support/map-editing.ts';
+import { boxOf, cellCentre, doubleClickCell, laneHead, laneOf, middleOfFlow, stepIn } from './support/map-editing.ts';
 
 /** The captures of the journeys of the layer, kept out of the repository for the eye of the owner of the product. */
 const CAPTURES = process.env.E2E_CAPTURES ?? '';
@@ -214,4 +214,34 @@ test('the entries by the menus: the volume of the start, the share of an exit wi
   await expect(page.getByTestId('lane-stream-NDF-C01')).toHaveText(/^Effectif à saisir/);
   await page.keyboard.press('Control+z');
   await expect(casesOf(page, 'NDF-E002').first()).toHaveText('153/mois');
+});
+
+test('under the layer, a step dragged along its row and a double click in a lane below stay in their lane (audit 5.1)', async ({ page, api }) => {
+  const { mapId } = await api.project('BND', 'Bande');
+  const first = await laneOf(api, mapId);
+  await api.lane(mapId, 'Manager', 'person');
+  const third = await api.lane(mapId, 'Comptabilité');
+  await api.step(mapId, first, 0, 'Recevoir', 'start');
+  await api.step(mapId, third, 0, 'Contrôler');
+  await openMap(page, mapId, 'BND-E002');
+  await layerButton(page).click();
+  await expect(page.locator('.stream-card').first()).toBeVisible();
+  const code = (await api.map(mapId)).lanes.find((lane) => lane.id === third)?.code ?? '';
+
+  // Rows of 156 px drawn: the third lane begins at 312 px, where rows of 120 px would read the lane below or a new row.
+  const step = await boxOf(stepOf(page, 'BND-E002'));
+  const target = await cellCentre(page, laneHead(page, code), 2);
+  await page.mouse.move(step.x + step.width / 2, step.y + step.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target.x, step.y + step.height / 2, { steps: 15 });
+  await page.mouse.up();
+  await expect.poll(async () => {
+    const moved = stepIn(await api.map(mapId), 'BND-E002');
+    return [moved.lane_id, moved.column, moved.row];
+  }).toEqual([third, 2, 0]);
+
+  // A column left of the panel of the layer, which opens on the right with it.
+  await doubleClickCell(page, laneHead(page, code), 1);
+  await expect.poll(async () => (await api.map(mapId)).steps.filter((item) => item.lane_id === third).map((item) => [item.column, item.row]))
+    .toContainEqual([1, 0]);
 });

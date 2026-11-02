@@ -1013,6 +1013,8 @@
       },
       "pasted": "Reply pasted",
       "copy_reply": "Copy the reply",
+      "report": "Report inappropriate content to the publisher ({{address}})",
+      "report_subject": "$t(app.name): report of an AI reply",
       "failures": {
         "refused": "The provider refuses the key or the identity: check the settings of the AI.",
         "key_missing": "No API key is saved: the administrator enters it in the settings of the AI.",

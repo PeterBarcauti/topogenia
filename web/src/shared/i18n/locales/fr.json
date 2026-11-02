@@ -1013,6 +1013,8 @@
       },
       "pasted": "Réponse collée",
       "copy_reply": "Copier la réponse",
+      "report": "Signaler un contenu inapproprié à l’éditeur ({{address}})",
+      "report_subject": "$t(app.name) : signalement d’une réponse de l’IA",
       "failures": {
         "refused": "Le fournisseur refuse la clé ou l’identité : à revoir dans les paramètres de l’IA.",
         "key_missing": "Aucune clé d’API n’est enregistrée : l’administrateur la saisit dans les paramètres de l’IA.",

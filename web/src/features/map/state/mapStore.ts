@@ -84,6 +84,11 @@ export interface MapState {
   readonly previewed: PreviewedTranslation | null;
   /** Shows a translation previewed in place, or the map again as it is (null). */
   readonly preview: (previewed: PreviewedTranslation | null) => void;
+  /**
+   * The summary of a sheet read or saved, put on its step in the map as the host gave it, then shown: a change of the
+   * language shown or of a preview keeps it (B-4-50, audit 5.3).
+   */
+  readonly summarize: (stepId: string, summary: Schema<'SheetSummary'>) => void;
   /** What the user can undo and redo on the map, from the host (spec 4.6). */
   readonly history: Schema<'HistoryView'> | null;
   readonly loading: boolean;
@@ -175,6 +180,11 @@ export function createMapStore(source: MapSource = hostSource): StoreApi<MapStat
       if (next === null && previewed === null) return;
       previewed = next;
       setState({ previewed: next, ...(given === null ? {} : present(given)), ...(next === null ? {} : { mode: 'normal', linkSource: null, editing: null, editingSeed: null }) });
+    },
+    summarize(stepId, summary) {
+      const step = given?.steps.find((candidate) => candidate.id === stepId);
+      if (given === null || step === undefined || JSON.stringify(step.sheet) === JSON.stringify(summary)) return;
+      setState(present({ ...given, steps: given.steps.map((candidate) => (candidate === step ? { ...step, sheet: summary } : candidate)) }));
     },
     async load(id) {
       running?.abort();
