@@ -1,0 +1,14 @@
+<!-- Topogenia.Persistence.Sqlite.csproj -->
+<!-- SQLite provider: migrations, connection settings and online backup -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Topogenia.Persistence/Topogenia.Persistence.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The source of each migration is embedded: its fingerprint is recorded when it is applied (spec 4.4) -->
+    <EmbeddedResource Include="Migrations/*.cs" Exclude="Migrations/*.Designer.cs;Migrations/*ModelSnapshot.cs" LogicalName="Migrations/%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

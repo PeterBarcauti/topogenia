@@ -1,0 +1,22 @@
+<!-- sheet.html -->
+<!-- Step sheet section: the editor with the docked panel at 1366 x 768, then the full panel content with notes. -->
+<div class="frame" data-capture-frame="04b-panneau-fiche-1366x768">
+  <div class="app app--sheet">
+    {{include:header-editor.html}}
+    {{include:ribbon.html}}
+    <div class="workspace">{{map:sheet}}<aside class="sheet sheet--docked" aria-label="Fiche de l’étape PRJ-E002">{{include:sheet-panel.html}}</aside></div>
+  </div>
+</div>
+<div class="sheet-full-wrap">
+  <aside class="sheet sheet--full" aria-label="Fiche de l’étape PRJ-E002, contenu complet">{{include:sheet-panel.html}}</aside>
+  <div class="notes">
+    <h3>Lecture du panneau</h3>
+    <div class="note"><span class="note-num">1</span><span><b>En-tête collant</b> : « code · libellé », couloir, état de la fiche, indicateur d’enregistrement automatique, puis la complétude en jauge (calculée par le serveur, aucun champ obligatoire).</span></div>
+    <div class="note"><span class="note-num">2</span><span><b>Bascule Formulaire / Écrire librement</b> : contrôle segmenté ; les deux contenus sont conservés.</span></div>
+    <div class="note"><span class="note-num">3</span><span><b>Champs dans l’ordre testé</b> : acteur, finalité, entrées, déroulé, sorties, outils, fréquence, durée. Le champ Finalité montre l’état focus (anneau <code>--focus-ring</code>).</span></div>
+    <div class="note"><span class="note-num">4</span><span><b>Entrée proche cochée</b> (de PRJ-E006) avec l’attente, le %C&amp;A et l’irritant, rattaché à l’étape productrice : d’où le pictogramme d’irritant sur PRJ-E006 dans la carte. Entrée « d’ailleurs » en lilas (<code>--other-input-bg</code>), entrée extérieure avec son lien.</span></div>
+    <div class="note"><span class="note-num">5</span><span><b>Déroulé</b> : trois micro-tâches avec outil et nature ; la nature « Contrôler » porte le liseré vert (<code>--success</code>) et le numéro blanc sur <code>--success-text</code> (5,81:1, AR-56).</span></div>
+    <div class="note"><span class="note-num">6</span><span><b>Suggestions</b> : pastilles « + outil » en pointillés, pastille « Reprendre » vanille quand la fréquence est vide.</span></div>
+    <div class="note"><span class="note-num">7</span><span><b>Validation</b> : bouton principal « Je valide ma fiche » dans un pied collant, toujours visible.</span></div>
+  </div>
+</div>

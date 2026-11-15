@@ -1,0 +1,508 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "topogenia-package-2.0.schema.json",
+  "title": "Paquet d'échange .topogenia, format 2.0",
+  "description": "Le schéma racine décrit manifest.json ; chaque autre entrée du paquet est décrite par la définition de $defs qui porte son nom (project, members, maps, sheets, documents, painpoints, translations). Format et règles : docs/format-topogenia.md.",
+  "$ref": "#/$defs/manifest",
+  "$defs": {
+    "date": {
+      "description": "Date UTC à sept décimales (D08).",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{7}Z$"
+    },
+    "login": {
+      "description": "Compte Windows DOMAINE\\compte.",
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[^\\\\/@]+\\\\[^\\\\/@]+$"
+    },
+    "language": { "type": "string", "pattern": "^[a-z]{2,3}$" },
+    "projectCode": { "type": "string", "pattern": "^[A-Z]{3,6}$" },
+    "stepCode": { "type": "string", "pattern": "^[A-Z]{3,6}-E[0-9]{2,9}$" },
+    "laneCode": { "type": "string", "pattern": "^[A-Z]{3,6}-C[0-9]{2,9}$" },
+    "painPointCode": { "type": "string", "pattern": "^[A-Z]{3,6}-I[0-9]{2,9}$" },
+    "text": {
+      "description": "Texte saisi (annexe A 2.18) : rogné, non vide, sans balise HTML ni caractère de contrôle autre que la tabulation et les fins de ligne.",
+      "type": "string",
+      "pattern": "^\\S([\\s\\S]*\\S)?$",
+      "allOf": [
+        { "not": { "pattern": "<[a-zA-Z!/?]" } },
+        { "not": { "pattern": "[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F]" } }
+      ]
+    },
+    "text60": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 60 }] },
+    "text100": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 100 }] },
+    "text150": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 150 }] },
+    "text200": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 200 }] },
+    "text400": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 400 }] },
+    "text1000": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 1000 }] },
+    "text2000": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 2000 }] },
+    "text4000": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 4000 }] },
+    "text20000": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 20000 }] },
+    "hours": { "type": "number", "minimum": 0, "maximum": 100000 },
+    "minutes": { "type": "number", "minimum": 0, "maximum": 100000 },
+    "frequency": { "enum": ["daily", "weekly", "monthly", "month_end_close", "quarterly", "yearly", "occasional"] },
+    "manifest": {
+      "type": "object",
+      "required": ["format", "formatVersion", "appVersion", "schemaVersion", "exportedAt", "projectCode", "options", "entries"],
+      "additionalProperties": false,
+      "properties": {
+        "format": { "const": "topogenia-package" },
+        "formatVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "appVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "schemaVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "exportedAt": { "$ref": "#/$defs/date" },
+        "exportedBy": { "$ref": "#/$defs/login" },
+        "projectCode": { "$ref": "#/$defs/projectCode" },
+        "options": {
+          "type": "object",
+          "required": ["withoutPeople"],
+          "additionalProperties": false,
+          "properties": { "withoutPeople": { "type": "boolean" } }
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "required": ["path", "size", "sha256"],
+            "additionalProperties": false,
+            "properties": {
+              "path": { "enum": ["project.json", "members.json", "maps.json", "sheets.json", "documents.json", "painpoints.json", "translations.json"] },
+              "size": { "type": "integer", "minimum": 0, "maximum": 524288000 },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "audit": {
+      "description": "Création et dernière modification : dates toujours, auteurs par login sauf export sans les personnes.",
+      "type": "object",
+      "properties": {
+        "createdAt": { "$ref": "#/$defs/date" },
+        "createdBy": { "$ref": "#/$defs/login" },
+        "updatedAt": { "$ref": "#/$defs/date" },
+        "updatedBy": { "$ref": "#/$defs/login" }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["project"],
+      "additionalProperties": false,
+      "properties": {
+        "project": {
+          "type": "object",
+          "required": ["code", "name", "sourceLanguage", "classification", "counters", "createdAt"],
+          "additionalProperties": false,
+          "allOf": [{ "$ref": "#/$defs/audit" }],
+          "properties": {
+            "code": { "$ref": "#/$defs/projectCode" },
+            "name": { "$ref": "#/$defs/text200" },
+            "sourceLanguage": { "$ref": "#/$defs/language" },
+            "description": { "$ref": "#/$defs/text4000" },
+            "sharedFolder": { "$ref": "#/$defs/text400" },
+            "classification": { "enum": ["internal", "confidential", "strictly_confidential"] },
+            "sharingGroupLabel": { "$ref": "#/$defs/text100" },
+            "translationGlossary": { "$ref": "#/$defs/text4000" },
+            "counters": {
+              "type": "object",
+              "required": ["step", "lane", "pain_point", "solution"],
+              "additionalProperties": false,
+              "properties": {
+                "step": { "type": "integer", "minimum": 0, "maximum": 999999999 },
+                "lane": { "type": "integer", "minimum": 0, "maximum": 999999999 },
+                "pain_point": { "type": "integer", "minimum": 0, "maximum": 999999999 },
+                "solution": { "type": "integer", "minimum": 0, "maximum": 999999999 }
+              }
+            },
+            "createdAt": true,
+            "createdBy": true,
+            "updatedAt": true,
+            "updatedBy": true
+          }
+        }
+      }
+    },
+    "members": {
+      "type": "object",
+      "required": ["members"],
+      "additionalProperties": false,
+      "properties": {
+        "members": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {
+            "type": "object",
+            "required": ["login", "displayName", "role", "isSponsor", "isKeyContributor", "displayOrder", "createdAt"],
+            "additionalProperties": false,
+            "allOf": [{ "$ref": "#/$defs/audit" }],
+            "properties": {
+              "login": { "$ref": "#/$defs/login" },
+              "displayName": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 128 }] },
+              "role": { "enum": ["reader", "contributor", "facilitator"] },
+              "isSponsor": { "type": "boolean" },
+              "isKeyContributor": { "type": "boolean" },
+              "displayOrder": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+              "createdAt": true,
+              "createdBy": true,
+              "updatedAt": true,
+              "updatedBy": true
+            }
+          }
+        }
+      }
+    },
+    "stepContent": {
+      "type": "object",
+      "required": ["code", "label", "sourceLanguage", "stepType", "automationStatus", "createdAt"],
+      "allOf": [{ "$ref": "#/$defs/audit" }],
+      "properties": {
+        "code": { "$ref": "#/$defs/stepCode" },
+        "label": { "$ref": "#/$defs/text150" },
+        "sourceLanguage": { "$ref": "#/$defs/language" },
+        "stepType": { "enum": ["task", "decision", "parallel", "inclusive", "wait", "start", "end"] },
+        "automationStatus": { "enum": ["manual", "in_progress", "automated"] },
+        "assignee": { "$ref": "#/$defs/login" }
+      }
+    },
+    "flowEnds": {
+      "type": "object",
+      "required": ["source", "target"],
+      "properties": {
+        "source": { "$ref": "#/$defs/stepCode" },
+        "target": { "$ref": "#/$defs/stepCode" }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "required": ["code", "name", "sourceLanguage", "laneType", "color", "sortOrder", "createdAt"],
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/audit" }],
+      "properties": {
+        "code": { "$ref": "#/$defs/laneCode" },
+        "name": { "$ref": "#/$defs/text150" },
+        "sourceLanguage": { "$ref": "#/$defs/language" },
+        "laneType": { "enum": ["person", "department", "system"] },
+        "actor": { "$ref": "#/$defs/login" },
+        "color": { "type": "string", "pattern": "^#[0-9A-F]{6}$" },
+        "sortOrder": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "sourceLane": { "$ref": "#/$defs/laneCode" },
+        "createdAt": true,
+        "createdBy": true,
+        "updatedAt": true,
+        "updatedBy": true
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["lane", "column", "row", "raci"],
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/stepContent" }],
+      "properties": {
+        "code": true,
+        "label": true,
+        "sourceLanguage": true,
+        "stepType": true,
+        "automationStatus": true,
+        "assignee": true,
+        "createdAt": true,
+        "createdBy": true,
+        "updatedAt": true,
+        "updatedBy": true,
+        "lane": { "$ref": "#/$defs/laneCode" },
+        "column": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "row": { "type": "integer", "minimum": 0, "maximum": 50 },
+        "raci": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "required": ["lane", "role", "createdAt"],
+            "additionalProperties": false,
+            "allOf": [{ "$ref": "#/$defs/audit" }],
+            "properties": {
+              "lane": { "$ref": "#/$defs/laneCode" },
+              "role": { "enum": ["A", "S", "C", "I"] },
+              "createdAt": true,
+              "createdBy": true,
+              "updatedAt": true,
+              "updatedBy": true
+            }
+          }
+        }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "required": ["createdAt"],
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/flowEnds" }, { "$ref": "#/$defs/audit" }],
+      "properties": {
+        "source": true,
+        "target": true,
+        "label": { "$ref": "#/$defs/text60" },
+        "createdAt": true,
+        "createdBy": true,
+        "updatedAt": true,
+        "updatedBy": true
+      }
+    },
+    "dissolution": {
+      "description": "Remontée ouverte : l'étape dissoute (supprimée, sans case), les étapes du cadre encore vivantes, les flèches et couloirs créés encore vivants.",
+      "type": "object",
+      "required": ["step", "frameSteps", "createdFlows", "createdLanes", "createdAt"],
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/audit" }],
+      "properties": {
+        "step": {
+          "type": "object",
+          "additionalProperties": false,
+          "allOf": [{ "$ref": "#/$defs/stepContent" }],
+          "properties": {
+            "code": true,
+            "label": true,
+            "sourceLanguage": true,
+            "stepType": true,
+            "automationStatus": true,
+            "assignee": true,
+            "createdAt": true,
+            "createdBy": true,
+            "updatedAt": true,
+            "updatedBy": true
+          }
+        },
+        "frameSteps": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/stepCode" } },
+        "createdFlows": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "type": "object", "additionalProperties": false, "allOf": [{ "$ref": "#/$defs/flowEnds" }], "properties": { "source": true, "target": true } }
+        },
+        "createdLanes": { "type": "array", "maxItems": 200, "items": { "$ref": "#/$defs/laneCode" } },
+        "createdAt": true,
+        "createdBy": true,
+        "updatedAt": true,
+        "updatedBy": true
+      }
+    },
+    "map": {
+      "type": "object",
+      "required": ["name", "sourceLanguage", "lanes", "steps", "flows", "createdAt"],
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/audit" }],
+      "properties": {
+        "parentStep": { "$ref": "#/$defs/stepCode" },
+        "name": { "$ref": "#/$defs/text200" },
+        "sourceLanguage": { "$ref": "#/$defs/language" },
+        "lanes": { "type": "array", "maxItems": 200, "items": { "$ref": "#/$defs/lane" } },
+        "steps": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/step" } },
+        "flows": { "type": "array", "maxItems": 20000, "items": { "$ref": "#/$defs/flow" } },
+        "dissolution": { "$ref": "#/$defs/dissolution" },
+        "createdAt": true,
+        "createdBy": true,
+        "updatedAt": true,
+        "updatedBy": true
+      }
+    },
+    "maps": {
+      "type": "object",
+      "required": ["maps"],
+      "additionalProperties": false,
+      "properties": {
+        "maps": { "type": "array", "minItems": 1, "maxItems": 5000, "items": { "$ref": "#/$defs/map" } }
+      }
+    },
+    "sheets": {
+      "type": "object",
+      "required": ["sheets"],
+      "additionalProperties": false,
+      "properties": {
+        "sheets": {
+          "type": "array",
+          "maxItems": 5000,
+          "items": {
+            "type": "object",
+            "required": ["step", "status", "sourceLanguage", "procedure", "versions", "createdAt"],
+            "additionalProperties": false,
+            "allOf": [{ "$ref": "#/$defs/audit" }],
+            "properties": {
+              "step": { "$ref": "#/$defs/stepCode" },
+              "status": { "enum": ["empty", "draft", "validated", "needs_review"] },
+              "actor": { "$ref": "#/$defs/text4000" },
+              "purpose": { "$ref": "#/$defs/text4000" },
+              "tools": { "$ref": "#/$defs/text4000" },
+              "frequency": { "$ref": "#/$defs/frequency" },
+              "durationMinutes": { "$ref": "#/$defs/minutes" },
+              "freeText": { "$ref": "#/$defs/text20000" },
+              "sourceLanguage": { "$ref": "#/$defs/language" },
+              "clarificationRequest": { "$ref": "#/$defs/text1000" },
+              "procedure": {
+                "type": "array",
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "required": ["position", "text"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "position": { "type": "integer", "minimum": 1, "maximum": 50 },
+                    "text": { "$ref": "#/$defs/text1000" },
+                    "tool": { "$ref": "#/$defs/text200" },
+                    "nature": { "enum": ["extract", "copy_paste", "re_enter", "format", "calculate", "check", "chase", "file", "send", "wait"] }
+                  }
+                }
+              },
+              "versions": {
+                "type": "array",
+                "maxItems": 10000,
+                "items": {
+                  "type": "object",
+                  "required": ["number", "content", "validatedAt"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "number": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+                    "content": { "type": "string", "minLength": 2, "maxLength": 200000 },
+                    "frequency": { "$ref": "#/$defs/frequency" },
+                    "durationMinutes": { "$ref": "#/$defs/minutes" },
+                    "validatedBy": { "$ref": "#/$defs/login" },
+                    "validatedAt": { "$ref": "#/$defs/date" }
+                  }
+                }
+              },
+              "createdAt": true,
+              "createdBy": true,
+              "updatedAt": true,
+              "updatedBy": true
+            }
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "object",
+      "required": ["documents"],
+      "additionalProperties": false,
+      "properties": {
+        "documents": {
+          "type": "array",
+          "maxItems": 50000,
+          "items": {
+            "type": "object",
+            "required": ["step", "direction", "name", "shareConfirmed", "sourceLanguage", "uses", "createdAt"],
+            "additionalProperties": false,
+            "allOf": [{ "$ref": "#/$defs/audit" }],
+            "properties": {
+              "step": { "$ref": "#/$defs/stepCode" },
+              "direction": { "enum": ["input", "output"] },
+              "name": { "$ref": "#/$defs/text200" },
+              "location": { "$ref": "#/$defs/text1000" },
+              "locationType": { "enum": ["url", "path"] },
+              "waitHours": { "$ref": "#/$defs/hours" },
+              "shareConfirmed": { "type": "boolean" },
+              "sourceLanguage": { "$ref": "#/$defs/language" },
+              "uses": {
+                "type": "array",
+                "maxItems": 5000,
+                "items": {
+                  "type": "object",
+                  "required": ["step", "createdAt"],
+                  "additionalProperties": false,
+                  "allOf": [{ "$ref": "#/$defs/audit" }],
+                  "properties": {
+                    "step": { "$ref": "#/$defs/stepCode" },
+                    "waitHours": { "$ref": "#/$defs/hours" },
+                    "percentCompleteAccurate": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "painPoint": { "$ref": "#/$defs/painPointCode" },
+                    "createdAt": true,
+                    "createdBy": true,
+                    "updatedAt": true,
+                    "updatedBy": true
+                  }
+                }
+              },
+              "createdAt": true,
+              "createdBy": true,
+              "updatedAt": true,
+              "updatedBy": true
+            }
+          }
+        }
+      }
+    },
+    "painpoints": {
+      "type": "object",
+      "required": ["painPoints"],
+      "additionalProperties": false,
+      "properties": {
+        "painPoints": {
+          "type": "array",
+          "maxItems": 50000,
+          "items": {
+            "type": "object",
+            "required": ["code", "description", "sourceLanguage", "status", "history", "createdAt"],
+            "additionalProperties": false,
+            "allOf": [{ "$ref": "#/$defs/audit" }],
+            "properties": {
+              "code": { "$ref": "#/$defs/painPointCode" },
+              "step": { "$ref": "#/$defs/stepCode" },
+              "description": { "$ref": "#/$defs/text2000" },
+              "sourceLanguage": { "$ref": "#/$defs/language" },
+              "lostHoursPerMonth": { "type": "number", "minimum": 0, "maximum": 99999.9 },
+              "status": { "$ref": "#/$defs/painPointStatus" },
+              "history": {
+                "type": "array",
+                "maxItems": 10000,
+                "items": {
+                  "type": "object",
+                  "required": ["statusAfter", "changedAt"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "statusBefore": { "$ref": "#/$defs/painPointStatus" },
+                    "statusAfter": { "$ref": "#/$defs/painPointStatus" },
+                    "comment": { "$ref": "#/$defs/text2000" },
+                    "changedBy": { "$ref": "#/$defs/login" },
+                    "changedAt": { "$ref": "#/$defs/date" }
+                  }
+                }
+              },
+              "createdAt": true,
+              "createdBy": true,
+              "updatedAt": true,
+              "updatedBy": true
+            }
+          }
+        }
+      }
+    },
+    "painPointStatus": { "enum": ["reported", "scored", "under_review", "in_progress", "implemented", "adopted", "dropped"] },
+    "translations": {
+      "type": "object",
+      "required": ["translations"],
+      "additionalProperties": false,
+      "properties": {
+        "translations": {
+          "type": "array",
+          "maxItems": 200000,
+          "items": {
+            "type": "object",
+            "required": ["object", "field", "language", "text", "source", "updatedAt"],
+            "additionalProperties": false,
+            "properties": {
+              "object": { "enum": ["project", "map", "lane", "step", "flow"] },
+              "parentStep": { "$ref": "#/$defs/stepCode" },
+              "lane": { "$ref": "#/$defs/laneCode" },
+              "step": { "$ref": "#/$defs/stepCode" },
+              "flow": { "type": "object", "additionalProperties": false, "allOf": [{ "$ref": "#/$defs/flowEnds" }], "properties": { "source": true, "target": true } },
+              "field": { "enum": ["name", "label"] },
+              "language": { "$ref": "#/$defs/language" },
+              "text": { "$ref": "#/$defs/text200" },
+              "source": { "enum": ["auto", "manual"] },
+              "updatedAt": { "$ref": "#/$defs/date" },
+              "updatedBy": { "$ref": "#/$defs/login" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

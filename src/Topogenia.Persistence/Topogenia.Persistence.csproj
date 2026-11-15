@@ -1,0 +1,17 @@
+<!-- Topogenia.Persistence.csproj -->
+<!-- Persistence: EF Core model and adapters of the application ports, shared by both providers -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Topogenia.Application/Topogenia.Application.csproj" />
+  </ItemGroup>
+  <!-- The core: its source project, or its package in the public repository (ADR 074) -->
+  <ItemGroup Condition="'$(UseCorePackage)' != 'true'">
+    <ProjectReference Include="../Topogenia.Domain/Topogenia.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseCorePackage)' == 'true'">
+    <PackageReference Include="Topogenia.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+</Project>

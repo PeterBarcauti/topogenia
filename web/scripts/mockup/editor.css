@@ -1,0 +1,190 @@
+/* editor.css */
+/* Mockup styles of the application header, the ribbon, the map canvas (lanes, steps, arrows, frame, minimap) and the notifications. */
+
+/* application frame and header (spec 9.5, AR-31) */
+.app { position: relative; width: 1366px; height: 768px; display: grid; grid-template-rows: var(--header-height) 61px 1fr; background: var(--bg-app); overflow: hidden; }
+.app--auto { height: auto; grid-template-rows: var(--header-height) auto; }
+.app-header { height: var(--header-height); display: flex; align-items: center; gap: 10px; padding: 0 12px 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; z-index: 7; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 15px; letter-spacing: -.01em; color: var(--text); text-decoration: none; }
+.brand-sign { font-size: var(--font-size-small); color: var(--text-muted); }
+.head-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+.crumbs { display: flex; align-items: center; gap: 6px; font-size: 13px; min-width: 0; }
+.crumbs a { color: var(--text-muted); text-decoration: none; }
+.crumbs .i { color: var(--text-muted); }
+.crumbs [aria-current] { color: var(--text); font-weight: 600; }
+.head-actions { display: flex; gap: 2px; margin-left: 6px; }
+.head-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.lang-switch { display: inline-flex; padding: 2px; background: var(--lane-even); border-radius: var(--radius-pill); border: 1px solid var(--border); }
+.lang-switch button { height: 22px; padding: 0 9px; border: 1px solid transparent; border-radius: var(--radius-pill); background: none; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+/* AR-59: the chosen language carries a 1 px --accent contour on top of its background */
+.lang-switch [aria-pressed="true"] { background: var(--surface); color: var(--text); border-color: var(--accent); box-shadow: var(--shadow-step); }
+.avatar { width: 28px; height: 28px; border-radius: var(--radius-pill); display: grid; place-items: center; background: var(--initials-bg); color: var(--initials-fg); font-size: 11px; font-weight: 600; }
+.user { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding-left: 4px; }
+
+/* ribbon (spec 9.5): named groups, 32 px icon buttons, one line at 1366 px */
+.ribbon { display: flex; align-items: flex-start; padding: 6px 12px 0; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; z-index: 6; }
+.rgroup { display: flex; flex-direction: column; align-items: center; padding: 0 12px; position: relative; }
+.rgroup:first-child { padding-left: 0; }
+.rgroup + .rgroup::before { content: ''; position: absolute; left: 0; top: 6px; height: 36px; width: 1px; background: var(--border); }
+.rgroup-buttons { display: flex; gap: 2px; align-items: center; height: var(--ribbon-button); }
+.rgroup-label { font-size: var(--font-size-micro); line-height: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+.rbtn { width: var(--ribbon-button); height: var(--ribbon-button); border-radius: var(--radius-ui); display: grid; place-items: center; color: var(--text-muted); background: none; border: 1px solid transparent; padding: 0; position: relative; transition: background var(--duration-fast), color var(--duration-fast); }
+.rbtn:hover, .rbtn.is-hover { background: var(--hover); color: var(--text); }
+.rbtn[aria-pressed="true"], .rbtn[aria-checked="true"] { background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent); }
+.rbtn:disabled { opacity: .38; cursor: default; }
+.rsep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+.ribbon-status { margin-left: auto; align-self: center; margin-top: -10px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+.ribbon-status .i { color: var(--success); }
+.tooltip {
+  position: absolute; top: calc(100% + 26px); left: 50%; transform: translateX(-50%); z-index: 20;
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 10px; border-radius: var(--radius-ui); white-space: nowrap;
+  background: var(--toast-bg); color: var(--toast-fg); font-size: 12px; font-weight: 500; line-height: 1; box-shadow: var(--shadow-raised);
+}
+.tooltip::before { content: ''; position: absolute; top: -4px; left: 50%; width: 8px; height: 8px; background: var(--toast-bg); transform: translateX(-50%) rotate(45deg); }
+.tooltip kbd { font-size: 11px; padding: 2px 5px; border-radius: var(--radius-small); border: 1px solid var(--text-muted); background: var(--toast-bg); color: var(--toast-fg); }
+
+/* canvas: dot grid (AR-41), lane bodies alternate white and --lane-even (spec 9.3) */
+.workspace { display: flex; min-height: 0; position: relative; }
+.canvas {
+  position: relative; overflow: hidden; flex: none;
+  background-color: var(--bg-app);
+  background-image: radial-gradient(circle, var(--canvas-dot) 1.3px, var(--bg-app) 1.6px);
+  background-size: 24px 24px;
+  background-position: calc(var(--view-x) - 12px) calc(var(--view-y) - 12px);
+}
+.viewport { position: absolute; left: 0; top: 0; }
+.lane-body { position: absolute; border-bottom: 1px solid var(--lane-separator); }
+.lane-body:first-child { border-top: 1px solid var(--lane-separator); }
+.lane-body--odd { background: var(--lane-odd); }
+.lane-body--even { background: var(--lane-even); }
+
+/* arrows (annex B 3.4, spec 9.7): 1.6 px stroke (annex B 3.4 rule 8) */
+.edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; z-index: 1; }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+.arrow-head { fill: var(--edge); }
+.edge-label {
+  position: absolute; transform: translate(-50%, -50%); z-index: 3; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-small); padding: 1px 6px 2px;
+  font-size: 11px; font-weight: 500; line-height: 1.3; color: var(--text-muted);
+}
+
+.edge-docs { display: inline-flex; align-items: center; gap: 3px; font-variant-numeric: tabular-nums; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* steps (spec 9.4); --lane-bg is the body colour of the step's lane, painted where the card is not opaque */
+.step {
+  position: absolute; width: 170px; height: 64px; z-index: 2;
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ink); border-radius: var(--radius-step);
+  box-shadow: var(--shadow-step);
+  padding: 2px 10px 2px 11px; display: flex; flex-direction: column; justify-content: safe center; gap: 0;
+  transition: box-shadow var(--duration-fast);
+}
+.step-code { font-family: var(--font-mono); font-size: var(--font-size-code); line-height: 12px; flex: none; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.step-label { font-size: var(--font-size-step); font-weight: 500; line-height: 15px; color: var(--text); flex: none; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -.003em; }
+/* label of 3 lines at most (code 12 + 3 x 15 = 57 px in the 62 px inside the card, 2 px from the border);
+   annex B 2.10: when the pictograms are shown, the text moves up by 12 px (extra bottom padding, as in the 1.x);
+   a label of 3 lines then starts at the top padding (safe center) and still clears the bottom border */
+.step.has-pictos { padding-bottom: 14px; }
+.step-pictos { position: absolute; right: 9px; bottom: 5px; display: flex; gap: 8px; font-size: var(--font-size-micro); line-height: 10px; font-weight: 500; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.step-pictos span { display: inline-flex; align-items: center; gap: 3px; }
+.step-pictos .picto-irritant { color: var(--danger-muted); }
+.step-gauge { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; overflow: hidden; border-radius: 0 0 calc(var(--radius-step) - 1px) calc(var(--radius-step) - 3px); }
+.step-gauge span { display: block; height: 100%; }
+.gauge--draft { background: var(--warning-graphic); }
+.gauge--validated { background: var(--success); }
+.gauge--needs_review { background: var(--danger); }
+.step-warning { position: absolute; left: -10px; top: -9px; width: 17px; height: 17px; border-radius: var(--radius-pill); background: var(--warning-graphic); color: var(--text); font-size: 11px; font-weight: 700; line-height: 17px; text-align: center; outline: 2px solid var(--surface); }
+.step-detailed {
+  position: absolute; top: -9px; right: 10px; height: 18px; padding: 0 7px 0 5px; display: inline-flex; gap: 4px; align-items: center;
+  border-radius: var(--radius-pill); background: var(--frame-label-bg); color: var(--accent-strong); font-size: 10.5px; font-weight: 600;
+  outline: 2px solid var(--surface);
+}
+.step-frequency {
+  position: absolute; top: calc(100% + 5px); left: 50%; transform: translateX(-50%); height: 18px; padding: 0 8px 0 6px; white-space: nowrap;
+  display: inline-flex; gap: 4px; align-items: center; border-radius: var(--radius-pill);
+  background: var(--lane-6-pastel); color: var(--lane-6-ink); font-size: 10.5px; font-weight: 600;
+}
+.step-stack { position: absolute; width: 170px; height: 64px; z-index: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-step); box-shadow: var(--shadow-step); }
+.step.is-hover { box-shadow: var(--shadow-raised); }
+.step.is-selected { box-shadow: var(--shadow-raised); outline: 2px solid var(--accent); outline-offset: 1px; }
+.step--wait { border-style: dashed; border-color: var(--edge); border-left-style: solid; border-left-color: var(--ink); }
+.step--start, .step--end { border-radius: var(--radius-pill); align-items: center; text-align: center; padding: 2px 18px 2px 16px; }
+/* the double border carries the type of the step: --edge (3.71:1), as the dashes of the wait step (AR-59) */
+.step--end { border-top: 3px double var(--edge); border-right: 3px double var(--edge); border-bottom: 3px double var(--edge); padding: 0 16px; }
+.step--end .step-label { line-height: 14px; }
+
+/* cut step and step outside the frame (AR-53): the card is dimmed, the text stays at full opacity in --text-muted */
+.step.is-cut, .step.is-outside { background: var(--lane-bg); border-style: none; box-shadow: none; padding: 3px 11px 3px 14px; }
+.step.is-cut.has-pictos, .step.is-outside.has-pictos { padding-bottom: 15px; }
+.step.is-cut::before, .step.is-outside::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; opacity: var(--step-cut-opacity);
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ink); border-radius: var(--radius-step); box-shadow: var(--shadow-step);
+}
+.step.is-cut::before { border-style: dashed; border-color: var(--edge); border-left: 3px dashed var(--ink); }
+.step.is-cut .step-label, .step.is-outside .step-label { color: var(--text-muted); }
+
+/* gateways (spec 9.4, annex B 3.2, AR-57): marker centred in the diamond, 13 px label under the shape, code above left */
+.step--decision, .step--parallel, .step--inclusive { background: var(--lane-bg); border: 0; border-radius: 0; box-shadow: none; padding: 0; display: block; }
+.gateway-shape { position: absolute; inset: 0; width: 170px; height: 64px; overflow: visible; }
+.gateway-shape polygon { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; stroke-linejoin: round; }
+.step--decision .step-code, .step--parallel .step-code, .step--inclusive .step-code { position: absolute; left: 0; bottom: calc(100% + 1px); }
+.gateway-marker { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--ink); }
+.step--decision .step-label, .step--parallel .step-label, .step--inclusive .step-label {
+  position: absolute; top: calc(100% + 3px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 200px;
+  padding: 0 4px; background: var(--lane-bg); text-align: center; -webkit-line-clamp: 2;
+}
+/* AR-58: when the bottom point carries an exit, the label is left aligned 10 px right of the vertical axis */
+.step.has-bottom-exit .step-label { left: calc(50% + 10px); transform: none; text-align: left; padding: 0 4px 0 0; }
+.quick-add { position: absolute; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: var(--radius-pill); padding: 0; z-index: 4; display: grid; place-items: center; border: 1px solid var(--border); background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow-step); }
+
+/* dissolution frame (annex B 2.9, AR-26) */
+.dissolution-frame { position: absolute; z-index: 0; border: 1.5px dashed var(--frame); border-radius: var(--radius-large); }
+.dissolution-label {
+  position: absolute; top: -12px; right: 12px; height: 22px; display: inline-flex; gap: 5px; align-items: center; padding: 0 9px 0 7px; white-space: nowrap;
+  border-radius: var(--radius-pill); border: 1px solid var(--frame); background: var(--frame-label-bg); color: var(--accent-strong); font-size: 11.5px; font-weight: 600;
+}
+
+/* lane headers in the fixed 184 px margin (spec 9.3, AR-19, AR-47) */
+.lane-heads { position: absolute; left: 0; width: 184px; z-index: 5; }
+.lane-head {
+  position: absolute; left: 0; width: 184px; color: var(--ink); background: var(--pastel);
+  border-right: 4px solid var(--ink); border-bottom: 1px solid var(--surface);
+  padding: 12px 16px 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 5px;
+  transition: box-shadow var(--duration-fast);
+}
+.lane-head:first-child { border-top: 1px solid var(--surface); }
+.lane-head-name { display: flex; gap: 8px; align-items: flex-start; font-size: var(--font-size-lane-name); font-weight: 600; line-height: 17px; }
+.lane-head-name span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lane-head-name .i { margin-top: 0; }
+.lane-head-code { font-size: var(--font-size-lane-code); line-height: 14px; padding-left: 24px; }
+.lane-head.is-hover { box-shadow: var(--shadow-raised); z-index: 1; }
+.lane-head-more { position: absolute; top: 8px; right: 10px; width: 26px; height: 26px; border-radius: var(--radius-small); padding: 0; display: grid; place-items: center; border: 0; color: var(--ink); background: var(--surface); }
+.lane-add { position: absolute; left: 92px; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: var(--radius-pill); padding: 0; z-index: 2; display: grid; place-items: center; border: 1px solid var(--border); background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow-step); }
+
+/* zoom controls and minimap (annex B 2.1) */
+.canvas-controls { position: absolute; right: 228px; bottom: 16px; z-index: 6; display: flex; align-items: center; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-ui); box-shadow: var(--shadow-raised); }
+.canvas-controls button { width: 28px; height: 28px; border-radius: var(--radius-small); border: 0; padding: 0; display: grid; place-items: center; background: none; color: var(--text-muted); }
+.zoom-value { min-width: 44px; text-align: center; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--text); }
+.controls-sep { width: 1px; height: 16px; background: var(--border); margin: 0 2px; }
+.minimap { position: absolute; right: 16px; bottom: 16px; z-index: 6; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-ui); box-shadow: var(--shadow-raised); overflow: hidden; line-height: 0; }
+.mm-body.odd { fill: var(--lane-odd); }
+.mm-body.even { fill: var(--lane-even); }
+.mm-step { fill: var(--minimap-node); }
+.mm-view { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+
+/* notifications (spec 9.5): bottom right corner, stacked above the minimap, state icon */
+.toasts { position: absolute; right: 16px; bottom: 100px; z-index: 9; width: 380px; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  display: grid; grid-template-columns: 20px 1fr auto; gap: 10px; align-items: start; padding: 10px 8px 10px 12px;
+  border-radius: var(--radius-ui); background: var(--toast-bg); color: var(--toast-fg); box-shadow: var(--shadow-raised);
+  font-size: 13px; line-height: 20px;
+}
+.toast-icon { width: 20px; height: 20px; border-radius: var(--radius-pill); display: grid; place-items: center; color: var(--surface); }
+.toast--info .toast-icon { background: var(--accent); }
+.toast--success .toast-icon { background: var(--success); }
+.toast--error .toast-icon { background: var(--danger); }
+.toast b { font-weight: 600; }
+.toast-tools { display: flex; align-items: center; gap: 2px; }
+.toast-action { height: 20px; padding: 0 6px; border: 0; background: none; color: var(--toast-fg); font-size: 12.5px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.toast-close { width: 20px; height: 20px; border: 0; padding: 0; display: grid; place-items: center; border-radius: var(--radius-small); background: none; color: var(--toast-fg); }
+.app--notify .tooltip, .app--notify .quick-add { display: none; }

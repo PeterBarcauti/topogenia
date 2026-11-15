@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AppxManifest.xml -->
+<!-- The manifest of the MSIX package of the desktop mode for the Microsoft Store (ADR 088): the identity reserved in Partner Center, written as it is; the product name as {{PRODUCT}}, the version in four parts as {{VERSION}}, replaced by build/package.mjs -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <!-- Partner Center, product identity: the three values must stay as Microsoft gave them (01/11/2026) -->
+  <Identity Name="PeterBarcauti.Topogenia" Publisher="CN=2AA7CE71-2550-41D9-812A-A5E5AC8EC7CA" Version="{{VERSION}}" ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>{{PRODUCT}}</DisplayName>
+    <PublisherDisplayName>Peter Barcauti</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <!-- The languages of the listing in the Store; the interface keeps its eighteen languages -->
+  <Resources>
+    <Resource Language="en-US" />
+    <Resource Language="fr-FR" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="{{PRODUCT}}.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="{{PRODUCT}}" Description="From the story to the diagrams" BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <!-- A desktop application in full trust: its own server on 127.0.0.1, the browser of the person, its data in the folder of the package -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

@@ -1,0 +1,459 @@
+// PmapReader.Maps.cs
+// The maps of a .pmap file: lanes, steps, columns and cells, sub-maps, RACI of the other lanes, flows (annex A 2.17, spec 7.5).
+
+using System.Text.Json;
+using Topogenia.Domain.Errors;
+using Topogenia.Domain.Values;
+using Topogenia.Domain.Workspace;
+
+namespace Topogenia.Interchange.Pmap;
+
+internal sealed partial class PmapReading
+{
+    private const string LaneKind = "lane";
+    private const string StepKind = "step";
+
+    private static readonly string[] MapProperties = ["lanes", "steps", "flows"];
+
+    private static readonly string[] MapProperties14 = ["lanes", "steps", "flows", "summary"];
+    private static readonly string[] LaneProperties = ["id", "name", "type", "color", "translations"];
+    private static readonly string[] StepProperties = ["id", "lane", "label", "type", "column", "row", "automation", "raci", "sub_map", "translations", "sheet"];
+    private static readonly string[] FlowProperties = ["source", "target", "label", "translations"];
+
+    // The version 1.2 adds the entries of the value stream (ADR 085); in a file of the version 1.1 they are unknown.
+    private static readonly string[] LaneProperties12 = [.. LaneProperties, "headcount"];
+    private static readonly string[] StepProperties12 = [.. StepProperties, "volume"];
+    private static readonly string[] StepProperties14 = [.. StepProperties12, "value_class"];
+    private static readonly string[] FlowProperties12 = [.. FlowProperties, "share"];
+
+    // The version 1.3 adds the route a user chose for a flow (ADR 091); in a file of an earlier version it is unknown.
+    private static readonly string[] FlowProperties13 = [.. FlowProperties12, "route"];
+    private static readonly string[] RouteProperties = ["from", "to", "via"];
+    private static readonly string[] PassageProperties = ["aisle", "column", "lane", "row", "edge"];
+    private static readonly IReadOnlyList<string> Sides = Codes.All<FlowSide>();
+    private static readonly IReadOnlyList<string> Edges = [Codes.Of(FlowSide.Top), Codes.Of(FlowSide.Bottom)];
+    private static readonly string[] VolumeProperties = ["quantity", "period"];
+    private static readonly IReadOnlyList<string> Periods = Codes.All<VolumePeriod>();
+
+    private static readonly IReadOnlyList<string> LaneTypes = Codes.All<LaneType>();
+    private static readonly IReadOnlyList<string> StepTypeCodes = Codes.All<StepType>();
+    private static readonly IReadOnlyList<string> Automations = Codes.All<AutomationStatus>();
+    private static readonly IReadOnlyList<string> ValueClasses = Codes.All<ValueClass>();
+
+    /// <summary>
+    /// A map and its sub-maps, <paramref name="depth"/> 1 for the root. The valid identifiers are kept even when their
+    /// element has another fault: a fault on a lane or a step does not raise others on what refers to it.
+    /// </summary>
+    private PmapMap? Map(JsonElement map, string path, int depth)
+    {
+        Properties(map, path, summaries ? MapProperties14 : MapProperties);
+        var laneIds = new HashSet<string>(StringComparer.Ordinal);
+        var lanes = new List<PmapLane>();
+        if (List(map, "lanes", path, required: true) is { } laneList)
+        {
+            if (laneList.GetArrayLength() == 0)
+                Fault($"{path}.lanes", FileErrorCodes.MapWithoutLane);
+            if (laneList.GetArrayLength() > PmapFormat.LanesMax)
+                Fault($"{path}.lanes", FileErrorCodes.TooManyLanes, ("max", PmapFormat.LanesMax));
+            var i = 0;
+            foreach (var element in laneList.EnumerateArray())
+            {
+                if (Lane(element, $"{path}.lanes[{i++}]", laneIds) is { } lane)
+                    lanes.Add(lane);
+            }
+        }
+        var stepIds = new HashSet<string>(StringComparer.Ordinal);
+        var steps = new List<PmapStep>();
+        var stepPaths = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (List(map, "steps", path, required: false) is { } stepList)
+        {
+            var i = 0;
+            foreach (var element in stepList.EnumerateArray())
+            {
+                var stepPath = $"{path}.steps[{i++}]";
+                if (Step(element, stepPath, laneIds, stepIds, depth) is { } step)
+                {
+                    steps.Add(step);
+                    stepPaths[step.Id] = stepPath;
+                }
+            }
+        }
+        stepCount += steps.Count;
+        Cells(steps, stepPaths, path);
+        Uses(steps, stepPaths);
+        var flows = Flows(map, path, stepIds, steps, laneIds);
+        return lanes.Count == 0 ? null : new PmapMap(lanes, steps, flows) { Summary = summaries ? Summary(map, path) : null };
+    }
+
+    /// <summary>
+    /// The summary of a map (1.4, plan 3.1, lot R): its sentence under the rules of every entered text, 200 characters at
+    /// most, on one line; its translations as those of every text. An empty sentence is no summary.
+    /// </summary>
+    private PmapSummary? Summary(JsonElement map, string path)
+    {
+        if (Object(map, "summary", path, required: false) is not { } summary)
+            return null;
+        var place = Join(path, "summary");
+        Properties(summary, place, SummaryProperties);
+        var text = Entered(summary, "text", place, Domain.Structure.StructureEdits.MapSummaryMax, required: true);
+        if (text is not null && text.AsSpan().IndexOfAny('\n', '\r') >= 0)
+        {
+            Fault(Join(place, "text"), DomainException.InvalidValue("text"));
+            return null;
+        }
+        var translations = Translations(summary, place, Domain.Structure.StructureEdits.MapSummaryMax);
+        return text is null ? null : new PmapSummary(text, translations);
+    }
+
+    private static readonly string[] SummaryProperties = ["text", "translations"];
+
+    /// <summary>Columns for all the steps of a map or for none (automatic placement); two steps never share a cell.</summary>
+    private void Cells(List<PmapStep> steps, Dictionary<string, string> stepPaths, string path)
+    {
+        var placed = steps.Count(step => step.Column is not null);
+        if (placed > 0 && placed < steps.Count)
+        {
+            Fault($"{path}.steps", FileErrorCodes.PartialColumns);
+            return;
+        }
+        if (placed == 0)
+            return;
+        foreach (var same in steps.GroupBy(step => (step.Lane, step.Column, step.Row)).Where(group => group.Count() > 1))
+            Fault(stepPaths[same.First().Id], FileErrorCodes.SameCell, ("lane", same.Key.Lane), ("column", same.Key.Column),
+                ("steps", string.Join(", ", same.Select(step => step.Id))));
+    }
+
+    private PmapLane? Lane(JsonElement element, string path, HashSet<string> laneIds)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            Fault(path, FileErrorCodes.LaneShape);
+            return null;
+        }
+        Properties(element, path, valueStream ? LaneProperties12 : LaneProperties);
+        var id = Identifier(element, path, LaneKind);
+        if (id is not null)
+            laneIds.Add(id);
+        var name = Entered(element, "name", path, PmapFormat.LaneNameMax, required: true);
+        var type = Enumeration(element, "type", path, LaneTypes) ?? Codes.Of(LaneType.Person);
+        var color = Text(element, "color", path, required: false);
+        string? parsed = null;
+        if (color is not null)
+        {
+            if (LaneColor.TryParse(color, out var valid))
+                parsed = valid.Value;
+            else
+                Fault($"{path}.color", FileErrorCodes.InvalidColor, ("color", color));
+        }
+        var translations = Translations(element, path, PmapFormat.LaneNameMax);
+        var headcount = Whole(element, "headcount", path);
+        // The rules of the domain, said where they are broken: the model corrects its proposal before anyone sees it (audit 4.5).
+        // In a file 1.1, the property is already unknown (a fault of its own).
+        if (valueStream && headcount is not null && (!Headcount.IsValid(headcount) || !Topogenia.Domain.Values.LaneTypes.IsHuman(Codes.Parse<LaneType>(type, "type"))))
+        {
+            Fault(Join(path, Headcount.Field), DomainException.InvalidValue(Headcount.Field));
+            headcount = null;
+        }
+        return id is null || name is null ? null : new PmapLane(id, name, type, parsed, translations) { Headcount = headcount };
+    }
+
+    private PmapStep? Step(JsonElement element, string path, HashSet<string> laneIds, HashSet<string> stepIds, int depth)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            Fault(path, FileErrorCodes.StepShape);
+            return null;
+        }
+        Properties(element, path, summaries ? StepProperties14 : valueStream ? StepProperties12 : StepProperties);
+        var id = Identifier(element, path, StepKind);
+        if (id is not null)
+            stepIds.Add(id);
+        var lane = Text(element, "lane", path, required: true);
+        if (lane is not null && !laneIds.Contains(lane))
+        {
+            Fault($"{path}.lane", FileErrorCodes.UnknownLane, ("lane", lane));
+            lane = null;
+        }
+        var label = Entered(element, "label", path, PmapFormat.StepLabelMax, required: true);
+        var type = Enumeration(element, "type", path, StepTypeCodes) ?? Codes.Of(StepType.Task);
+        var noContent = StepTypes.HasNoContent(Codes.Parse<StepType>(type, "type"));
+        var automation = Enumeration(element, "automation", path, Automations) ?? Codes.Of(AutomationStatus.Manual);
+        var column = Place(element, "column", path, Cell.MaxColumn, FileErrorCodes.InvalidColumn);
+        var row = Place(element, "row", path, Cell.MaxRow, FileErrorCodes.InvalidRow) ?? 0;
+        var raci = Raci(element, path, laneIds, lane, noContent);
+        var subMap = SubMap(element, path, noContent, depth);
+        var translations = Translations(element, path, PmapFormat.StepLabelMax);
+        currentStep = id ?? string.Empty;
+        var sheet = Sheet(element, path, noContent);
+        var volume = Volume(element, path);
+        if (valueStream && volume is not null && Codes.Parse<StepType>(type, "type") != StepType.Start)
+        {
+            Fault(Join(path, IncomingVolume.Field), DomainException.InvalidValue(IncomingVolume.Field));
+            volume = null;
+        }
+        var valueClass = ValueClassOf(element, path, noContent, subMap);
+        if (id is null || lane is null || label is null)
+            return null;
+        // A sub-map without a step details nothing: it is left out (A-2.17-25).
+        if (subMap is { Steps.Count: 0 })
+            subMap = null;
+        return new PmapStep(id, lane, label, type, column, row, automation, raci, subMap, translations, sheet) { Volume = volume, ValueClass = valueClass };
+    }
+
+    /// <summary>
+    /// The value class of a step (1.4, Makigami M1): a code of its list, refused on a step without content or whose detail
+    /// has steps (its detail is classified) as the API refuses it (audit 3.1 V2, 4.5.2).
+    /// </summary>
+    private string? ValueClassOf(JsonElement element, string path, bool noContent, PmapMap? subMap)
+    {
+        var valueClass = summaries ? Enumeration(element, Domain.Steps.StepOperations.ValueClassField, path, ValueClasses) : null;
+        if (valueClass is null || (!noContent && subMap is not { Steps.Count: > 0 }))
+            return valueClass;
+        Fault(Join(path, Domain.Steps.StepOperations.ValueClassField), DomainException.InvalidValue(Domain.Steps.StepOperations.ValueClassField));
+        return null;
+    }
+
+    /// <summary>The incoming volume of a step (1.2): an object with a quantity and a period code; its rules are those of the domain.</summary>
+    private PmapVolume? Volume(JsonElement element, string path)
+    {
+        if (Object(element, "volume", path, required: false) is not { } volume)
+            return null;
+        var place = Join(path, "volume");
+        Properties(volume, place, VolumeProperties);
+        var quantity = Number(volume, "quantity", place);
+        var period = Enumeration(volume, "period", place, Periods);
+        if (quantity is null || period is null)
+        {
+            Fault(place, FileErrorCodes.InvalidValue, ("value", volume.ToString()), ("possible", "{ \"quantity\", \"period\": " + string.Join(", ", Periods) + " }"));
+            return null;
+        }
+        try
+        {
+            if (valueStream)
+                IncomingVolume.Parse(quantity, period);
+        }
+        catch (DomainException refusal)
+        {
+            Fault(place, refusal);
+            return null;
+        }
+        return new PmapVolume(quantity.Value, period);
+    }
+
+    /// <summary>A column (0 to 10 000) or a row (0 to 50), null when absent or out of bounds (a fault that gives the bounds).</summary>
+    private int? Place(JsonElement element, string name, string path, int max, string code)
+    {
+        if (!element.TryGetProperty(name, out var value) || value.ValueKind == JsonValueKind.Null)
+            return null;
+        if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var number) && number >= 0 && number <= max)
+            return number;
+        Fault($"{path}.{name}", code, ("max", max));
+        return null;
+    }
+
+    private PmapMap? SubMap(JsonElement element, string path, bool noContent, int depth)
+    {
+        if (!element.TryGetProperty("sub_map", out var subMap) || subMap.ValueKind == JsonValueKind.Null)
+            return null;
+        if (subMap.ValueKind != JsonValueKind.Object)
+            Fault($"{path}.sub_map", FileErrorCodes.SubMapShape);
+        else if (noContent)
+            Fault($"{path}.sub_map", FileErrorCodes.SubMapOnEmptyStep);
+        else if (depth >= PmapFormat.DepthMax)
+            Fault($"{path}.sub_map", FileErrorCodes.TooDeep, ("max", PmapFormat.DepthMax));
+        else
+            return Map(subMap, $"{path}.sub_map", depth + 1);
+        return null;
+    }
+
+    /// <summary>
+    /// The roles of the other lanes of the same map, `{lane: letter}` (A-2.17-26 to 29): the R is the lane of the step,
+    /// written again it is ignored, on another lane it is refused; another letter on the lane of the step is refused; the
+    /// letters are those of the setting, one A at most; no RACI on a start, an end or a parallel or inclusive gateway
+    /// (spec 7.5).
+    /// </summary>
+    private Dictionary<string, string> Raci(JsonElement element, string path, HashSet<string> laneIds, string? stepLane, bool noContent)
+    {
+        var roles = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (!element.TryGetProperty("raci", out var raci) || raci.ValueKind == JsonValueKind.Null)
+            return roles;
+        var place = $"{path}.raci";
+        if (raci.ValueKind != JsonValueKind.Object)
+        {
+            Fault(place, FileErrorCodes.RaciShape);
+            return roles;
+        }
+        if (noContent && raci.EnumerateObject().Any())
+        {
+            Fault(place, FileErrorCodes.RaciOnStepType);
+            return roles;
+        }
+        var letters = string.Join(", ", settings.RaciLetters.Select(letter => letter.ToString()));
+        foreach (var property in raci.EnumerateObject())
+        {
+            var lane = property.Name;
+            var role = property.Value.ValueKind == JsonValueKind.String ? property.Value.GetString()! : string.Empty;
+            if (!laneIds.Contains(lane))
+                Fault(place, FileErrorCodes.UnknownLane, ("lane", lane));
+            else if (role == "R")
+            {
+                // The R is always the lane of the step: writing it again changes nothing.
+                if (lane != stepLane)
+                    Fault(place, FileErrorCodes.RaciRElsewhere, ("lane", lane), ("own", stepLane), ("letters", letters));
+            }
+            else if (role.Length != 1 || !settings.RaciLetters.Contains(role[0], StringComparison.Ordinal))
+                Fault(place, FileErrorCodes.RaciInvalidRole, ("role", role), ("lane", lane), ("letters", letters));
+            else if (lane == stepLane)
+                Fault(place, FileErrorCodes.RaciOwnLane, ("lane", lane));
+            else
+                roles[lane] = role;
+        }
+        if (roles.Values.Count(role => role == "A") > 1)
+            Fault(place, FileErrorCodes.RaciSingleAccountable);
+        return roles;
+    }
+
+    private List<PmapFlow> Flows(JsonElement map, string path, HashSet<string> stepIds, List<PmapStep> steps, HashSet<string> laneIds)
+    {
+        var flows = new List<PmapFlow>();
+        if (List(map, "flows", path, required: false) is not { } list)
+            return flows;
+        var types = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var step in steps)
+            types.TryAdd(step.Id, step.Type);
+        var pairs = new HashSet<(string, string)>();
+        var i = 0;
+        foreach (var element in list.EnumerateArray())
+        {
+            var place = $"{path}.flows[{i++}]";
+            if (Flow(element, place, stepIds, laneIds, steps.Any(step => step.Column is not null)) is not { } flow)
+                continue;
+            if (!pairs.Add((flow.Source, flow.Target)))
+            {
+                Fault(place, FileErrorCodes.DuplicateFlow, ("source", flow.Source), ("target", flow.Target));
+                continue;
+            }
+            flows.Add(ShareChecked(flow, place, types));
+        }
+        return flows;
+    }
+
+    /// <summary>
+    /// The share of the cases of a flow, by the rules of the domain: within its bounds, and only out of a decision or an
+    /// inclusive gateway (audit 4.5); a share refused is a fault, and leaves the flow.
+    /// </summary>
+    private PmapFlow ShareChecked(PmapFlow flow, string path, Dictionary<string, string> types)
+    {
+        if (!valueStream || flow.Share is not { } share)
+            return flow;
+        try
+        {
+            CaseShare.Parse(share);
+            if (types.TryGetValue(flow.Source, out var source) && StepTypes.SharesItsCases(Codes.Parse<StepType>(source, "type")))
+                return flow;
+            // At the path of the flow, as the building of the project says it (PmapBuild).
+            Fault(path, DomainException.InvalidValue(CaseShare.Field));
+        }
+        catch (DomainException refusal)
+        {
+            Fault(path, refusal);
+        }
+        return flow with { Share = null };
+    }
+
+    private PmapFlow? Flow(JsonElement element, string path, HashSet<string> stepIds, HashSet<string> laneIds, bool placed)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            Fault(path, FileErrorCodes.FlowShape);
+            return null;
+        }
+        Properties(element, path, routes ? FlowProperties13 : valueStream ? FlowProperties12 : FlowProperties);
+        var source = End(element, "source", path, stepIds);
+        var target = End(element, "target", path, stepIds);
+        var label = Entered(element, "label", path, PmapFormat.FlowLabelMax, required: false);
+        var translations = Translations(element, path, PmapFormat.FlowLabelMax);
+        var share = Number(element, "share", path);
+        var route = routes && !settings.Proposal ? Route(element, path, laneIds, placed) : null;
+        if (source is null || target is null)
+            return null;
+        if (source == target)
+        {
+            Fault(path, FileErrorCodes.SelfFlow, ("step", source));
+            return null;
+        }
+        return new PmapFlow(source, target, label, translations) { Share = share, Route = route };
+    }
+
+    /// <summary>
+    /// The route of a flow (1.3, ADR 091): its sides from their list, and a passage, one of an aisle from −1 to the last
+    /// column, the middle of a column, or a row of a lane of the map along its band at the top or the bottom or through its
+    /// middle without an edge, only on a map that gives its columns; null without any part, a fault for each part refused.
+    /// </summary>
+    private PmapRoute? Route(JsonElement element, string path, HashSet<string> laneIds, bool placed)
+    {
+        if (Object(element, "route", path, required: false) is not { } route)
+            return null;
+        var at = $"{path}.route";
+        Properties(route, at, RouteProperties);
+        var from = Enumeration(route, "from", at, Sides);
+        var to = Enumeration(route, "to", at, Sides);
+        var via = Object(route, "via", at, required: false) is { } passage ? Passage(passage, $"{at}.via", laneIds, placed) : null;
+        return from is null && to is null && via is null ? null : new PmapRoute(from, to, via);
+    }
+
+    private PmapPassage? Passage(JsonElement element, string path, HashSet<string> laneIds, bool placed)
+    {
+        Properties(element, path, PassageProperties);
+        bool Has(string name) => element.TryGetProperty(name, out var value) && value.ValueKind != JsonValueKind.Null;
+        var aisle = Whole(element, "aisle", path);
+        var column = Has("column") ? Place(element, "column", path, Cell.MaxColumn, FileErrorCodes.InvalidColumn) : null;
+        var lane = Text(element, "lane", path, required: false);
+        var row = Has("row") ? Place(element, "row", path, Cell.MaxRow, FileErrorCodes.InvalidRow) : null;
+        var edge = Enumeration(element, "edge", path, Edges);
+        if (!placed)
+        {
+            Fault(path, FileErrorCodes.PassageWithoutColumns);
+            return null;
+        }
+        // One passage, a row only with its lane, an edge only with its row: the fault of the passage, else of a part.
+        var kinds = new[] { Has("aisle"), Has("column"), Has("lane") }.Count(given => given);
+        if (kinds != 1 || Has("lane") != Has("row") || (Has("edge") && !Has("lane")))
+        {
+            Fault(path, FileErrorCodes.InvalidValue, ("value", "via"), ("possible", "aisle | column | lane, row, edge?"));
+            return null;
+        }
+        if (Has("aisle"))
+            return AisleOf(aisle, path);
+        if (Has("column"))
+            return column is { } middle ? new PmapPassage(null, null, null, null) { Column = middle } : null;
+        if (lane is null || row is null)
+            return null;
+        if (laneIds.Contains(lane))
+            return new PmapPassage(null, lane, row, edge);
+        Fault($"{path}.lane", FileErrorCodes.UnknownLane, ("lane", lane));
+        return null;
+    }
+
+    /// <summary>An aisle of a passage, from −1 (before the column 0) to the last column; a fault at its place otherwise.</summary>
+    private PmapPassage? AisleOf(int? aisle, string path)
+    {
+        if (aisle is not { } between)
+            return null;
+        if (between >= FlowLinks.FirstAisle && between <= Cell.MaxColumn)
+            return new PmapPassage(between, null, null, null);
+        Fault($"{path}.aisle", FileErrorCodes.InvalidValue, ("value", between), ("possible", $"{FlowLinks.FirstAisle} - {Cell.MaxColumn}"));
+        return null;
+    }
+
+    /// <summary>An end of a flow: a step of the same map, with a fault of its own when the step is in another map.</summary>
+    private string? End(JsonElement element, string name, string path, HashSet<string> stepIds)
+    {
+        var id = Text(element, name, path, required: true);
+        if (id is null || stepIds.Contains(id))
+            return id;
+        Fault($"{path}.{name}", ids.TryGetValue(id, out var kind) && kind == StepKind ? FileErrorCodes.StepInOtherMap : FileErrorCodes.UnknownStep,
+            ("step", id));
+        return null;
+    }
+}

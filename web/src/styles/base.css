@@ -1,0 +1,24 @@
+/* base.css */
+/* Base element styles of the interface, built only on the tokens of tokens.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  color: var(--text);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+}
+
+code, kbd { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* Durations in tabular figures, typed or read (spec 9.5). */
+input[type="number"], .duration-value { font-variant-numeric: tabular-nums; }
+
+:focus-visible { outline: var(--focus-outline); outline-offset: 1px; box-shadow: var(--focus-ring); }
+
+h1 { font-size: var(--font-size-h1); font-weight: 600; }
+h2 { font-size: var(--font-size-h2); font-weight: 600; }

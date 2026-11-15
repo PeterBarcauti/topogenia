@@ -1,0 +1,35 @@
+<!-- Topogenia.Host.Tests.csproj -->
+<!-- End-to-end HTTP integration tests of the API on the SQLite x SQL Server matrix -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The samples and the documents are read where they live, whatever the output folder (artifacts path) -->
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>RepositoryRoot</_Parameter1>
+      <_Parameter2>$(MSBuildThisFileDirectory)../..</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Topogenia.Host/Topogenia.Host.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The test bases of the persistence tests, shared as sources: same prefix, same bounded creation and cleaning -->
+    <Compile Include="../Topogenia.Persistence.Tests/Infrastructure/TestDatabase.cs" Link="Infrastructure/Shared/TestDatabase.cs" />
+    <Compile Include="../Topogenia.Persistence.Tests/Infrastructure/TestServer.cs" Link="Infrastructure/Shared/TestServer.cs" />
+    <Compile Include="../Topogenia.Persistence.Tests/Infrastructure/TransientFailures.cs" Link="Infrastructure/Shared/TransientFailures.cs" />
+    <Compile Include="../Topogenia.Persistence.Tests/Infrastructure/StaleDatabases.cs" Link="Infrastructure/Shared/StaleDatabases.cs" />
+    <Compile Include="../Topogenia.Persistence.Tests/Infrastructure/ModelLock.cs" Link="Infrastructure/Shared/ModelLock.cs" />
+    <Compile Include="../Topogenia.Persistence.Tests/Infrastructure/FixedClock.cs" Link="Infrastructure/Shared/FixedClock.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

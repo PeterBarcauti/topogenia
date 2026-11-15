@@ -1,0 +1,110 @@
+/* pages.css */
+/* Styles of the home page, the forms of a project and the dialogs of the files, after the validated mockup, built only on the tokens. */
+
+h1, h2, h3, p { margin: 0; }
+
+/* shared pieces of the pages */
+.muted { color: var(--text-muted); }
+.chip-code { font-family: var(--font-mono); font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: var(--radius-small); background: var(--table-header-bg);
+  border: 1px solid var(--border); color: var(--text-muted); }
+.tag { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.tag--sponsor { background: var(--lane-6-pastel); color: var(--lane-6-ink); }
+.initials { width: 32px; height: 32px; border-radius: var(--radius-pill); display: grid; place-items: center; background: var(--initials-bg); color: var(--initials-fg);
+  font-size: 12px; font-weight: 600; letter-spacing: .02em; flex: none; }
+.message-error { color: var(--danger); }
+.message-success { color: var(--success-text); }
+.message-warning { color: var(--warning-text); }
+.empty-state { padding: 18px 20px; border: 1px dashed var(--border); border-radius: var(--radius-large); color: var(--text-muted); }
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+
+/* home (annex B 1.3, mockup) */
+.home { min-height: 100%; background: var(--bg-app); padding: 28px 40px 40px; display: flex; flex-direction: column; gap: 28px; }
+.banner { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-large); padding: 34px 40px;
+  display: flex; align-items: center; justify-content: space-between; gap: 40px;
+  background: linear-gradient(115deg, var(--surface) 40%, var(--lane-3-pastel) 80%, var(--lane-2-pastel)); }
+.banner-text { max-width: 720px; display: flex; flex-direction: column; gap: 10px; }
+.banner-eyebrow { font-size: 13px; font-weight: 600; color: var(--accent-strong); display: flex; gap: 6px; align-items: center; }
+.banner h1 { font-size: var(--font-size-display); font-weight: 600; line-height: 1.25; letter-spacing: -.018em; }
+.home-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; align-items: start; }
+.home-col-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; min-height: 32px; }
+.home-col-head .count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.home-col-head .spacer { flex: 1; }
+.project-list, .trash-list, .people-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.project { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-large); padding: 16px 18px 14px 20px;
+  display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; box-shadow: var(--shadow-step); transition: box-shadow var(--duration-fast); }
+.project:hover { box-shadow: var(--shadow-raised); }
+.project-title { display: flex; align-items: center; gap: 8px; }
+.project-title a { font-size: 15px; font-weight: 600; color: var(--text); text-decoration: none; letter-spacing: -.005em; border-radius: var(--radius-small); }
+.project-title a:hover { color: var(--accent-strong); }
+.project p { grid-column: 1; color: var(--text-muted); font-size: 13px; max-width: 640px; }
+.project-meta { grid-column: 1; display: flex; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.project-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.project-actions { grid-column: 2; grid-row: 1 / span 3; display: flex; gap: 4px; align-items: center; align-self: center; }
+.trash { margin-top: 26px; }
+.trash-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.trash-head h2 { display: flex; gap: 6px; align-items: center; }
+.trash-head p { font-size: 12px; color: var(--text-muted); }
+.trash-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border: 1px dashed var(--border); border-radius: var(--radius-large); }
+.trash-row .grow { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.trash-row b { font-weight: 600; font-size: 13px; display: flex; gap: 8px; align-items: center; }
+.trash-row small { font-size: 12px; color: var(--text-muted); }
+.people { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-large); box-shadow: var(--shadow-step); padding: 6px 0; }
+.people-head { padding: 12px 18px 10px; border-bottom: 1px solid var(--lane-separator); font-size: 12px; font-weight: 500; color: var(--text-muted); display: flex; gap: 6px; align-items: center; }
+.people-project { margin-left: auto; color: var(--text); font-weight: 600; }
+.people-list { gap: 0; }
+.person { display: flex; align-items: center; gap: 12px; padding: 9px 18px; }
+.person .who { flex: 1; display: flex; flex-direction: column; line-height: 1.3; }
+.person .who b { font-weight: 500; font-size: 13px; }
+.person .who small { font-size: 12px; color: var(--text-muted); }
+
+/* B-1.3-28: one column below 900 px */
+@media (max-width: 899px) {
+  .home { padding: 20px 16px 32px; }
+  .home-cols { grid-template-columns: 1fr; }
+  .banner { flex-direction: column; align-items: flex-start; padding: 24px; }
+}
+
+/* forms of a project (annex B 1.4, 1.5) */
+.page-form { max-width: 760px; margin: 0 auto; padding: 28px 40px 40px; display: flex; flex-direction: column; gap: 18px; }
+.page-form form { display: flex; flex-direction: column; gap: 14px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.form-row { display: grid; grid-template-columns: 1fr 2fr; gap: 14px; }
+/* B-6-55: the code and the name of a file form on one column below 600 px */
+@media (max-width: 599px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+.members { border: 1px solid var(--border); border-radius: var(--radius-large); padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); }
+.members legend { padding: 0 6px; font-size: 13px; font-weight: 600; }
+.member-line { display: grid; grid-template-columns: 1fr 160px auto auto; gap: 8px; align-items: center; }
+
+/* dialogs of the files (annex B 1.6) and of the package (spec 7.3) */
+.dialog-subtitle { font-weight: 600; }
+.uncertainties, .file-faults { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.file-choice { display: flex; align-items: center; gap: 10px; }
+.file-name { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.file-content { font-family: var(--font-mono); font-size: 12px; resize: vertical; }
+.package-preview { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-ui); background: var(--lane-even); }
+.package-preview h3 { font-size: 13px; font-weight: 600; }
+
+/* dialogs of the translations (annex B 5, ADR 065) */
+.translation-step { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.translation-step + .translation-step { padding-top: 12px; border-top: 1px solid var(--lane-separator); }
+/* 12 px between the options: the centres of two radio buttons stay 24 px apart at least (WCAG 2.5.8, target size) */
+.scope-choice { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; border: 0; }
+.scope-choice legend { margin-bottom: 4px; padding: 0; font-size: 13px; }
+.glossary { align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.glossary .field { align-self: stretch; }
+.glossary-text { font-family: var(--font-mono); font-size: 12px; resize: vertical; }
+.translation-report { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-ui); background: var(--lane-even); }
+.manual-translations { display: flex; flex-direction: column; gap: 12px; }
+.manual-original { margin: 0; padding: 6px 10px; border-radius: var(--radius-ui); background: var(--table-header-bg); }
+
+/* the translations: the assistant first, the languages of the workbook, the field of a language added (ADR 083) */
+.translation-assistant .dialog-subtitle { display: flex; align-items: center; gap: 6px; color: var(--ai-ink); }
+.translation-workbook { margin-top: 20px; }
+.workbook-languages { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; padding: 0; border: 0; }
+.workbook-languages legend { margin-bottom: 6px; }
+.language-chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  font-size: 13px; cursor: pointer; transition: border-color var(--duration-fast), background var(--duration-fast); }
+.language-chip.is-on { border-color: var(--accent); background: var(--accent-soft); }
+.manual-add { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }

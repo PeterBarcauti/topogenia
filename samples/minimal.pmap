@@ -1,0 +1,22 @@
+{
+  "format": "topogenia",
+  "version": "1.2",
+  "project": { "name": "Demande d'achat" },
+  "map": {
+    "lanes": [
+      { "id": "c1", "name": "Demandeur" },
+      { "id": "c2", "name": "Acheteur", "type": "department" }
+    ],
+    "steps": [
+      { "id": "e1", "lane": "c1", "label": "Besoin identifié", "type": "start" },
+      { "id": "e2", "lane": "c1", "label": "Saisir la demande" },
+      { "id": "e3", "lane": "c2", "label": "Passer la commande" },
+      { "id": "e4", "lane": "c2", "label": "Commande envoyée", "type": "end" }
+    ],
+    "flows": [
+      { "source": "e1", "target": "e2" },
+      { "source": "e2", "target": "e3" },
+      { "source": "e3", "target": "e4" }
+    ]
+  }
+}

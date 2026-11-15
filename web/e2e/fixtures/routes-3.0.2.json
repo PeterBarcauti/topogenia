@@ -1,0 +1,426 @@
+{
+  "cloture-mensuelle/GLC-E003#stream:GLC-E009>GLC-E010": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "cloture-mensuelle/GLC-E003#stream:GLC-E010>GLC-E011": {
+    "path": "M 420 60 L 470 60",
+    "label": null
+  },
+  "cloture-mensuelle/GLC-E003:GLC-E009>GLC-E010": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "cloture-mensuelle/GLC-E003:GLC-E010>GLC-E011": {
+    "path": "M 420 60 L 470 60",
+    "label": null
+  },
+  "cloture-mensuelle/root#stream:GLC-E001>GLC-E002": {
+    "path": "M 200 60 L 215 60 Q 225 60 225 70 L 225 206 Q 225 216 235 216 L 250 216",
+    "label": null
+  },
+  "cloture-mensuelle/root#stream:GLC-E002>GLC-E003": {
+    "path": "M 420 216 L 435 216 Q 445 216 445 206 L 445 70 Q 445 60 455 60 L 470 60",
+    "label": null
+  },
+  "cloture-mensuelle/root#stream:GLC-E003>GLC-E004": {
+    "path": "M 640 60 L 655 60 Q 665 60 665 70 L 665 362 Q 665 372 675 372 L 690 372",
+    "label": "translate(648px, 206.5px)"
+  },
+  "cloture-mensuelle/root#stream:GLC-E004>GLC-E005": {
+    "path": "M 860 372 L 875 372 Q 885 372 885 362 L 885 70 Q 885 60 895 60 L 910 60",
+    "label": null
+  },
+  "cloture-mensuelle/root#stream:GLC-E005>GLC-E006": {
+    "path": "M 1080 60 L 1130 60",
+    "label": "translate(1081.5px, 4.5px)"
+  },
+  "cloture-mensuelle/root#stream:GLC-E005>GLC-E007": {
+    "path": "M 995 92 L 995 518 Q 995 528 1005 528 L 1350 528",
+    "label": "translate(1147.5px, 518.5px)"
+  },
+  "cloture-mensuelle/root#stream:GLC-E006>GLC-E007": {
+    "path": "M 1300 60 L 1315 60 Q 1325 60 1325 70 L 1325 518 Q 1325 528 1335 528 L 1350 528",
+    "label": null
+  },
+  "cloture-mensuelle/root#stream:GLC-E007>GLC-E008": {
+    "path": "M 1520 528 L 1570 528",
+    "label": null
+  },
+  "cloture-mensuelle/root:GLC-E001>GLC-E002": {
+    "path": "M 200 60 L 215 60 Q 225 60 225 70 L 225 170 Q 225 180 235 180 L 250 180",
+    "label": null
+  },
+  "cloture-mensuelle/root:GLC-E002>GLC-E003": {
+    "path": "M 420 180 L 435 180 Q 445 180 445 170 L 445 70 Q 445 60 455 60 L 470 60",
+    "label": null
+  },
+  "cloture-mensuelle/root:GLC-E003>GLC-E004": {
+    "path": "M 640 60 L 655 60 Q 665 60 665 70 L 665 290 Q 665 300 675 300 L 690 300",
+    "label": "translate(648px, 170.5px)"
+  },
+  "cloture-mensuelle/root:GLC-E004>GLC-E005": {
+    "path": "M 860 300 L 875 300 Q 885 300 885 290 L 885 70 Q 885 60 895 60 L 910 60",
+    "label": null
+  },
+  "cloture-mensuelle/root:GLC-E005>GLC-E006": {
+    "path": "M 1080 60 L 1130 60",
+    "label": "translate(1089px, 50.5px)"
+  },
+  "cloture-mensuelle/root:GLC-E005>GLC-E007": {
+    "path": "M 995 92 L 995 410 Q 995 420 1005 420 L 1350 420",
+    "label": "translate(1155px, 410.5px)"
+  },
+  "cloture-mensuelle/root:GLC-E006>GLC-E007": {
+    "path": "M 1300 60 L 1315 60 Q 1325 60 1325 70 L 1325 410 Q 1325 420 1335 420 L 1350 420",
+    "label": null
+  },
+  "cloture-mensuelle/root:GLC-E007>GLC-E008": {
+    "path": "M 1520 420 L 1570 420",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E009>GLA-E010": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E010>GLA-E017": {
+    "path": "M 420 60 L 470 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E017>GLA-E018": {
+    "path": "M 640 60 L 690 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E017>GLA-E019": {
+    "path": "M 555 92 L 555 206 Q 555 216 565 216 L 690 216",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E018>GLA-E020": {
+    "path": "M 860 60 L 910 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E019>GLA-E020": {
+    "path": "M 860 216 L 875 216 Q 885 216 885 206 L 885 70 Q 885 60 895 60 L 910 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E020>GLA-E021": {
+    "path": "M 1080 60 L 1130 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E021>GLA-E022": {
+    "path": "M 1300 60 L 1350 60",
+    "label": "translate(1272.5px, 4.5px)"
+  },
+  "conges/GLA-E002#stream:GLA-E021>GLA-E023": {
+    "path": "M 1215 28 L 1215 21 Q 1215 14 1222 14 L 1535 14 Q 1545 14 1545 24 L 1545 50 Q 1545 60 1555 60 L 1570 60",
+    "label": "translate(1398px, 4.5px)"
+  },
+  "conges/GLA-E002#stream:GLA-E022>GLA-E023": {
+    "path": "M 1520 60 L 1570 60",
+    "label": null
+  },
+  "conges/GLA-E002#stream:GLA-E023>GLA-E011": {
+    "path": "M 1740 60 L 1790 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E009>GLA-E010": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E010>GLA-E017": {
+    "path": "M 420 60 L 470 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E017>GLA-E018": {
+    "path": "M 640 60 L 690 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E017>GLA-E019": {
+    "path": "M 555 92 L 555 170 Q 555 180 565 180 L 690 180",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E018>GLA-E020": {
+    "path": "M 860 60 L 910 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E019>GLA-E020": {
+    "path": "M 860 180 L 875 180 Q 885 180 885 170 L 885 70 Q 885 60 895 60 L 910 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E020>GLA-E021": {
+    "path": "M 1080 60 L 1130 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E021>GLA-E022": {
+    "path": "M 1300 60 L 1350 60",
+    "label": "translate(1291px, 4.5px)"
+  },
+  "conges/GLA-E002:GLA-E021>GLA-E023": {
+    "path": "M 1215 28 L 1215 21 Q 1215 14 1222 14 L 1535 14 Q 1545 14 1545 24 L 1545 50 Q 1545 60 1555 60 L 1570 60",
+    "label": "translate(1376px, 4.5px)"
+  },
+  "conges/GLA-E002:GLA-E022>GLA-E023": {
+    "path": "M 1520 60 L 1570 60",
+    "label": null
+  },
+  "conges/GLA-E002:GLA-E023>GLA-E011": {
+    "path": "M 1740 60 L 1790 60",
+    "label": null
+  },
+  "conges/root#stream:GLA-E001>GLA-E002": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "conges/root#stream:GLA-E002>GLA-E003": {
+    "path": "M 420 60 L 435 60 Q 445 60 445 70 L 445 362 Q 445 372 455 372 L 470 372",
+    "label": "translate(428px, 206.5px)"
+  },
+  "conges/root#stream:GLA-E003>GLA-E004": {
+    "path": "M 640 372 L 690 372",
+    "label": "translate(630.5px, 316.5px)"
+  },
+  "conges/root#stream:GLA-E003>GLA-E008": {
+    "path": "M 555 340 L 555 226 Q 555 216 565 216 L 690 216",
+    "label": "translate(587.5px, 206.5px)"
+  },
+  "conges/root#stream:GLA-E004>GLA-E013": {
+    "path": "M 860 372 L 875 372 Q 885 372 885 382 L 885 518 Q 885 528 895 528 L 910 528",
+    "label": null
+  },
+  "conges/root#stream:GLA-E006>GLA-E007": {
+    "path": "M 1740 684 L 1755 684 Q 1765 684 1765 674 L 1765 70 Q 1765 60 1775 60 L 1790 60",
+    "label": null
+  },
+  "conges/root#stream:GLA-E008>GLA-E002": {
+    "path": "M 775 248 L 775 288 Q 775 298 765 298 L 675 298 Q 665 298 665 288 L 665 152 Q 665 142 655 142 L 345 142 Q 335 142 335 132 L 335 92",
+    "label": null
+  },
+  "conges/root#stream:GLA-E013>GLA-E014": {
+    "path": "M 1080 528 L 1095 528 Q 1105 528 1105 538 L 1105 830 Q 1105 840 1115 840 L 1130 840",
+    "label": null
+  },
+  "conges/root#stream:GLA-E014>GLA-E006": {
+    "path": "M 1300 840 L 1535 840 Q 1545 840 1545 830 L 1545 694 Q 1545 684 1555 684 L 1570 684",
+    "label": null
+  },
+  "conges/root:GLA-E001>GLA-E002": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "conges/root:GLA-E002>GLA-E003": {
+    "path": "M 420 60 L 435 60 Q 445 60 445 70 L 445 290 Q 445 300 455 300 L 470 300",
+    "label": "translate(428px, 170.5px)"
+  },
+  "conges/root:GLA-E003>GLA-E004": {
+    "path": "M 640 300 L 690 300",
+    "label": "translate(649px, 290.5px)"
+  },
+  "conges/root:GLA-E003>GLA-E008": {
+    "path": "M 555 268 L 555 190 Q 555 180 565 180 L 690 180",
+    "label": "translate(605px, 170.5px)"
+  },
+  "conges/root:GLA-E004>GLA-E013": {
+    "path": "M 860 300 L 875 300 Q 885 300 885 310 L 885 410 Q 885 420 895 420 L 910 420",
+    "label": null
+  },
+  "conges/root:GLA-E006>GLA-E007": {
+    "path": "M 1740 540 L 1755 540 Q 1765 540 1765 530 L 1765 70 Q 1765 60 1775 60 L 1790 60",
+    "label": null
+  },
+  "conges/root:GLA-E008>GLA-E002": {
+    "path": "M 775 212 L 775 219 Q 775 226 768 226 L 675 226 Q 665 226 665 216 L 665 116 Q 665 106 655 106 L 342 106 Q 335 106 335 99 L 335 92",
+    "label": null
+  },
+  "conges/root:GLA-E013>GLA-E014": {
+    "path": "M 1080 420 L 1095 420 Q 1105 420 1105 430 L 1105 650 Q 1105 660 1115 660 L 1130 660",
+    "label": null
+  },
+  "conges/root:GLA-E014>GLA-E006": {
+    "path": "M 1300 660 L 1535 660 Q 1545 660 1545 650 L 1545 550 Q 1545 540 1555 540 L 1570 540",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E009>GLB-E010": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E010>GLB-E017": {
+    "path": "M 420 60 L 470 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E017>GLB-E018": {
+    "path": "M 640 60 L 690 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E017>GLB-E019": {
+    "path": "M 555 92 L 555 206 Q 555 216 565 216 L 690 216",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E018>GLB-E020": {
+    "path": "M 860 60 L 910 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E019>GLB-E020": {
+    "path": "M 860 216 L 875 216 Q 885 216 885 206 L 885 70 Q 885 60 895 60 L 910 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E020>GLB-E021": {
+    "path": "M 1080 60 L 1130 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E021>GLB-E022": {
+    "path": "M 1300 60 L 1350 60",
+    "label": "translate(1272.5px, 4.5px)"
+  },
+  "leave/GLB-E002#stream:GLB-E021>GLB-E023": {
+    "path": "M 1215 28 L 1215 21 Q 1215 14 1222 14 L 1535 14 Q 1545 14 1545 24 L 1545 50 Q 1545 60 1555 60 L 1570 60",
+    "label": "translate(1398px, 4.5px)"
+  },
+  "leave/GLB-E002#stream:GLB-E022>GLB-E023": {
+    "path": "M 1520 60 L 1570 60",
+    "label": null
+  },
+  "leave/GLB-E002#stream:GLB-E023>GLB-E011": {
+    "path": "M 1740 60 L 1790 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E009>GLB-E010": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E010>GLB-E017": {
+    "path": "M 420 60 L 470 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E017>GLB-E018": {
+    "path": "M 640 60 L 690 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E017>GLB-E019": {
+    "path": "M 555 92 L 555 170 Q 555 180 565 180 L 690 180",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E018>GLB-E020": {
+    "path": "M 860 60 L 910 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E019>GLB-E020": {
+    "path": "M 860 180 L 875 180 Q 885 180 885 170 L 885 70 Q 885 60 895 60 L 910 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E020>GLB-E021": {
+    "path": "M 1080 60 L 1130 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E021>GLB-E022": {
+    "path": "M 1300 60 L 1350 60",
+    "label": "translate(1291px, 4.5px)"
+  },
+  "leave/GLB-E002:GLB-E021>GLB-E023": {
+    "path": "M 1215 28 L 1215 21 Q 1215 14 1222 14 L 1535 14 Q 1545 14 1545 24 L 1545 50 Q 1545 60 1555 60 L 1570 60",
+    "label": "translate(1376px, 4.5px)"
+  },
+  "leave/GLB-E002:GLB-E022>GLB-E023": {
+    "path": "M 1520 60 L 1570 60",
+    "label": null
+  },
+  "leave/GLB-E002:GLB-E023>GLB-E011": {
+    "path": "M 1740 60 L 1790 60",
+    "label": null
+  },
+  "leave/root#stream:GLB-E001>GLB-E002": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "leave/root#stream:GLB-E002>GLB-E003": {
+    "path": "M 420 60 L 435 60 Q 445 60 445 70 L 445 362 Q 445 372 455 372 L 470 372",
+    "label": "translate(428px, 206.5px)"
+  },
+  "leave/root#stream:GLB-E003>GLB-E004": {
+    "path": "M 640 372 L 690 372",
+    "label": "translate(630.5px, 316.5px)"
+  },
+  "leave/root#stream:GLB-E003>GLB-E008": {
+    "path": "M 555 340 L 555 226 Q 555 216 565 216 L 690 216",
+    "label": "translate(587.5px, 206.5px)"
+  },
+  "leave/root#stream:GLB-E004>GLB-E013": {
+    "path": "M 860 372 L 875 372 Q 885 372 885 382 L 885 518 Q 885 528 895 528 L 910 528",
+    "label": null
+  },
+  "leave/root#stream:GLB-E006>GLB-E007": {
+    "path": "M 1740 684 L 1755 684 Q 1765 684 1765 674 L 1765 70 Q 1765 60 1775 60 L 1790 60",
+    "label": null
+  },
+  "leave/root#stream:GLB-E008>GLB-E002": {
+    "path": "M 775 248 L 775 288 Q 775 298 765 298 L 675 298 Q 665 298 665 288 L 665 152 Q 665 142 655 142 L 345 142 Q 335 142 335 132 L 335 92",
+    "label": null
+  },
+  "leave/root#stream:GLB-E013>GLB-E014": {
+    "path": "M 1080 528 L 1095 528 Q 1105 528 1105 538 L 1105 830 Q 1105 840 1115 840 L 1130 840",
+    "label": null
+  },
+  "leave/root#stream:GLB-E014>GLB-E006": {
+    "path": "M 1300 840 L 1535 840 Q 1545 840 1545 830 L 1545 694 Q 1545 684 1555 684 L 1570 684",
+    "label": null
+  },
+  "leave/root:GLB-E001>GLB-E002": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "leave/root:GLB-E002>GLB-E003": {
+    "path": "M 420 60 L 435 60 Q 445 60 445 70 L 445 290 Q 445 300 455 300 L 470 300",
+    "label": "translate(428px, 170.5px)"
+  },
+  "leave/root:GLB-E003>GLB-E004": {
+    "path": "M 640 300 L 690 300",
+    "label": "translate(649px, 290.5px)"
+  },
+  "leave/root:GLB-E003>GLB-E008": {
+    "path": "M 555 268 L 555 190 Q 555 180 565 180 L 690 180",
+    "label": "translate(605px, 170.5px)"
+  },
+  "leave/root:GLB-E004>GLB-E013": {
+    "path": "M 860 300 L 875 300 Q 885 300 885 310 L 885 410 Q 885 420 895 420 L 910 420",
+    "label": null
+  },
+  "leave/root:GLB-E006>GLB-E007": {
+    "path": "M 1740 540 L 1755 540 Q 1765 540 1765 530 L 1765 70 Q 1765 60 1775 60 L 1790 60",
+    "label": null
+  },
+  "leave/root:GLB-E008>GLB-E002": {
+    "path": "M 775 212 L 775 219 Q 775 226 768 226 L 675 226 Q 665 226 665 216 L 665 116 Q 665 106 655 106 L 342 106 Q 335 106 335 99 L 335 92",
+    "label": null
+  },
+  "leave/root:GLB-E013>GLB-E014": {
+    "path": "M 1080 420 L 1095 420 Q 1105 420 1105 430 L 1105 650 Q 1105 660 1115 660 L 1130 660",
+    "label": null
+  },
+  "leave/root:GLB-E014>GLB-E006": {
+    "path": "M 1300 660 L 1535 660 Q 1545 660 1545 650 L 1545 550 Q 1545 540 1555 540 L 1570 540",
+    "label": null
+  },
+  "minimal/root#stream:GLD-E001>GLD-E002": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "minimal/root#stream:GLD-E002>GLD-E003": {
+    "path": "M 420 60 L 435 60 Q 445 60 445 70 L 445 206 Q 445 216 455 216 L 470 216",
+    "label": null
+  },
+  "minimal/root#stream:GLD-E003>GLD-E004": {
+    "path": "M 640 216 L 690 216",
+    "label": null
+  },
+  "minimal/root:GLD-E001>GLD-E002": {
+    "path": "M 200 60 L 250 60",
+    "label": null
+  },
+  "minimal/root:GLD-E002>GLD-E003": {
+    "path": "M 420 60 L 435 60 Q 445 60 445 70 L 445 170 Q 445 180 455 180 L 470 180",
+    "label": null
+  },
+  "minimal/root:GLD-E003>GLD-E004": {
+    "path": "M 640 180 L 690 180",
+    "label": null
+  }
+}

@@ -1,0 +1,12 @@
+<!-- Topogenia.EndToEnd.Host.csproj -->
+<!-- Starter of the host for the journeys of the browser (web/e2e): a tool of the tests, never shipped, with no test of its own -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Topogenia.EndToEnd</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Topogenia.Host/Topogenia.Host.csproj" />
+  </ItemGroup>
+</Project>

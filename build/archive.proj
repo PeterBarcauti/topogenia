@@ -1,0 +1,13 @@
+<!-- archive.proj -->
+<!-- The archives of the build, written and read by the tasks of the .NET SDK, so that no script of the repository compresses nor unpacks a file (ADR 076) -->
+<!-- dotnet msbuild build/archive.proj -t:Zip -p:Folder=<folder> -p:Archive=<file.zip> ; -t:Unzip -p:Archive=<file> -p:Folder=<empty folder> -->
+<Project>
+  <Target Name="Zip">
+    <Error Condition="'$(Folder)' == '' Or '$(Archive)' == ''" Text="Zip: give the folder (-p:Folder) and the archive to write (-p:Archive)" />
+    <ZipDirectory SourceDirectory="$(Folder)" DestinationFile="$(Archive)" Overwrite="true" />
+  </Target>
+  <Target Name="Unzip">
+    <Error Condition="'$(Folder)' == '' Or '$(Archive)' == ''" Text="Unzip: give the archive (-p:Archive) and an empty folder (-p:Folder)" />
+    <Unzip SourceFiles="$(Archive)" DestinationFolder="$(Folder)" SkipUnchangedFiles="false" />
+  </Target>
+</Project>

@@ -1,0 +1,312 @@
+// AssistantInstructions.cs
+// The texts sent to the model: the common instruction and the documentation of the formats (cached), the schema of the project (cached), the former turns, the message of the exchange; the whole prompt as one text for the copy and paste (spec 3.0 sections 3.1, 5, 7).
+
+using System.Globalization;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
+using Topogenia.Application.Assistant;
+using Topogenia.Application.Ports;
+using Topogenia.Domain.Values;
+using Topogenia.Domain.ValueStreams;
+
+namespace Topogenia.Assistant;
+
+/// <summary>
+/// The prompt of an exchange, in the order of the cache of the providers (tools, system, messages): first the common
+/// instruction followed by the documentation of the formats, the same for every project and every call; then the schema of
+/// the project, the same while the project does not change; then the former turns of the panel; then the message of the
+/// exchange (the practice, the map open, the selection, the request), which changes at each call. The documentation is
+/// the files of the repository embedded in this assembly: one source, it cannot drift from what the application reads.
+/// </summary>
+public sealed class AssistantInstructions : IAssistantInstructions
+{
+    /// <summary>The name of the package of exchange in its files, the root identifier of the solution (ADR 051).</summary>
+    private static readonly string Package = nameof(Topogenia).ToLowerInvariant();
+
+    /// <summary>The version of the exchange package the schema of a project is written in (PackageFormat.Version).</summary>
+    public const string PackageVersion = "2.4";
+
+    /// <summary>The version of the `.pmap` the map open and the schema of a map are written in (PmapFormat.Version).</summary>
+    public const string PmapVersion = "1.4";
+
+    /// <summary>
+    /// The files of the documentation of the formats, in the order they are given (spec 3.0 section 5); each schema is the
+    /// one of the version the prompt names, so that the model never reads the schema of another version.
+    /// </summary>
+    public static readonly IReadOnlyList<string> FormatFiles =
+    [
+        "docs/pmap/PMAP_GUIDE_IA.md", "docs/format-pmap.md", $"schemas/pmap-{PmapVersion}.schema.json", $"docs/format-{Package}.md",
+        $"schemas/{Package}-package-{PackageVersion}.schema.json",
+    ];
+
+    /// <summary>The common instruction followed by the documentation of the formats: the first block of the system, cached.</summary>
+    public static string System { get; } = BuildSystem();
+
+    /// <summary>The instruction of a practice (a tile of the panel); none when the person writes directly.</summary>
+    public static string? PracticeOf(AssistantIntent intent) => intent switch
+    {
+        AssistantIntent.Create => Resource("Instructions.practice-create.md"),
+        AssistantIntent.Modify => Resource("Instructions.practice-modify.md"),
+        AssistantIntent.Analyze => Resource("Instructions.practice-analyze.md"),
+        AssistantIntent.Ask => Resource("Instructions.practice-ask.md"),
+        AssistantIntent.Translate => Resource("Instructions.practice-translate.md"),
+        AssistantIntent.Report => Resource("Instructions.practice-report.md"),
+        AssistantIntent.Summaries => Resource("Instructions.practice-summaries.md"),
+        _ => null,
+    };
+
+    /// <summary>The schema of the project with the line that says its format: the second block of the system, cached; null for a project yet to create.</summary>
+    public static string? SchemaOf(AssistantPrompt prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        if (prompt.Schema is not { } schema)
+            return null;
+        // The versions written by the formats of the exchange (PackageFormat, PmapFormat), which a test holds equal (audit 4.8).
+        var heading = prompt.SchemaFormat == AssistantSchemaFormat.Package
+            ? $"# The schema of the project\n\nThe whole project as the entries of its exchange package (format .{Package} {PackageVersion}), without the people and the translations; each entry under a line `=== name ===`.\n\n"
+            : $"# The schema of the project\n\nThe whole project as one .pmap {PmapVersion} document of all its maps, the sheets as the person may see them.\n\n";
+        return heading + schema;
+    }
+
+    /// <summary>A former request of the person, as it was sent.</summary>
+    public static string TurnRequest(AssistantTurn turn)
+    {
+        ArgumentNullException.ThrowIfNull(turn);
+        return $"<request>\n{turn.Request}\n</request>";
+    }
+
+    /// <summary>
+    /// The message of the exchange: the map open as a `.pmap` (none for a project yet to create), the codes selected, the
+    /// languages (the one of origin of the project and those configured, ADR 081), the practice with its scope and the forms
+    /// allowed, then the request.
+    /// </summary>
+    public static string MessageOf(AssistantPrompt prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        var text = new StringBuilder();
+        if (prompt.OpenMap is { } map)
+            text.Append("<map name=\"").Append(Attribute(prompt.MapName ?? "")).Append("\" format=\"pmap ").Append(PmapVersion).Append("\">\n").Append(map).Append("\n</map>\n\n");
+        else
+            text.Append("<map>none: the project does not exist yet</map>\n\n");
+        text.Append("<selection>").Append(prompt.Selection.Count == 0 ? "none" : string.Join(", ", prompt.Selection)).Append("</selection>\n\n");
+        if (prompt.Languages is { } languages)
+        {
+            text.Append("<languages");
+            if (languages.Origin is { } origin)
+                text.Append(" origin=\"").Append(Attribute(origin)).Append('"');
+            text.Append(" configured=\"").Append(Attribute(string.Join(", ", languages.Configured))).Append('"');
+            if (languages.Target is { } target)
+                text.Append(" target=\"").Append(Attribute(target)).Append('"');
+            text.Append(" />\n\n");
+        }
+        text.Append("<exchange practice=\"").Append(Codes.Of(prompt.Intent)).Append("\" scope=\"").Append(ScopeOf(prompt.Scope))
+            .Append("\" allowed_forms=\"").Append(string.Join(", ", prompt.Forms.Select(Codes.Of))).Append("\">\n");
+        if (PracticeOf(prompt.Intent) is { } practice)
+            text.Append(practice).Append('\n');
+        else
+            text.Append("No tile was chosen: choose the form of your reply among the allowed forms.\n");
+        if (!prompt.Forms.Contains(AssistantForm.Proposal) && prompt.Intent is not (AssistantIntent.Report or AssistantIntent.Summaries))
+            text.Append("A proposal is not allowed in this exchange (the person may read the map, not change it): answer, ask or analyse.\n");
+        text.Append("</exchange>\n\n");
+        if (prompt.Intent == AssistantIntent.Report)
+            text.Append(PainPointsOf(prompt.PainPoints)).Append("\n\n");
+        if (prompt.Intent == AssistantIntent.Summaries)
+            text.Append(MapsOf(prompt.SummaryMaps)).Append("\n\n");
+        if (prompt.Intent == AssistantIntent.Translate && prompt.Comments.Count + prompt.FlowComments.Count > 0)
+            text.Append(CommentsOf(prompt.Comments, prompt.FlowComments)).Append("\n\n");
+        if (prompt.Indicators is { } indicators)
+            text.Append(IndicatorsOf(indicators)).Append("\n\n");
+        text.Append("<request>\n").Append(prompt.Request).Append("\n</request>");
+        return text.ToString();
+    }
+
+    /// <summary>
+    /// The maps whose summary is asked (plan 3.1, lot R), one a line: the reference the reply gives back, the name of the
+    /// map, and its summary of today when it has one, for the model to see what it rewrites.
+    /// </summary>
+    public static string MapsOf(IReadOnlyList<AssistantSummaryTarget> maps)
+    {
+        ArgumentNullException.ThrowIfNull(maps);
+        var text = new StringBuilder("<maps>\n");
+        foreach (var map in maps)
+        {
+            text.Append(map.Reference).Append(" | ").Append(map.Name.ReplaceLineEndings(" "));
+            if (map.Current is { } current)
+                text.Append(" | its summary today, to write again: ").Append(current.ReplaceLineEndings(" "));
+            text.Append('\n');
+        }
+        return text.Append("</maps>").ToString();
+    }
+
+    /// <summary>
+    /// The comments of presentation whose translation is asked (ADR 099 revised), as a JSON list of `{ step, text }`: the
+    /// code of the step the reply gives back, and the text in its language of origin, whose line breaks the JSON keeps
+    /// (each line of a comment is one sentence said aloud). The comments of the flows follow those of the steps (lot
+    /// J10), in the same entries: a flow has no code, `step` holds the codes of its two steps, `SOURCE &gt; TARGET`. A
+    /// `&lt;` and a `&gt;` are written as their escapes, so that no text closes the list.
+    /// </summary>
+    public static string CommentsOf(IReadOnlyList<AssistantCommentTarget> comments, IReadOnlyList<AssistantFlowCommentTarget>? flows = null)
+    {
+        ArgumentNullException.ThrowIfNull(comments);
+        var list = JsonSerializer.Serialize(comments.Select(comment => new { step = comment.Reference, text = comment.Original })
+            .Concat((flows ?? []).Select(comment => new { step = comment.Reference, text = comment.Original })), CommentsJson);
+        return "<comments>\n" + list + "\n</comments>";
+    }
+
+    /// <summary>The JSON of the comments: every letter as it is, the characters of markup and the quotes as their escapes.</summary>
+    private static readonly JsonSerializerOptions CommentsJson = new() { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
+
+    /// <summary>
+    /// The indicators of the project (F-109): a line for now, then a line by photo, the reference of a target state first,
+    /// each indicator by its code with its value in the photo, now, and « better » or « worse » when the core says which way
+    /// its gain goes; « unknown » when a figure is not known. Hours are working hours, the working day given.
+    /// </summary>
+    public static string IndicatorsOf(AssistantIndicators indicators)
+    {
+        ArgumentNullException.ThrowIfNull(indicators);
+        var text = new StringBuilder("<indicators of=\"the main map of the project and its detailed maps, as the person sees them\" workday_hours=\"")
+            .Append(indicators.WorkdayHours.ToString(CultureInfo.InvariantCulture)).Append("\">\nnow");
+        foreach (var change in IndicatorComparison.Of(indicators.Now, indicators.Now))
+            text.Append(" | ").Append(change.Indicator).Append(' ').Append(Figure(change.After));
+        text.Append('\n');
+        foreach (var photo in indicators.Photos)
+        {
+            text.Append(photo.Origin == SnapshotOrigin.Baseline ? "reference of the target state \"" : "photo \"").Append(Attribute(photo.Label)).Append("\" of ")
+                .Append(photo.TakenAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+            foreach (var change in photo.Changes)
+            {
+                text.Append(" | ").Append(change.Indicator).Append(' ').Append(Figure(change.Before)).Append(" -> ").Append(Figure(change.After));
+                if (change.Better is { } better)
+                    text.Append(better ? " better" : " worse");
+            }
+            text.Append('\n');
+        }
+        return text.Append("</indicators>").ToString();
+    }
+
+    /// <summary>A figure of the core for the model: three decimals at most, in the invariant culture; « unknown » when it is not known.</summary>
+    private static string Figure(double? value) =>
+        value is { } known ? Math.Round(known, 3).ToString("0.###", CultureInfo.InvariantCulture) : "unknown";
+
+    /// <summary>
+    /// The pain points of the map for its report (plan 3.1, L4), one a line: code, step, hours lost per month, status, text;
+    /// the only problems the report may call noted.
+    /// </summary>
+    public static string PainPointsOf(IReadOnlyList<AssistantPainPointView> points)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+        var text = new StringBuilder("<pain_points>\n");
+        if (points.Count == 0)
+            text.Append("none: the sheets of the map hold no pain point\n");
+        foreach (var point in points)
+            text.Append(point.Code).Append(" | step ").Append(point.Step ?? "none").Append(" | ")
+                .Append(point.LostHoursPerMonth is { } hours ? hours.ToString(CultureInfo.InvariantCulture) + " h/month" : "hours unknown")
+                .Append(" | ").Append(point.Status).Append(" | ").Append(point.Description.ReplaceLineEndings(" ")).Append('\n');
+        return text.Append("</pain_points>").ToString();
+    }
+
+    /// <summary>
+    /// The line that names a file joined (lot 4): before a PDF or an image, which follow as blocks of the provider, it
+    /// closes itself; a document read by the host follows it as its text, then the end of the file (<see cref="FileText"/>).
+    /// </summary>
+    public static string FileHeading(AssistantAttachment file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
+        return $"<file name=\"{Attribute(file.Name)}\" kind=\"{Codes.Of(file.Kind)}\"{(file.Binary ? " />" : ">")}";
+    }
+
+    /// <summary>A document read by the host as the model receives it: its heading, its text, its end.</summary>
+    public static string FileText(AssistantAttachment file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
+        return FileHeading(file) + "\n" + file.Text + "\n</file>";
+    }
+
+    /// <summary>
+    /// The files of a request in the prompt copied for the AI of the person: the text of each document; a PDF or an image
+    /// named only, for the person joins it in their AI.
+    /// </summary>
+    private static void CopiedFiles(StringBuilder text, IReadOnlyList<AssistantAttachment> files)
+    {
+        foreach (var file in files)
+        {
+            if (file.Binary)
+                text.Append("<file name=\"").Append(Attribute(file.Name)).Append("\" kind=\"").Append(Codes.Of(file.Kind))
+                    .Append("\">joined by the person to this message</file>\n\n");
+            else
+                text.Append(FileText(file)).Append("\n\n");
+        }
+    }
+
+    /// <summary>
+    /// The effort of the model (spec 3.0 section 5, set explicitly): `medium` for a question, `high` for what creates,
+    /// changes or analyses.
+    /// </summary>
+    public static string EffortOf(AssistantIntent intent) => intent == AssistantIntent.Ask ? "medium" : "high";
+
+    /// <summary>
+    /// The whole prompt as one text, for the copy and paste: the same parts in the same order, the former turns written as
+    /// such, the documents joined as their text (a PDF or an image named, for the person joins it in their AI), and the
+    /// schema of the reply, which no provider then enforces.
+    /// </summary>
+    public string Render(AssistantPrompt prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        var text = new StringBuilder(System).Append("\n\n");
+        if (SchemaOf(prompt) is { } schema)
+            text.Append(schema).Append("\n\n");
+        if (prompt.History.Count > 0)
+        {
+            text.Append("# The former exchanges of the panel\n\n");
+            foreach (var turn in prompt.History)
+            {
+                CopiedFiles(text, turn.Attachments);
+                text.Append(TurnRequest(turn)).Append("\n<your_reply>\n").Append(turn.Reply).Append("\n</your_reply>\n\n");
+            }
+        }
+        text.Append("# This exchange\n\n");
+        CopiedFiles(text, prompt.Attachments);
+        text.Append(MessageOf(prompt)).Append("\n\n");
+        text.Append("# The schema of your reply\n\nReply with one JSON object that follows this JSON Schema, and nothing before or after it:\n\n")
+            .Append(ReplySchema.For(prompt));
+        return text.ToString();
+    }
+
+    private static string ScopeOf(AssistantScope scope) => scope switch
+    {
+        AssistantScope.Project => "the whole project (the root map is open: every map of the project)",
+        AssistantScope.NewProject => "a project yet to create",
+        _ => "the map open",
+    };
+
+    private static string Attribute(string text) => text.Replace("&", "&amp;", StringComparison.Ordinal).Replace("\"", "&quot;", StringComparison.Ordinal)
+        .Replace("<", "&lt;", StringComparison.Ordinal);
+
+    private static string BuildSystem()
+    {
+        var text = new StringBuilder(Resource("Instructions.common.md")).Append("\n\n# The documentation of the formats\n");
+        foreach (var file in FormatFiles)
+            text.Append("\n## ").Append(file).Append("\n\n").Append(Resource("Formats." + Path.GetFileName(file))).Append('\n');
+        return text.ToString();
+    }
+
+    /// <summary>A text embedded in this assembly, without the comment lines that open a Markdown file of the repository.</summary>
+    public static string Resource(string name)
+    {
+        using var stream = typeof(AssistantInstructions).Assembly.GetManifestResourceStream(typeof(AssistantInstructions).Namespace + "." + name)
+            ?? throw new InvalidOperationException($"The text {name} is not embedded.");
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        var lines = reader.ReadToEnd().ReplaceLineEndings("\n").Split('\n');
+        var start = 0;
+        while (start < lines.Length && lines[start].StartsWith("<!--", StringComparison.Ordinal))
+            start++;
+        return string.Join('\n', lines[start..]).Trim();
+    }
+
+    /// <summary>The names of the texts embedded, for the tests.</summary>
+    public static IReadOnlyList<string> Embedded() =>
+        typeof(AssistantInstructions).Assembly.GetManifestResourceNames().Where(name => name.EndsWith(".md", StringComparison.Ordinal) || name.EndsWith(".json", StringComparison.Ordinal))
+            .ToList();
+}

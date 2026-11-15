@@ -1,0 +1,7 @@
+# .gitattributes
+# Line endings kept by git: LF everywhere, CRLF for Windows batch files
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.woff2 binary

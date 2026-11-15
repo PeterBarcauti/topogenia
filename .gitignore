@@ -1,0 +1,24 @@
+# .gitignore
+# Build output, local data and tool caches kept out of the repository
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+.artifacts/
+publish/
+web/node_modules/
+# A cache of vitest or vite run from another folder than web/.
+node_modules/
+web/test-results/
+web/playwright-report/
+src/Topogenia.Host/wwwroot/
+*.db
+*.db-wal
+*.db-shm
+*.log
+*.bak
+web/tsconfig.tsbuildinfo
+web/.vitest/
+# The packages built by build/package.mjs (phase 7)
+artifacts/

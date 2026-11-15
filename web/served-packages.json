@@ -1,0 +1,166 @@
+[
+  {
+    "path": "node_modules/@babel/runtime",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/@fontsource-variable/inter",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/@xyflow/react",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/@xyflow/react/node_modules/zustand",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/@xyflow/system",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/canvg",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/classcat",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/core-js",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-color",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-dispatch",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-drag",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-ease",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-interpolate",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-selection",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-timer",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-transition",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/d3-zoom",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/dompurify",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/exceljs",
+    "bundled": [
+      "dist/exceljs.min.js"
+    ]
+  },
+  {
+    "path": "node_modules/fast-png",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/fast-png/node_modules/pako",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/fflate",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/html-to-image",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/html2canvas",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/i18next",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/inter-font",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/iobuffer",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/jspdf",
+    "bundled": [
+      "dist/jspdf.es.min.js"
+    ]
+  },
+  {
+    "path": "node_modules/lucide-react",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/performance-now",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/raf",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/react",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/react-dom",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/react-i18next",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/rgbcolor",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/scheduler",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/stackblur-canvas",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/svg-pathdata",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/use-sync-external-store",
+    "bundled": []
+  },
+  {
+    "path": "node_modules/zustand",
+    "bundled": []
+  }
+]

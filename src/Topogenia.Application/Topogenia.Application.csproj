@@ -1,0 +1,11 @@
+<!-- Topogenia.Application.csproj -->
+<!-- Application: use-case handlers, ports, authorisation and operation log; depends on Domain only -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The core: its source project, or its package in the public repository (ADR 074) -->
+  <ItemGroup Condition="'$(UseCorePackage)' != 'true'">
+    <ProjectReference Include="../Topogenia.Domain/Topogenia.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseCorePackage)' == 'true'">
+    <PackageReference Include="Topogenia.Core" />
+  </ItemGroup>
+</Project>

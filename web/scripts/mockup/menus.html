@@ -1,0 +1,62 @@
+<!-- menus.html -->
+<!-- Context menus over the map: lane header menu with the eight colour swatches, step menu with the seven types listed in it. -->
+<div class="menus-stage">
+  {{map:menus}}
+
+  <span class="cursor" style="left:126px;top:204px">{{icon:mouse-pointer-2:18:1.75}}</span>
+  <div class="menu" role="menu" aria-label="Couloir Service Achats" style="left:136px;top:214px">
+    <div class="menu-item is-focus" role="menuitem" tabindex="0">{{icon:pencil-line:15}}Renommer</div>
+    <div class="menu-sep" role="separator"></div>
+    <div role="group" aria-labelledby="menu-lane-type">
+      <div class="menu-title" id="menu-lane-type" aria-hidden="true">Type</div>
+      <div class="menu-item" role="menuitemradio" aria-checked="false" tabindex="-1">{{icon:user:15}}Personne ou rôle<span class="kbd" aria-hidden="true"><span class="radio-dot"></span></span></div>
+      <div class="menu-item is-active" role="menuitemradio" aria-checked="true" tabindex="-1">{{icon:building-2:15}}Service<span class="kbd" aria-hidden="true"><span class="radio-dot is-on"></span></span></div>
+      <div class="menu-item" role="menuitemradio" aria-checked="false" tabindex="-1">{{icon:server:15}}Système<span class="kbd" aria-hidden="true"><span class="radio-dot"></span></span></div>
+    </div>
+    <div class="menu-sep" role="separator"></div>
+    <div role="group" aria-labelledby="menu-lane-colour">
+      <div class="menu-title" id="menu-lane-colour" aria-hidden="true">Couleur</div>
+      <div class="swatches">
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Rose poudré" style="--pastel:var(--lane-1-pastel);--ink:var(--lane-1-ink)" tabindex="-1"></button>
+        <button class="swatch-btn is-on" role="menuitemradio" aria-checked="true" aria-label="Lavande" style="--pastel:var(--lane-2-pastel);--ink:var(--lane-2-ink)" tabindex="-1">{{icon:check:14:2.75}}</button>
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Bleu ciel" style="--pastel:var(--lane-3-pastel);--ink:var(--lane-3-ink)" tabindex="-1"></button>
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Menthe" style="--pastel:var(--lane-4-pastel);--ink:var(--lane-4-ink)" tabindex="-1"></button>
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Pêche" style="--pastel:var(--lane-5-pastel);--ink:var(--lane-5-ink)" tabindex="-1"></button>
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Vanille" style="--pastel:var(--lane-6-pastel);--ink:var(--lane-6-ink)" tabindex="-1"></button>
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Lilas" style="--pastel:var(--lane-7-pastel);--ink:var(--lane-7-ink)" tabindex="-1"></button>
+        <button class="swatch-btn" role="menuitemradio" aria-checked="false" aria-label="Aqua" style="--pastel:var(--lane-8-pastel);--ink:var(--lane-8-ink)" tabindex="-1"></button>
+      </div>
+      <div class="swatch-name" aria-hidden="true"><b>Lavande</b><span>teinte 2 sur 8</span></div>
+    </div>
+    <div class="menu-sep" role="separator"></div>
+    <div class="menu-item menu-item--danger" role="menuitem" tabindex="-1">{{icon:trash-2:15}}Supprimer le couloir</div>
+  </div>
+
+  <span class="cursor" style="left:1236px;top:204px">{{icon:mouse-pointer-2:18:1.75}}</span>
+  <div class="menu" role="menu" aria-label="Étape PRJ-E008" style="left:996px;top:40px">
+    <div class="menu-item is-focus" role="menuitem" aria-keyshortcuts="F2" tabindex="0">{{icon:pencil-line:15}}Renommer<span class="kbd" aria-hidden="true">F2</span></div>
+    <div class="menu-item" role="menuitem" tabindex="-1">{{icon:arrow-left-from-line:15}}Insérer une étape avant</div>
+    <div class="menu-item" role="menuitem" tabindex="-1">{{icon:arrow-right-from-line:15}}Insérer une étape après</div>
+    <div class="menu-item menu-item--wrap" role="menuitem" tabindex="-1">{{icon:git-branch-plus:15}}Ajouter une branche en parallèle (même acteur)</div>
+    <div class="menu-item" role="menuitem" tabindex="-1">{{icon:square-stack:15}}Détailler cette étape</div>
+    <div class="menu-sep" role="separator"></div>
+    <div class="menu-item" role="menuitem" aria-keyshortcuts="Control+X" tabindex="-1">{{icon:scissors:15}}Couper<span class="kbd" aria-hidden="true">Ctrl+X</span></div>
+    <div class="menu-item" role="menuitem" aria-keyshortcuts="Control+C" tabindex="-1">{{icon:copy:15}}Copier<span class="kbd" aria-hidden="true">Ctrl+C</span></div>
+    <div class="menu-item" role="menuitem" aria-keyshortcuts="Control+D" tabindex="-1">{{icon:copy-plus:15}}Dupliquer<span class="kbd" aria-hidden="true">Ctrl+D</span></div>
+    <div class="menu-item is-active" role="menuitem" tabindex="-1">{{icon:clipboard-paste:15}}Coller avant cette étape</div>
+    <div class="menu-item" role="menuitem" aria-keyshortcuts="Control+V" tabindex="-1">{{icon:clipboard-paste:15}}Coller après cette étape<span class="kbd" aria-hidden="true">Ctrl+V</span></div>
+    <div class="menu-sep" role="separator"></div>
+    <div role="group" aria-label="Type de l’étape">
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="true"><span aria-hidden="true" class="radio-dot is-on"></span>Changer le type : Étape<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="20" height="12" rx="3"/></svg></div>
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"><span aria-hidden="true" class="radio-dot"></span>Changer le type : Attente<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="20" height="12" rx="3" stroke-dasharray="3 2.2"/></svg></div>
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"><span aria-hidden="true" class="radio-dot"></span>Changer le type : Début<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="2.5" width="21" height="11" rx="5.5"/></svg></div>
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"><span aria-hidden="true" class="radio-dot"></span>Changer le type : Fin<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="2" width="21" height="12" rx="6"/><rect x="4" y="4.5" width="16" height="7" rx="3.5" stroke-width="1.1"/></svg></div>
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"><span aria-hidden="true" class="radio-dot"></span>Changer le type : Décision<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 1 22 8 12 15 2 8Z"/><path d="m10 6 4 4m0-4-4 4"/></svg></div>
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"><span aria-hidden="true" class="radio-dot"></span>Changer le type : Parallèle<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 1 22 8 12 15 2 8Z"/><path d="M12 5.5v5M9.5 8h5"/></svg></div>
+      <div class="menu-item" role="menuitemradio" tabindex="-1" aria-checked="false"><span aria-hidden="true" class="radio-dot"></span>Changer le type : Inclusif<svg class="menu-shape kbd" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 1 22 8 12 15 2 8Z"/><circle cx="12" cy="8" r="2.4"/></svg></div>
+    </div>
+    <div class="menu-sep" role="separator"></div>
+    <div class="menu-item" role="menuitem" tabindex="-1">{{icon:hash:15}}Copier le code PRJ-E008</div>
+    <div class="menu-item menu-item--danger" role="menuitem" aria-keyshortcuts="Delete" tabindex="-1">{{icon:trash-2:15}}Supprimer<span class="kbd" aria-hidden="true">Suppr</span></div>
+  </div>
+</div>

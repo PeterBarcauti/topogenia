@@ -1,0 +1,213 @@
+/* presenter.css */
+/* The stage of a presentation (ADR 097): the map in full screen on the page colour, the step shown raised with its halo, the way run half lit, the rest faded; the lanes named on the left; the light of a passage; the caption and the bar on dark glass, read from the back of a room; the screens black and white. */
+
+/* « Présenter » at the right margin of the ribbon, before the assistant, folded or not */
+.ribbon-present {
+  margin-left: auto; align-self: center; width: 34px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0;
+  border: 1px solid var(--accent); border-radius: var(--radius-pill); background: var(--surface); color: var(--accent-strong); cursor: pointer;
+  transition: background var(--duration-fast);
+}
+.ribbon-present:hover:not(:disabled) { background: var(--accent-soft); }
+.ribbon-present:disabled { border-color: var(--border); color: var(--text-muted); cursor: default; }
+.ribbon-present + .ribbon-assistant { margin-left: 8px; }
+
+.presenter {
+  position: fixed; inset: 0; z-index: 900; background: var(--bg-app); overflow: hidden;
+  font-family: var(--font-sans); color: var(--text);
+}
+/* the stage holds the focus of its presentation, a modal dialog: no ring round the whole screen */
+.presenter:focus-visible { outline: none; box-shadow: none; }
+/* the ring of a control shows the one Entrée and Espace press: while the keyboard walks the controls (Tab) only; a button a click
+   left focused, or given the focus back (the pencil of a comment closed), shows none, the keys being then those of the story */
+.presenter:not(.is-keyed) button:focus-visible { outline: none; }
+.presenter:not(.is-keyed) :is(.presenter-button, .presenter-chapter, .presenter-voice-answer):focus-visible { box-shadow: none; }
+/* at rest the pointer hides, over the map too, whose steps and whose pane set their own */
+.presenter.is-idle { cursor: none; }
+.presenter.is-idle .presenter-flow * { cursor: none; }
+.presenter-flow { position: absolute; inset: 0; }
+
+/* the scene lit: the step shown raised with a halo in the ink of its lane, the ends of a passage lit, the way run half lit;
+   a gateway lit by the outline of its diamond, never by a frame around it */
+.presenter-flow .react-flow__node.is-presented .step:not(.step--gateway) {
+  box-shadow: 0 0 0 var(--presented-ring-gap) var(--surface), 0 0 0 var(--presented-ring) var(--ink), var(--presenter-lift);
+  transition: box-shadow var(--duration-caption);
+}
+.presenter-flow .react-flow__node.is-presented { z-index: 10; }
+.presenter-flow .react-flow__node.is-lit .step:not(.step--gateway) { box-shadow: 0 0 0 2px var(--ink), var(--shadow-raised); }
+.presenter-flow .react-flow__node.is-presented .gateway-shape { filter: drop-shadow(var(--presenter-lift)); }
+.presenter-flow .react-flow__node.is-presented .gateway-shape polygon { stroke-width: 4; }
+.presenter-flow .react-flow__node.is-lit .gateway-shape polygon { stroke-width: 3; }
+.presenter-flow .react-flow__node.is-visited .step { opacity: var(--presenter-visited-opacity); }
+.presenter-flow .react-flow__edge.is-visited .react-flow__edge-path { opacity: var(--presenter-visited-opacity); }
+.presenter-flow .react-flow__edge.is-lit .react-flow__edge-path { stroke: var(--accent); stroke-width: var(--lit-stroke); }
+.map-arrow-lit polyline { fill: var(--accent); stroke: var(--accent); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+/* the flows the scene leaves aside, fainter than the steps are not: a thin stroke at the faded opacity of a step is lost on a projector */
+.map-canvas.presenter-flow .react-flow__edge-path.is-faded, .map-canvas.presenter-flow .edge-label.is-faded { opacity: var(--presenter-faded-flow-opacity); }
+/* a step takes a click (it becomes the stop shown), and so does a flow, by its line or by its label (its passage is shown, lot J10): both show the hand */
+.presenter-flow .react-flow__node, .presenter-flow .react-flow__edge, .presenter-flow .edge-label { cursor: pointer; }
+
+/* the marks of the edition left out of a presentation: the gauge of the sheet, the warnings of the layout */
+.presenter-flow .step-gauge, .presenter-flow .step-warning { display: none; }
+
+/* the light of a passage: the stroke lit behind the point, the point and its breathing halo, the documents it carries */
+.presenter-light { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
+/* the mask of the light: shown on the map, hidden on each step, so that it is born at the edge of a box (essai J2 of 3.2) */
+.presenter-light-mask-shown { fill: var(--presenter-white); }
+.presenter-light-mask-hidden { fill: var(--presenter-black); }
+.presenter-trail { fill: none; stroke: var(--accent); stroke-width: 4px; stroke-linecap: round; opacity: .9; }
+.presenter-spark-core { fill: var(--surface); stroke: var(--accent); stroke-width: 3px; }
+.presenter-spark-halo { fill: var(--accent); opacity: .28; animation: presenter-breath var(--duration-pulse) ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes presenter-breath { 50% { opacity: .1; transform: scale(1.45); } }
+.presenter-cargo {
+  position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 6px; margin: -44px 0 0 0; translate: -50% 0; white-space: nowrap;
+  padding: 4px 10px; border-radius: var(--radius-pill); background: var(--presenter-glass); color: var(--presenter-glass-text); font-size: 12.5px; font-weight: 500;
+  box-shadow: var(--shadow-raised); pointer-events: none;
+}
+
+/* the exits of a decision shown, numbered: a button of 28 px on each, the one the story follows filled */
+.presenter-fork {
+  position: absolute; left: 0; top: 0; width: 28px; height: 28px; margin: -14px 0 0 -14px; display: grid; place-items: center; padding: 0;
+  border: 2px solid var(--accent); border-radius: var(--radius-pill); background: var(--surface); color: var(--accent-strong);
+  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; pointer-events: all; box-shadow: var(--shadow-raised); transition: background var(--duration-fast);
+}
+.presenter-fork:hover { background: var(--accent-soft); }
+.presenter-fork.is-followed { background: var(--accent); color: var(--presenter-glass-text); }
+.presenter-fork:focus-visible { outline: var(--focus-outline); outline-offset: 2px; }
+
+/* the lanes named on the left, beside their band in the view; the lane of the step shown in its ink */
+.presenter-lanes { position: absolute; left: 0; top: 0; bottom: 0; width: 184px; pointer-events: none; z-index: 5; }
+.presenter-lane {
+  position: absolute; left: 0; width: 100%; display: flex; align-items: center; padding: 0 14px 0 16px; overflow: hidden;
+  border-left: 4px solid var(--ink); background: linear-gradient(90deg, var(--surface) 70%, transparent);
+  transition: opacity var(--duration-caption);
+}
+.presenter-lane span { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.presenter-lane.is-active span { font-size: 17px; }
+.presenter-lane.is-dim { opacity: .45; }
+
+/* the small map « you are here » at the bottom right, beside the caption, the room out of view veiled */
+.presenter-flow .react-flow__panel.presenter-minimap { margin: 0; bottom: 96px; right: 18px; width: 200px; border: 1px solid var(--border); border-radius: var(--radius-ui); overflow: hidden; box-shadow: var(--shadow-raised); }
+.presenter-minimap .react-flow__minimap-svg { width: 100%; }
+.presenter-flow .presenter-minimap .react-flow__minimap-mask { fill: var(--bg-app); fill-opacity: .72; stroke: var(--accent); stroke-width: 2; }
+
+/* the caption: the sentence of the scene on dark glass, a sentence at a time (Netflix: 42 characters a line, two lines), just above the bar
+   and growing upwards; no banner, the box lit on the map says the step (essai J2) */
+.presenter-caption {
+  position: absolute; left: 50%; bottom: 124px; translate: -50% 0; width: min(920px, calc(100% - 480px)); z-index: 20;
+  display: flex; flex-direction: column; align-items: center; pointer-events: none;
+}
+.presenter-line {
+  margin: 0; max-width: 46ch; padding: 12px 22px; border-radius: 14px; background: var(--presenter-glass); color: var(--presenter-glass-text);
+  font-size: 26px; line-height: 1.3; font-weight: 500; text-align: center; text-wrap: balance; box-shadow: var(--presenter-lift);
+  animation: presenter-in var(--duration-caption) ease-out;
+}
+.presenter-line:empty { display: none; }
+@keyframes presenter-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* the comment of presentation of the step shown, written where the subtitles stand (ADR 099) */
+.presenter-comment {
+  position: absolute; left: 50%; bottom: 124px; translate: -50% 0; width: min(760px, calc(100% - 80px)); z-index: 25;
+  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 14px; background: var(--presenter-glass);
+  color: var(--presenter-glass-text); border: 1px solid var(--presenter-glass-border); box-shadow: var(--presenter-lift);
+}
+.presenter-comment-label { font-size: 13px; font-weight: 600; color: var(--presenter-glass-muted); }
+/* the original of the comment, above the translation being written */
+.presenter-comment-original { display: flex; flex-direction: column; gap: 2px; margin: 0; font-size: 12.5px; color: var(--presenter-glass-muted); }
+.presenter-comment-original-text { font-size: 16px; line-height: 1.35; white-space: pre-line; color: var(--presenter-glass-text); }
+.presenter-comment-field {
+  width: 100%; resize: none; padding: 10px 12px; border-radius: var(--radius-small); border: 1px solid var(--presenter-glass-border);
+  background: transparent; color: inherit; font: inherit; font-size: 22px; line-height: 1.35;
+}
+.presenter-comment-field:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.presenter-comment-hint { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin: 0; font-size: 12.5px; color: var(--presenter-glass-muted); }
+
+/* where the presentation stands, at the top left: the process on its main map, in a detail the step it details, the levels above paler; cut before the counters */
+.presenter-title {
+  position: absolute; top: 18px; left: 18px; z-index: 20; display: flex; align-items: baseline; gap: 8px; margin: 0; pointer-events: none;
+  max-width: max(160px, calc(50% - 230px)); padding: 8px 16px; border-radius: var(--radius-large);
+  background: var(--presenter-glass); color: var(--presenter-glass-muted); box-shadow: var(--shadow-raised); font-size: 15px; font-weight: 500;
+}
+.presenter-title-level { flex: 0 8 auto; min-width: 2ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.presenter-title-level.is-current { flex-shrink: 1; color: var(--presenter-glass-text); font-size: 17px; font-weight: 650; }
+.presenter-title-chevron { flex: none; }
+
+/* the counters of the work and the lead time run so far */
+.presenter-counters { position: absolute; top: 18px; left: 50%; translate: -50% 0; display: flex; gap: 10px; z-index: 20; pointer-events: none; }
+.presenter-counter {
+  display: flex; flex-direction: column; align-items: flex-start; min-width: 128px; padding: 8px 16px; border-radius: var(--radius-large);
+  background: var(--presenter-glass); color: var(--presenter-glass-text); box-shadow: var(--shadow-raised);
+}
+.presenter-counter-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--presenter-glass-muted); }
+.presenter-counter-value { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.presenter-counter-value small { font-size: 15px; font-weight: 500; margin-left: 4px; color: var(--presenter-glass-muted); }
+
+/* the bar: on dark glass at the foot of the screen, hidden with the pointer while it plays and the mouse rests */
+.presenter-bar {
+  position: absolute; left: 50%; bottom: 20px; translate: -50% 0; z-index: 30; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 40px);
+  padding: 8px 12px; border-radius: var(--radius-pill); background: var(--presenter-glass); color: var(--presenter-glass-text);
+  border: 1px solid var(--presenter-glass-border); box-shadow: var(--shadow-raised); transition: opacity var(--duration-caption);
+}
+.presenter.is-idle .presenter-bar { opacity: 0; pointer-events: none; }
+/* it comes back for the focus while the keyboard walks its controls, not for a button a click left focused */
+.presenter.is-idle.is-keyed .presenter-bar:focus-within { opacity: 1; pointer-events: auto; }
+.presenter-bar-group { display: flex; align-items: center; gap: 2px; }
+.presenter-button {
+  display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 0; border-radius: var(--radius-pill);
+  background: transparent; color: inherit; font: inherit; cursor: pointer; transition: background var(--duration-fast);
+}
+.presenter-button:hover { background: var(--presenter-glass-border); }
+.presenter-button[aria-pressed="false"] { color: var(--presenter-glass-muted); }
+.presenter-button--play { width: 46px; height: 46px; background: var(--accent); }
+.presenter-button--play:hover { background: var(--accent-strong); }
+.presenter-speed { width: auto; min-width: 46px; padding: 0 8px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.presenter-chapters { display: flex; align-items: center; gap: 3px; min-width: 120px; max-width: 520px; flex: 1 1 auto; }
+/* a chapter: a button of 24 px at least (WCAG 2.5.8), its mark a bar in the ink of its lane; a long tour, a track of marks */
+.presenter-chapter {
+  position: relative; flex: 1 1 0; min-width: 24px; height: 24px; border: 0; padding: 0; background: transparent; cursor: pointer;
+}
+.presenter-chapter::before {
+  content: ""; position: absolute; left: 2px; right: 2px; top: 50%; height: 8px; translate: 0 -50%; border-radius: var(--radius-pill); background: var(--ink); opacity: .35;
+  transition: opacity var(--duration-fast), height var(--duration-fast);
+}
+.presenter-chapter:hover::before { opacity: .7; }
+.presenter-chapter.is-run::before { opacity: .85; }
+.presenter-chapter.is-shown::before { opacity: 1; height: 14px; box-shadow: 0 0 0 2px var(--presenter-glass-text); }
+.presenter-chapters.is-track { gap: 1px; }
+.presenter-chapters.is-track .presenter-chapter { min-width: 3px; cursor: default; }
+.presenter-chapters.is-track .presenter-chapter::before { left: 0; right: 0; }
+.presenter-progress { font-size: 13px; font-weight: 500; color: var(--presenter-glass-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.presenter-button:focus-visible, .presenter-chapter:focus-visible { outline: var(--focus-outline); outline-offset: 2px; }
+
+/* the settings of the voice, above its button: the voice, the online ones allowed or not, what that means */
+.presenter-voice-settings { position: relative; display: inline-flex; }
+.presenter-voice-panel {
+  position: absolute; right: -80px; bottom: calc(100% + 16px); width: 340px; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px;
+  border-radius: var(--radius-large); background: var(--presenter-glass); color: var(--presenter-glass-text); border: 1px solid var(--presenter-glass-border);
+  box-shadow: var(--shadow-raised); font-size: 13px; text-align: left;
+}
+.presenter-voice-field { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.presenter-voice-field select { font: inherit; font-weight: 400; padding: 5px 8px; border-radius: var(--radius-small); border: 1px solid var(--field-border); background: var(--surface); color: var(--text); }
+.presenter-voice-check { display: flex; align-items: flex-start; gap: 8px; font-weight: 600; cursor: pointer; }
+.presenter-voice-check input { margin: 2px 0 0; accent-color: var(--accent); }
+.presenter-voice-help, .presenter-voice-none { margin: 0; color: var(--presenter-glass-muted); line-height: 1.4; }
+
+/* the screens of the room while the presenter speaks (PowerPoint, reveal.js: B and W) */
+.presenter-blank { position: absolute; inset: 0; z-index: 40; }
+.presenter-blank--black { background: var(--presenter-black); }
+.presenter-blank--white { background: var(--presenter-white); }
+
+/* a refusal or a failure said in the stage, where the full screen shows it: above everything, a blanked screen too */
+.presenter-alert {
+  position: absolute; top: 92px; left: 50%; translate: -50% 0; z-index: 50; margin: 0; max-width: min(720px, calc(100% - 80px)); padding: 10px 18px;
+  border-radius: var(--radius-large); border-left: 4px solid var(--danger); background: var(--presenter-glass); color: var(--presenter-glass-text);
+  font-size: 16px; line-height: 1.4; box-shadow: var(--presenter-lift);
+}
+
+/* the question of the voice, asked once: two answers, each said for where the text goes (essai J2 of 3.2) */
+.presenter-voice-question { margin: 0; font-weight: 600; }
+.presenter-voice-answer {
+  display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: var(--radius-small); border: 1px solid var(--presenter-glass-border);
+  background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.presenter-voice-answer:hover, .presenter-voice-answer:focus-visible { background: var(--presenter-glass-border); }
+.presenter-voice-answer span { color: var(--presenter-glass-muted); line-height: 1.4; }

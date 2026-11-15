@@ -1,0 +1,60 @@
+<!-- ribbon.html -->
+<!-- Editor ribbon: six labelled groups of 32 px icon buttons on one line, roving tabindex (one button at 0); Paste is active, Cut tooltip shown. -->
+<div class="ribbon" role="toolbar" aria-label="Ruban de la carte">
+  <div class="rgroup" role="group" aria-label="Outils">
+    <div class="rgroup-buttons" role="radiogroup" aria-label="Outil actif">
+      <button class="rbtn" role="radio" aria-checked="false" title="Sélection (V)" tabindex="0">{{icon:mouse-pointer-2:18:1.75}}</button>
+      <button class="rbtn" role="radio" aria-checked="true" title="Main (H)" tabindex="-1">{{icon:hand:18:1.75}}</button>
+    </div>
+    <span class="rgroup-label" aria-hidden="true">Outils</span>
+  </div>
+  <div class="rgroup" role="group" aria-label="Formes">
+    <div class="rgroup-buttons" role="radiogroup" aria-label="Type des prochaines étapes">
+      <button class="rbtn" role="radio" aria-checked="true" title="Étape" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/></svg></button>
+      <button class="rbtn" role="radio" aria-checked="false" title="Attente" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3" stroke-dasharray="3 2.4"/></svg></button>
+      <button class="rbtn" role="radio" aria-checked="false" title="Début" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="2.5" y="7" width="19" height="10" rx="5"/></svg></button>
+      <button class="rbtn" role="radio" aria-checked="false" title="Fin" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="2" y="6.5" width="20" height="11" rx="5.5"/><rect x="4.75" y="9.25" width="14.5" height="5.5" rx="2.75" stroke-width="1.25"/></svg></button>
+    </div>
+    <span class="rgroup-label" aria-hidden="true">Formes</span>
+  </div>
+  <div class="rgroup" role="group" aria-label="Branchements">
+    <div class="rgroup-buttons"><span role="radiogroup" aria-label="Losange des prochaines étapes" style="display:contents">
+      <button class="rbtn" role="radio" aria-checked="false" title="Décision" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3 21 12 12 21 3 12Z"/><path d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5"/></svg></button>
+      <button class="rbtn" role="radio" aria-checked="false" title="Parallèle" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3 21 12 12 21 3 12Z"/><path d="M12 8.75v6.5M8.75 12h6.5"/></svg></button>
+      <button class="rbtn" role="radio" aria-checked="false" title="Inclusif" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 12 12 21 3 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </span><span class="rsep"></span>
+      <button class="rbtn" title="Ajouter une branche en parallèle" tabindex="-1">{{icon:git-branch-plus:18:1.75}}</button>
+    </div>
+    <span class="rgroup-label" aria-hidden="true">Branchements</span>
+  </div>
+  <div class="rgroup" role="group" aria-label="Liens">
+    <div class="rgroup-buttons">
+      <button class="rbtn" aria-pressed="false" title="Relier" tabindex="-1">{{icon:spline:18:1.75}}</button>
+      <button class="rbtn" title="Barre de commande (Ctrl+K)" tabindex="-1">{{icon:square-terminal:18:1.75}}</button>
+    </div>
+    <span class="rgroup-label" aria-hidden="true">Liens</span>
+  </div>
+  <div class="rgroup" role="group" aria-label="Édition">
+    <div class="rgroup-buttons">
+      <button class="rbtn" title="Annuler (Ctrl+Z)" tabindex="-1">{{icon:undo-2:18:1.75}}</button>
+      <button class="rbtn" title="Rétablir (Ctrl+Y)" disabled tabindex="-1">{{icon:redo-2:18:1.75}}</button>
+      <span class="rsep"></span>
+      <button class="rbtn is-hover" aria-describedby="tip-cut" tabindex="-1">{{icon:scissors:18:1.75}}<span class="tooltip" role="tooltip" id="tip-cut">Couper<kbd>Ctrl+X</kbd></span></button>
+      <button class="rbtn" title="Copier (Ctrl+C)" tabindex="-1">{{icon:copy:18:1.75}}</button>
+      <button class="rbtn" title="Coller (Ctrl+V)" tabindex="-1">{{icon:clipboard-paste:18:1.75}}</button>
+      <span class="rsep"></span>
+      <button class="rbtn" title="Détailler" tabindex="-1">{{icon:square-stack:18:1.75}}</button>
+      <button class="rbtn" title="Aligner" tabindex="-1">{{icon:wand-sparkles:18:1.75}}</button>
+    </div>
+    <span class="rgroup-label" aria-hidden="true">Édition</span>
+  </div>
+  <div class="rgroup" role="group" aria-label="Affichage">
+    <div class="rgroup-buttons">
+      <button class="rbtn" aria-pressed="true" title="Codes" tabindex="-1">{{icon:hash:18:1.75}}</button>
+      <button class="rbtn" aria-pressed="true" title="Pictogrammes" tabindex="-1">{{icon:shapes:18:1.75}}</button>
+      <button class="rbtn" aria-pressed="false" title="RACI" tabindex="-1">{{icon:users-round:18:1.75}}</button>
+    </div>
+    <span class="rgroup-label" aria-hidden="true">Affichage</span>
+  </div>
+  <div class="ribbon-status">{{icon:check:14:2.5}}Enregistré automatiquement</div>
+</div>

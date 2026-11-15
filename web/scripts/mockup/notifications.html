@@ -1,0 +1,24 @@
+<!-- notifications.html -->
+<!-- Map editor at 1366 x 768 with three stacked notifications in the bottom right corner: information, success and error. -->
+<div class="app app--notify">
+  {{include:header-editor.html}}
+  {{include:ribbon.html}}
+  <div class="workspace">{{map:notify}}</div>
+  <div class="toasts" aria-label="Notifications">
+    <div class="toast toast--info" role="status">
+      <span class="toast-icon">{{icon:info:14:2.5}}</span>
+      <span><b>Carte alignée</b> : 3 étapes replacées.</span>
+      <span class="toast-tools"><button class="toast-action" type="button" tabindex="-1">Annuler</button><button class="toast-close" type="button" aria-label="Fermer la notification" tabindex="-1">{{icon:x:14}}</button></span>
+    </div>
+    <div class="toast toast--success" role="status">
+      <span class="toast-icon">{{icon:check:14:3}}</span>
+      <span><b>Fiche validée</b> : PRJ-E002 · Rédiger la demande d’achat.</span>
+      <span class="toast-tools"><button class="toast-close" type="button" aria-label="Fermer la notification" tabindex="-1">{{icon:x:14}}</button></span>
+    </div>
+    <div class="toast toast--error" role="alert">
+      <span class="toast-icon">{{icon:x:14:3}}</span>
+      <span><b>Modification refusée</b> : PRJ-E008 a été modifiée par Léa Petit entre-temps. La carte a été rechargée, refaites votre modification.</span>
+      <span class="toast-tools"><button class="toast-close" type="button" aria-label="Fermer la notification" tabindex="-1">{{icon:x:14}}</button></span>
+    </div>
+  </div>
+</div>
