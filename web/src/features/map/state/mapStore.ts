@@ -36,10 +36,14 @@ export type StepMark = 'changed' | 'removed';
 /** The exports of the map (annex B 2.14), the Markdown with its Mermaid diagram (plan 3.1, L3), the poster for a wall (Makigami M9). */
 export type ExportFormat = 'pdf' | 'png' | 'svg' | 'xlsx' | 'md' | 'wall';
 
-/** An export running: its format, and the line of the classification printed under the image of a PNG (S-4.1-08). */
+/**
+ * An export running: its format, the line of the classification printed under the image of a PNG (S-4.1-08), and the
+ * steps of a selection copied as an image, the rest of the map left out (ADR 109); absent, the whole map.
+ */
 export interface ExportRun {
   readonly format: ExportFormat;
   readonly caption: string | null;
+  readonly steps?: readonly string[];
 }
 
 /**

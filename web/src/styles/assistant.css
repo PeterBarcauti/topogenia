@@ -56,6 +56,9 @@
 .assistant-tile.is-modify .tile-icon { background: var(--lane-3-pastel); color: var(--lane-3-ink); }
 .assistant-tile.is-analyze .tile-icon { background: var(--lane-5-pastel); color: var(--lane-5-ink); }
 .assistant-tile.is-ask .tile-icon { background: var(--lane-2-pastel); color: var(--lane-2-ink); }
+/* The fifth tile, the comments of presentation (F-130), across the two columns. */
+.assistant-tile.is-comments { grid-column: 1 / -1; min-height: 0; }
+.assistant-tile.is-comments .tile-icon { background: var(--lane-1-pastel); color: var(--lane-1-ink); }
 .tile-title { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
 .tile-text { font-size: var(--font-size-small); line-height: 1.4; color: var(--text-muted); }
 

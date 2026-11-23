@@ -64,7 +64,7 @@ affaibli. Le code de production n'est pas en cause : la 1.x, comme la 2.0, crée
 ## Conséquences
 
 - La suite de persistance reste verte avec plusieurs exécutions complètes simultanées sur une instance (mesures
-  dans `docs/couverture-p3/r1-c3.md`).
+  dans `docs/couverture-p3/r1-c3.md` (non publié)).
 - Un test plus lent sous charge ne devient pas rouge pour autant ; un test bloqué échoue après 120 s au lieu de 30.
 - Une base ou un dossier laissé par un processus tué disparaît à l'exécution suivante sur la même machine.
 
@@ -73,7 +73,7 @@ affaibli. Le code de production n'est pas en cause : la 1.x, comme la 2.0, crée
 `tests/Topogenia.Persistence.Tests/Infrastructure/TestInfrastructureTests.cs` (classification des pannes, 1802
 seul refusé, nouvel essai borné, base supprimée après une préparation échouée, nouvelle base après une panne
 passagère, fixture qui ne garde qu'une base migrée, nettoyage des bases et des dossiers) ; mutations dans
-`docs/couverture-p3/r1-c3.md` ; trois exécutions simultanées de la suite de persistance et deux de la solution.
+`docs/couverture-p3/r1-c3.md` (non publié) ; trois exécutions simultanées de la suite de persistance et deux de la solution.
 
 ## Révision (23/10/2026) : migrations des tests
 
@@ -110,7 +110,7 @@ Toute autre panne d'un test reste un échec. Vérification : `TestInfrastructure
 (mutation : une seule connexion coupée suffit, `Any` au lieu de `All` : 4060 + 233 redevient sans réponse, rouge).
 
 Vérification : trois suites de persistance simultanées, chacune avec son dossier d'artefacts
-(`docs/couverture-p3/occupation-sqlite.md`).
+(`docs/couverture-p3/occupation-sqlite.md` (non publié)).
 
 ## Révision (23/10/2026) : nettoyage, budget des essais, Query Store, options et attentes mesurées
 
@@ -184,7 +184,7 @@ Décision :
 
 Vérification : `TestInfrastructureTests` (12408, budget imbriqué, création rejouée seulement sans base, nettoyage qui
 échoue ou dure, liste sans attente, dossier des fichiers SQLite), `SnapshotIsolationTests.Removing_the_snapshot_isolation_by_hand_waits_for_the_writes_in_progress_in_another_versioned_database`,
-`RealBusyTests` ; mutations et mesures sous charge dans `docs/couverture-p3/r2-b.md`.
+`RealBusyTests` ; mutations et mesures sous charge dans `docs/couverture-p3/r2-b.md` (non publié).
 
 ## Révision (24/10/2026) : pannes traduites par les migrations, existence d'une base, bases suffixées, attentes de SQLite
 
@@ -254,7 +254,7 @@ Décision :
 Vérification : `TestInfrastructureTests` (panne refusée par les migrations, numéros lus sous `BASE_OCCUPEE` seulement,
 création rejouée, préparation recommencée, existence après une création annulée, nettoyage des bases suffixées, logins
 dérivés) et `RealBusyTests`. Les mutations et les mesures sous charge (trois suites de persistance simultanées, deux
-fois) sont dans `docs/couverture-p3/r3-b.md`.
+fois) sont dans `docs/couverture-p3/r3-b.md` (non publié).
 
 ## Révision (25/10/2026, round 2) : attentes de SQLite sous la charge de la porte P4
 

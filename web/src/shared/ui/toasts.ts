@@ -16,19 +16,24 @@ export interface Toast {
   readonly kind: ToastKind;
   readonly text: string;
   readonly action: ToastAction | undefined;
+  /** The key of the notification: a new one of the same key takes its place, so that one stays shown at a time. */
+  readonly key: string | undefined;
 }
+
+/** The key of the notifications of an export (running, done, failed) and of the copy of an image: one is shown at a time. */
+export const EXPORT_TOAST_KEY = 'export';
 
 /** How long a notification stays: 3.5 s, 7 s for an error (B-1.2-17, B-1.2-18). */
 export const TOAST_DELAYS: Readonly<Record<ToastKind, number>> = { info: 3500, success: 3500, error: 7000 };
 
-/** What a screen is given to notify: a text and its kind, the notification itself kept by the store (B-8.1-27). */
-export type Notifier = (text: string, kind?: ToastKind) => void;
+/** What a screen is given to notify: a text and its kind, the notification itself kept by the store (B-8.1-27); with a key, it replaces the one of that key. */
+export type Notifier = (text: string, kind?: ToastKind, action?: ToastAction, key?: string) => void;
 
 export interface ToastState {
   /** The notifications shown, the oldest first. */
   readonly toasts: readonly Toast[];
-  /** Shows a notification; gives its identifier. */
-  readonly notify: (text: string, kind?: ToastKind, action?: ToastAction) => number;
+  /** Shows a notification; gives its identifier. With a key, it takes the place in the stack of the one of that key, with its own delay. */
+  readonly notify: (text: string, kind?: ToastKind, action?: ToastAction, key?: string) => number;
   /** Closes a notification (its close button, its delay, its action); nothing when it is already gone. */
   readonly dismiss: (id: number) => void;
 }
@@ -39,9 +44,16 @@ export function createToastStore(): StoreApi<ToastState> {
   const timers = new Map<number, ReturnType<typeof setTimeout>>();
   return createStore<ToastState>()((set, get) => ({
     toasts: [],
-    notify(text, kind = 'info', action) {
+    notify(text, kind = 'info', action, key) {
       const id = ++next;
-      set({ toasts: [...get().toasts, { id, kind, text, action }] });
+      const toast: Toast = { id, kind, text, action, key };
+      const replaced = key === undefined ? undefined : get().toasts.find((shown) => shown.key === key);
+      if (replaced === undefined) set({ toasts: [...get().toasts, toast] });
+      else {
+        clearTimeout(timers.get(replaced.id));
+        timers.delete(replaced.id);
+        set({ toasts: get().toasts.map((shown) => (shown.id === replaced.id ? toast : shown)) });
+      }
       timers.set(id, setTimeout(() => {
         get().dismiss(id);
       }, TOAST_DELAYS[kind]));
@@ -59,4 +71,4 @@ export function createToastStore(): StoreApi<ToastState> {
 export const toasts = createToastStore();
 
 /** Shows a notification of the application (B-1.2-20: the one stack the shell shows is the one the screens feed). */
-export const notify = (text: string, kind?: ToastKind, action?: ToastAction): number => toasts.getState().notify(text, kind, action);
+export const notify = (text: string, kind?: ToastKind, action?: ToastAction, key?: string): number => toasts.getState().notify(text, kind, action, key);

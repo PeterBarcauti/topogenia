@@ -14,6 +14,18 @@ export interface SummaryKept {
   readonly version: number;
 }
 
+/**
+ * A comment of presentation written by the model and kept after review (F-130): its step or its flow, its text as
+ * corrected, the version of the original it replaces (0 for none), and whether the person accepted to replace one typed by hand.
+ */
+export interface CommentKept {
+  readonly stepId: string | null;
+  readonly flowId: string | null;
+  readonly text: string;
+  readonly version: number;
+  readonly replace: boolean;
+}
+
 export interface ThreadContext {
   readonly store: StoreApi<AssistantState>;
   readonly status: AssistantStatus | null;
@@ -25,6 +37,8 @@ export interface ThreadContext {
   readonly saveReport?: (report: Schema<'AssistantReportView'>, model: string) => Promise<void>;
   /** Saves the summaries kept after review (plan 3.1, lot R), with the model that wrote them; true when they are saved. */
   readonly saveSummaries?: (summaries: readonly SummaryKept[], model: string | null) => Promise<boolean>;
+  /** Saves the comments of presentation kept after review (F-130); true when they are saved. */
+  readonly saveComments?: (comments: readonly CommentKept[]) => Promise<boolean>;
   /** Opens the creation of a project from the `.pmap` of a proposal (an administrator). */
   readonly createProject?: (pmap: string) => void;
   /** A proposal on the map open, for the facilitator (spec 3.0 section 3.1-5 to 7): its preview, its application, its marks taken off. */

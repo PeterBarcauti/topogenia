@@ -3,6 +3,7 @@
 
 import { fileURLToPath } from 'node:url';
 import { expect, openMap, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 /** A fictitious key: the connectors of the starter answer without calling anyone. */
 const KEY = 'sk-ant-fictive-summaries-0000';
@@ -22,7 +23,7 @@ test('the summaries are asked from the File menu, reviewed, saved; the bubble op
   await expect(page.getByTestId('summary-bubble')).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Fichier', exact: true }).click();
-  await page.getByRole('menu', { name: 'Menu Fichier' }).getByRole('menuitem', { name: 'Résumer les cartes' }).click();
+  await (await fileEntry(page, 'file.summaries')).click();
   await expect(page.getByTestId('assistant-panel').locator('.intent-chip').last()).toHaveText('Résumés');
   const review = page.getByTestId('assistant-summaries');
   await expect(review.getByTestId('assistant-summary')).toHaveCount(1);
@@ -62,6 +63,6 @@ test('the summaries are asked from the File menu, reviewed, saved; the bubble op
 
   // Every map summarised and up to date: the File menu asks nothing of the model and says so.
   await page.getByRole('button', { name: 'Fichier', exact: true }).click();
-  await page.getByRole('menu', { name: 'Menu Fichier' }).getByRole('menuitem', { name: 'Résumer les cartes' }).click();
+  await (await fileEntry(page, 'file.summaries')).click();
   await expect(page.getByTestId('assistant-panel')).toContainText('Toutes les cartes ont un résumé à jour.');
 });

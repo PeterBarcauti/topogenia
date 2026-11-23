@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-Le lot 2 de P6-T04 rend la carte modifiable (`plan.md`, phase 6) : ruban et ses zones, outils Main et Sélection, menus
+Le lot 2 de P6-T04 rend la carte modifiable (`plan.md` (non publié), phase 6) : ruban et ses zones, outils Main et Sélection, menus
 contextuels, commandes et raccourcis, sélection et rectangle, glisser-déposer, mode Relier, aligner, presse-papiers,
 en-têtes de couloirs (renommer, réordonner, ajouter), états choisi, coupé et source (annexe B 2.1, 2.3 à 2.5, 2.7, 2.8,
 2.12, 3.2, 7, 8.2). La référence de comportement est l'éditeur 1.x (`EditeurCarte.tsx`, `magasin.ts`, `pressePapiers.ts`,

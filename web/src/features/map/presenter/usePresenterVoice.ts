@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import type { MapEditor } from '../state/editor.ts';
+import { SPEEDS } from './model/player.ts';
 import { lineAt } from './model/timing.ts';
 import { readerOf, spokenOf, voicesFor, type VoiceMark } from './model/voice.ts';
 import { chooseVoice, forgetVoice, useProjectVoices } from './projectVoices.ts';
@@ -117,7 +118,7 @@ export function usePresenterVoice(editor: MapEditor, presentation: Presentation,
     const utterance = new SpeechSynthesisUtterance(said);
     utterance.voice = by;
     utterance.lang = by.lang;
-    utterance.rate = Math.min(2, Math.max(0.5, speed));
+    utterance.rate = Math.min(SPEEDS[SPEEDS.length - 1] ?? 1, Math.max(SPEEDS[0] ?? 1, speed));
     utterance.onend = done;
     utterance.onerror = done;
     const guard = setTimeout(done, Math.max(LONGEST_SILENCE_MS, said.length * MS_A_CHARACTER));

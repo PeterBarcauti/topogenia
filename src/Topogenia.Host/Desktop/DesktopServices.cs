@@ -26,7 +26,8 @@ namespace Topogenia.Host.Desktop;
 /// account of the process, administrator of its file; the logs go to the `logs` folder of the product (ADR 021); the
 /// data file of the folder of the product is opened by the SQLite engine, backed up by the online backup of SQLite, and
 /// opened at the start by <see cref="DesktopDatabase"/>; the browser is opened once the server listens; without a console,
-/// an icon near the clock opens and quits the application (<see cref="DesktopTrayService"/>, F-69); the folder of a
+/// an icon near the clock opens and quits the application (<see cref="DesktopTrayService"/>, F-69), after the writes that
+/// the pages declare waiting (<see cref="DesktopWrites"/>, ADR 115); the folder of a
 /// document is shown on demand by the shell (<see cref="IFolderOpener"/>, ADR 104), which the server mode never registers.
 /// </summary>
 public static class DesktopServices
@@ -78,6 +79,8 @@ public static class DesktopServices
         services.AddSingleton<IFolderOpener, CheckedFolderOpener>();
         services.AddHostedService<DesktopLaunchService>();
         services.AddHostedService<DesktopReopenService>();
+        // ADR 115: the tabs that still have writes to send, which « Quit » by the icon waits for.
+        services.AddSingleton<DesktopWrites>();
         // F-69: without a console, the icon near the clock (nothing otherwise).
         services.AddSingleton<DesktopTrayService>();
         services.AddHostedService(provider => provider.GetRequiredService<DesktopTrayService>());

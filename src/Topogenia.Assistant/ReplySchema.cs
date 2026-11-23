@@ -24,7 +24,7 @@ public static class ReplySchema
     public static readonly IReadOnlyList<string> FindingKinds = ["wait", "re_entry", "repeated_task", "no_owner", "no_sheet", "loop", "break", "other"];
 
     /// <summary>The forms of a reply.</summary>
-    public static readonly IReadOnlyList<string> Forms = ["answer", "questions", "findings", "proposal", "report", "summaries"];
+    public static readonly IReadOnlyList<string> Forms = ["answer", "questions", "findings", "proposal", "report", "summaries", "comments"];
 
     /// <summary>The sources of a problem and the waves of an action of a report.</summary>
     public static readonly IReadOnlyList<string> Sources = ["noted", "spotted"];
@@ -97,8 +97,11 @@ public static class ReplySchema
             properties["report"] = allowed.Count == 1 ? Report() : OrNull(Report());
         if (Allows(AssistantForm.Summaries))
             properties["summaries"] = ListOf(new() { ["map"] = new { type = "string" }, ["text"] = new { type = "string" } });
-        // The translations of the comments of presentation asked with a translation (ADR 099 revised), beside the `.pmap`.
-        if (comments)
+        // The comments of presentation written for the map open and its detailed maps (F-130), the one field of their form; or their translations
+        // asked with a translation (ADR 099 revised), beside the `.pmap`: the two never go together.
+        if (Allows(AssistantForm.Comments))
+            properties["comments"] = ListOf(new() { ["step"] = new { type = "string" }, ["text"] = new { type = "string" } });
+        else if (comments)
             properties["comments"] = OrNull(ListOf(new() { ["step"] = new { type = "string" }, ["text"] = new { type = "string" } }));
         return JsonSerializer.Serialize(Strict(properties));
     }

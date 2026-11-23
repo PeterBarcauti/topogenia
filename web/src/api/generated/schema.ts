@@ -159,6 +159,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/code-proposal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CodeProposalBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProposedProjectCode"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{id}": {
         parameters: {
             query?: never;
@@ -475,6 +514,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{id}/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SearchBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjectSearchView"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/import/preview": {
         parameters: {
             query?: never;
@@ -715,6 +795,45 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PmapOpened"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/import-collection/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PreviewCollectionBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CollectionPreview"];
                     };
                 };
             };
@@ -1193,7 +1312,32 @@ export interface paths {
             };
         };
         put?: never;
-        post?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CommentDraftsBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CommentDraftsResult"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -1404,7 +1548,9 @@ export interface paths {
         };
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    purpose?: string;
+                };
                 header?: never;
                 path: {
                     id: string;
@@ -1426,6 +1572,90 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/maps/{id}/insert-pmap/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["InsertPmapPreviewBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PmapInsertionPreview"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/maps/{id}/insert-pmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    "If-Match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["InsertPmapBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StructureReply"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -2284,6 +2514,49 @@ export interface paths {
                 cookie?: never;
             };
             requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StructureReply"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/steps/{id}/replace-pmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    "If-Match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReplaceDetailBody"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -3476,6 +3749,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/steps/{id}/pain-points/{painPointId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    "If-Match"?: string;
+                };
+                path: {
+                    id: string;
+                    painPointId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PainPointStatusBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SheetView"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{id}/members": {
         parameters: {
             query?: never;
@@ -3845,6 +4162,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/desktop/writes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["DesktopWritesBody"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/desktop/sample-project": {
         parameters: {
             query?: never;
@@ -4127,7 +4481,14 @@ export interface components {
             /** Format: int32 */
             open_pain_points: number;
         };
-        /** @description A line of the action plan: the pain point, its plan and status, the step it is raised on, the lane of the step, the map. */
+        /**
+         * @description A line of the action plan: the pain point, its plan and status, the step it is raised on, the lane of the step, the
+         *     map; whether it is open (neither implemented, nor adopted, nor dropped, as the map shows it); the step that receives
+         *     the document and the document, from the use that carries the pain point (null when none, a package written by hand);
+         *     whether the person may fill the sheet where its status is chosen, the receiving step (its plan too, ADR 112) or, when
+         *     no live use carries it, its own step (R10); the version of the pain point, sent back to choose its status, and the
+         *     instant of the last record of its history (ADR 116).
+         */
         ActionPlanLine: {
             /** Format: uuid */
             pain_point_id: string;
@@ -4148,10 +4509,36 @@ export interface components {
             step_code: string;
             step: components["schemas"]["NamedText"];
             lane: null | components["schemas"]["NamedText"];
+            open: boolean;
+            /** Format: uuid */
+            receiving_step_id: null | string;
+            /** Format: uuid */
+            receiving_map_id: null | string;
+            /** Format: uuid */
+            document_id: null | string;
+            can_fill: boolean;
+            /**
+             * Format: uuid
+             * @description The step under which its status is chosen (`PUT /api/steps/{id}/pain-points/{painPointId}/status`): the receiving
+             *     step of the live use that carries it, else the step it is raised on (R10).
+             */
+            status_step_id: string;
+            /**
+             * Format: int32
+             * @description The version of the pain point, the If-Match of a change of its status (never the version of the use).
+             */
+            version: number;
+            /**
+             * Format: date-time
+             * @description The instant of the last change of its status, in universal time; null for a pain point without history (a package may bring none).
+             */
+            status_changed_at: null | string;
         };
-        /** @description The action plan of a map (`ActionPlan`), in its order. */
+        /** @description The action plan of a map (`ActionPlan`), in its order, and the hours lost per month of its open lines, added exactly. */
         ActionPlanView: {
             lines: components["schemas"]["ActionPlanLine"][];
+            /** Format: double */
+            open_lost_hours_per_month: number;
         };
         /** @description `POST /api/maps/{id}/lanes` (1.x `CouloirDemande`: `nom`, `type`, `couleur`, `acteur_utilisateur_id`, `traductions`). */
         AddLaneBody: {
@@ -4232,6 +4619,26 @@ export interface components {
             short: string;
             steps: string[];
             story: string;
+        };
+        /**
+         * @description A comment written by the model for a step or a flow of the map open or of one of its detailed maps, as the panel shows
+         *     it for review: the step or the flow, its reference, the words that place it and the name of its map, the text
+         *     proposed, the original of today with its source (`manual`: typed by a person, which the save replaces only when the
+         *     person asks it) and its version, which the save sends back.
+         */
+        AssistantCommentDraftView: {
+            /** Format: uuid */
+            step_id: null | string;
+            /** Format: uuid */
+            flow_id: null | string;
+            reference: string;
+            context: string;
+            map: string;
+            text: string;
+            current: null | string;
+            current_source: null | string;
+            /** Format: int32 */
+            version: number;
         };
         /**
          * @description A translation written by the model for a comment asked, as the panel shows it: the step and its code, the original it
@@ -4463,6 +4870,8 @@ export interface components {
             comments?: null | components["schemas"]["AssistantCommentView"][];
             /** @description The translations of the comments of presentation of the flows asked with a translation (ADR 099, lot J10); null for any other reply. */
             flow_comments?: null | components["schemas"]["AssistantFlowCommentView"][];
+            /** @description The comments of presentation written for the steps and the flows of the map open and of its detailed maps (practice `comments`, F-130); null for any other reply. */
+            comment_drafts?: null | components["schemas"]["AssistantCommentDraftView"][];
         };
         /**
          * @description The report of a map written with the model (plan 3.1, L4): what it says in a minute, how its actors share the work, its
@@ -4658,13 +5067,83 @@ export interface components {
             classification: null | string;
         };
         /**
+         * @description `POST /api/projects/code-proposal` (3.4, lot 3, ADR 111 point 7): the name of the new project, in the body and never in
+         *     the address.
+         */
+        CodeProposalBody: {
+            name: null | string;
+        };
+        /**
          * @description Whether the code a package would take is free, the code of a live project, or of a project in the trash.
          * @enum {string}
          */
         CodeState: "free" | "taken" | "in_trash";
+        /**
+         * @description A fault of a process of a collection, as the opening of a file reports it (FICHIER_INVALIDE, A-1.2-19): its place in
+         *     the `.pmap` of the process and its code; the host writes the message in the language of the person from its values.
+         */
+        CollectionFault: {
+            path: string;
+            code: string;
+            message: string;
+        };
+        /** @description A collection previewed: its name, its description and its processes in the order of the file. */
+        CollectionPreview: {
+            name: string;
+            description: null | string;
+            processes: components["schemas"]["CollectionProcessPreview"][];
+        };
+        /**
+         * @description A process of a collection previewed: its rank, its name (as the file writes it for a process in fault, when it is a readable text of 1 to 200 characters, never interpreted), the language of its texts, the code of its file, the free
+         *     code proposed, its description, what it holds, its points to check and how many addresses of its documents reach
+         *     another machine (web, network path: pre-audit 68, P3-02); its faults instead, without code proposed
+         *     nor counts, when its `.pmap` is refused; and its text as the host read it, which the interface sends as it is to the
+         *     opening of a file (`POST /api/projects/import-pmap`), never reading the collection again.
+         */
+        CollectionProcessPreview: {
+            /** Format: int32 */
+            index: number;
+            name: null | string;
+            language: null | string;
+            file_code: null | string;
+            proposed_code: null | string;
+            description: null | string;
+            counts: null | components["schemas"]["PmapCounts"];
+            uncertainties: string[];
+            /** Format: int32 */
+            remote_locations: number;
+            faults: components["schemas"]["CollectionFault"][];
+            content: string;
+        };
         /** @description `POST /api/maps/{id}/command` (1.x `CommandeDemande`: `texte`). */
         CommandBarBody: {
             text: null | string;
+        };
+        /**
+         * @description One comment of `POST /api/maps/{id}/presentation-comments` (F-130): its step or its flow, the text kept from the review,
+         *     the version of the original read (0 when there was none), and whether the person accepted to replace an original typed
+         *     by hand (false when absent).
+         */
+        CommentDraftBody: {
+            /** Format: uuid */
+            step_id: null | string;
+            /** Format: uuid */
+            flow_id: null | string;
+            text: null | string;
+            /** Format: int32 */
+            version: null | number;
+            replace: null | boolean;
+        };
+        /** @description `POST /api/maps/{id}/presentation-comments` (3.3, lot 3, F-130): the comments written by the assistant and kept after review. */
+        CommentDraftsBody: {
+            comments: null | components["schemas"]["IReadOnlyListOfCommentDraftBody"];
+        };
+        /** @description What the writing did: the comments written, and those typed by a person that stayed because their replacement was not accepted. */
+        CommentDraftsResult: {
+            /** Format: int32 */
+            written: number;
+            /** Format: int32 */
+            kept: number;
         };
         /**
          * @description A comment of presentation and its translations of today, as a row of the workbook: its step and its readable code,
@@ -4736,6 +5215,15 @@ export interface components {
             flows: null | string[];
             stitch: null | boolean;
             sub_maps: null | string;
+        };
+        /**
+         * @description `POST /api/desktop/writes` (ADR 115): a tab of the desktop mode says whether it still has writes to send to the host
+         *     and, `unsaved` (R11, absent read false), whether it holds a form changed and not validated, which never leaves by itself.
+         */
+        DesktopWritesBody: {
+            tab: null | string;
+            waiting: null | boolean;
+            unsaved?: null | boolean;
         };
         /** @description A document produced by a step (output) or received from outside the map (input), annex A 2.11. */
         Document: {
@@ -4853,7 +5341,7 @@ export interface components {
         /** @description The body of every error of the API: the stable code, the message in the language of the user, the values. */
         ErrorBody: {
             /** @enum {string} */
-            code: "ACCES_REFUSE" | "ADRESSE_INVALIDE" | "CARTE_MODIFIEE" | "CARTE_RACINE" | "CHAMP_OBLIGATOIRE" | "CHEMIN_NON_PRIS_EN_CHARGE" | "CHEMIN_TROP_LONG" | "COMMANDE_ERREURS" | "COMMANDE_SYNTAXE" | "COMMANDE_VIDE" | "CONFIRMATION_INVALIDE" | "CONFLIT_INTEGRITE" | "CONFLIT_UNICITE" | "CONFLIT_VERSION" | "COULOIR_CIBLE_INVALIDE" | "COULOIR_DERNIER" | "COULOIR_NON_VIDE" | "COULOIR_SUPPRIME" | "DETAIL_ABSENT" | "DISPOSITION_CASE_OCCUPEE" | "DOCUMENT_SANS_CHEMIN" | "DOCUMENT_UTILISE_PAR_CIBLE" | "DOSSIER_ACCES_REFUSE" | "DOSSIER_INJOIGNABLE" | "DOSSIER_INTROUVABLE" | "DOSSIER_OUVERTURE_EN_COURS" | "EN_TETE_MANQUANT" | "ERREUR_INTERNE" | "ETAPE_DEJA_DETAILLEE" | "ETAPE_HORS_CARTE" | "ETAPE_INCONNUE" | "ETAPE_NON_DETAILLABLE" | "ETAPE_SANS_CONTENU" | "FICHE_ETAT_INVALIDE" | "FICHE_VIDE" | "FICHIER_INVALIDE" | "FICHIER_SANS_FEUILLE_PROJET" | "FICHIER_TROP_GROS" | "FREQUENCES_MELANGEES" | "HTTPS_EXIGE" | "IA_CLASSIFICATION_REFUSEE" | "IA_CONTENU_TROP_GRAND" | "IA_FICHIERS_TROP_LOURDS" | "IA_FICHIERS_TROP_NOMBREUX" | "IA_FICHIER_ANCIEN_FORMAT" | "IA_FICHIER_FORMAT" | "IA_FICHIER_ILLISIBLE" | "IA_FICHIER_PROTEGE" | "IA_FICHIER_TROP_GROS" | "IA_INDISPONIBLE" | "INTROUVABLE" | "LANGUE_INVALIDE" | "LIEN_DOUBLON" | "LIEN_HORS_CARTE" | "LIEN_REFLEXIF" | "MACRO_CHOIX_REQUIS" | "MEMBRE_DOUBLON" | "MEMBRE_LOGIN_INVALIDE" | "MEMBRE_ROLE_INVALIDE" | "NON_AUTHENTIFIE" | "OPERATION_DEPASSEE" | "ORDRE_COULOIRS_INVALIDE" | "PAQUET_INVALIDE" | "PAQUET_TROP_RECENT" | "PMAP_CARTE_SANS_COULOIR" | "PMAP_CASE_DOUBLE" | "PMAP_COLONNE" | "PMAP_COLONNES_PARTIELLES" | "PMAP_COULEUR" | "PMAP_COULOIR_FORME" | "PMAP_COULOIR_INCONNU" | "PMAP_ETAPE_AUTRE_CARTE" | "PMAP_ETAPE_FORME" | "PMAP_ETAPE_INCONNUE" | "PMAP_FICHE_FORME" | "PMAP_FICHE_TYPE" | "PMAP_FORMAT" | "PMAP_ID_DOUBLON" | "PMAP_ID_INVALIDE" | "PMAP_ID_VIDE" | "PMAP_INCERTITUDE_TEXTE" | "PMAP_JSON" | "PMAP_LANGUE" | "PMAP_LIEN_DOUBLON" | "PMAP_LIEN_FORME" | "PMAP_LIEN_REFLEXIF" | "PMAP_OBLIGATOIRE" | "PMAP_PASSAGE_SANS_COLONNES" | "PMAP_PAS_OBJET" | "PMAP_PROFONDEUR" | "PMAP_PROPRIETE_INCONNUE" | "PMAP_RACI_FORME" | "PMAP_RACI_PROPRE_COULOIR" | "PMAP_RACI_ROLE" | "PMAP_RACI_R_AILLEURS" | "PMAP_RACI_TYPE" | "PMAP_RACI_UN_SEUL_A" | "PMAP_RANGEE" | "PMAP_SORTIE_INCONNUE" | "PMAP_SOUS_CARTE_FORME" | "PMAP_SOUS_CARTE_SANS_CONTENU" | "PMAP_TEXTE_VIDE" | "PMAP_TRADUCTION_TEXTE" | "PMAP_TROP_COULOIRS" | "PMAP_TROP_ETAPES" | "PMAP_TYPE_LISTE" | "PMAP_TYPE_NOMBRE" | "PMAP_TYPE_OBJET" | "PMAP_TYPE_TEXTE" | "PMAP_USAGE_DOUBLON" | "PMAP_VALEUR" | "PMAP_VERSION" | "PMAP_VIDE" | "POINT_PRIS" | "PROJET_CODE_CORBEILLE" | "PROJET_CODE_EXISTANT" | "PROJET_CODE_INVALIDE" | "PROJET_SANS_ANIMATEUR" | "PROPOSITION_NOUVEAU_PROJET" | "QUELQU_UN" | "RANGEE_NON_VIDE" | "RATTACHEMENT_INVALIDE" | "REMONTEE_EN_COURS" | "REMONTEE_EN_COURS_DESSOUS" | "REMONTEE_TERMINEE" | "REQUETE_INVALIDE" | "REQUETE_TROP_GROSSE" | "RESUMES_A_JOUR" | "TEMPS_HEURES_FEW" | "TEMPS_HEURES_MANY" | "TEMPS_HEURES_ONE" | "TEMPS_HEURES_OTHER" | "TEMPS_INSTANT" | "TEMPS_JOURS_FEW" | "TEMPS_JOURS_MANY" | "TEMPS_JOURS_ONE" | "TEMPS_JOURS_OTHER" | "TEMPS_MINUTES_FEW" | "TEMPS_MINUTES_MANY" | "TEMPS_MINUTES_ONE" | "TEMPS_MINUTES_OTHER" | "TEXTE_HTML_INTERDIT" | "TEXTE_TROP_LONG" | "TRADUCTIONS_INVALIDES" | "TRADUCTION_INCOMPLETE" | "TRANSFERT_CYCLE" | "TRANSFERT_HORS_PROJET" | "USAGE_EXISTANT" | "VALEUR_INVALIDE" | "VERSION_INVALIDE" | "VERSION_REQUISE";
+            code: "ACCES_REFUSE" | "ADRESSE_INVALIDE" | "CARTE_MODIFIEE" | "CARTE_RACINE" | "CHAMP_OBLIGATOIRE" | "CHEMIN_NON_PRIS_EN_CHARGE" | "CHEMIN_TROP_LONG" | "COLLECTION_TROP_DE_PROCESSUS" | "COMMANDE_ERREURS" | "COMMANDE_SYNTAXE" | "COMMANDE_VIDE" | "CONFIRMATION_INVALIDE" | "CONFLIT_INTEGRITE" | "CONFLIT_UNICITE" | "CONFLIT_VERSION" | "COULOIR_CIBLE_INVALIDE" | "COULOIR_DERNIER" | "COULOIR_NON_VIDE" | "COULOIR_SUPPRIME" | "DETAIL_ABSENT" | "DISPOSITION_CASE_OCCUPEE" | "DOCUMENT_SANS_CHEMIN" | "DOCUMENT_UTILISE_PAR_CIBLE" | "DOSSIER_ACCES_REFUSE" | "DOSSIER_INJOIGNABLE" | "DOSSIER_INTROUVABLE" | "DOSSIER_OUVERTURE_EN_COURS" | "EN_TETE_MANQUANT" | "ERREUR_INTERNE" | "ETAPE_DEJA_DETAILLEE" | "ETAPE_HORS_CARTE" | "ETAPE_INCONNUE" | "ETAPE_NON_DETAILLABLE" | "ETAPE_SANS_CONTENU" | "FICHE_ETAT_INVALIDE" | "FICHE_VIDE" | "FICHIER_INVALIDE" | "FICHIER_SANS_FEUILLE_PROJET" | "FICHIER_TROP_GROS" | "FREQUENCES_MELANGEES" | "HTTPS_EXIGE" | "IA_CLASSIFICATION_REFUSEE" | "IA_CONTENU_TROP_GRAND" | "IA_FICHIERS_TROP_LOURDS" | "IA_FICHIERS_TROP_NOMBREUX" | "IA_FICHIER_ANCIEN_FORMAT" | "IA_FICHIER_FORMAT" | "IA_FICHIER_ILLISIBLE" | "IA_FICHIER_PROTEGE" | "IA_FICHIER_TROP_GROS" | "IA_INDISPONIBLE" | "INTROUVABLE" | "LANGUE_INVALIDE" | "LIEN_DOUBLON" | "LIEN_HORS_CARTE" | "LIEN_REFLEXIF" | "MACRO_CHOIX_REQUIS" | "MEMBRE_DOUBLON" | "MEMBRE_LOGIN_INVALIDE" | "MEMBRE_ROLE_INVALIDE" | "NON_AUTHENTIFIE" | "OPERATION_DEPASSEE" | "ORDRE_COULOIRS_INVALIDE" | "PAQUET_INVALIDE" | "PAQUET_TROP_RECENT" | "PMAP_CARTE_SANS_COULOIR" | "PMAP_CASE_DOUBLE" | "PMAP_COLONNE" | "PMAP_COLONNES_PARTIELLES" | "PMAP_COULEUR" | "PMAP_COULOIR_FORME" | "PMAP_COULOIR_INCONNU" | "PMAP_ETAPE_AUTRE_CARTE" | "PMAP_ETAPE_FORME" | "PMAP_ETAPE_INCONNUE" | "PMAP_FICHE_FORME" | "PMAP_FICHE_TYPE" | "PMAP_FORMAT" | "PMAP_ID_DOUBLON" | "PMAP_ID_INVALIDE" | "PMAP_ID_VIDE" | "PMAP_INCERTITUDE_TEXTE" | "PMAP_JSON" | "PMAP_LANGUE" | "PMAP_LIEN_DOUBLON" | "PMAP_LIEN_FORME" | "PMAP_LIEN_REFLEXIF" | "PMAP_OBLIGATOIRE" | "PMAP_PASSAGE_SANS_COLONNES" | "PMAP_PAS_OBJET" | "PMAP_PROFONDEUR" | "PMAP_PROPRIETE_INCONNUE" | "PMAP_RACI_FORME" | "PMAP_RACI_PROPRE_COULOIR" | "PMAP_RACI_ROLE" | "PMAP_RACI_R_AILLEURS" | "PMAP_RACI_TYPE" | "PMAP_RACI_UN_SEUL_A" | "PMAP_RANGEE" | "PMAP_SORTIE_INCONNUE" | "PMAP_SOUS_CARTE_FORME" | "PMAP_SOUS_CARTE_SANS_CONTENU" | "PMAP_TEXTE_VIDE" | "PMAP_TRADUCTION_TEXTE" | "PMAP_TROP_COULOIRS" | "PMAP_TROP_ETAPES" | "PMAP_TYPE_LISTE" | "PMAP_TYPE_NOMBRE" | "PMAP_TYPE_OBJET" | "PMAP_TYPE_TEXTE" | "PMAP_USAGE_DOUBLON" | "PMAP_VALEUR" | "PMAP_VERSION" | "PMAP_VIDE" | "POINT_PRIS" | "PROJET_CODE_CORBEILLE" | "PROJET_CODE_EXISTANT" | "PROJET_CODE_INVALIDE" | "PROJET_SANS_ANIMATEUR" | "PROPOSITION_NOUVEAU_PROJET" | "QUELQU_UN" | "RANGEE_NON_VIDE" | "RATTACHEMENT_INVALIDE" | "REMONTEE_EN_COURS" | "REMONTEE_EN_COURS_DESSOUS" | "REMONTEE_TERMINEE" | "REQUETE_INVALIDE" | "REQUETE_TROP_GROSSE" | "REQUETE_TROP_GROSSE_KO" | "RESUMES_A_JOUR" | "TEMPS_HEURES_FEW" | "TEMPS_HEURES_MANY" | "TEMPS_HEURES_ONE" | "TEMPS_HEURES_OTHER" | "TEMPS_INSTANT" | "TEMPS_JOURS_FEW" | "TEMPS_JOURS_MANY" | "TEMPS_JOURS_ONE" | "TEMPS_JOURS_OTHER" | "TEMPS_MINUTES_FEW" | "TEMPS_MINUTES_MANY" | "TEMPS_MINUTES_ONE" | "TEMPS_MINUTES_OTHER" | "TEXTE_HTML_INTERDIT" | "TEXTE_TROP_LONG" | "TRADUCTIONS_INVALIDES" | "TRADUCTION_INCOMPLETE" | "TRANSFERT_CYCLE" | "TRANSFERT_HORS_PROJET" | "USAGE_EXISTANT" | "VALEUR_INVALIDE" | "VERSION_INVALIDE" | "VERSION_REQUISE";
             message: string;
             details: {
                 [key: string]: unknown;
@@ -5149,6 +5637,34 @@ export interface components {
             gain_share: null | number;
             better: null | boolean;
         };
+        /**
+         * @description `POST /api/maps/{id}/insert-pmap`: the text of the file, the lane of the new step, its label (the one proposed when
+         *     empty), the sheets taken or not; its place, a column and a row, or a step of the map it goes `before` or `after` in the
+         *     flow (`anchor_step_id`, `position`, after by default), or a flow of the map it goes on, cut in two (`flow_id`, which
+         *     prevails), the column not read then.
+         */
+        InsertPmapBody: {
+            content: null | string;
+            /** Format: uuid */
+            lane_id: null | string;
+            /** Format: int32 */
+            column: null | number;
+            /** Format: int32 */
+            row: null | number;
+            label: null | string;
+            with_sheets: null | boolean;
+            /** Format: uuid */
+            flow_id?: null | string;
+            /** Format: uuid */
+            anchor_step_id?: null | string;
+            position?: null | string;
+        };
+        /** @description `POST /api/maps/{id}/insert-pmap/preview`: the text of the file, and the step whose detail it would replace, if any. */
+        InsertPmapPreviewBody: {
+            content: null | string;
+            /** Format: uuid */
+            step_id?: null | string;
+        };
         /** @description `POST /api/lanes/{id}/rows` (3.1, ADR 096): the row where the empty rows go, and how many (one by default). */
         InsertRowsBody: {
             /** Format: int32 */
@@ -5162,6 +5678,7 @@ export interface components {
             type: null | string;
         };
         IReadOnlyListOfAuditEntry: components["schemas"]["AuditEntry"][];
+        IReadOnlyListOfCommentDraftBody: components["schemas"]["CommentDraftBody"][];
         IReadOnlyListOfMapSummaryBody: components["schemas"]["MapSummaryBody"][];
         IReadOnlyListOfPastedFlowBody: components["schemas"]["PastedFlowBody"][];
         IReadOnlyListOfPastedStepBody: components["schemas"]["PastedStepBody"][];
@@ -5569,8 +6086,15 @@ export interface components {
             code: string;
             description: string;
         };
-        /** @enum {string} */
-        PainPointStatus: "reported" | "scored" | "under_review" | "in_progress" | "implemented" | "adopted" | "dropped";
+        /** @enum {null|string} */
+        PainPointStatus: "reported" | "scored" | "under_review" | "in_progress" | "implemented" | "adopted" | "dropped" | null;
+        /**
+         * @description `PUT /api/steps/{id}/pain-points/{painPointId}/status` (3.4, ADR 116): the code of the status chosen, one of the seven of
+         *     the list, carried as text and checked by the command (VALEUR_INVALIDE on `status`).
+         */
+        PainPointStatusBody: {
+            status: null | string;
+        };
         /** @description `POST /api/maps/{id}/paste` (1.x `CollageDemande`: `etapes`, `liens`, `ancre` facultative). */
         PasteBody: {
             steps: null | components["schemas"]["IReadOnlyListOfPastedStepBody"];
@@ -5615,9 +6139,55 @@ export interface components {
             /** Format: double */
             work_minutes: null | number;
         };
+        /** @description The maps, lanes, steps, flows and sheets of a document. */
+        PmapCounts: {
+            /** Format: int32 */
+            maps: number;
+            /** Format: int32 */
+            lanes: number;
+            /** Format: int32 */
+            steps: number;
+            /** Format: int32 */
+            flows: number;
+            /** Format: int32 */
+            sheets: number;
+        };
         /**
-         * @description A project opened from a file or duplicated (reply 201): what the 1.x returned, the sheets written as drafts besides;
-         *     whether a duplication left sub-maps out beyond the walks of the domain, said by the header of the route, not the body.
+         * @description What an insertion shows before anything is written: the project of the file, its language, what it holds, its levels and
+         *     how many the map leaves room for, the points its author asks to check, how many addresses of its documents reach
+         *     another machine (pre-audit 68, P3-02), the languages of its translations left out (not
+         *     configured), the label proposed for the new step, and the structure version of the project read.
+         */
+        PmapInsertionPreview: {
+            project_code: null | string;
+            project_name: string;
+            language: string;
+            /** Format: int32 */
+            maps: number;
+            /** Format: int32 */
+            lanes: number;
+            /** Format: int32 */
+            steps: number;
+            /** Format: int32 */
+            flows: number;
+            /** Format: int32 */
+            sheets: number;
+            /** Format: int32 */
+            depth: number;
+            /** Format: int32 */
+            room: number;
+            uncertainties: string[];
+            /** Format: int32 */
+            remote_locations: number;
+            dropped_languages: string[];
+            label: string;
+            /** Format: int32 */
+            structure_version: number;
+        };
+        /**
+         * @description A project opened from a file or duplicated (reply 201): what the 1.x returned, the sheets written as drafts besides,
+         *     and how many addresses of its documents reach another machine (web, network path: pre-audit 68, P3-02), said before a
+         *     link is followed; whether a duplication left sub-maps out beyond the walks of the domain, said by the header of the route, not the body.
          */
         PmapOpened: {
             /** Format: uuid */
@@ -5636,6 +6206,8 @@ export interface components {
             /** Format: int32 */
             sheets: number;
             uncertainties: string[];
+            /** Format: int32 */
+            remote_locations: number;
         };
         /**
          * @description `PUT /api/steps/{id}/presentation-comment` and `PUT /api/flows/{id}/presentation-comment`: the text said in
@@ -5682,6 +6254,10 @@ export interface components {
             /** Format: int32 */
             version: number;
         };
+        /** @description `POST /api/projects/import-collection/preview`: the text of the collection (ADR 114). */
+        PreviewCollectionBody: {
+            content: null | string;
+        };
         /** @description A line of the procedure as entered (1.x `Operation`: `texte`, `outil`, `nature`). */
         ProcedureLineBody: {
             text: null | string;
@@ -5693,6 +6269,14 @@ export interface components {
             text: string;
             tool: null | string;
             nature: null | components["schemas"]["OperationNature"];
+        };
+        /**
+         * @description The site of the product and its page of the Store (ADR 111 point 2), opened by the browser on a click, never called by
+         *     the application; the interface builds the pages of the site (versions, gallery) on the base it receives.
+         */
+        ProductLinks: {
+            site: string;
+            store_page: string;
         };
         /**
          * @description The profile (1.x `ProfilVue`): the language of the profile and the effective one (AR-51), the administrator flag, the
@@ -5720,6 +6304,12 @@ export interface components {
              *     command « Quit » and, while he has no project, the sample project. Set by the host, which alone knows its mode.
              */
             desktop?: boolean;
+            /**
+             * @description The desktop mode runs from the package of the Microsoft Store (ADR 088, ADR 111 point 4): « Check for updates » opens
+             *     the page of the Store, and no reminder is shown, the Store updating by itself. False in server mode. Set by the host.
+             */
+            store?: boolean;
+            links?: null | components["schemas"]["ProductLinks"];
         };
         /** @description The detail of a project (1.x `ProjetDetail`), with its members in display order and its version. */
         ProjectDetail: {
@@ -5795,6 +6385,12 @@ export interface components {
             project_id: string;
             role: components["schemas"]["MemberRole"];
             is_sponsor: boolean;
+        };
+        /** @description The reply of a search: the number of results, and the first int ProjectSearchQuery.HitsMax of them by map. */
+        ProjectSearchView: {
+            /** Format: int32 */
+            total: number;
+            maps: components["schemas"]["SearchMapView"][];
         };
         /**
          * @description `POST /api/maps/{id}/assistant/preview` and `/apply`: the text of the `.pmap` proposed, and for a translation by the
@@ -5890,6 +6486,10 @@ export interface components {
             used: boolean;
             use: null | components["schemas"]["DocumentUse"];
         };
+        /** @description The reply of a proposal: the code, or null when the name gives none. */
+        ProposedProjectCode: {
+            code: null | string;
+        };
         /** @enum {string} */
         RaciRole: "A" | "S" | "C" | "I";
         /** @description A visible RACI role of a step on a lane (the responsible lane R is the lane of the step and is not listed). */
@@ -5959,6 +6559,11 @@ export interface components {
             /** Format: uuid */
             object_id: null | string;
         };
+        /** @description `POST /api/steps/{id}/replace-pmap`: the text of the file and the sheets taken or not. */
+        ReplaceDetailBody: {
+            content: null | string;
+            with_sheets: null | boolean;
+        };
         /**
          * @description Where the person responsible for a sheet comes from: the assignee of the step, or the actor of the lane.
          * @enum {string}
@@ -5971,6 +6576,54 @@ export interface components {
             };
             procedure: null | components["schemas"]["ListOfProcedureLineBody"];
             free_text: null | string;
+        };
+        /**
+         * @description `POST /api/projects/{id}/search` (3.4, lot 2, ADR 110): the word, in the body and never in the address; the language
+         *     shown (absent: the language of origin alone); the map open, put first (unknown: ignored).
+         */
+        SearchBody: {
+            text: null | string;
+            language: null | string;
+            /** Format: uuid */
+            map_id: null | string;
+        };
+        /**
+         * @description A result: its kind, its step or its lane, the text the words were found in, the language of that text (null for a code),
+         *     the marks of the words in it (UTF-16 units; retouch R9b: by place, never overlapping nor touching, one at least) and
+         *     the first of them as `start` and `length`, the place a result carried before. A document, a
+         *     tool, a pain point and an action carry the code and the name of their step; a pain point and an action, the status of
+         *     the pain point.
+         */
+        SearchHitView: {
+            kind: components["schemas"]["SearchKind"];
+            /** Format: uuid */
+            step_id: null | string;
+            /** Format: uuid */
+            lane_id: null | string;
+            text: string;
+            language: null | string;
+            /** Format: int32 */
+            start: number;
+            /** Format: int32 */
+            length: number;
+            marks: components["schemas"]["TextMatch"][];
+            step_code?: null | string;
+            step?: null | components["schemas"]["NamedText"];
+            status?: null | components["schemas"]["PainPointStatus"];
+        };
+        /**
+         * @description What a result is: a step (name or code), a lane, a document, a tool of a sheet, a pain point (code or description), an action.
+         * @enum {string}
+         */
+        SearchKind: "step" | "lane" | "document" | "tool" | "pain_point" | "action";
+        /** @description The results of one map, with its level (1 for the root map) and its name. */
+        SearchMapView: {
+            /** Format: uuid */
+            map_id: string;
+            /** Format: int32 */
+            depth: number;
+            name: components["schemas"]["NamedText"];
+            hits: components["schemas"]["SearchHitView"][];
         };
         /** @description `PUT /api/steps/{id}/raci` (1.x `RaciDemande`: `couloir_id`, `role`): a null role removes the role of the lane. */
         SetRaciBody: {
@@ -6071,7 +6724,8 @@ export interface components {
         /**
          * @description The sheet of a step (1.x `FicheVue`, `GET /api/etapes/{id}/fiche`): state and completeness as the reader sees them
          *     (`SheetVisibility`), the content (the draft, or the latest validated version), the inputs and outputs of the step
-         *     (`DocumentFlows`, visible to every member) with the pain points of their uses, the latest version, the clarification
+         *     (`DocumentFlows`, visible to every member) with the pain points of their uses, the pain points raised on the step that no
+         *     live use carries (R10: a package may bring some; their status is chosen here), the latest version, the clarification
          *     request, the responsible, the rights (`SheetRights`), the suggestions (only for the one who may fill, A-2.10-42) and,
          *     for the one who sees the draft, the last change and the version to send back in `If-Match`.
          */
@@ -6091,6 +6745,7 @@ export interface components {
             inputs: components["schemas"]["ProposedInput"][];
             outputs: components["schemas"]["StepOutput"][];
             pain_points: components["schemas"]["PainPoint"][];
+            step_pain_points: components["schemas"]["PainPoint"][];
             /** Format: date-time */
             updated_at: null | string;
             /** Format: uuid */
@@ -6441,6 +7096,13 @@ export interface components {
             code: null | string;
             name: null | string;
             label: null | string;
+        };
+        /** @description The place of a word found in a text of origin, in UTF-16 units (those of JavaScript). */
+        TextMatch: {
+            /** Format: int32 */
+            start: number;
+            /** Format: int32 */
+            length: number;
         };
         /** @description `POST /api/maps/{id}/transfer` (1.x `TransfertDemande`: `etapes`, `couper`, `ancre` facultative). */
         TransferBody: {

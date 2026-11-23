@@ -18,6 +18,8 @@ internal static partial class CommandCatalog
     internal static readonly Dictionary<Type, string> ProjectsAndMembers = new()
     {
         [typeof(GetProjectQuery)] = "reader",
+        // The search of a word in the whole project (3.4, lot 2, ADR 110): what the member reads.
+        [typeof(Topogenia.Application.Search.ProjectSearchQuery)] = "reader",
         [typeof(ReplaceMembersCommand)] = "facilitator",
         [typeof(GetParticipantsQuery)] = "reader",
         [typeof(ChangeSharingGroupLabelCommand)] = "facilitator",
@@ -41,6 +43,10 @@ internal static partial class CommandCatalog
         // A proposal of the assistant on the map open (3.0, lot 3): its preview and its application change the structure.
         [typeof(PreviewProposalQuery)] = "facilitator",
         [typeof(ApplyProposalCommand)] = "facilitator",
+        // A .pmap file inserted as a detailed step, or replacing the detail of a step (3.3, F-208, ADR 108): the structure changes.
+        [typeof(PmapInsertionPreviewQuery)] = "facilitator",
+        [typeof(InsertPmapCommand)] = "facilitator",
+        [typeof(ReplaceDetailCommand)] = "facilitator",
     };
 
     /// <summary>
@@ -52,6 +58,8 @@ internal static partial class CommandCatalog
     {
         [typeof(CreateProjectCommand)] = "admin",
         [typeof(ListProjectsQuery)] = "authenticated",
+        [typeof(ProposeProjectCodeQuery)] = "admin",
+        [typeof(FreeProjectCodeQuery)] = "admin",
         [typeof(ListTrashQuery)] = "authenticated",
         [typeof(PurgeProjectCommand)] = "admin",
         [typeof(GetProfileQuery)] = "authenticated",
@@ -68,6 +76,8 @@ internal static partial class CommandCatalog
         [typeof(PreviewReplacementQuery)] = "facilitator",
         [typeof(ReplaceProjectCommand)] = "facilitator",
         [typeof(OpenPmapCommand)] = "admin",
+        // The preview of a template collection (3.4, lot 6, ADR 114): read only, as the opening of a file it precedes.
+        [typeof(PreviewCollectionQuery)] = "admin",
         [typeof(DuplicateProjectCommand)] = "admin",
         [typeof(ReadAssistantSettingsQuery)] = "admin",
         [typeof(ChangeAssistantSettingsCommand)] = "admin",
@@ -78,6 +88,7 @@ internal static partial class CommandCatalog
         // The comments of presentation of the flows (ADR 099, lot J10): the rights of those of the steps.
         [typeof(Topogenia.Application.Presentation.ReadFlowPresentationCommentsQuery)] = "reader",
         [typeof(Topogenia.Application.Presentation.SetFlowPresentationCommentRequest)] = "facilitator",
+        [typeof(Topogenia.Application.Presentation.WriteCommentDraftsRequest)] = "facilitator",
         // The voices a project keeps for its presentation (ADR 103): read with the project, chosen by the facilitator.
         [typeof(Topogenia.Application.Presentation.ReadPresentationVoicesQuery)] = "reader",
         [typeof(Topogenia.Application.Presentation.SetPresentationVoiceRequest)] = "facilitator",

@@ -125,8 +125,8 @@ aujourd'hui le nom donné ci-dessus.
 ## Révision (29/10/2026) : P7-T04b
 
 Livraison du cœur faite selon l'ADR 074 : `ProductIdentity.cs` est dans `src/Topogenia.Application` ; la bascule
-`UseCorePackage` suit la présence des sources du domaine ; la chaîne `build/core/Topogenia.Core.csproj` signe par nom fort,
-obscurcit et emballe ; `build/split.mjs` écrit le dépôt public et prouve qu'il compile et passe ses tests avec le seul
+`UseCorePackage` suit la présence des sources du domaine ; la chaîne `build/core/Topogenia.Core.csproj` (non publié) signe par nom fort,
+obscurcit et emballe ; `build/split.mjs` (non publié) écrit le dépôt public et prouve qu'il compile et passe ses tests avec le seul
 paquet. Écart (AR-147) : pas de dépôt `topogenia-core` réduit au domaine, la copie de travail en tient lieu. Les règles
 d'architecture qui lisent les sources du domaine sont sautées dans le dépôt public, avec leur raison, et tournent dans la
 copie de travail ; elles ne tournent pas sur l'assemblage du paquet, dont l'obscurcissement efface les noms qui

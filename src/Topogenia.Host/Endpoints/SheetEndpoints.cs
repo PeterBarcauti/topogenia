@@ -7,7 +7,7 @@ using Topogenia.Host.Api.Sheets;
 
 namespace Topogenia.Host.Endpoints;
 
-/// <summary>`/api/steps/{id}/sheet`, `/documents` and `/uses`: each route reads the request and calls its handler (spec 3.2).</summary>
+/// <summary>`/api/steps/{id}/sheet`, `/documents`, `/uses` and `/pain-points/{painPointId}/status`: each route reads the request and calls its handler (spec 3.2).</summary>
 public static class SheetEndpoints
 {
     public static void MapSheetRoutes(this IEndpointRouteBuilder routes)
@@ -50,5 +50,8 @@ public static class SheetEndpoints
         steps.MapDelete("/uses/{documentId:guid}",
             async (Guid id, Guid documentId, [FromHeader(Name = "If-Match")] string? ifMatch, DocumentApi api, CancellationToken token) =>
                 TypedResults.Ok(await api.StopUsingAsync(id, documentId, ifMatch, token)));
+        steps.MapPut("/pain-points/{painPointId:guid}/status",
+            async (Guid id, Guid painPointId, PainPointStatusBody body, [FromHeader(Name = "If-Match")] string? ifMatch, DocumentApi api, CancellationToken token) =>
+                TypedResults.Ok(await api.ChangePainPointStatusAsync(id, painPointId, body, ifMatch, token)));
     }
 }

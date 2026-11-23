@@ -9,12 +9,12 @@ type SheetContent = Schema<'SheetContent'>;
 /** A number as the language writes it, with the two decimals at most that the host keeps: « 12,5 » in French, « 12.5 » in English (audit 3.1 V3, U7). */
 const numberText = (value: number, language: string): string => new Intl.NumberFormat(language, { maximumFractionDigits: 2 }).format(value);
 
-/** The bounds of the duration as read (Makigami M5): « 10 à 25 minutes », « au moins 10 minutes », « au plus 25 minutes », or nothing. */
+/** The bounds of the duration as read (Makigami M5): « 10 à 25 minutes », « au moins 10 minutes », « au plus 25 minutes », or nothing; the bound just before the word « minutes » (the longest, or the only one) chooses its plural form (F-205). */
 function boundsText(content: SheetContent, t: TFunction, language: string): string | null {
   const [min, max] = [content.duration_min_minutes ?? null, content.duration_max_minutes ?? null];
-  if (min !== null && max !== null) return t('sheet.duration_between', { min: numberText(min, language), max: numberText(max, language) });
-  if (min !== null) return t('sheet.duration_at_least', { min: numberText(min, language) });
-  return max === null ? null : t('sheet.duration_at_most', { max: numberText(max, language) });
+  if (min !== null && max !== null) return t('sheet.duration_between', { count: max, min: numberText(min, language), max: numberText(max, language) });
+  if (min !== null) return t('sheet.duration_at_least', { count: min, min: numberText(min, language) });
+  return max === null ? null : t('sheet.duration_at_most', { count: max, max: numberText(max, language) });
 }
 
 /** The duration with its bounds after it, « 15 minutes (10 à 25 minutes) », or the bounds alone; null when none is given. */

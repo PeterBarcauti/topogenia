@@ -5,6 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Locator, Page } from '@playwright/test';
 import { expect, stepOf, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 const REPOSITORY = new URL('../../', import.meta.url);
 const SAMPLE = fileURLToPath(new URL('samples/cloture-mensuelle.pmap', REPOSITORY));
@@ -29,13 +30,15 @@ async function openSample(page: Page): Promise<void> {
 /** The PNG of the map, as the File menu gives it. */
 async function png(page: Page): Promise<Buffer> {
   const download = page.waitForEvent('download');
-  await (await openFileMenu(page)).getByRole('menuitem', { name: 'Exporter en image PNG' }).click();
+  await openFileMenu(page);
+  await (await fileEntry(page, 'file.png')).click();
   return readFileSync(await (await download).path());
 }
 
 /** The image SVG of the map, through its dialog, its copy ticked or not. */
 async function svg(page: Page, editable: boolean): Promise<{ name: string; text: string }> {
-  await (await openFileMenu(page)).getByRole('menuitem', { name: 'Exporter en image SVG…' }).click();
+  await openFileMenu(page);
+  await (await fileEntry(page, 'file.svg')).click();
   const dialog = page.getByRole('dialog', { name: 'Exporter en image SVG' });
   const box = dialog.getByRole('checkbox', { name: 'Inclure une copie modifiable' });
   await expect(box).not.toBeChecked();
@@ -84,6 +87,10 @@ test('the image SVG has the frame of the PNG, draws every step, carries its copy
   await expect(dialog.getByRole('textbox', { name: 'Code court' })).toHaveValue('VIS');
   await dialog.getByRole('textbox', { name: 'Code court' }).fill('SVG');
   await dialog.getByRole('button', { name: 'Ouvrir', exact: true }).click();
+  // The copy carries the link of a document of the example: said before the map opens (pre-audit 68, P3-02).
+  const created = page.getByRole('dialog', { name: 'Projet créé' });
+  await expect(created.getByTestId('pmap-created-remote')).toHaveText('Adresses réseau ou web dans les fiches : 1, à vérifier avant d’ouvrir un document.');
+  await created.getByTestId('pmap-created-open').click();
   await expect(stepOf(page, 'SVG-E004')).toBeVisible();
   // Its sheets came with it: the pictograms of the detailed step.
   await expect(stepOf(page, 'SVG-E003').getByTestId('step-pictos')).toBeVisible();

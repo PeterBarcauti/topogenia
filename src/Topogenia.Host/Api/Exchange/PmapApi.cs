@@ -1,10 +1,12 @@
 // PmapApi.cs
-// The routes of the .pmap files turned into their requests: the copy of a project, the opening of a file, the duplication (ADR 054).
+// The routes of the .pmap files turned into their requests: the copy of a project, the opening of a file, the preview of a collection, the duplication (ADR 054, ADR 114).
 
 using Topogenia.Application.Commands;
 using Topogenia.Application.Exchange;
 using Topogenia.Application.Ports;
 using Topogenia.Domain.Errors;
+using Topogenia.Domain.Values;
+using Topogenia.Host.Errors;
 
 namespace Topogenia.Host.Api.Exchange;
 
@@ -14,14 +16,19 @@ namespace Topogenia.Host.Api.Exchange;
 /// </summary>
 public sealed record OpenPmapBody(string? Content, string? Code, string? Name, Guid? OriginMapId = null);
 
+/// <summary>`POST /api/projects/import-collection/preview`: the text of the collection (ADR 114).</summary>
+public sealed record PreviewCollectionBody(string? Content);
+
 /// <summary>`POST /api/projects/{id}/duplicate`: the code and the name of the copy, those of the source when absent (A-1.2-21).</summary>
 public sealed record DuplicateProjectBody(string? Code, string? Name);
 
 /// <summary>
 /// Reads the bodies of the `.pmap` routes and runs their requests. The opening takes a JSON body of 10 MB at most, refused
-/// before it is read (A-4-22: the 1.x read 8 million characters before it checked them), and read after its right.
+/// before it is read (A-4-22: the 1.x read 8 million characters before it checked them), and read after its right; the
+/// preview of a collection (ADR 114) the same, the messages of the faults of its processes in the language of the user.
 /// </summary>
-public sealed class PmapApi(PmapCopyExport copy, MapPmapExport mapCopy, UserRunner runner, IPmapFormat format)
+public sealed class PmapApi(PmapCopyExport copy, MapPmapExport mapCopy, UserRunner runner, IPmapFormat format, ErrorMessages messages,
+    ICurrentUser currentUser, LanguageSettings languages)
 {
     /// <summary>The limit of the body of the opening of a file (A-4-22, spec 5.4).</summary>
     public const long OpeningLimit = 10L * 1024 * 1024;
@@ -38,8 +45,19 @@ public sealed class PmapApi(PmapCopyExport copy, MapPmapExport mapCopy, UserRunn
             _ => throw DomainException.InvalidValue("with_sheets"),
         }, cancellationToken);
 
-    /// <summary>The copy of one map and of the maps below it, with their sheets as the user sees them: what an image carries (plan 3.1, L7).</summary>
-    public Task<PmapCopy> MapCopyAsync(Guid mapId, CancellationToken cancellationToken) => mapCopy.RunAsync(mapId, cancellationToken);
+    /// <summary>
+    /// The copy of one map and of the maps below it, with their sheets as the user sees them: what an image carries (plan
+    /// 3.1, L7), the source of a .bpmn (`purpose=bpmn`), of the view in BPMN 2.0 (`purpose=view`, no event, ADR 106), or of
+    /// the sheets of the project as PDF (`purpose=pdf`, without place nor comment, ADR 113).
+    /// </summary>
+    public Task<PmapCopy> MapCopyAsync(Guid mapId, string? purpose, CancellationToken cancellationToken) => mapCopy.RunAsync(mapId, purpose switch
+    {
+        null or "copy" => MapCopyPurpose.Copy,
+        "bpmn" => MapCopyPurpose.Bpmn,
+        "view" => MapCopyPurpose.View,
+        "pdf" => MapCopyPurpose.Pdf,
+        _ => throw DomainException.InvalidValue("purpose"),
+    }, cancellationToken);
 
     /// <summary>
     /// The opening of a file: its JSON body read only once the right is granted (audit 3.2.0), what the user alone decides
@@ -54,6 +72,29 @@ public sealed class PmapApi(PmapCopyExport copy, MapPmapExport mapCopy, UserRunn
         await runner.DemandAsync(new OpenPmapCommand(format, null, null, null), cancellationToken);
         var body = await request.ReadFromJsonAsync<OpenPmapBody>(cancellationToken) ?? throw new DomainException(ErrorCodes.InvalidRequest, RefusalKind.Invalid);
         return await runner.RunAsync(new OpenPmapCommand(format, body.Content, body.Code, body.Name, body.OriginMapId), cancellationToken);
+    }
+
+    /// <summary>
+    /// The preview of a collection (ADR 114 point 4): its JSON body read only once the right of the administrator is
+    /// granted, as the opening of a file it precedes; nothing written. Each fault of a process gets its message in the
+    /// language of the user, as the details of FICHIER_INVALIDE get theirs.
+    /// </summary>
+    public async Task<CollectionPreview> PreviewCollectionAsync(HttpRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (!request.HasJsonContentType())
+            throw new DomainException(ErrorCodes.InvalidRequest, RefusalKind.Invalid);
+        await runner.DemandAsync(new PreviewCollectionQuery(format, null), cancellationToken);
+        var body = await request.ReadFromJsonAsync<PreviewCollectionBody>(cancellationToken) ?? throw new DomainException(ErrorCodes.InvalidRequest, RefusalKind.Invalid);
+        var preview = await runner.RunAsync(new PreviewCollectionQuery(format, body.Content), cancellationToken);
+        var language = currentUser.User?.Language ?? languages.DefaultLanguage;
+        return preview with
+        {
+            Processes = [.. preview.Processes.Select(process => process with
+            {
+                Faults = [.. process.Faults.Select(fault => fault with { Message = messages.Format(fault.Code, language, fault.Values) })],
+            })],
+        };
     }
 
     public Task<PmapOpened> DuplicateAsync(Guid projectId, DuplicateProjectBody body, CancellationToken cancellationToken)

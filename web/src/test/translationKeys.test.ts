@@ -80,4 +80,14 @@ describe('the keys made of a value (plan 3.1, E11)', () => {
     const missing = languages.flatMap(([name, texts]) => intents.filter((intent) => !exists(texts, `assistant.panel.tiles.${intent}.title`)).map((intent) => `${name}: ${intent}`));
     expect(missing).toEqual([]);
   });
+
+  it('every form of reply the host knows names its title in each language file, the comments among them', () => {
+    // The head of a reply reads `assistant.panel.forms.<form>` (TurnCards): a form without it shows its key (audit of the copy 64, P1-01).
+    const schema = readFileSync(join(src, '../../src/Topogenia.Assistant/ReplySchema.cs'), 'utf8');
+    const declared = /IReadOnlyList<string> Forms = \[([^\]]+)\];/.exec(schema)?.[1] ?? '';
+    const forms = [...declared.matchAll(/"([a-z]+)"/g)].map((match) => match[1] ?? '');
+    expect(forms).toContain('comments');
+    const missing = languages.flatMap(([name, texts]) => forms.filter((form) => !exists(texts, `assistant.panel.forms.${form}`)).map((form) => `${name}: ${form}`));
+    expect(missing).toEqual([]);
+  });
 });

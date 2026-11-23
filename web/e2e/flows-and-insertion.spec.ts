@@ -71,7 +71,8 @@ test('right click on a flow: « Inverser le sens » turns it the other way; Ctrl
   // A straight flow has no height, which Playwright takes for hidden: the right click lands on its line, between the steps.
   await page.mouse.click((from.x + from.width + to.x) / 2, from.y + from.height / 2, { button: 'right' });
   const menu = page.getByTestId('menu-flow');
-  await expect(menu.getByRole('menuitem')).toHaveText(['Libellé de la flèche', 'Inverser le sens', 'Tracé automatique', 'Supprimer la flèche']);
+  // A file inserted on the flow follows the reversal (ADR 108 point 5).
+  await expect(menu.getByRole('menuitem')).toHaveText(['Libellé de la flèche', 'Inverser le sens', 'Insérer un fichier sur cette flèche…', 'Tracé automatique', 'Supprimer la flèche']);
   await menu.getByRole('menuitem', { name: 'Inverser le sens' }).click();
   await expect.poll(() => arrows(api, mapId)).toEqual(['E002>E001']);
   expect((await api.map(mapId)).flows.map((flow) => flow.id)).toEqual([flowId]);

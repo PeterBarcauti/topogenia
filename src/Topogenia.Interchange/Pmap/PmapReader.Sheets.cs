@@ -33,6 +33,7 @@ internal sealed partial class PmapReading
         ["document", DocumentRules.WaitHoursField, DocumentRules.PercentField, DocumentRules.PainPointField, DocumentRules.LostHoursField];
 
     private static readonly string[] UseProperties14 = [.. UseProperties, DocumentRules.ActionField, DocumentRules.OwnerField, DocumentRules.DueDateField];
+    private static readonly string[] UseProperties15 = [.. UseProperties14, PainPointCodeField, PainPointStatusField];
 
     /// <summary>The step whose sheet is being read: the owner of the outputs it declares.</summary>
     private string currentStep = string.Empty;
@@ -198,7 +199,7 @@ internal sealed partial class PmapReading
                 Fault(place, FileErrorCodes.SheetShape);
                 continue;
             }
-            Properties(element, place, summaries ? UseProperties14 : UseProperties);
+            Properties(element, place, extras ? UseProperties15 : summaries ? UseProperties14 : UseProperties);
             var document = Text(element, "document", place, required: true);
             try
             {
@@ -208,9 +209,14 @@ internal sealed partial class PmapReading
                 var lost = DocumentRules.LostHours(Number(element, DocumentRules.LostHoursField, place));
                 var plan = DocumentRules.Plan(Text(element, DocumentRules.ActionField, place, required: false),
                     Text(element, DocumentRules.OwnerField, place, required: false), Day(element, DocumentRules.DueDateField, place), painPoint is not null);
+                var code = PainPointCode(element, place, painPoint is not null);
+                var status = PainPointStatusOf(element, place, painPoint is not null);
                 if (document is null)
                     continue;
-                var use = new PmapUse(document, wait, percent, painPoint, lost) { Action = plan.Action, Owner = plan.Owner, DueDate = plan.DueDate };
+                var use = new PmapUse(document, wait, percent, painPoint, lost)
+                {
+                    Action = plan.Action, Owner = plan.Owner, DueDate = plan.DueDate, PainPointCode = code, PainPointStatus = status,
+                };
                 uses.Add(use);
                 usePaths[use] = place;
             }

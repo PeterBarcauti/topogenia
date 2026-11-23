@@ -1,14 +1,18 @@
 // keys.test.ts
-// The shortcuts of the map run by the one keyboard manager, without React: level, tools, undo and redo, the command bar, clipboard, group and ungroup, choose all, delete, rename, Escape, the arrows (annex B 2.5, B-8.2-07, AR-154, AR-155).
+// The shortcuts of the map run by the one keyboard manager, without React but for the search field: level, tools, undo and redo, the command bar, clipboard, group and ungroup, choose all, delete, rename, Escape, the arrows, Ctrl+F taken or left to the browser (annex B 2.5, B-8.2-07, AR-154, AR-155, ADR 110).
 
+import { act, fireEvent, screen } from '@testing-library/react';
 import { i18next } from '../../../../shared/i18n/i18n.ts';
 import { createKeyboard } from '../../../../shared/keyboard/keyboard.ts';
 import { callsTo, fakeApi } from '../../../../test/fakeApi.ts';
+import { showEditor } from '../../../../test/editor.tsx';
 import { editorOf } from '../../../../test/editorStore.ts';
-import { frameOf, MAP_ID, replyOf, sampleMap } from '../../../../test/maps.ts';
+import { frameOf, MAP_ID, PROJECT_ID, replyOf, sampleMap } from '../../../../test/maps.ts';
+import { EMPTY_SEARCH, searchStore } from '../../search/searchStore.ts';
+import { closeSearch } from '../../search/useSearch.ts';
 import { clipboard, setClipboard } from '../clipboard.ts';
 import type { MapEditor } from '../editor.ts';
-import { mapKeyHandler } from './mapCommands.ts';
+import { bpmnKeyHandler, mapKeyHandler } from './mapCommands.ts';
 import type { Point } from '../../model/geometry/grid.ts';
 
 beforeEach(async () => {
@@ -249,5 +253,74 @@ describe('group and ungroup by the keyboard, as in Office (AR-154)', () => {
     await vi.waitFor(() => {
       expect(callsTo(sent, 'POST', '/api/steps/s2/dissolve')).toHaveLength(1);
     });
+  });
+});
+
+describe('Show all by the keyboard (lot 1 of the 3.4)', () => {
+  it('Shift+1 on a French keyboard and Shift+! on an English one show the whole map, for a reader too', async () => {
+    for (const rights of [{ structure: true, role: 'facilitator' }, { structure: false, role: 'reader' }] as const) {
+      const { editor } = await editorOf(sampleMap({ rights }));
+      const fit = vi.fn();
+      editor.canvas.showFit(fit);
+      const press = keysOf(editor);
+      expect(press({ key: '1', shiftKey: true })).toBe(true);
+      expect(press({ key: '!', shiftKey: true })).toBe(true);
+      expect(fit).toHaveBeenCalledTimes(2);
+      expect(press({ key: '1' })).toBe(false);
+      expect(press({ key: '1', shiftKey: true, ctrlKey: true })).toBe(false);
+      expect(fit).toHaveBeenCalledTimes(2);
+    }
+  });
+});
+
+describe('Ctrl+F, the search in the project (lot 2 of the 3.4, ADR 110 point 6)', () => {
+  afterEach(() => {
+    act(() => {
+      closeSearch();
+      searchStore.setState({ ...EMPTY_SEARCH });
+    });
+  });
+
+  it('Ctrl+F opens the search on the map and in the BPMN view, for a reader too, with one step alone chosen too', async () => {
+    for (const rights of [{ structure: true, role: 'facilitator' }, { structure: false, role: 'reader' }] as const) {
+      const { editor } = await editorOf(sampleMap({ rights }));
+      selected(editor, ['s2']);
+      expect(keysOf(editor)({ key: 'f', ctrlKey: true })).toBe(true);
+      expect(searchStore.getState()).toMatchObject({ open: true, projectId: PROJECT_ID, focusField: true });
+      expect(editor.store.getState().editing).toBeNull();
+      closeSearch();
+      const bpmn = createKeyboard();
+      bpmn.add('canvas', bpmnKeyHandler(editor));
+      const event = new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true, cancelable: true });
+      bpmn.dispatch(event);
+      expect([event.defaultPrevented, searchStore.getState().open]).toEqual([true, true]);
+      closeSearch();
+    }
+  });
+
+  it('Ctrl+F in a field, the search field included, and under a dialog is left to the browser', async () => {
+    fakeApi({ [`POST /api/projects/${PROJECT_ID}/search`]: { json: { total: 0, maps: [] } } });
+    const { canvas } = await showEditor(sampleMap());
+    fireEvent.keyDown(canvas, { key: 'f', ctrlKey: true });
+    const field = screen.getByTestId('search-field');
+    expect(document.activeElement).toBe(field);
+    // A second Ctrl+F in the field is the browser's: its own search opens (`fireEvent` is false once prevented).
+    expect(fireEvent.keyDown(field, { key: 'f', ctrlKey: true })).toBe(true);
+    act(() => {
+      closeSearch();
+    });
+    const other = document.createElement('textarea');
+    document.body.append(other);
+    expect(fireEvent.keyDown(other, { key: 'f', ctrlKey: true })).toBe(true);
+    expect(searchStore.getState().open).toBe(false);
+    other.remove();
+    // Under a dialog, the modal layer takes nothing: the key goes to the browser.
+    const { editor } = await editorOf(sampleMap());
+    const keyboard = createKeyboard();
+    keyboard.add('canvas', mapKeyHandler(editor));
+    keyboard.add('modal', () => false);
+    const event = new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true, cancelable: true });
+    keyboard.dispatch(event);
+    expect([event.defaultPrevented, searchStore.getState().open]).toEqual([false, false]);
   });
 });

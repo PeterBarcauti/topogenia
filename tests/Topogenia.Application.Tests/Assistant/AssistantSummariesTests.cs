@@ -57,6 +57,9 @@ public sealed class AssistantSummariesTests
         Assert.EndsWith("processus…", cut, StringComparison.Ordinal);
         Assert.Equal("Le < b>gras< /b> et 3 <5 jours", AssistantSummariesReader.Bounded("Le <b>gras</b> et 3 <5 jours"));
         Assert.Null(AssistantSummariesReader.Bounded(" \t "));
+        // Cut where no space is, never between the two halves of an emoji (audit of the copy 64, P2-06).
+        var emojis = AssistantSummariesReader.Bounded(string.Concat(Enumerable.Repeat("\U0001F600", StructureEdits.MapSummaryMax)))!;
+        Assert.False(char.IsHighSurrogate(emojis[^2]), "a half of a character before the ellipsis");
         Assert.Null(AssistantReplyReader.Read("""{"form":"summaries","message":"x","cited":[],"questions":[],"findings":[],"pmap":null,"report":null,"summaries":[]}""", out var reason));
         Assert.Equal("summaries without summary", reason);
     }

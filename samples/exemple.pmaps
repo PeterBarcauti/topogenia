@@ -1,0 +1,112 @@
+{
+  "format": "topogenia-collection",
+  "version": "1.0",
+  "name": "Exemples fictifs",
+  "description": "Deux processus fictifs : la demande d'achat de docs/format-pmap.md et la clôture mensuelle des visites.",
+  "processes": [
+    {
+      "format": "topogenia",
+      "version": "1.2",
+      "project": { "name": "Demande d'achat" },
+      "map": {
+        "lanes": [
+          { "id": "c1", "name": "Demandeur" },
+          { "id": "c2", "name": "Acheteur", "type": "department" }
+        ],
+        "steps": [
+          { "id": "e1", "lane": "c1", "label": "Besoin identifié", "type": "start" },
+          { "id": "e2", "lane": "c1", "label": "Saisir la demande" },
+          { "id": "e3", "lane": "c2", "label": "Passer la commande" },
+          { "id": "e4", "lane": "c2", "label": "Commande envoyée", "type": "end" }
+        ],
+        "flows": [
+          { "source": "e1", "target": "e2" },
+          { "source": "e2", "target": "e3" },
+          { "source": "e3", "target": "e4" }
+        ]
+      }
+    },
+    {
+      "format": "topogenia",
+      "version": "1.2",
+      "generated_by": "Exemple de la documentation",
+      "project": {
+        "code": "VIS",
+        "name": "Clôture mensuelle des visites",
+        "language": "fr",
+        "description": "Du chargement des visites de l'ERP à la validation du reporting par la direction.",
+        "translations": { "en": "Monthly visits closing" }
+      },
+      "map": {
+        "lanes": [
+          { "id": "nord", "name": "Billetterie Nord", "type": "department", "translations": { "en": "Ticketing North" } },
+          { "id": "erp", "name": "ERP", "type": "system" },
+          { "id": "sud", "name": "Billetterie Sud", "type": "department" },
+          { "id": "dir", "name": "Direction", "type": "person" }
+        ],
+        "steps": [
+          { "id": "debut", "lane": "nord", "label": "Début de clôture", "type": "start", "column": 0 },
+          { "id": "extraire", "lane": "erp", "label": "Extraire les visites du mois", "column": 1, "automation": "automated" },
+          {
+            "id": "tcd", "lane": "nord", "label": "Construire le tableau croisé", "column": 2,
+            "raci": { "dir": "A", "sud": "I" },
+            "sub_map": {
+              "lanes": [
+                { "id": "tcd-nord", "name": "Billetterie Nord", "type": "department" }
+              ],
+              "steps": [
+                { "id": "tcd-1", "lane": "tcd-nord", "label": "Importer l'extraction dans le tableur" },
+                { "id": "tcd-2", "lane": "tcd-nord", "label": "Mettre en forme le tableau" },
+                { "id": "tcd-3", "lane": "tcd-nord", "label": "Comparer au mois précédent" }
+              ],
+              "flows": [
+                { "source": "tcd-1", "target": "tcd-2" },
+                { "source": "tcd-2", "target": "tcd-3" }
+              ]
+            },
+            "translations": { "en": "Build the pivot table" },
+            "sheet": {
+              "purpose": "Donner à la direction les visites du mois par région.",
+              "tools": "Tableur",
+              "frequency": "month_end_close",
+              "duration_minutes": 90,
+              "procedure": [
+                { "text": "Ouvrir l'extraction du mois", "tool": "Tableur", "nature": "extract" },
+                { "text": "Recopier les totaux par région", "nature": "copy_paste" },
+                { "text": "Vérifier le total général", "nature": "check" }
+              ],
+              "outputs": [
+                { "id": "tableau", "name": "Tableau croisé des visites", "location": "https://intranet.example/visites/tableau.xlsx" }
+              ]
+            }
+          },
+          {
+            "id": "complet", "lane": "sud", "label": "Compléter le fichier du mois", "column": 3, "raci": { "nord": "C" },
+            "sheet": {
+              "uses": [
+                { "document": "tableau", "wait_hours": 24, "percent_complete_accurate": 80, "pain_point": "Le tableau arrive sans les visites de la veille.", "lost_hours_per_month": 3 }
+              ]
+            }
+          },
+          { "id": "ecart", "lane": "nord", "label": "Écart supérieur à 5 % ?", "type": "decision", "column": 4 },
+          { "id": "analyser", "lane": "nord", "label": "Analyser les écarts", "column": 5 },
+          { "id": "valider", "lane": "dir", "label": "Valider le reporting", "column": 6, "raci": { "nord": "I", "sud": "I" } },
+          { "id": "fin", "lane": "dir", "label": "Reporting publié", "type": "end", "column": 7 }
+        ],
+        "flows": [
+          { "source": "debut", "target": "extraire" },
+          { "source": "extraire", "target": "tcd" },
+          { "source": "tcd", "target": "complet" },
+          { "source": "complet", "target": "ecart" },
+          { "source": "ecart", "target": "analyser", "label": "oui", "translations": { "en": "yes" } },
+          { "source": "ecart", "target": "valider", "label": "non", "translations": { "en": "no" } },
+          { "source": "analyser", "target": "valider" },
+          { "source": "valider", "target": "fin" }
+        ]
+      },
+      "uncertainties": [
+        "Le seuil de 5 % est à confirmer avec la direction."
+      ]
+    }
+  ]
+}

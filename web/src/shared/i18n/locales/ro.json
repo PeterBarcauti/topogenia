@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) nu s-a oprit. Încercați din nou sau închideți fereastra consolei.",
     "quit_unsaved": "O modificare din fișă nu este încă salvată: $t(app.name) rămâne deschis. Încercați din nou după ce fișa este salvată.",
     "stopped": "$t(app.name) este oprit. Această filă poate fi închisă.",
-    "stopped_help": "Pentru a-l reporni, deschideți-l din nou."
+    "stopped_help": "Pentru a-l reporni, deschideți-l din nou.",
+    "help_menu": "Meniul Ajutor",
+    "help_online": "Ajutor online (în engleză)",
+    "update_check": "Căutare actualizări",
+    "update_check_help": "Deschide pagina de versiuni a site-ului. Instalată: {{version}} din {{date}}.",
+    "update_check_store_help": "Deschide pagina din Microsoft Store, care instalează actualizările.",
+    "quit_text_unsaved": "Un formular deschis nu este salvat: ce s-a introdus în el se va pierde.",
+    "quit_anyway": "Ieșire totuși"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Spațiu",
     "Enter": "Enter",
-    "ArrowUp": "Sus"
+    "ArrowUp": "Sus",
+    "ArrowLeft": "Stânga",
+    "ArrowRight": "Dreapta",
+    "ArrowDown": "Jos",
+    "Backspace": "Backspace",
+    "Wheel": "Rotiță"
   },
   "errors": {
     "RESEAU": "$t(app.name) nu răspunde. Verificați dacă $t(app.name) este încă pornit (sau conexiunea la rețea, dacă rulează pe un server).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Răspuns neașteptat de la server. Reîncărcați pagina.",
     "ACCES_REFUSE": "Drepturi insuficiente pentru această pagină.",
     "UNKNOWN": "A apărut o eroare neașteptată.",
-    "RESUMES_A_JOUR": "Toate hărțile au un rezumat actualizat. Pentru a reface unul, deschideți harta și faceți clic pe „i” lângă titlul ei."
+    "RESUMES_A_JOUR": "Toate hărțile au un rezumat actualizat. Pentru a reface unul, deschideți harta și faceți clic pe „i” lângă titlul ei.",
+    "COLLECTION_TROP_DE_PROCESSUS": "Colecția are prea multe procese."
   },
   "home": {
     "eyebrow": "Pentru a vă optimiza procesele cu IA, începeți prin a le descrie.",
@@ -81,7 +94,24 @@
     "sample_title": "Proiect exemplu",
     "sample_text": "Un proiect fictiv, deja descris, pentru a descoperi o hartă completă: culoare, decizii, subhartă, fișe, documente și neajunsuri. Se șterge ca orice proiect.",
     "sample_create": "Creare proiect exemplu",
-    "sample_created": "Proiectul exemplu {{code}} a fost creat."
+    "sample_created": "Proiectul exemplu {{code}} a fost creat.",
+    "filter": "Filtrează proiectele",
+    "filter_placeholder": "Cod sau nume",
+    "filter_count": "{{shown}} din {{total}}",
+    "filter_none": "Niciun proiect nu corespunde.",
+    "update_line": "Această versiune datează din {{date}}.",
+    "update_link": "Verificați dacă există una mai recentă",
+    "update_close": "Închideți memento-ul",
+    "button_start_help": "Alegeți un punct de plecare.",
+    "start_menu": "Începeți un proiect",
+    "start_sample": "Proiect exemplu",
+    "start_gallery": "Galerie de șabloane",
+    "start_gallery_help": "Se deschide în browser.",
+    "start_blank": "Hartă goală…",
+    "new_project_help": "Porniți de la o hartă goală, un exemplu sau un șablon.",
+    "new_project_help_no_sample": "Porniți de la o hartă goală sau un șablon.",
+    "new_project_help_no_gallery": "Porniți de la o hartă goală sau un exemplu.",
+    "new_project_help_blank": "Porniți de la o hartă goală."
   },
   "roles": {
     "facilitator": "Facilitator",
@@ -114,7 +144,7 @@
     "properties": "Proprietățile proiectului…",
     "properties_title": "Proprietățile proiectului {{code}}",
     "sharing_group": "Grup de partajare a documentelor",
-    "sharing_group_help": "Numit în fișe pentru o intrare partajată (ex.: Echipa financiară). Gol: „grupul de partajare al proiectului”.",
+    "sharing_group_help": "Numele grupului de persoane care poate citi documentele proiectului. Apare la caseta „Partajat cu grupul” a fiecărui document dintr-o fișă. Gol: „grupul de partajare al proiectului”.",
     "properties_read_only": "Doar un facilitator al proiectului modifică aceste proprietăți.",
     "properties_saved": "Proprietățile proiectului au fost salvate.",
     "language": "Limba procesului",
@@ -123,12 +153,14 @@
     "workday_hours": "Zi de lucru (ore)",
     "workday_hours_help": "Între 1 și 24 h, implicit 7: convertește valorile de lead time în zile lucrătoare.",
     "fte_hours": "Ore per FTE pe lună",
-    "fte_hours_help": "Între 1 și 744 h, implicit 151,67: convertește volumul de muncă în echivalente normă întreagă."
+    "fte_hours_help": "Între 1 și 744 h, implicit 151,67: convertește volumul de muncă în echivalente normă întreagă.",
+    "code_proposed": "Propus pe baza numelui.",
+    "more_options": "Mai multe opțiuni"
   },
   "files": {
     "open": "Deschidere fișier…",
     "open_title": "Deschidere fișier",
-    "open_help": "Fișierul devine un proiect nou: un fișier .pmap (copie descărcată sau răspunsul unei IA care a citit o schiță), un tabel Excel sau CSV, o diagramă Mermaid (.mmd, .md) sau o imagine SVG exportată cu copia ei editabilă.",
+    "open_help": "Fișierul devine un proiect nou: un fișier .pmap (copie descărcată sau răspunsul unei IA care a citit o schiță), o colecție de modele (.pmaps), un tabel Excel sau CSV, o diagramă Mermaid (.mmd, .md) sau o imagine SVG exportată cu copia ei editabilă.",
     "choose": "Alegere fișier…",
     "or_paste": "Sau lipiți conținutul aici, de exemplu răspunsul unei IA:",
     "area": "Lipiți sau plasați aici conținutul fișierului .pmap",
@@ -194,7 +226,52 @@
     "target_name": "{{name}} (starea țintă)",
     "target_label": "Eticheta referinței",
     "target_label_default": "Starea actuală",
-    "target_button": "Creare"
+    "target_button": "Creare",
+    "map_download": "Salvarea hărții deschise (.pmap)",
+    "map_downloaded": "Harta a fost salvată cu hărțile detaliate, fișele și comentariile ei: fișierul .pmap este în dosarul Descărcări.",
+    "insert": "Inserare fișier ca pas detaliat…",
+    "insert_here": "Inserare fișier aici…",
+    "insert_title": "Inserare fișier ca pas detaliat",
+    "insert_help": "Fișierul devine un nou pas detaliat al acestei hărți. Este o copie: modificarea ulterioară a fișierului nu schimbă harta. Un fișier .pmap, un tabel Excel sau CSV, o diagramă Mermaid sau o imagine SVG cu copia ei.",
+    "replace_title": "Înlocuire detaliu cu un fișier",
+    "replace_help": "Detaliul pasului „{{label}}” ajunge în coșul de reciclare, iar fișierul îi ia locul. Ctrl+Z anulează totul.",
+    "insert_counts": "Pași: {{steps}} · Culoare: {{lanes}} · Legături: {{flows}} · Hărți: {{maps}} · Fișe: {{sheets}}",
+    "insert_too_deep": "Acest fișier are {{depth}} niveluri de hărți; sub această hartă poate avea cel mult {{room}}.",
+    "insert_too_large": "Acest fișier depășește {{max}} MB: nu poate fi inserat.",
+    "insert_package": "Este un pachet de schimb: se importă ca proiect, nu se inserează.",
+    "insert_dropped": "Traduceri omise (limbi neconfigurate aici): {{languages}}",
+    "insert_label": "Denumirea pasului",
+    "insert_lane": "Culoar",
+    "insert_after": "Plasare după",
+    "insert_at_start": "La începutul hărții",
+    "insert_sheets": "Preluare fișe",
+    "insert_sheets_help": "Fișele, documentele și punctele lor critice sosesc ca ciornă, de revizuit și apoi de validat.",
+    "insert_button": "Inserare",
+    "replace_button": "Înlocuire",
+    "inserted": "Fișier inserat. Pași: {{steps}} · Hărți: {{maps}}",
+    "insert_on_flow": "Pe săgeata {{from}} → {{to}}",
+    "insert_on_flow_here": "Inserare fișier pe această săgeată…",
+    "collection_title": "Colecția „{{name}}”",
+    "collection_help": "Se creează un proiect pentru fiecare proces bifat. Nu se scrie nimic înainte de „Creează proiectele”.",
+    "collection_all": "Bifează tot",
+    "collection_ticked": "Bifate: {{count}} din {{total}}",
+    "collection_points": "Puncte de verificat: {{count}}",
+    "collection_details": "Descriere și puncte de verificat",
+    "collection_code_free": "{{code}} este deja folosit.",
+    "collection_invalid": "Nu poate fi deschis:",
+    "collection_create": "Creează proiectele",
+    "collection_creating": "Creare {{done}} din {{total}}…",
+    "collection_done": "Proiecte create",
+    "collection_created": "{{code}} creat.",
+    "collection_failed": "Necreat: {{reason}}",
+    "collection_retry": "Reîncearcă",
+    "collection_unnamed": "Procesul {{rank}}",
+    "insert_collection": "O colecție se deschide prin „Deschidere fișier…”. Inserați un singur model al ei.",
+    "open_too_large": "Acest fișier depășește {{max}} MB: nu poate fi deschis.",
+    "collection_none": "Niciun proiect creat",
+    "collection_code_twice": "{{code}} este dat și altui rând.",
+    "collection_fix": "Corectează textul",
+    "remote_locations": "Adrese de rețea sau web în fișe: {{count}}, de verificat înainte de a deschide un document."
   },
   "package": {
     "export": "Exportare proiect ({{extension}})…",
@@ -373,7 +450,13 @@
       "due": "Termen",
       "status": "Stare",
       "lost": "Ore pierdute pe lună"
-    }
+    },
+    "copy_image": "Copiere hartă ca imagine",
+    "copying": "Se copiază imaginea…",
+    "copied": "Imagine copiată: lipiți-o (Ctrl+V) într-un e-mail sau într-un diapozitiv.",
+    "copy_failed": "Imaginea nu a putut fi copiată.",
+    "copy_as_png": "Exportare ca PNG",
+    "project_pdf": "Exportare proiect ca PDF…"
   },
   "classification": {
     "internal": "Intern",
@@ -507,7 +590,8 @@
     "breadcrumb": "Traseu de navigare",
     "file": "Fișier",
     "file_help": "Deschidere fișier, descărcare copie, dublare, export",
-    "members": "Membri"
+    "members": "Membri",
+    "fit": "Vezi tot"
   },
   "ribbon": {
     "name": "Panglica hărții",
@@ -606,6 +690,27 @@
       "necessary": "Necesar fără valoare",
       "waste": "Risipă",
       "none": "Neclasificat"
+    },
+    "replace_detail": "Înlocuire detaliu cu un fișier…",
+    "copy_selection_image": "Copiere selecție ca imagine",
+    "file_cascade": {
+      "export": "Exportare hartă",
+      "project": "Proiect",
+      "package": "Pachet de schimb",
+      "assistant": "Asistent IA"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 peisaj)",
+      "png": "Imagine PNG",
+      "svg": "Imagine SVG…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Tot proiectul ca PDF…",
+      "import": "Importare pachet…",
+      "replace": "Înlocuire cu un pachet…",
+      "report": "Raport povestit (Markdown)",
+      "comments": "Comentarii de prezentare…"
     }
   },
   "deletion": {
@@ -657,7 +762,8 @@
       "retracer_liens": "traseu automat al săgeților",
       "inserer_rangees": "inserare de rânduri",
       "retirer_rangee": "eliminare de rând",
-      "proposition_ia": "propunere IA"
+      "proposition_ia": "propunere IA",
+      "inserer_fichier": "inserare fișier"
     }
   },
   "command": {
@@ -781,9 +887,6 @@
     "duration_max": "Durata cea mai lungă",
     "duration_bounds_order": "Cea mai scurtă ≤ durata ≤ cea mai lungă",
     "minutes": "minute",
-    "duration_between": "între {{min}} și {{max}} min",
-    "duration_at_least": "cel puțin {{min}} min",
-    "duration_at_most": "cel mult {{max}} min",
     "duration_value_one": "{{count}} min",
     "duration_value_few": "{{count}} min",
     "duration_value_other": "{{count}} min",
@@ -847,6 +950,7 @@
     "clarification_withdrawn": "Întrebare eliminată.",
     "read_empty": "Deocamdată nicio fișă validată pentru acest pas.",
     "read_validated": "Versiune validată pe {{date}} de {{name}}.",
+    "read_draft": "Ciornă în lucru, încă nevalidată.",
     "document": {
       "add_output": "Adăugare ieșire",
       "new_output": "Ieșire nouă",
@@ -910,7 +1014,8 @@
         "file": "Fișier",
         "software": "Software",
         "other": "Altul"
-      }
+      },
+      "edit_pain": "Modificare în {{code}}"
     },
     "pain_point": {
       "title": "Neajuns",
@@ -939,7 +1044,21 @@
         "implemented": "realizat",
         "adopted": "adoptat",
         "dropped": "abandonat"
-      }
+      },
+      "status": "Stare",
+      "status_of": "Starea punctului critic {{code}}",
+      "status_help": "Realizat, adoptat sau abandonat: punctul critic iese de pe hartă, iar orele lui nu se mai numără.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problemă semnalată, acțiune de planificat",
+        "scored": "punct critic evaluat, acțiune de hotărât",
+        "under_review": "acțiune în analiză, încă nehotărâtă",
+        "in_progress": "acțiune în curs de implementare",
+        "implemented": "acțiune încheiată, rezultat de verificat",
+        "adopted": "verificat, este noul mod de lucru",
+        "dropped": "se hotărăște să nu fie tratat"
+      },
+      "status_now": "Starea punctului critic {{code}}: {{status}}"
     },
     "lead_time": "Lead time",
     "lead_time_help": "Timpul scurs între sosirea unui caz și ieșirea lui din pas, inclusiv așteptările; nu contează la gradul de completare.",
@@ -959,7 +1078,22 @@
       "minute": "minute",
       "hour": "ore",
       "day": "zile lucrătoare"
-    }
+    },
+    "duration_between_one": "între {{min}} și {{max}} min",
+    "duration_between_few": "între {{min}} și {{max}} min",
+    "duration_between_other": "între {{min}} și {{max}} min",
+    "duration_at_least_one": "cel puțin {{min}} min",
+    "duration_at_least_few": "cel puțin {{min}} min",
+    "duration_at_least_other": "cel puțin {{min}} min",
+    "duration_at_most_one": "cel mult {{max}} min",
+    "duration_at_most_few": "cel mult {{max}} min",
+    "duration_at_most_other": "cel mult {{max}} min",
+    "step_pain_points": "Neajunsurile pasului",
+    "step_pain_points_help": "Neajunsuri legate de pas, fără document. Descrierea și planul lor se pot doar citi.",
+    "pain_points_one": "{{count}} neajuns",
+    "pain_points_few": "{{count}} neajunsuri",
+    "pain_points_other": "{{count}} de neajunsuri",
+    "step_pain_points_help_fill": "Neajunsuri legate de pas, fără document. Starea lor se schimbă aici; descrierea și planul lor se pot doar citi."
   },
   "translations": {
     "title": "Traducerea proiectului",
@@ -1214,6 +1348,12 @@
         },
         "summaries": {
           "title": "Rezumate"
+        },
+        "comments": {
+          "title": "Comentarii de prezentare",
+          "text": "Ce spune prezentarea despre etape și predări.",
+          "example": "Scrie comentariile etapelor și predărilor acestei hărți și ale hărților ei detaliate.",
+          "example_empty": "Scrie comentariile etapelor și predărilor acestei hărți și ale hărților ei detaliate."
         }
       },
       "thread": "Conversația cu asistentul",
@@ -1281,7 +1421,8 @@
         "findings": "Analiză",
         "report": "Raport",
         "summaries": "Rezumate",
-        "proposal": "Propunere"
+        "proposal": "Propunere",
+        "comments": "Comentarii de prezentare"
       },
       "pasted": "Răspuns lipit",
       "copy_reply": "Copiere răspuns",
@@ -1442,7 +1583,19 @@
     "resource": "Resursă Azure",
     "resource_help": "Numele resursei: contoso pentru contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Gol: portul implicit (Ollama 11434, LM Studio 1234)."
+    "port_help": "Gol: portul implicit (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Scrie comentariile de prezentare ale etapelor și predărilor acestei hărți și ale hărților ei detaliate care nu au niciunul.",
+      "menu": "Scrierea comentariilor de prezentare (IA)…",
+      "intro": "Recitiți fiecare comentariu: păstrați-l, corectați-l sau renunțați la el. Va fi rostit în timpul prezentării.",
+      "flow": "Predare {{labels}}",
+      "map": "Hartă: {{name}}",
+      "current": "Comentariul actual: {{text}}",
+      "typed": "Înlocuiește un comentariu scris de mână: {{text}}",
+      "save": "Salvare comentarii păstrate ({{n}})",
+      "saved": "Comentarii salvate: {{n}}",
+      "done": "Comentarii de prezentare salvate: {{n}}"
+    }
   },
   "interface_language": {
     "help": "Limba meniurilor și a mesajelor, doar pentru dumneavoastră. Limba în care se afișează hărțile se alege în partea de sus a ferestrei, când un proiect este deschis."
@@ -1909,5 +2062,175 @@
       "closing_lost": "Timp pierdut: {{lost}} pe lună.",
       "arrow": "către"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Exportă în BPMN 2.0 (.bpmn)…",
+    "export_title": "Exportă în BPMN 2.0",
+    "export_help": "Fișierul .bpmn se deschide în modelatoarele BPMN (Camunda, Signavio, Bizagi…). Conține întreaga fișă a fiecărei etape, fără locația documentelor.",
+    "export_button": "Exportă",
+    "export_subprocesses": "Include subprocesele detaliate",
+    "export_subprocesses_help": "Fiecare etapă detaliată se deschide în modelator ca subproces.",
+    "export_subprocesses_none": "Harta nu are nicio etapă detaliată.",
+    "export_details": "Desenează documentele și punctele de fricțiune",
+    "export_details_help": "Debifat, ele rămân scrise în documentația fișierului.",
+    "toolbar": "Vizualizare BPMN 2.0",
+    "badge": "Diagramă BPMN 2.0 · doar citire",
+    "details": "Detalii pe diagramă",
+    "export": "Exportă (.bpmn)…",
+    "close": "Înapoi la hartă",
+    "close_help": "Înapoi la hartă (Alt+B)",
+    "failed": "Diagrama nu a putut fi citită.",
+    "loading": "Se citește diagrama…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Eveniment de început",
+      "endEvent": "Eveniment de sfârșit",
+      "intermediateCatchEvent": "Așteptare",
+      "manualTask": "Sarcină manuală",
+      "userTask": "Sarcină de utilizator",
+      "serviceTask": "Sarcină automatizată",
+      "subProcess": "Subproces",
+      "exclusiveGateway": "Poartă exclusivă",
+      "parallelGateway": "Poartă paralelă",
+      "inclusiveGateway": "Poartă inclusivă"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "„{{text}}”",
+      "map": "Hartă: {{name}}",
+      "classification": "Clasificare: {{value}}",
+      "language": "Limbă: {{language}}",
+      "work_time": "Zi de lucru: {{workday}} h; ore ale unui ENI pe lună: {{fte}} h",
+      "description": "Descriere",
+      "wait": "așteptare de {{hours}} h",
+      "from": "de la {{code}}",
+      "volume": "Volum de intrare: {{quantity}} pe {{period}}",
+      "periods": {
+        "day": "zi lucrătoare",
+        "week": "săptămână",
+        "month": "lună",
+        "year": "an"
+      },
+      "lane_system": "Culoar al unui software care acționează singur",
+      "headcount": "Efectiv: {{number}}"
+    },
+    "fit": "Vezi tot",
+    "fit_help": "Afișează întreaga diagramă în fereastră"
+  },
+  "shortcuts": {
+    "title": "Comenzi rapide de la tastatură",
+    "sections": {
+      "move": "Deplasare",
+      "choose": "Alegere",
+      "edit": "Modificarea hărții",
+      "display": "Afișare",
+      "present": "Prezentare",
+      "help": "Ajutor"
+    },
+    "edit_note": "Rezervat facilitatorului proiectului.",
+    "or": "sau",
+    "move_selection": "Mutarea selecției",
+    "escape": "Închide un meniu, un panou sau o fișă; oprește „Legare”",
+    "space_held": "Instrumentul Mână cât timp tasta este apăsată",
+    "enter": "Deschide fișa pasului ales",
+    "type": "Începe numele pasului ales",
+    "menu_key": "Meniul obiectului ales",
+    "wheel": "Derulare; cu Shift, pe orizontală",
+    "zoom": "Mărire",
+    "saved": "Reamintește că totul este salvat",
+    "alone_note": "Fără un singur pas ales (altfel, tasta începe numele lui)",
+    "type_key": "o literă",
+    "search_keys": "În căutare: următorul; cu Shift, anteriorul; Esc închide"
+  },
+  "search": {
+    "command_help": "Caută în proiect",
+    "title": "Caută",
+    "field": "Cuvântul căutat",
+    "placeholder": "Pas, document, instrument…",
+    "previous": "Anterior (Shift+Enter)",
+    "next": "Următorul (Enter)",
+    "position": "{{index}} din {{count}}",
+    "searching": "Se caută…",
+    "none": "Niciun rezultat.",
+    "too_many": "Primele {{shown}} din {{total}} rezultate: restrângeți căutarea.",
+    "short": "Cel puțin două caractere sau Enter.",
+    "this_map": "Această hartă",
+    "level": "Nivel {{level}}",
+    "origin": "Limba originală: {{language}}",
+    "kinds": {
+      "step": "Pas",
+      "lane": "Culoar",
+      "document": "Document",
+      "tool": "Instrument",
+      "pain_point": "Neajuns",
+      "action": "Acțiune"
+    },
+    "results_one": "{{count}} rezultat",
+    "results_few": "{{count}} rezultate",
+    "results_other": "{{count}} de rezultate"
+  },
+  "action_plan": {
+    "command": "Plan de acțiuni",
+    "title": "Plan de acțiuni",
+    "total": "{{hours}} h pierdute pe lună din neajunsurile deschise",
+    "late_count": "Întârziate: {{count}}",
+    "count": "Neajunsuri afișate: {{shown}} din {{total}}",
+    "sort": "Sortează după",
+    "sorts": {
+      "project": "Ordinea proiectului",
+      "lost": "Ore pierdute",
+      "due": "Termen"
+    },
+    "filters": "Filtre",
+    "filter_open": "Deschise",
+    "filter_late": "Întârziate",
+    "filter_no_action": "Fără acțiune",
+    "late": "Întârziat",
+    "no_action": "Nicio acțiune hotărâtă",
+    "map": "Hartă: {{name}}",
+    "lane": "Culoar: {{name}}",
+    "go_to": "Mergi la {{code}}",
+    "edit": "Modifică planul",
+    "edit_of": "Modifică planul pentru {{code}}",
+    "loading": "Se încarcă planul…",
+    "empty": "Niciun neajuns în acest proiect.",
+    "none": "Niciun neajuns nu corespunde filtrelor.",
+    "status_since": "{{status}} din {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Anulează",
+    "undo_of": "Anulează: readu {{code}} la starea „{{status}}”"
+  },
+  "project_pdf": {
+    "sheet_state": "Starea fișei: {{state}}",
+    "continued": "{{title}} (continuare)",
+    "file": "proiect",
+    "contents": "Cuprins",
+    "page": "Pagina {{page}} din {{total}}",
+    "scope_line": "Harta „{{name}}” și nivelurile ei",
+    "empty_map": "Hartă fără pași.",
+    "depth_cut": "Hărțile dincolo de {{max}} niveluri nu sunt în acest document.",
+    "sheets_of": "Fișe · {{map}}",
+    "reading": "Citirea hărților: {{count}}",
+    "reading_sheets": "Citirea fișelor…",
+    "drawing": "Harta {{index}} din {{total}}",
+    "writing": "Scrierea documentului: pagina {{page}}",
+    "too_many_maps": "Peste {{max}} hărți: alegeți „{{scope}}”.",
+    "too_many_pages": "Peste {{max}} pagini: debifați fișele sau exportați o hartă detaliată și nivelurile ei.",
+    "cancelled": "Export anulat.",
+    "title": "Exportare proiect ca PDF",
+    "help": "Toate hărțile într-un singur fișier, nivel cu nivel, pentru cine nu are aplicația.",
+    "scope": "Domeniu",
+    "scope_project": "Tot proiectul",
+    "scope_branch": "Această hartă și nivelurile ei",
+    "with_sheets": "Cu fișele",
+    "with_raci": "Cu matricea RACI",
+    "with_stream": "Cu fluxul de valoare",
+    "with_plan": "Cu planul de acțiuni",
+    "sheets_help": "Fișele sunt cele pe care le vedeți: trimiteți documentul doar celor care le pot citi.",
+    "button": "Creare PDF",
+    "progress": "Progres",
+    "too_many_maps_below": "Peste {{max}} hărți: deschideți o hartă detaliată de la un nivel inferior, apoi alegeți „{{scope}}”.",
+    "too_many_pages_top": "Peste {{max}} pagini: debifați fișele."
   }
 }

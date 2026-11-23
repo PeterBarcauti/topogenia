@@ -116,7 +116,9 @@ public static class AssistantSummariesReader
             return null;
         if (line.Length <= StructureEdits.MapSummaryMax)
             return line;
-        var cut = line[..(StructureEdits.MapSummaryMax - 1)];
+        // Never between the two halves of a character outside the basic plane, as the comments (audit of the copy 64, P2-06).
+        var end = StructureEdits.MapSummaryMax - 1;
+        var cut = line[..(char.IsHighSurrogate(line[end - 1]) ? end - 1 : end)];
         var space = cut.LastIndexOf(' ');
         return (space > StructureEdits.MapSummaryMax / 2 ? cut[..space] : cut).TrimEnd() + "…";
     }

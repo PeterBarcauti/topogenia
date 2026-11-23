@@ -156,8 +156,9 @@ public sealed class DocumentLocationNeverOpenedTests(ApiHosts hosts) : IClassFix
 
     /// <summary>
     /// Every route of the table of the rights, played once as the administrator on a project of its own whose document
-    /// carries the location; then the two routes that table leaves out and that read the base or make a project: the
-    /// health, and the sample project, made once in desktop mode and not found in server mode.
+    /// carries the location; then the routes that table leaves out and that read the base, make a project or answer by the
+    /// mode: the health, the sample project, made once in desktop mode and not found in server mode, and the writes that a
+    /// page declares, held in memory in desktop mode and not found in server mode.
     /// </summary>
     private static async Task WholeTableAsync(ApiHost host, LocationWatch watch)
     {
@@ -166,6 +167,9 @@ public sealed class DocumentLocationNeverOpenedTests(ApiHosts hosts) : IClassFix
         (await watch.CallAsync("GET /api/health", () => admin.GetAsync("/api/health"))).Ok();
         var sample = await watch.CallAsync("POST /api/desktop/sample-project", () => admin.PostAsync("/api/desktop/sample-project"));
         Assert.True(sample.Status is 201 or 404 or 409, $"The sample project: {sample.Status} {sample.Body}");
+        // What a page still has to send (ADR 115): held in memory in desktop mode, not found in server mode, nothing read.
+        var writes = await watch.CallAsync("POST /api/desktop/writes", () => admin.PostAsync("/api/desktop/writes", new { tab = "tour", waiting = false }));
+        Assert.True(writes.Status is 204 or 404, $"The writes of a page: {writes.Status} {writes.Body}");
     }
 
     /// <summary>

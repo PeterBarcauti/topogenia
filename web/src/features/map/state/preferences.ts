@@ -1,5 +1,5 @@
 // preferences.ts
-// The display preferences of the map, kept in the local storage of the browser, and nothing else there (annex B 7, AR-28, AR-90): switches, and the name of the voice of a presentation chosen (audit 3.2, UX-MOY-01).
+// The display preferences of the map, kept in the local storage of the browser, and nothing else there (annex B 7, AR-28, AR-90): switches (the details of the view in BPMN 2.0 among them, ADR 106), the name of the voice of a presentation chosen (audit 3.2, UX-MOY-01), and the day the reminder of an old version was closed (ADR 111).
 
 import { createStore, type StoreApi } from 'zustand/vanilla';
 
@@ -30,6 +30,8 @@ export interface DisplayPreferences {
   readonly presenterStepMessages: boolean;
   /** What a presentation says on the way from a step to the next (the handoffs), on by default (lot J10). */
   readonly presenterFlowMessages: boolean;
+  /** The documents and the notes of the pain points drawn under the steps of the view in BPMN 2.0, on by default (ADR 106). */
+  readonly showBpmnDetails: boolean;
 }
 
 export type PreferenceName = keyof DisplayPreferences;
@@ -49,12 +51,13 @@ export const PREFERENCE_KEYS: Readonly<Record<PreferenceName, string>> = {
   presenterVoiceAsked: 'app.presenterVoiceAsked',
   presenterStepMessages: 'app.presenterStepMessages',
   presenterFlowMessages: 'app.presenterFlowMessages',
+  showBpmnDetails: 'app.bpmnShowDetails',
 };
 
 export const DEFAULT_PREFERENCES: DisplayPreferences = {
   showCodes: true, alwaysShowPictos: true, showRaci: false, showValueStream: false, showAnalysis: false, ribbonCollapsed: false,
   showSummaryOnOpen: true, presenterSubtitles: true, presenterVoice: false,
-  presenterOnlineVoices: false, presenterVoiceAsked: false, presenterStepMessages: true, presenterFlowMessages: true,
+  presenterOnlineVoices: false, presenterVoiceAsked: false, presenterStepMessages: true, presenterFlowMessages: true, showBpmnDetails: true,
 };
 
 /** The layers under the steps, one at a time (spec 14.5), the older first: turning one on turns the others off. */
@@ -95,6 +98,28 @@ function readVoiceName(storage: PreferenceStorage | null): string | null {
     return name === '' || name.length > VOICE_NAME_MAX ? null : name;
   } catch {
     return null;
+  }
+}
+
+/** The key of the day the reminder of an old version was closed (ADR 111): a day `yyyy-mm-dd`, kept by the browser, never by the database. */
+export const UPDATE_REMINDER_CLOSED_KEY = 'app.updateReminderClosed';
+
+/** The day stored, null when none is (absent, too long to be a day, or unreadable); whether it is a real day is the rule of the reminder. */
+export function readReminderClosed(storage: PreferenceStorage | null = browserStorage()): string | null {
+  try {
+    const day = storage?.getItem(UPDATE_REMINDER_CLOSED_KEY) ?? '';
+    return day === '' || day.length > 10 ? null : day;
+  } catch {
+    return null;
+  }
+}
+
+/** Keeps the day the reminder was closed; a storage that refuses leaves it to the visit. */
+export function writeReminderClosed(day: string, storage: PreferenceStorage | null = browserStorage()): void {
+  try {
+    storage?.setItem(UPDATE_REMINDER_CLOSED_KEY, day);
+  } catch {
+    // The storage is full or blocked: the reminder stays closed for the visit only.
   }
 }
 

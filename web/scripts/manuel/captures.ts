@@ -1,109 +1,18 @@
 // captures.ts
-// The captures of the user manual, in French, or in English with MANUEL_LANG=en (the interface, the sample LEAVE and the texts typed in English): the home page, a new project and a proposal of the assistant on its empty map, the sample project (map, menus, sheet, RACI, the route of a flow, detailed map, value stream, the layer Analyse of the Makigami), the dialogs of the header and of the File menu; a capture that fails is noted and the run goes on.
+// The captures of the user manual, in French, or in English with MANUEL_LANG=en (the interface, the sample LEAVE and the texts typed in English): the home page, a new project and a proposal of the assistant on its empty map, the sample project (map, menus, sheet, RACI, the route of a flow, detailed map, value stream, the layer Analyse of the Makigami), the dialogs of the header and of the File menu, a collection of the gallery; a capture that fails is noted and the run goes on.
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Locator, Page } from '@playwright/test';
 import type { Api } from '../../e2e/support/api.ts';
+import { fileEntry } from '../../e2e/support/file-menu.ts';
 import { expect, stepOf, test } from '../../e2e/support/journey.ts';
+import { ANALYSIS, code, FRENCH, label, LANGUAGE, PROPOSAL, PURCHASE_NAME, SAMPLE, TARGET } from './texts.ts';
 
 const FOLDER = process.env.MANUEL_CAPTURES ?? '';
-/** The name of the .pmap format: the name of the product, read where it is written (D13). */
-const PRODUCT = (JSON.parse(readFileSync(new URL('../../src/shared/i18n/locales/fr.json', import.meta.url), 'utf-8')) as { app: { name: string } }).app.name.toLowerCase();
-/** The language of the captures: French by default, English with MANUEL_LANG=en. */
-const LANGUAGE = process.env.MANUEL_LANG ?? 'fr';
-if (LANGUAGE !== 'fr' && LANGUAGE !== 'en') throw new Error('MANUEL_LANG is fr or en.');
-const FRENCH = LANGUAGE === 'fr';
-type Messages = { [key: string]: string | Messages };
-const MESSAGES = JSON.parse(readFileSync(new URL(`../../src/shared/i18n/locales/${LANGUAGE}.json`, import.meta.url), 'utf-8')) as Messages;
-/** A text of the interface in the language of the captures, by its key: the names the gestures look for. */
-function label(key: string): string {
-  const found = key.split('.').reduce<string | Messages | undefined>((node, part) => (typeof node === 'object' ? node[part] : undefined), MESSAGES);
-  if (typeof found !== 'string') throw new Error(`No text ${key} in ${LANGUAGE}.json.`);
-  return found;
-}
-/** The sample offered in the language of the interface (ADR 088): CONGES written in French, LEAVE written in English. */
-const SAMPLE = FRENCH ? 'CONGES' : 'LEAVE';
-/** The small project of purchases, and the target state made from the sample. */
-const PURCHASE = FRENCH ? 'ACH' : 'PUR';
-const TARGET = FRENCH ? 'CIBLE' : 'TARGET';
-const code = (number: number): string => `${SAMPLE}-E${String(number).padStart(3, '0')}`;
 const failures: string[] = [];
-
-/** A small purchase process, pasted back as the reply of the AI of the person: the desired state of the empty map. */
-const PROPOSAL_FR = {
-  format: PRODUCT, version: '1.2', project: { name: 'Demande d’achat' },
-  map: {
-    lanes: [{ id: 'c1', name: 'Demandeur' }, { id: 'c2', name: 'Acheteur', type: 'department' }, { id: 'c3', name: 'Direction', type: 'department' }],
-    steps: [
-      { id: 'e1', lane: 'c1', label: 'Besoin identifié', type: 'start' },
-      { id: 'e2', lane: 'c1', label: 'Saisir la demande d’achat' },
-      { id: 'e3', lane: 'c2', label: 'Montant > 5 000 € ?', type: 'decision' },
-      { id: 'e4', lane: 'c3', label: 'Valider la dépense' },
-      { id: 'e5', lane: 'c2', label: 'Passer la commande' },
-      { id: 'e6', lane: 'c1', label: 'Commande passée', type: 'end' },
-    ],
-    flows: [
-      { source: 'e1', target: 'e2' }, { source: 'e2', target: 'e3' }, { source: 'e3', target: 'e4', label: 'oui' },
-      { source: 'e3', target: 'e5', label: 'non' }, { source: 'e4', target: 'e5' }, { source: 'e5', target: 'e6' },
-    ],
-  },
-};
-
-/** What the person asks the assistant on the sample, and the reply of their AI pasted back. */
-const ANALYSIS_FR = {
-  request: 'Qu’est-ce qui ralentit le traitement d’une demande ?',
-  reply: {
-    form: 'findings', message: 'Trois points à regarder sur la demande de congés.', cited: [],
-    findings: [
-      { kind: 'loop', title: 'Boucle de correction', detail: 'Une demande non conforme repart en saisie, sans délai ni limite de tours.',
-        objects: [code(8), code(2)], suggestion: 'Fixer un délai de correction et prévenir le manager au-delà.' },
-      { kind: 're_entry', title: 'Solde ressaisi', detail: 'Le solde est lu dans la paie, puis comparé à la main à la demande.',
-        objects: [code(13), code(14)], suggestion: 'Afficher le solde dans le formulaire de demande.' },
-      { kind: 'break', title: 'Rupture de support', detail: 'La demande arrive par le portail, l’avis du manager repart par courriel.',
-        objects: [code(4)], suggestion: 'Répondre dans le portail, là où la demande est saisie.' },
-    ],
-  },
-};
-
-/** The same purchase process, written in English. */
-const PROPOSAL_EN = {
-  format: PRODUCT, version: '1.2', project: { name: 'Purchase request' },
-  map: {
-    lanes: [{ id: 'c1', name: 'Requester' }, { id: 'c2', name: 'Buyer', type: 'department' }, { id: 'c3', name: 'Management', type: 'department' }],
-    steps: [
-      { id: 'e1', lane: 'c1', label: 'Need identified', type: 'start' },
-      { id: 'e2', lane: 'c1', label: 'Enter the purchase request' },
-      { id: 'e3', lane: 'c2', label: 'Amount > €5,000?', type: 'decision' },
-      { id: 'e4', lane: 'c3', label: 'Approve the expense' },
-      { id: 'e5', lane: 'c2', label: 'Place the order' },
-      { id: 'e6', lane: 'c1', label: 'Order placed', type: 'end' },
-    ],
-    flows: [
-      { source: 'e1', target: 'e2' }, { source: 'e2', target: 'e3' }, { source: 'e3', target: 'e4', label: 'yes' },
-      { source: 'e3', target: 'e5', label: 'no' }, { source: 'e4', target: 'e5' }, { source: 'e5', target: 'e6' },
-    ],
-  },
-};
-
-/** The same analysis of the leave request, written in English. */
-const ANALYSIS_EN = {
-  request: 'What slows down the handling of a request?',
-  reply: {
-    form: 'findings', message: 'Three points to look at in the leave request.', cited: [],
-    findings: [
-      { kind: 'loop', title: 'Correction loop', detail: 'A request that is not compliant goes back to be entered again, with no deadline and no limit on the rounds.',
-        objects: [code(8), code(2)], suggestion: 'Set a deadline for the correction and warn the manager beyond it.' },
-      { kind: 're_entry', title: 'Balance entered again', detail: 'The balance is read in the payroll, then compared by hand with the request.',
-        objects: [code(13), code(14)], suggestion: 'Show the balance in the request form.' },
-      { kind: 'break', title: 'Media break', detail: 'The request arrives through the portal, the opinion of the manager goes back by email.',
-        objects: [code(4)], suggestion: 'Reply in the portal, where the request is entered.' },
-    ],
-  },
-};
-
-const PROPOSAL = FRENCH ? PROPOSAL_FR : PROPOSAL_EN;
-const ANALYSIS = FRENCH ? ANALYSIS_FR : ANALYSIS_EN;
+/** The code of the small project of purchases: the one the form proposed from its name (capture 02). */
+let purchase = '';
 
 async function settled(page: Page): Promise<void> {
   await page.evaluate(() => Promise.all(document.getAnimations()
@@ -126,6 +35,8 @@ async function shot(page: Page, name: string, element?: Locator, keepPointer = f
 /** The colours of a terminal message (the escape sign, a bracket, numbers, m); the folder where the screen at a failure is kept, outside the manual. */
 const COLOURS = new RegExp(`${String.fromCodePoint(27)}\\[[0-9;]*m`, 'g');
 const FAILURES = process.env.MANUEL_FAILURES;
+/** The folder of the site, read only, whose gallery gives the collection of capture 47. */
+const SITE = process.env.MANUEL_SITE ?? '';
 
 /** One capture and the gestures before it: a failure is noted, the menus and dialogs are closed, and the run goes on. */
 async function capture(page: Page, name: string, gestures: () => Promise<void>): Promise<void> {
@@ -171,15 +82,22 @@ async function firstProject(page: Page): Promise<void> {
     await expect(page.getByTestId('home-sample')).toBeVisible();
     await shot(page, '01-accueil');
   });
-  // The sample is offered while no project exists: created first.
-  await page.getByTestId('home-sample').getByRole('button').first().click();
+  // The sample is offered while no project exists: created first, it opens its map (ADR 111); back to the home page.
+  await page.getByTestId('home-sample-create').click();
+  await expect(stepOf(page, code(1))).toBeVisible();
+  await page.getByTestId('header-brand').click();
   await expect(page.getByTestId(`project-${SAMPLE}`)).toBeVisible();
 
+  // « New project » is a menu of the starts, the blank map first; the form asks the name, proposes the code from it and folds the rest under « More options ».
   await capture(page, '02-nouveau-projet', async () => {
     await page.getByTestId('home-new-project').click();
-    await page.getByTestId('new-project-code').fill(PURCHASE);
-    await page.getByTestId(`new-project-name-${LANGUAGE}`).fill(FRENCH ? 'Demande d’achat' : 'Purchase request');
-    await page.getByTestId('new-project-description').fill(FRENCH ? 'Du besoin d’achat à la commande passée.' : 'From the purchase need to the order placed.');
+    await page.getByTestId('home-start-menu-blank').click();
+    await page.getByTestId(`new-project-name-${LANGUAGE}`).fill(PURCHASE_NAME);
+    const field = page.getByTestId('new-project-code');
+    await expect(field).toHaveValue(/^[A-Z]{3,6}$/);
+    await expect(page.getByTestId('new-project')).toContainText(label('project.code_proposed'));
+    purchase = await field.inputValue();
+    await expect(page.getByTestId('new-project-create')).toBeEnabled();
     await shot(page, '02-nouveau-projet');
     await page.getByTestId('new-project-create').click();
     await expect(page.getByTestId('map-empty')).toBeVisible();
@@ -211,7 +129,7 @@ async function firstProject(page: Page): Promise<void> {
   // The sample project, from the home page.
   await capture(page, '07-accueil-projets', async () => {
     await page.getByTestId('header-brand').click();
-    await expect(page.getByTestId(`project-${PURCHASE}`)).toBeVisible();
+    await expect(page.getByTestId(`project-${purchase}`)).toBeVisible();
     await shot(page, '07-accueil-projets');
   });
 }
@@ -438,7 +356,7 @@ async function presentation(page: Page): Promise<void> {
   await expect(stage).toHaveCount(0);
 }
 
-/** The analysis by the assistant, the File menu and its dialogs, the languages, the settings of the AI, the account and the import (captures 22 to 30). */
+/** The analysis by the assistant, the File menu and its dialogs, the languages (captures 22 to 27, 33 and 44). */
 async function menusAndSettings(page: Page): Promise<void> {
   await capture(page, '22-assistant-analyse', async () => {
     await page.getByTestId('ribbon-assistant').click();
@@ -452,14 +370,14 @@ async function menusAndSettings(page: Page): Promise<void> {
 
   await capture(page, '23-menu-fichier', async () => {
     await page.getByTestId('header-file').click();
-    await expect(page.getByTestId('menu-file-file.pdf')).toBeVisible();
+    await expect(await fileEntry(page, 'file.pdf')).toBeVisible();
     await shot(page, '23-menu-fichier', undefined, true);
     await page.keyboard.press('Escape');
   });
 
   await capture(page, '24-proprietes', async () => {
     await page.getByTestId('header-file').click();
-    await page.getByTestId('menu-file-file.properties').click();
+    await (await fileEntry(page, 'file.properties')).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await shot(page, '24-proprietes');
     await page.keyboard.press('Escape');
@@ -467,7 +385,7 @@ async function menusAndSettings(page: Page): Promise<void> {
 
   await capture(page, '25-export-paquet', async () => {
     await page.getByTestId('header-file').click();
-    await page.getByTestId('menu-file-file.export').click();
+    await (await fileEntry(page, 'file.export')).click();
     await expect(page.getByTestId('export-package-without-people')).toBeVisible();
     await shot(page, '25-export-paquet');
     await page.keyboard.press('Escape');
@@ -475,7 +393,7 @@ async function menusAndSettings(page: Page): Promise<void> {
 
   await capture(page, '33-export-svg', async () => {
     await page.getByTestId('header-file').click();
-    await page.getByTestId('menu-file-file.svg').click();
+    await (await fileEntry(page, 'file.svg')).click();
     await expect(page.getByTestId('export-svg-editable')).toBeEnabled();
     await shot(page, '33-export-svg');
     await page.keyboard.press('Escape');
@@ -484,7 +402,7 @@ async function menusAndSettings(page: Page): Promise<void> {
   // The poster for a wall (Makigami M9): its dialog on A4 landscape, the count, the size and the scale said.
   await capture(page, '44-imprimer-en-grand', async () => {
     await page.getByTestId('header-file').click();
-    await page.getByTestId('menu-file-file.wall').click();
+    await (await fileEntry(page, 'file.wall')).click();
     await expect(page.getByTestId('wall-print-summary')).toBeVisible();
     await shot(page, '44-imprimer-en-grand');
     await page.keyboard.press('Escape');
@@ -501,7 +419,10 @@ async function menusAndSettings(page: Page): Promise<void> {
     await shot(page, '27-langue-processus', undefined, true);
     await page.keyboard.press('Escape');
   });
+}
 
+/** The settings of the AI and the menu of the account (captures 28 and 29). */
+async function settingsAndAccount(page: Page): Promise<void> {
   await capture(page, '28-parametres-ia', async () => {
     await page.getByTestId('header-assistant').click();
     await expect(page.getByTestId('assistant-settings')).toBeVisible();
@@ -515,6 +436,9 @@ async function menusAndSettings(page: Page): Promise<void> {
 
   await capture(page, '29-menu-compte', async () => {
     await page.getByTestId('header-user').click();
+    // The language of the interface, « Check for updates » (the administrator, the links to the site given) and « Quit », the last.
+    await expect(page.getByTestId('account-menu-update')).toBeVisible();
+    await expect(page.getByTestId('account-menu-quit')).toBeVisible();
     await shot(page, '29-menu-compte', undefined, true);
     await page.keyboard.press('Escape');
   });
@@ -542,7 +466,7 @@ async function targetState(page: Page, api: Api): Promise<void> {
 
   await capture(page, '42-etat-cible', async () => {
     await page.getByTestId('header-file').click();
-    await page.getByTestId('menu-file-file.target').click();
+    await (await fileEntry(page, 'file.target')).click();
     const dialog = page.getByRole('dialog', { name: label('files.target_title') });
     await dialog.getByLabel(label('project.code')).fill(TARGET);
     await shot(page, '42-etat-cible-creer');
@@ -561,7 +485,7 @@ async function targetState(page: Page, api: Api): Promise<void> {
   });
 }
 
-/** The dialogs of the home page: the opening of a file in every format it reads, the import of a package (captures 34 and 30). */
+/** The dialogs of the home page: the opening of a file in every format it reads, the import of a package, the opening of the collection Purchasing of the gallery in the language of the captures, read (never written) in the site next to the repository (captures 34, 30 and 47). */
 async function homeDialogs(page: Page): Promise<void> {
   await capture(page, '34-ouvrir-un-fichier', async () => {
     await page.getByTestId('header-brand').click();
@@ -578,6 +502,16 @@ async function homeDialogs(page: Page): Promise<void> {
     await shot(page, '30-import-paquet');
     await page.keyboard.press('Escape');
   });
+
+  await capture(page, '47-ouvrir-une-collection', async () => {
+    await page.getByTestId('header-brand').click();
+    await page.getByTestId('home-open-pmap').click();
+    await expect(page.getByRole('dialog', { name: label('files.open_title') })).toBeVisible();
+    await page.getByTestId('open-pmap-file').setInputFiles({ name: `purchasing.${LANGUAGE}.pmaps`, mimeType: 'application/json', buffer: readFileSync(join(SITE, FRENCH ? 'modeles/achats' : 'en/templates/purchasing', `purchasing.${LANGUAGE}.pmaps`)) });
+    await expect(page.getByTestId('collection-row-0')).toBeVisible();
+    await shot(page, '47-ouvrir-une-collection');
+    await page.getByTestId('collection-cancel').click();
+  });
 }
 
 test('the captures of the manual', async ({ page, api, context }) => {
@@ -593,8 +527,11 @@ test('the captures of the manual', async ({ page, api, context }) => {
   await analysis(page);
   await presentation(page);
   await menusAndSettings(page);
+  await settingsAndAccount(page);
   await homeDialogs(page);
   await targetState(page, api);
 
   writeFileSync(join(FOLDER, 'echecs.txt'), failures.length === 0 ? 'aucun\n' : `${failures.join('\n')}\n`, 'utf8');
+  // A capture missing makes the run red: the folders of the manual are then not replaced (harnais, series F).
+  expect(failures).toEqual([]);
 });

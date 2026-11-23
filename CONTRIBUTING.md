@@ -16,7 +16,7 @@
 - **Dépendances** : licence permissive (MIT, Apache-2.0, BSD, ISC, OFL pour les polices),
   publication dans les 12 derniers mois, version figée, inscrite dans
   `THIRD-PARTY-NOTICES.md`.
-- **Cœur fermé** : le domaine (`src/Topogenia.Domain`) et ses tests sont sous licence propriétaire (ADR 048) :
+- **Cœur fermé** : le domaine (`src/Topogenia.Domain` (non publié)) et ses tests sont sous licence propriétaire (ADR 048) :
   aucune contribution externe n'y est reçue ; le reste du dépôt est sous Apache-2.0. Le dépôt public ne porte pas leurs
   sources : il compile avec le paquet `Topogenia.Core`, remis avec la licence écrite du titulaire et posé dans
   `artifacts/core-feed` (ADR 074) ; les règles d'architecture qui lisent les sources du cœur y sont sautées, avec leur

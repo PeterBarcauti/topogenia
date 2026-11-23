@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-P6-T04 est découpée en trois lots (`plan.md`, phase 6). Le lot 1 affiche la carte : magasin et chargement, canevas,
+P6-T04 est découpée en trois lots (`plan.md` (non publié), phase 6). Le lot 1 affiche la carte : magasin et chargement, canevas,
 vue accrochée, étapes (codes, pictogrammes, jauge, avertissements), en-têtes de couloirs, flèches tracées par le module
 de routage de P6-T05 (ADR 059). La spec 3.5 donne l'organisation (`model/`, `state/`, `canvas/`, `nodes/`, `edges/`,
 `chrome/`), la spec 9.3 à 9.5 et la maquette validée donnent le rendu, l'annexe B 2.1, 2.2, 2.10, 2.12 et 3 les

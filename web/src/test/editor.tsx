@@ -167,9 +167,9 @@ export interface EditorFakes {
 
 /** The same, with the fakes given. */
 export async function showEditorWith(options: EditorFakes, map: Schema<'MapView'>, ...next: Schema<'MapView'>[]) {
-  const notes: [string, string | undefined][] = [];
+  const notes: [string, string | undefined, string?][] = [];
   const opened: string[] = [];
-  const editor = createMapEditor({ source: sourceOf(map, ...next), storage: options.storage ?? memoryStorage(), notify: (text, kind) => notes.push([text, kind]),
+  const editor = createMapEditor({ source: sourceOf(map, ...next), storage: options.storage ?? memoryStorage(), notify: (text, kind, _action, key) => notes.push(key === undefined ? [text, kind] : [text, kind, key]),
     navigate: (path) => opened.push(path), comments: options.comments ?? memoryComments().source, onlineVoices: options.onlineVoices ?? (() => Promise.resolve(true)),
     voices: options.voices ?? memoryVoices().source });
   const { container } = renderMapScreen({ mapId: MAP_ID, editor });

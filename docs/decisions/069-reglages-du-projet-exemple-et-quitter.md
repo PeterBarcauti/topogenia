@@ -53,11 +53,11 @@ Le profil ne disait pas à l'interface dans quel mode l'hôte tourne.
 ## Conséquences
 
 - Deux routes nouvelles au contrat (`openapi.json` réécrit, client régénéré) et à la table des routes de
-  `couverture.md` ; `ProfileView.desktop` facultatif, `ProjectListItem.classification` requis.
+  `couverture.md` (non publié) ; `ProfileView.desktop` facultatif, `ProjectListItem.classification` requis.
 - L'audit du changement de classification va au-delà de la liste de la spec 5.5 : la classification gouverne le
   traitement des exports (spec 4.1), un abaissement doit se retrouver. Une ligne nouvelle de la couverture le
   porte.
-- Restes acceptés, inscrits au registre `a-peaufiner.md` : une fiche ouverte garde le libellé du groupe lu à son
+- Restes acceptés, inscrits au registre `a-peaufiner.md` (non publié) : une fiche ouverte garde le libellé du groupe lu à son
   ouverture jusqu'à sa réouverture ; la carte de l'exemple et la classification de l'accueil empruntent les styles de
   `.project` et `.project-meta` (aucune couleur propre aux niveaux « Confidentiel » et « Strictement confidentiel »).
 - Le parcours « Quitter » arrête l'hôte : il se joue sur un hôte à lui ou en dernier.

@@ -1,5 +1,5 @@
 // Shell.tsx
-// The envelope of every screen: profile loading or its error, header, the screen of the address, notifications, Ctrl+S, the project opened remembered, the application stopped (annex B 1.2, B-2.5-05, AR-49, spec 5.2).
+// The envelope of every screen: profile loading or its error, header, the screen of the address, notifications, Ctrl+S, the project opened remembered, the writes waiting declared in desktop mode, the application stopped (annex B 1.2, B-2.5-05, AR-49, spec 5.2, ADR 115).
 
 import { useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { useGlobalShortcut } from '../shared/keyboard/KeyboardContext.tsx';
 import { openProject } from '../shared/state/openProject.ts';
 import { notify } from '../shared/ui/toasts.ts';
 import { Toaster } from '../shared/ui/Toaster.tsx';
+import { declareWrites } from './desktopWrites.ts';
 import { ErrorPage } from './ErrorPage.tsx';
 import { Header } from './Header.tsx';
 import { useProfile } from './profile/ProfileProvider.tsx';
@@ -69,6 +70,7 @@ export function Shell({ screens }: { screens: Screens }) {
   const rememberProject = useProfile((state) => state.rememberProject);
   const projectId = useStore(openProject, (state) => state.project?.id ?? null);
   const halted = useStore(stopped, (state) => state.stopped);
+  const desktop = profile?.desktop === true;
   useGlobalShortcut('Ctrl+S', () => {
     notify(t('app.autosaved'));
   });
@@ -76,6 +78,8 @@ export function Shell({ screens }: { screens: Screens }) {
   useEffect(() => {
     if (projectId !== null) void rememberProject(projectId);
   }, [projectId, rememberProject]);
+  // The icon near the clock waits for what this tab still has to write before it stops the host (ADR 115).
+  useEffect(() => (desktop ? declareWrites() : undefined), [desktop]);
   if (halted) return <Stopped />;
   if (profile === null && error !== null)
     return <ErrorPage testId="page-profile-error" message={messageOf(error)} actionLabel={t('app.retry')} onAction={() => void load()} />;

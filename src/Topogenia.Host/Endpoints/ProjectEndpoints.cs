@@ -1,5 +1,5 @@
 // ProjectEndpoints.cs
-// The HTTP entry points of the profile and of the projects: me, list, create, detail, label of the sharing group, classification, glossary of the translations, export, import, .pmap (annex A 1, spec 3.6, 4.1, 7), voices kept for the presentation (ADR 103).
+// The HTTP entry points of the profile and of the projects: me, list, create, code proposed (ADR 111), detail, label of the sharing group, classification, glossary of the translations, export, import, .pmap and the preview of a collection (annex A 1, spec 3.6, 4.1, 7), voices kept for the presentation (ADR 103), search (ADR 110).
 
 using Microsoft.AspNetCore.Mvc;
 using Topogenia.Domain.Errors;
@@ -31,6 +31,10 @@ public static class ProjectEndpoints
             var created = await api.CreateAsync(body, token);
             return TypedResults.Created($"/api/projects/{created.Id}", created);
         });
+        // The code proposed from the name of a new project (3.4, lot 3, ADR 111 point 7), before the routes of a project: the
+        // name in the body of a POST, never in the address that the logs of IIS write; 4 KB at most, refused before it is read.
+        projects.MapPost("/code-proposal", async (CodeProposalBody body, ProjectApi api, CancellationToken token) =>
+            TypedResults.Ok(await api.ProposeCodeAsync(body, token))).WithMetadata(new RequestSizeLimitAttribute(ProjectApi.CodeProposalLimit));
         projects.MapGet("/{id:guid}", async (Guid id, ProjectApi api, CancellationToken token) => TypedResults.Ok(await api.GetAsync(id, token)));
         projects.MapPut("/{id:guid}/sharing-group-label",
             async (Guid id, SharingGroupLabelBody body, [FromHeader(Name = "If-Match")] string? ifMatch, ProjectApi api, CancellationToken token) =>
@@ -53,6 +57,10 @@ public static class ProjectEndpoints
             var package = await api.ExportAsync(id, body, token);
             return TypedResults.File(package.Content, ExchangeApi.ExportMediaType, package.FileName);
         }).Produces(StatusCodes.Status200OK, typeof(Stream), ExchangeApi.ExportMediaType);
+        // The search of a word in the whole project (3.4, lot 2, ADR 110): the word in the body of a POST, never in the
+        // address that the logs of IIS write; 4 KB at most, refused before it is read.
+        projects.MapPost("/{id:guid}/search", async (Guid id, SearchBody body, ProjectApi api, CancellationToken token) =>
+            TypedResults.Ok(await api.SearchAsync(id, body, token))).WithMetadata(new RequestSizeLimitAttribute(ProjectApi.SearchLimit));
         MapImportRoutes(projects);
         MapPmapRoutes(projects);
         MapVoiceRoutes(projects);
@@ -73,7 +81,8 @@ public static class ProjectEndpoints
 
     /// <summary>
     /// The `.pmap` files (ADR 054): the copy as a text file named by the rule of the 1.x (A-1.2-16), the opening of a file
-    /// (10 MB at most, refused before it is read, read after its right) and the duplication, both creating a project (201).
+    /// (10 MB at most, refused before it is read, read after its right) and the duplication, both creating a project (201);
+    /// the preview of a collection (ADR 114), bounded and read as the opening.
     /// </summary>
     private static void MapPmapRoutes(RouteGroupBuilder projects)
     {
@@ -90,6 +99,10 @@ public static class ProjectEndpoints
             var opened = await api.OpenAsync(request, token);
             return TypedResults.Created($"/api/projects/{opened.Id}", opened);
         }).WithMetadata(new RequestSizeLimitAttribute(PmapApi.OpeningLimit)).Accepts<OpenPmapBody>("application/json");
+        // The preview of a template collection (ADR 114): read only, 10 MB at most as the opening it precedes, read after its right.
+        projects.MapPost("/import-collection/preview", async (HttpRequest request, PmapApi api, CancellationToken token) =>
+            TypedResults.Ok(await api.PreviewCollectionAsync(request, token)))
+            .WithMetadata(new RequestSizeLimitAttribute(PmapApi.OpeningLimit)).Accepts<PreviewCollectionBody>("application/json");
         projects.MapPost("/{id:guid}/duplicate", async (Guid id, DuplicateProjectBody body, PmapApi api, HttpResponse response, CancellationToken token) =>
         {
             var duplicated = await api.DuplicateAsync(id, body, token);

@@ -5,6 +5,7 @@ import type { Page } from '@playwright/test';
 import { expect, openMap, openSheetOf, test } from './support/journey.ts';
 import { laneOf } from './support/map-editing.ts';
 import { BASE_URL } from './support/run.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 /** The addresses that are neither of the application nor kept in the page (data:, blob: of the application). */
 function foreign(addresses: readonly string[], origin: string): string[] {
@@ -40,7 +41,7 @@ test('the home page, a map with its icons, its fonts and a sheet, then an export
   await page.evaluate(() => document.fonts.ready);
   const download = page.waitForEvent('download');
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.png').click();
+  await (await fileEntry(page, 'file.png')).click();
   await download;
   await expect(page.getByText('Export terminé : le fichier est dans le dossier Téléchargements.')).toBeVisible();
 

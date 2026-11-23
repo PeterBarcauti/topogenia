@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) ne s’est pas arrêté. Réessayer, ou fermer la fenêtre de la console.",
     "quit_unsaved": "Une saisie de la fiche n’est pas encore enregistrée : $t(app.name) reste ouvert. Réessayer une fois la fiche enregistrée.",
     "stopped": "$t(app.name) est arrêté. Cet onglet peut être fermé.",
-    "stopped_help": "Pour le relancer, l’ouvrir de nouveau."
+    "stopped_help": "Pour le relancer, l’ouvrir de nouveau.",
+    "help_menu": "Menu Aide",
+    "help_online": "Aide en ligne",
+    "update_check": "Rechercher une mise à jour",
+    "update_check_help": "Ouvre la page des versions du site. Installée : {{version}} du {{date}}.",
+    "update_check_store_help": "Ouvre la fiche du Microsoft Store, qui fait les mises à jour.",
+    "quit_text_unsaved": "Un formulaire ouvert n’est pas enregistré : sa saisie sera perdue.",
+    "quit_anyway": "Quitter quand même"
   },
   "keys": {
     "Shift": "Maj",
@@ -34,7 +41,12 @@
     "Escape": "Échap",
     "Space": "Espace",
     "Enter": "Entrée",
-    "ArrowUp": "Haut"
+    "ArrowUp": "Haut",
+    "ArrowLeft": "Gauche",
+    "ArrowRight": "Droite",
+    "ArrowDown": "Bas",
+    "Backspace": "Retour arrière",
+    "Wheel": "Molette"
   },
   "errors": {
     "RESEAU": "$t(app.name) ne répond pas. Vérifier que $t(app.name) est toujours lancé (ou la connexion au réseau s’il est sur un serveur).",
@@ -42,13 +54,24 @@
     "REPONSE_INVALIDE": "Réponse inattendue du serveur. Recharger la page.",
     "ACCES_REFUSE": "Droits insuffisants pour cette page.",
     "UNKNOWN": "Une erreur inattendue s’est produite.",
-    "RESUMES_A_JOUR": "Toutes les cartes ont un résumé à jour. Pour en refaire un, ouvrez la carte et cliquez sur « i » à côté de son titre."
+    "RESUMES_A_JOUR": "Toutes les cartes ont un résumé à jour. Pour en refaire un, ouvrez la carte et cliquez sur « i » à côté de son titre.",
+    "COLLECTION_TROP_DE_PROCESSUS": "La collection compte trop de processus."
   },
   "home": {
     "eyebrow": "Pour booster vos processus avec l’IA, commencez par les décrire.",
     "title": "Cartographiez vos processus réels pour automatiser les actions répétitives et gagner en efficacité.",
     "button": "Décrire un processus",
     "button_help": "Ouvrir la carte du projet pour la compléter.",
+    "update_line": "Cette version date du {{date}}.",
+    "update_link": "Voir s’il en existe une plus récente",
+    "update_close": "Fermer le rappel",
+    "button_start_help": "Choisir un point de départ.",
+    "start_menu": "Commencer un projet",
+    "start_sample": "Projet d’exemple",
+    "start_gallery": "Galerie de modèles",
+    "start_gallery_help": "S’ouvre dans le navigateur.",
+    "start_blank": "Carte vide…",
+    "new_project_help": "Partir d’une carte vide, d’un exemple ou d’un modèle.",
     "projects": "Projets",
     "no_project": "Aucun projet pour l’instant. L’animateur du projet enverra une invitation.",
     "no_project_admin": "Aucun projet pour l’instant. Créer le premier.",
@@ -79,7 +102,14 @@
     "sample_title": "Projet d’exemple",
     "sample_text": "Un projet fictif, déjà décrit, pour découvrir une carte complète : couloirs, décisions, sous-carte, fiches, documents et irritants. Il se supprime comme tout projet.",
     "sample_create": "Créer le projet d’exemple",
-    "sample_created": "Projet d’exemple {{code}} créé."
+    "sample_created": "Projet d’exemple {{code}} créé.",
+    "filter": "Filtrer les projets",
+    "filter_placeholder": "Code ou nom",
+    "filter_count": "{{shown}} sur {{total}}",
+    "filter_none": "Aucun projet ne correspond.",
+    "new_project_help_no_sample": "Partir d’une carte vide ou d’un modèle.",
+    "new_project_help_no_gallery": "Partir d’une carte vide ou d’un exemple.",
+    "new_project_help_blank": "Partir d’une carte vide."
   },
   "roles": {
     "facilitator": "Animateur",
@@ -90,6 +120,8 @@
     "create_title": "Créer un projet",
     "code": "Code court",
     "code_help": "3 à 6 lettres majuscules, unique et définitif (ex. VIS).",
+    "code_proposed": "Proposé d’après le nom.",
+    "more_options": "Plus d’options",
     "name_in": "Nom en {{language}}",
     "names_help": "Le nom se traduit dans les autres langues ici ou plus tard, avec le reste du processus.",
     "description": "Description",
@@ -112,7 +144,7 @@
     "properties": "Propriétés du projet…",
     "properties_title": "Propriétés du projet {{code}}",
     "sharing_group": "Groupe de partage des documents",
-    "sharing_group_help": "Nommé dans les fiches pour une entrée partagée (ex. Équipe finance). Vide : « le groupe de partage du projet ».",
+    "sharing_group_help": "Nom du groupe de personnes qui peut lire les documents du projet. Repris sur la case « Partagé avec le groupe » de chaque document d'une fiche. Vide : « le groupe de partage du projet ».",
     "properties_read_only": "Seul un animateur du projet modifie ces propriétés.",
     "properties_saved": "Propriétés du projet enregistrées.",
     "language": "Langue du processus",
@@ -123,10 +155,42 @@
     "fte_hours": "Heures par ETP et par mois",
     "fte_hours_help": "De 1 à 744 h, 151,67 par défaut : convertit la charge en équivalents temps plein."
   },
+  "project_pdf": {
+    "sheet_state": "État de la fiche : {{state}}",
+    "continued": "{{title}} (suite)",
+    "file": "projet",
+    "contents": "Sommaire",
+    "page": "Page {{page}} sur {{total}}",
+    "scope_line": "Carte « {{name}} » et ses niveaux",
+    "empty_map": "Carte sans étape.",
+    "depth_cut": "Les cartes au-delà de {{max}} niveaux ne sont pas dans ce document.",
+    "sheets_of": "Fiches · {{map}}",
+    "reading": "Lecture des cartes : {{count}}",
+    "reading_sheets": "Lecture des fiches…",
+    "drawing": "Carte {{index}} sur {{total}}",
+    "writing": "Écriture du document : page {{page}}",
+    "too_many_maps": "Plus de {{max}} cartes : choisissez « {{scope}} ».",
+    "too_many_pages": "Plus de {{max}} pages : décochez les fiches ou exportez une carte détaillée et ses niveaux.",
+    "cancelled": "Export annulé.",
+    "title": "Exporter le projet en PDF",
+    "help": "Toutes les cartes dans un seul fichier, niveau par niveau, pour qui n’a pas l’application.",
+    "scope": "Étendue",
+    "scope_project": "Tout le projet",
+    "scope_branch": "Cette carte et ses niveaux",
+    "with_sheets": "Avec les fiches",
+    "with_raci": "Avec la matrice RACI",
+    "with_stream": "Avec le flux de valeur",
+    "with_plan": "Avec le plan d’actions",
+    "sheets_help": "Les fiches sont celles que vous voyez : n’envoyez le document qu’à qui peut les lire.",
+    "button": "Créer le PDF",
+    "progress": "Avancement",
+    "too_many_maps_below": "Plus de {{max}} cartes : ouvrez une carte détaillée plus bas, puis choisissez « {{scope}} ».",
+    "too_many_pages_top": "Plus de {{max}} pages : décochez les fiches."
+  },
   "files": {
     "open": "Ouvrir un fichier…",
     "open_title": "Ouvrir un fichier",
-    "open_help": "Le fichier devient un nouveau projet : un fichier .pmap (copie téléchargée ou réponse d’une IA qui a lu un croquis), un tableau Excel ou CSV, un diagramme Mermaid (.mmd, .md) ou une image SVG exportée avec sa copie modifiable.",
+    "open_help": "Le fichier devient un nouveau projet : un fichier .pmap (copie téléchargée ou réponse d’une IA qui a lu un croquis), une collection de modèles (.pmaps), un tableau Excel ou CSV, un diagramme Mermaid (.mmd, .md) ou une image SVG exportée avec sa copie modifiable.",
     "choose": "Choisir un fichier…",
     "or_paste": "Ou coller son contenu ici, par exemple la réponse d’une IA :",
     "area": "Coller ou déposer ici le contenu du fichier .pmap",
@@ -137,6 +201,21 @@
     "created_summary": "Étapes : {{steps}} · Couloirs : {{lanes}} · Liens : {{flows}} · Cartes : {{maps}}",
     "uncertainties": "Points à vérifier, signalés dans le fichier :",
     "open_map": "Ouvrir la carte",
+    "collection_title": "Collection « {{name}} »",
+    "collection_help": "Un projet est créé pour chaque processus coché. Rien n’est écrit avant « Créer les projets ».",
+    "collection_all": "Tout cocher",
+    "collection_ticked": "Cochés : {{count}} sur {{total}}",
+    "collection_points": "Points à vérifier : {{count}}",
+    "collection_details": "Description et points à vérifier",
+    "collection_code_free": "{{code}} est déjà pris.",
+    "collection_invalid": "Ne peut pas être ouvert :",
+    "collection_create": "Créer les projets",
+    "collection_creating": "Création {{done}} sur {{total}}…",
+    "collection_done": "Projets créés",
+    "collection_created": "{{code}} créé.",
+    "collection_failed": "Non créé : {{reason}}",
+    "collection_retry": "Réessayer",
+    "collection_unnamed": "Processus {{rank}}",
     "duplicate": "Dupliquer le projet…",
     "duplicate_title": "Dupliquer le projet",
     "duplicate_help": "La copie reprend toutes les cartes : couloirs, étapes, flèches et RACI. Les fiches, documents et irritants restent dans le projet d’origine. La personne qui duplique en devient l’animateur ; les membres ne sont pas copiés.",
@@ -192,7 +271,37 @@
     "target_name": "{{name}} (état cible)",
     "target_label": "Libellé de la référence",
     "target_label_default": "État actuel",
-    "target_button": "Créer"
+    "target_button": "Créer",
+    "map_download": "Enregistrer la carte ouverte (.pmap)",
+    "map_downloaded": "Carte enregistrée avec ses cartes détaillées, ses fiches et ses commentaires : le fichier .pmap est dans le dossier Téléchargements.",
+    "insert": "Insérer un fichier comme étape détaillée…",
+    "insert_here": "Insérer un fichier ici…",
+    "insert_title": "Insérer un fichier comme étape détaillée",
+    "insert_help": "Le fichier devient une nouvelle étape détaillée de cette carte. C’est une copie : modifier le fichier ensuite ne change pas la carte. Fichier .pmap, tableau Excel ou CSV, diagramme Mermaid ou image SVG avec sa copie.",
+    "replace_title": "Remplacer le détail par un fichier",
+    "replace_help": "Le détail de « {{label}} » part à la corbeille et le fichier prend sa place. Ctrl+Z annule le tout.",
+    "insert_counts": "Étapes : {{steps}} · Couloirs : {{lanes}} · Liens : {{flows}} · Cartes : {{maps}} · Fiches : {{sheets}}",
+    "insert_too_deep": "Ce fichier a {{depth}} niveaux de cartes ; sous cette carte, il en faut {{room}} au plus.",
+    "insert_too_large": "Ce fichier dépasse {{max}} Mo : il ne peut pas être inséré.",
+    "open_too_large": "Ce fichier dépasse {{max}} Mo : il ne peut pas être ouvert.",
+    "insert_package": "C’est un paquet d’échange : il s’importe comme un projet, il ne s’insère pas.",
+    "insert_collection": "Une collection s’ouvre par « Ouvrir un fichier… ». Insérer un de ses modèles seul.",
+    "insert_dropped": "Traductions écartées (langues non configurées ici) : {{languages}}",
+    "insert_label": "Libellé de l’étape",
+    "insert_lane": "Couloir",
+    "insert_after": "Placer après",
+    "insert_at_start": "Au début de la carte",
+    "insert_sheets": "Reprendre les fiches",
+    "insert_sheets_help": "Les fiches, leurs documents et leurs irritants arrivent en brouillon, à relire puis valider.",
+    "insert_button": "Insérer",
+    "replace_button": "Remplacer",
+    "inserted": "Fichier inséré. Étapes : {{steps}} · Cartes : {{maps}}",
+    "insert_on_flow": "Sur la flèche {{from}} → {{to}}",
+    "insert_on_flow_here": "Insérer un fichier sur cette flèche…",
+    "collection_none": "Aucun projet créé",
+    "collection_code_twice": "{{code}} est aussi donné à une autre ligne.",
+    "collection_fix": "Corriger le texte",
+    "remote_locations": "Adresses réseau ou web dans les fiches : {{count}}, à vérifier avant d’ouvrir un document."
   },
   "package": {
     "export": "Exporter le projet ({{extension}})…",
@@ -230,6 +339,11 @@
   "export": {
     "pdf": "Exporter en PDF (A3 paysage)",
     "png": "Exporter en image PNG",
+    "copy_image": "Copier la carte en image",
+    "copying": "Copie de l’image…",
+    "copied": "Image copiée : la coller (Ctrl+V) dans un courriel ou une diapositive.",
+    "copy_failed": "L’image n’a pas pu être copiée.",
+    "copy_as_png": "Exporter en PNG",
     "svg": "Exporter en image SVG…",
     "svg_title": "Exporter en image SVG",
     "svg_help": "Une image vectorielle, nette à toute taille, à insérer dans Word, PowerPoint ou une page web.",
@@ -369,7 +483,8 @@
       "due": "Échéance",
       "status": "État",
       "lost": "Heures perdues par mois"
-    }
+    },
+    "project_pdf": "Exporter le projet en PDF…"
   },
   "classification": {
     "internal": "Interne",
@@ -383,6 +498,7 @@
     "read_only": "Consultation : cliquer sur une étape pour lire sa fiche. Seul l’animateur modifie la structure.",
     "depth": "Cette carte est au niveau {{level}}. Au-delà de {{max}} niveaux, la lecture devient difficile.",
     "back_to_start": "Revenir au début de la carte",
+    "fit": "Tout voir",
     "controls": "Zoom",
     "zoom_in": "Zoom avant",
     "zoom_out": "Zoom arrière",
@@ -553,6 +669,7 @@
     "delete_detail": "Supprimer le détail",
     "cut": "Couper",
     "copy": "Copier",
+    "copy_selection_image": "Copier la sélection en image",
     "duplicate": "Dupliquer",
     "paste_before": "Coller avant cette étape",
     "paste_after": "Coller après cette étape",
@@ -596,6 +713,26 @@
       "necessary": "Nécessaire sans valeur",
       "waste": "Gaspillage",
       "none": "Non classée"
+    },
+    "replace_detail": "Remplacer le détail par un fichier…",
+    "file_cascade": {
+      "export": "Exporter la carte",
+      "project": "Projet",
+      "package": "Paquet d’échange",
+      "assistant": "Assistant IA"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 paysage)",
+      "png": "Image PNG",
+      "svg": "Image SVG…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Tout le projet en PDF…",
+      "import": "Importer un paquet…",
+      "replace": "Remplacer par un paquet…",
+      "report": "Rapport raconté (Markdown)",
+      "comments": "Commentaires de présentation…"
     }
   },
   "deletion": {
@@ -646,7 +783,8 @@
       "retracer_liens": "tracé automatique des flèches",
       "inserer_rangees": "insertion de rangées",
       "retirer_rangee": "retrait de rangée",
-      "proposition_ia": "proposition de l’IA"
+      "proposition_ia": "proposition de l’IA",
+      "inserer_fichier": "insertion d’un fichier"
     }
   },
   "command": {
@@ -769,9 +907,12 @@
     "duration_max": "Durée la plus longue",
     "duration_bounds_order": "La plus courte ≤ durée ≤ la plus longue",
     "minutes": "minutes",
-    "duration_between": "{{min}} à {{max}} minutes",
-    "duration_at_least": "au moins {{min}} minutes",
-    "duration_at_most": "au plus {{max}} minutes",
+    "duration_between_one": "{{min}} à {{max}} minute",
+    "duration_between_other": "{{min}} à {{max}} minutes",
+    "duration_at_least_one": "au moins {{min}} minute",
+    "duration_at_least_other": "au moins {{min}} minutes",
+    "duration_at_most_one": "au plus {{max}} minute",
+    "duration_at_most_other": "au plus {{max}} minutes",
     "duration_value_one": "{{count}} minute",
     "duration_value_other": "{{count}} minutes",
     "fold": "Replier « {{section}} »",
@@ -832,6 +973,7 @@
     "clarification_withdrawn": "Question retirée.",
     "read_empty": "Aucune fiche validée pour cette étape pour l’instant.",
     "read_validated": "Version validée le {{date}} par {{name}}.",
+    "read_draft": "Brouillon en cours, pas encore validé.",
     "document": {
       "add_output": "Ajouter une sortie",
       "new_output": "Nouvelle sortie",
@@ -895,7 +1037,8 @@
         "file": "Fichier",
         "software": "Logiciel",
         "other": "Autre"
-      }
+      },
+      "edit_pain": "Modifier dans {{code}}"
     },
     "pain_point": {
       "title": "Irritant",
@@ -916,6 +1059,19 @@
       "plan_action": "Action : {{action}}",
       "plan_owner": "Responsable : {{owner}}",
       "plan_due": "Échéance : {{date}}",
+      "status": "État",
+      "status_of": "État de l’irritant {{code}}",
+      "status_help": "Réalisé, adopté ou abandonné : l’irritant quitte la carte et ses heures ne comptent plus.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problème repéré, action à prévoir",
+        "scored": "irritant évalué, action à décider",
+        "under_review": "action à l’étude, pas encore décidée",
+        "in_progress": "action en cours de mise en œuvre",
+        "implemented": "action faite, résultat à vérifier",
+        "adopted": "vérifié, c’est la nouvelle façon de faire",
+        "dropped": "on décide de ne pas le traiter"
+      },
       "statuses": {
         "reported": "signalé",
         "scored": "pris en compte",
@@ -924,7 +1080,8 @@
         "implemented": "réalisé",
         "adopted": "adopté",
         "dropped": "abandonné"
-      }
+      },
+      "status_now": "État de l’irritant {{code}} : {{status}}"
     },
     "lead_time": "Délai",
     "lead_time_help": "Temps écoulé entre l’arrivée d’un dossier et sa sortie de l’étape, attentes comprises ; ne compte pas dans la complétude.",
@@ -941,7 +1098,12 @@
       "minute": "minutes",
       "hour": "heures",
       "day": "jours ouvrés"
-    }
+    },
+    "step_pain_points": "Irritants de l’étape",
+    "step_pain_points_help": "Irritants rattachés à l’étape, sans document. Leur description et leur plan se lisent seulement.",
+    "pain_points_one": "{{count}} irritant",
+    "pain_points_other": "{{count}} irritants",
+    "step_pain_points_help_fill": "Irritants rattachés à l’étape, sans document. Leur état se change ici ; leur description et leur plan se lisent seulement."
   },
   "translations": {
     "title": "Traduire le projet",
@@ -1188,6 +1350,12 @@
         },
         "summaries": {
           "title": "Résumés"
+        },
+        "comments": {
+          "title": "Commentaires de présentation",
+          "text": "Ce que la présentation dit des étapes et des relais.",
+          "example": "Écris les commentaires des étapes et des relais de cette carte et de ses cartes détaillées.",
+          "example_empty": "Écris les commentaires des étapes et des relais de cette carte et de ses cartes détaillées."
         }
       },
       "thread": "Échanges avec l’assistant",
@@ -1245,7 +1413,8 @@
         "findings": "Analyse",
         "report": "Rapport",
         "summaries": "Résumés",
-        "proposal": "Proposition"
+        "proposal": "Proposition",
+        "comments": "Commentaires de présentation"
       },
       "pasted": "Réponse collée",
       "copy_reply": "Copier la réponse",
@@ -1401,7 +1570,19 @@
     "resource": "Ressource Azure",
     "resource_help": "Le nom de la ressource : contoso pour contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Vide : le port par défaut (Ollama 11434, LM Studio 1234)."
+    "port_help": "Vide : le port par défaut (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Écris les commentaires de présentation des étapes et des relais de cette carte et de ses cartes détaillées qui n’en ont pas.",
+      "menu": "Écrire les commentaires de présentation (IA)…",
+      "intro": "Relisez chaque commentaire : gardez-le, corrigez-le ou écartez-le. Il sera dit pendant la présentation.",
+      "flow": "Relais {{labels}}",
+      "map": "Carte : {{name}}",
+      "current": "Commentaire actuel : {{text}}",
+      "typed": "Remplace un commentaire saisi à la main : {{text}}",
+      "save": "Enregistrer les commentaires gardés ({{n}})",
+      "saved": "Commentaires enregistrés : {{n}}",
+      "done": "Commentaires de présentation enregistrés : {{n}}"
+    }
   },
   "interface_language": {
     "help": "La langue des menus et des messages, pour vous seul. La langue dans laquelle les cartes s’affichent se choisit en haut de la fenêtre, quand un projet est ouvert."
@@ -1856,5 +2037,142 @@
       "closing_lost": "Temps perdu : {{lost}} par mois.",
       "arrow": "vers"
     }
+  },
+  "bpmn": {
+    "doc": {
+      "field": "{{label}} : {{value}}",
+      "quote": "« {{text}} »",
+      "map": "Carte : {{name}}",
+      "classification": "Classification : {{value}}",
+      "language": "Langue : {{language}}",
+      "work_time": "Journée de travail : {{workday}} h ; heures d’un ETP par mois : {{fte}} h",
+      "description": "Description",
+      "wait": "attente de {{hours}} h",
+      "from": "de {{code}}",
+      "volume": "Volume entrant : {{quantity}} par {{period}}",
+      "periods": {
+        "day": "jour ouvré",
+        "week": "semaine",
+        "month": "mois",
+        "year": "an"
+      },
+      "lane_system": "Couloir d’un logiciel qui agit seul",
+      "headcount": "Effectif : {{number}}"
+    },
+    "view": "BPMN 2.0",
+    "export_menu": "Exporter en BPMN 2.0 (.bpmn)…",
+    "export_title": "Exporter en BPMN 2.0",
+    "export_help": "Le fichier .bpmn s’ouvre dans les modeleurs BPMN (Camunda, Signavio, Bizagi…). Il porte toute la fiche de chaque étape, sans l’emplacement des documents.",
+    "export_button": "Exporter",
+    "export_subprocesses": "Inclure les sous-processus détaillés",
+    "export_subprocesses_help": "Chaque étape détaillée s’ouvre dans le modeleur comme un sous-processus.",
+    "export_subprocesses_none": "La carte n’a pas d’étape détaillée.",
+    "export_details": "Dessiner les documents et les irritants",
+    "export_details_help": "Décochée, ils restent écrits dans la documentation du fichier.",
+    "toolbar": "Vue BPMN 2.0",
+    "badge": "Schéma BPMN 2.0 · lecture seule",
+    "details": "Détails sur le schéma",
+    "export": "Exporter (.bpmn)…",
+    "close": "Revenir à la carte",
+    "close_help": "Revenir à la carte (Alt+B)",
+    "failed": "Le schéma n’a pas pu être lu.",
+    "loading": "Lecture du schéma…",
+    "node_label": "{{kind}} : {{name}}",
+    "kinds": {
+      "startEvent": "Événement de début",
+      "endEvent": "Événement de fin",
+      "intermediateCatchEvent": "Attente",
+      "manualTask": "Tâche manuelle",
+      "userTask": "Tâche avec un outil",
+      "serviceTask": "Tâche automatisée",
+      "subProcess": "Sous-processus",
+      "exclusiveGateway": "Décision exclusive",
+      "parallelGateway": "Branches parallèles",
+      "inclusiveGateway": "Décision inclusive"
+    },
+    "fit": "Tout voir",
+    "fit_help": "Montrer tout le schéma dans la fenêtre"
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "sections": {
+      "move": "Se déplacer",
+      "choose": "Choisir",
+      "edit": "Modifier la carte",
+      "display": "Afficher",
+      "present": "Présenter",
+      "help": "Aide"
+    },
+    "edit_note": "Réservé à l’animateur du projet.",
+    "or": "ou",
+    "move_selection": "Déplacer la sélection",
+    "escape": "Fermer un menu, un volet ou une fiche ; arrêter « Relier »",
+    "space_held": "Outil Main tant qu’elle est maintenue",
+    "enter": "Ouvrir la fiche de l’étape choisie",
+    "type": "Commencer le nom de l’étape choisie",
+    "menu_key": "Menu de l’objet choisi",
+    "wheel": "Défiler ; avec Maj, à l’horizontale",
+    "zoom": "Zoomer",
+    "saved": "Rappeler que tout est enregistré",
+    "alone_note": "Sans étape seule choisie (sinon, la touche commence son nom)",
+    "type_key": "une lettre",
+    "search_keys": "Dans la recherche : suivant ; avec Maj, précédent ; Échap ferme"
+  },
+  "search": {
+    "command_help": "Rechercher dans le projet",
+    "title": "Rechercher",
+    "field": "Mot à rechercher",
+    "placeholder": "Étape, document, outil…",
+    "previous": "Précédent (Maj+Entrée)",
+    "next": "Suivant (Entrée)",
+    "position": "{{index}} sur {{count}}",
+    "searching": "Recherche…",
+    "none": "Aucun résultat.",
+    "too_many": "Les {{shown}} premiers résultats sur {{total}} : préciser la recherche.",
+    "short": "Au moins deux caractères, ou Entrée.",
+    "this_map": "Cette carte",
+    "level": "Niveau {{level}}",
+    "origin": "Langue d’origine : {{language}}",
+    "kinds": {
+      "step": "Étape",
+      "lane": "Couloir",
+      "document": "Document",
+      "tool": "Outil",
+      "pain_point": "Irritant",
+      "action": "Action"
+    },
+    "results_one": "{{count}} résultat",
+    "results_other": "{{count}} résultats"
+  },
+  "action_plan": {
+    "command": "Plan d’actions",
+    "title": "Plan d’actions",
+    "total": "{{hours}} h perdues par mois sur les irritants ouverts",
+    "late_count": "En retard : {{count}}",
+    "count": "Irritants montrés : {{shown}} sur {{total}}",
+    "sort": "Trier par",
+    "sorts": {
+      "project": "Ordre du projet",
+      "lost": "Heures perdues",
+      "due": "Échéance"
+    },
+    "filters": "Filtres",
+    "filter_open": "Ouverts",
+    "filter_late": "En retard",
+    "filter_no_action": "Sans action",
+    "late": "En retard",
+    "no_action": "Aucune action décidée",
+    "map": "Carte : {{name}}",
+    "lane": "Couloir : {{name}}",
+    "go_to": "Aller à {{code}}",
+    "edit": "Modifier le plan",
+    "edit_of": "Modifier le plan de {{code}}",
+    "loading": "Chargement du plan…",
+    "empty": "Aucun irritant dans ce projet.",
+    "none": "Aucun irritant ne correspond aux filtres.",
+    "status_since": "{{status}} depuis le {{date}}",
+    "status_changed": "{{code}} : {{status}}.",
+    "undo": "Annuler",
+    "undo_of": "Annuler : remettre {{code}} à l’état « {{status}} »"
   }
 }

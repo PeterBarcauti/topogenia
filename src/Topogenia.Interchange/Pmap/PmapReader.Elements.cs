@@ -187,11 +187,8 @@ internal sealed partial class PmapReading
         foreach (var property in translations.EnumerateObject())
         {
             var place = $"{Join(path, "translations")}.{property.Name}";
-            if (!settings.Languages.IsSupported(property.Name))
-            {
-                Fault(place, FileErrorCodes.UnknownLanguage, ("language", property.Name), ("possible", string.Join(", ", settings.Languages.Languages)));
+            if (!Configured(property.Name, place))
                 continue;
-            }
             if (property.Value.ValueKind != JsonValueKind.String)
             {
                 Fault(place, FileErrorCodes.TranslationNotText);

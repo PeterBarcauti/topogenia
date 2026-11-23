@@ -28,13 +28,26 @@ const lastClass = (selector: string) => /\.([\w-]+)[^.\s]*$/.exec(selector.split
  */
 const NOT_FOCUSABLE = new Set(['step-handle', 'step-pictos', 'lane-body-margin', 'lane-grip']);
 
+/**
+ * What the sheets hide only on the image being captured, never on the screen at rest: the steps left out of a selection
+ * copied as an image, hidden under `.is-exporting` for the time of the capture only (ADR 109).
+ */
+const CAPTURE_ONLY = new Set(['is-left-out']);
+
 describe('the focus of the keyboard on what is hidden until a hover (S-NF-11, WCAG 2.4.7)', () => {
   it('every element hidden by the sheets shows when it, or a control in it, holds the focus, but those that take no focus', () => {
     const hidden = new Set(RULES.filter((rule) => hides(rule.body)).flatMap((rule) => rule.selectors.map(lastClass)).filter((name) => name !== undefined));
     const shownOnFocus = (name: string) => RULES.some((rule) => shows(rule.body) && rule.selectors.some((selector) =>
       selector.endsWith(`.${name}:focus-visible`) || (selector.includes(':focus-within') && lastClass(selector) === name)));
-    expect([...hidden].filter((name) => !NOT_FOCUSABLE.has(name) && !shownOnFocus(name))).toEqual([]);
+    expect([...hidden].filter((name) => !NOT_FOCUSABLE.has(name) && !CAPTURE_ONLY.has(name) && !shownOnFocus(name))).toEqual([]);
+    expect([...hidden].filter((name) => CAPTURE_ONLY.has(name))).toEqual([...CAPTURE_ONLY]);
     expect([...hidden].filter((name) => NOT_FOCUSABLE.has(name)).sort()).toEqual([...NOT_FOCUSABLE].sort());
+  });
+
+  it('what is hidden for the capture only is hidden under .is-exporting and nowhere else', () => {
+    const hiding = RULES.filter((rule) => hides(rule.body)).flatMap((rule) => rule.selectors).filter((selector) => CAPTURE_ONLY.has(lastClass(selector) ?? ''));
+    expect(hiding.length).toBeGreaterThan(0);
+    expect(hiding.filter((selector) => !selector.includes('.is-exporting'))).toEqual([]);
   });
 
   it('a « + » of the quick add shows under the focus and takes the pointer, as on the hover of its step, which stays as it was (B-2.3-41)', () => {

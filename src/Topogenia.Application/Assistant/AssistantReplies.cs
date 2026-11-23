@@ -23,7 +23,7 @@ public sealed record AssistantReply(
     AssistantReportView? Report = null,
     IReadOnlyList<AssistantSummaryText>? Summaries = null)
 {
-    /// <summary>The translations of comments of presentation a proposal brings beside its `.pmap` (ADR 099 revised); null without any.</summary>
+    /// <summary>The translations of comments of presentation a proposal brings beside its `.pmap` (ADR 099 revised), or the comments the form `comments` writes (F-130); null without any.</summary>
     public IReadOnlyList<AssistantCommentText>? Comments { get; init; }
 }
 
@@ -89,6 +89,7 @@ public static partial class AssistantReplyReader
             var pmap = root.TryGetProperty("pmap", out var value) ? PmapOf(value) : null;
             var report = form == AssistantForm.Report ? AssistantReportReader.Read(root) : null;
             var summaries = form == AssistantForm.Summaries ? AssistantSummariesReader.Read(root) : null;
+            var comments = form is AssistantForm.Proposal or AssistantForm.Comments ? AssistantCommentsReader.Read(root) : null;
             switch (form)
             {
                 case AssistantForm.Report when report is null:
@@ -96,6 +97,9 @@ public static partial class AssistantReplyReader
                     return null;
                 case AssistantForm.Summaries when summaries is not { Count: > 0 }:
                     reason = "summaries without summary";
+                    return null;
+                case AssistantForm.Comments when comments is not { Count: > 0 }:
+                    reason = "comments without comment";
                     return null;
                 case AssistantForm.Answer when message.Length == 0:
                     reason = "answer without message";
@@ -109,7 +113,7 @@ public static partial class AssistantReplyReader
             }
             return new AssistantReply(form, message, cited, questions, findings, form == AssistantForm.Proposal ? pmap : null, json, report, summaries)
             {
-                Comments = form == AssistantForm.Proposal ? AssistantCommentsReader.Read(root) : null,
+                Comments = comments,
             };
         }
     }

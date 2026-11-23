@@ -4,10 +4,10 @@
 import { toCanvas } from 'html-to-image';
 import type { Schema } from '../../../api/client.ts';
 import { flowElements, type MapNode } from '../canvas/flowElements.ts';
-import { LANE_HEADER_WIDTH } from '../model/geometry/constants.ts';
+import { LANE_HEADER_WIDTH, STEP_HEIGHT, UNDER_STEP } from '../model/geometry/constants.ts';
 import { layoutMap } from '../model/mapLayout.ts';
-import { frameOf, sampleMap, streamOf } from '../../../test/maps.ts';
-import { captionPosition, captureFrame, captureView, fontFaces, keptInCapture, LEFT_OUT, mapBounds, pixelRatio, pngOf, waitForSteps, type WaitClock } from './capture.ts';
+import { frameOf, sampleMap, staircaseMap, streamOf } from '../../../test/maps.ts';
+import { CAPTURE_MARGIN, captionPosition, captureFrame, captureView, fontFaces, keptInCapture, LEFT_OUT, mapBounds, pixelRatio, pngOf, selectionBounds, waitForSteps, type WaitClock } from './capture.ts';
 
 vi.mock('html-to-image', () => ({ toCanvas: vi.fn() }));
 
@@ -18,6 +18,13 @@ const STEP_STREAM: Schema<'StepStream'> = {
   step_id: '', throughput: 120, entry: null, entry_volume: null, inflows: [], opened_by: null, executions: null, basis: 'none', work_minutes: null, work_origin: 'none',
   lead_hours: null, lead_origin: 'none', expected_lead_hours: null, work_per_case_minutes: null, charge_hours: null, fte: null, human: true, from_draft: false,
 };
+
+/** The box round boxes, as the bounds of an image give it. */
+function around(boxes: readonly { x: number; y: number; width: number; height: number }[]) {
+  const left = Math.min(...boxes.map((box) => box.x));
+  const top = Math.min(...boxes.map((box) => box.y));
+  return { x: left, y: top, width: Math.max(...boxes.map((box) => box.x + box.width)) - left, height: Math.max(...boxes.map((box) => box.y + box.height)) - top };
+}
 
 describe('the bounds of the image (B-2.14-05, B-2.9-20)', () => {
   it('the lanes from the margin of their headers to the end of the map; the frame never counts', () => {
@@ -40,6 +47,28 @@ describe('the bounds of the image (B-2.14-05, B-2.9-20)', () => {
     expect(mapBounds(nodes)).toEqual({ x: -LANE_HEADER_WIDTH, y: 0, width: layout.width + LANE_HEADER_WIDTH, height: layout.height });
   });
 
+  it('the box of a selection: its steps, what hangs under them, their cartouches and the flows between them, nothing else of their lanes; none when none of its steps is drawn (lot 1 of the 3.4, R8)', () => {
+    const map = sampleMap({ value_stream: streamOf({ steps: { s3: { ...STEP_STREAM, step_id: 's3' } } }) });
+    const layout = layoutMap(map, 'fr', measure, { language: 'fr', workdayHours: 7, t: (key: string) => key });
+    const { nodes } = flowElements(layout);
+    const flows = layout.flows.map((flow) => flow.route);
+    const box = (id: string) => {
+      const node = nodes.find((candidate) => candidate.id === id);
+      if (node === undefined) throw new Error(`The node ${id} is missing.`);
+      return { x: node.position.x, y: node.position.y, width: node.width ?? 0, height: node.height ?? 0 };
+    };
+    const decision = layout.steps.find((figure) => figure.step.id === 's3');
+    if (decision === undefined) throw new Error('The decision is missing.');
+    // The label of the decision hangs under it; the flows f2 and f4 (back) run between s2 and s3, f3 goes to s4.
+    const s3 = { ...box('s3'), height: STEP_HEIGHT + decision.raciTop - UNDER_STEP.gap };
+    const between = flows.filter((flow) => flow.id === 'f2' || flow.id === 'f4');
+    const parts = [box('s2'), s3, box('card:s3'), ...between.flatMap((flow) => [...flow.points.map((point) => ({ ...point, width: 0, height: 0 })), ...(flow.label === null ? [] : [flow.label])])];
+    expect(selectionBounds(nodes, ['s3', 's2'], flows)).toEqual(around(parts));
+    expect(selectionBounds(nodes, ['s2', 's4'], flows)).toEqual(around([box('s2'), box('s4')]));
+    expect(selectionBounds(nodes, ['gone'], flows)).toBeNull();
+    expect(selectionBounds(nodes, [], flows)).toBeNull();
+  });
+
   it('the box runs from the nodes furthest left and up to the ends of those furthest right and down', () => {
     const node = (x: number, y: number) => ({ id: String(x), type: 'step', position: { x, y }, width: 170, height: 64, data: {} }) as unknown as MapNode;
     expect(mapBounds([node(400, 300), node(100, 50), node(250, 120)])).toEqual({ x: 100, y: 50, width: 470, height: 314 });
@@ -50,6 +79,12 @@ describe('the bounds of the image (B-2.14-05, B-2.9-20)', () => {
     expect(captureFrame(bounds)).toEqual({ width: 1049, height: 428, transform: 'translate(208px, 24px) scale(1)' });
     expect(captureFrame({ ...bounds, y: 10 }, true)).toEqual({ width: 1049, height: 452, transform: 'translate(208px, 14px) scale(1)' });
     expect(captionPosition(bounds)).toEqual({ x: -184, y: 380 });
+  });
+
+  it('the image is as wide as its line of classification at least: a selection narrower than its caption keeps it whole (R8)', () => {
+    const step = { x: 400, y: 120, width: 170, height: 64 };
+    expect(captureFrame(step, true, 260)).toEqual({ width: 308, height: 156, transform: 'translate(-376px, -96px) scale(1)' });
+    expect(captureFrame(step, true, 120)).toEqual({ width: 218, height: 156, transform: 'translate(-376px, -96px) scale(1)' });
   });
 });
 
@@ -177,5 +212,28 @@ describe('the fonts of the image, read without a base address (S-5.4-04)', () =>
     const css = await fontFaces([sheetOf('http://localhost/a.css', ['@font-face { src: url(gone.woff2); }', '@font-face { src: url(here.woff2); }'])], read as unknown as typeof fetch);
     expect(css).toBe('@font-face { src: url("data:application/octet-stream;base64,eA=="); }');
     expect(await fontFaces([sheetOf('http://localhost/a.css', [], 3)], read as unknown as typeof fetch)).toBe('');
+  });
+});
+
+describe('the bounds of a staircase over three lanes (R8)', () => {
+  it('the box of a staircase over three lanes: tight on its three steps, the frequency under the last one, the flows between them; no step left, right or under it (R8)', () => {
+    const layout = layoutMap(staircaseMap(), 'fr', measure);
+    const { nodes } = flowElements(layout);
+    const at = (id: string) => {
+      const node = nodes.find((candidate) => candidate.id === id);
+      if (node === undefined) throw new Error(`The node ${id} is missing.`);
+      return { x: node.position.x, y: node.position.y, right: node.position.x + (node.width ?? 0), bottom: node.position.y + (node.height ?? 0) };
+    };
+    const [c1, c3] = [at('c1'), at('c3')];
+    const bounds = selectionBounds(nodes, ['c1', 'c2', 'c3'], layout.flows.map((flow) => flow.route));
+    const frequency = UNDER_STEP.frequencyTop + UNDER_STEP.frequencyHeight;
+    expect(bounds).toEqual({ x: c1.x, y: c1.y, width: c3.right - c1.x, height: c3.bottom + frequency - c1.y });
+    if (bounds === null) throw new Error('No bounds.');
+    // With its margin, the image meets none of the steps not chosen on the left, the right or under the staircase.
+    const image = { x: bounds.x - CAPTURE_MARGIN, y: bounds.y - CAPTURE_MARGIN, right: bounds.x + bounds.width + CAPTURE_MARGIN, bottom: bounds.y + bounds.height + CAPTURE_MARGIN };
+    for (const id of ['left', 'right', 'lowLeft', 'below']) {
+      const step = at(id);
+      expect(step.right <= image.x || step.x >= image.right || step.bottom <= image.y || step.y >= image.bottom, id).toBe(true);
+    }
   });
 });

@@ -2,7 +2,7 @@
 // The view hooked to the top of the map: the zoom range and the four bounds, the zoom kept (annex B 2.2, AR-19).
 
 import { BOTTOM_MARGIN, INITIAL_VIEW, MAX_ZOOM, MIN_ZOOM, RIGHT_MARGIN, TOP_MARGIN } from './constants.ts';
-import { boundView } from './viewport.ts';
+import { boundView, fitView } from './viewport.ts';
 
 const screen = { width: 1000, height: 600 };
 const small = { width: 500, height: 240 };
@@ -45,5 +45,37 @@ describe('the bounded view (B-2.2-04 to B-2.2-08)', () => {
 
   it('leaves the view as it is while the screen is not measured', () => {
     expect(boundView({ x: 900, y: 900, zoom: 1.5 }, large, { width: 0, height: 0 })).toEqual({ x: 900, y: 900, zoom: 1.5 });
+  });
+});
+
+describe('the view that shows the whole map', () => {
+  const free = { width: screen.width - INITIAL_VIEW.x - RIGHT_MARGIN, height: screen.height - TOP_MARGIN - BOTTOM_MARGIN };
+
+  it('fitView keeps an empty map at its start at zoom 1', () => {
+    expect(fitView({ width: 0, height: 0 }, screen)).toEqual(INITIAL_VIEW);
+  });
+
+  it('fitView keeps a small map at zoom 1, never larger', () => {
+    expect(fitView(small, screen)).toEqual({ x: INITIAL_VIEW.x, y: TOP_MARGIN, zoom: 1 });
+  });
+
+  it('fitView holds a wide map by its width and a tall one by its height, under the headers and above the bottom margin', () => {
+    const wide = { width: 2400, height: 300 };
+    const tall = { width: 600, height: 1500 };
+    expect(fitView(wide, screen)).toEqual({ x: INITIAL_VIEW.x, y: TOP_MARGIN, zoom: free.width / wide.width });
+    expect(fitView(tall, screen)).toEqual({ x: INITIAL_VIEW.x, y: TOP_MARGIN, zoom: free.height / tall.height });
+    for (const map of [wide, tall]) {
+      const view = fitView(map, screen);
+      expect(view.x + map.width * view.zoom).toBeLessThanOrEqual(screen.width - RIGHT_MARGIN + 1e-9);
+      expect(view.y + map.height * view.zoom).toBeLessThanOrEqual(screen.height - BOTTOM_MARGIN + 1e-9);
+    }
+  });
+
+  it('fitView gives a very large map the smallest zoom, from its start', () => {
+    expect(fitView({ width: 30000, height: 9000 }, screen)).toEqual({ x: INITIAL_VIEW.x, y: TOP_MARGIN, zoom: MIN_ZOOM });
+  });
+
+  it('fitView leaves a screen not measured yet at the start of the map', () => {
+    expect(fitView(large, { width: 0, height: 0 })).toEqual(INITIAL_VIEW);
   });
 });

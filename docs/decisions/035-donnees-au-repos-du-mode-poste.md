@@ -165,7 +165,7 @@ et `LanmanRedirector` refusés `FICHIER_SUR_PARTAGE` avec leur partage, chemins 
 par son code, jamais levé) ; porte P3 round 3 : `DesktopDataFileTests` (lien physique fictif et vrai lien physique
 fait dans un dossier temporaire refusés `FICHIER_LIENS_PHYSIQUES`, accepté de nouveau sans son second nom ; chemins avec
 un NUL refusés par leur code) ; `Sqlite/BackupRetentionTests` (rotation, dossier refusé) ; revues
-S-5.2-11 et S-5.4-22 sur ce document (`docs/couverture-p3/portage-b.md`).
+S-5.2-11 et S-5.4-22 sur ce document (`docs/couverture-p3/portage-b.md` (non publié)).
 
 ## Révision (24/10/2026) : avertissement des dossiers lisibles par d'autres comptes (AR-98)
 

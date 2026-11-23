@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) stängdes inte av. Försök igen, eller stäng konsolfönstret.",
     "quit_unsaved": "Något du skrivit i ett faktablad är inte sparat ännu: $t(app.name) förblir öppet. Försök igen när faktabladet har sparats.",
     "stopped": "$t(app.name) är avstängt. Du kan stänga den här fliken.",
-    "stopped_help": "Öppna programmet igen för att använda det."
+    "stopped_help": "Öppna programmet igen för att använda det.",
+    "help_menu": "Hjälpmeny",
+    "help_online": "Hjälp online (på engelska)",
+    "update_check": "Sök efter uppdateringar",
+    "update_check_help": "Öppnar webbplatsens versionssida. Installerad: {{version}} från {{date}}.",
+    "update_check_store_help": "Öppnar sidan i Microsoft Store, som installerar uppdateringarna.",
+    "quit_text_unsaved": "Ett öppet formulär är inte sparat: det du skrivit i det går förlorat.",
+    "quit_anyway": "Avsluta ändå"
   },
   "keys": {
     "Shift": "Skift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Blanksteg",
     "Enter": "Retur",
-    "ArrowUp": "Uppil"
+    "ArrowUp": "Uppil",
+    "ArrowLeft": "Vänsterpil",
+    "ArrowRight": "Högerpil",
+    "ArrowDown": "Nedpil",
+    "Backspace": "Backsteg",
+    "Wheel": "Mushjul"
   },
   "errors": {
     "RESEAU": "$t(app.name) svarar inte. Kontrollera att $t(app.name) fortfarande körs (eller nätverksanslutningen om det ligger på en server).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Oväntat svar från servern. Läs in sidan igen.",
     "ACCES_REFUSE": "Du har inte behörighet till den här sidan.",
     "UNKNOWN": "Ett oväntat fel uppstod.",
-    "RESUMES_A_JOUR": "Alla kartor har en aktuell sammanfattning. Öppna kartan och klicka på ”i” bredvid rubriken för att skriva om en."
+    "RESUMES_A_JOUR": "Alla kartor har en aktuell sammanfattning. Öppna kartan och klicka på ”i” bredvid rubriken för att skriva om en.",
+    "COLLECTION_TROP_DE_PROCESSUS": "Samlingen innehåller för många processer."
   },
   "home": {
     "eyebrow": "Vill du boosta dina processer med AI? Börja med att beskriva dem.",
@@ -79,7 +92,24 @@
     "sample_title": "Exempelprojekt",
     "sample_text": "Ett påhittat projekt, redan beskrivet, där du kan upptäcka en komplett karta: simbanor, beslut, underkarta, faktablad, dokument och smärtpunkter. Det tas bort som vilket projekt som helst.",
     "sample_create": "Skapa exempelprojektet",
-    "sample_created": "Exempelprojektet {{code}} har skapats."
+    "sample_created": "Exempelprojektet {{code}} har skapats.",
+    "filter": "Filtrera projekten",
+    "filter_placeholder": "Kod eller namn",
+    "filter_count": "{{shown}} av {{total}}",
+    "filter_none": "Inget projekt matchar.",
+    "update_line": "Den här versionen är från {{date}}.",
+    "update_link": "Se om det finns en nyare",
+    "update_close": "Stäng påminnelsen",
+    "button_start_help": "Välj en startpunkt.",
+    "start_menu": "Starta ett projekt",
+    "start_sample": "Exempelprojekt",
+    "start_gallery": "Mallgalleri",
+    "start_gallery_help": "Öppnas i webbläsaren.",
+    "start_blank": "Tom karta…",
+    "new_project_help": "Börja med en tom karta, ett exempel eller en mall.",
+    "new_project_help_no_sample": "Börja med en tom karta eller en mall.",
+    "new_project_help_no_gallery": "Börja med en tom karta eller ett exempel.",
+    "new_project_help_blank": "Börja med en tom karta."
   },
   "roles": {
     "facilitator": "Processledare",
@@ -112,7 +142,7 @@
     "properties": "Projektegenskaper…",
     "properties_title": "Egenskaper för projektet {{code}}",
     "sharing_group": "Delningsgrupp för dokumenten",
-    "sharing_group_help": "Anges i faktabladen för delad indata (t.ex. Ekonomiteamet). Tomt: ”projektets delningsgrupp”.",
+    "sharing_group_help": "Namnet på den grupp av personer som får läsa projektets dokument. Visas vid rutan ”Delas med gruppen” för varje dokument i ett faktablad. Tomt: ”projektets delningsgrupp”.",
     "properties_read_only": "Bara en processledare i projektet kan ändra de här egenskaperna.",
     "properties_saved": "Projektegenskaperna har sparats.",
     "language": "Språk för processen",
@@ -121,12 +151,14 @@
     "workday_hours": "Arbetsdag (timmar)",
     "workday_hours_help": "Från 1 till 24 h, standard 7: omvandlar ledtiderna till arbetsdagar.",
     "fte_hours": "Timmar per HTE och månad",
-    "fte_hours_help": "Från 1 till 744 h, standard 151,67: omvandlar arbetsbelastningen till heltidsekvivalenter."
+    "fte_hours_help": "Från 1 till 744 h, standard 151,67: omvandlar arbetsbelastningen till heltidsekvivalenter.",
+    "code_proposed": "Föreslagen utifrån namnet.",
+    "more_options": "Fler alternativ"
   },
   "files": {
     "open": "Öppna en fil…",
     "open_title": "Öppna en fil",
-    "open_help": "Filen blir ett nytt projekt: en .pmap-fil (en nedladdad kopia eller svaret från en AI som läst en skiss), en Excel- eller CSV-tabell, ett Mermaid-diagram (.mmd, .md) eller en SVG-bild som exporterats med sin redigerbara kopia.",
+    "open_help": "Filen blir ett nytt projekt: en .pmap-fil (en nedladdad kopia eller svaret från en AI som läst en skiss), en samling mallar (.pmaps), en Excel- eller CSV-tabell, ett Mermaid-diagram (.mmd, .md) eller en SVG-bild som exporterats med sin redigerbara kopia.",
     "choose": "Välj en fil…",
     "or_paste": "Eller klistra in innehållet här, till exempel svaret från en AI:",
     "area": "Klistra in eller släpp innehållet i .pmap-filen här",
@@ -192,7 +224,52 @@
     "target_name": "{{name}} (målläge)",
     "target_label": "Referensens etikett",
     "target_label_default": "Nuläge",
-    "target_button": "Skapa"
+    "target_button": "Skapa",
+    "map_download": "Spara den öppna kartan (.pmap)",
+    "map_downloaded": "Kartan sparad med sina detaljkartor, blad och kommentarer: .pmap-filen ligger i mappen Hämtade filer.",
+    "insert": "Infoga en fil som detaljerat steg…",
+    "insert_here": "Infoga en fil här…",
+    "insert_title": "Infoga en fil som detaljerat steg",
+    "insert_help": "Filen blir ett nytt detaljerat steg i den här kartan. Det är en kopia: att ändra filen efteråt ändrar inte kartan. En .pmap-fil, en Excel- eller CSV-tabell, ett Mermaid-diagram eller en SVG-bild med sin kopia.",
+    "replace_title": "Ersätt detaljkartan med en fil",
+    "replace_help": "Detaljkartan för ”{{label}}” hamnar i papperskorgen och filen tar dess plats. Ctrl+Z ångrar allt.",
+    "insert_counts": "Steg: {{steps}} · Simbanor: {{lanes}} · Länkar: {{flows}} · Kartor: {{maps}} · Blad: {{sheets}}",
+    "insert_too_deep": "Filen har {{depth}} kartnivåer; under den här kartan får den ha högst {{room}}.",
+    "insert_too_large": "Filen är större än {{max}} MB: den kan inte infogas.",
+    "insert_package": "Det här är ett utbytespaket: det importeras som ett projekt, det infogas inte.",
+    "insert_dropped": "Översättningar som utelämnats (språk som inte är konfigurerade här): {{languages}}",
+    "insert_label": "Stegets text",
+    "insert_lane": "Simbana",
+    "insert_after": "Placera efter",
+    "insert_at_start": "I början av kartan",
+    "insert_sheets": "Ta med bladen",
+    "insert_sheets_help": "Bladen, deras dokument och deras problempunkter kommer som utkast, att granska och sedan godkänna.",
+    "insert_button": "Infoga",
+    "replace_button": "Ersätt",
+    "inserted": "Filen infogad. Steg: {{steps}} · Kartor: {{maps}}",
+    "insert_on_flow": "På pilen {{from}} → {{to}}",
+    "insert_on_flow_here": "Infoga en fil på den här pilen…",
+    "collection_title": "Samling ”{{name}}”",
+    "collection_help": "Ett projekt skapas för varje markerad process. Ingenting skrivs före ”Skapa projekten”.",
+    "collection_all": "Markera alla",
+    "collection_ticked": "Markerade: {{count}} av {{total}}",
+    "collection_points": "Punkter att kontrollera: {{count}}",
+    "collection_details": "Beskrivning och punkter att kontrollera",
+    "collection_code_free": "{{code}} är redan upptagen.",
+    "collection_invalid": "Kan inte öppnas:",
+    "collection_create": "Skapa projekten",
+    "collection_creating": "Skapar {{done}} av {{total}}…",
+    "collection_done": "Projekt skapade",
+    "collection_created": "{{code}} skapad.",
+    "collection_failed": "Inte skapad: {{reason}}",
+    "collection_retry": "Försök igen",
+    "collection_unnamed": "Process {{rank}}",
+    "insert_collection": "En samling öppnas med ”Öppna en fil…”. Infoga en av dess mallar för sig.",
+    "open_too_large": "Filen är större än {{max}} MB: den kan inte öppnas.",
+    "collection_none": "Inget projekt skapat",
+    "collection_code_twice": "{{code}} är också angiven på en annan rad.",
+    "collection_fix": "Rätta texten",
+    "remote_locations": "Nätverks- eller webbadresser i bladen: {{count}}, kontrollera dem innan ett dokument öppnas."
   },
   "package": {
     "export": "Exportera projektet ({{extension}})…",
@@ -369,7 +446,13 @@
       "due": "Slutdatum",
       "status": "Status",
       "lost": "Förlorade timmar per månad"
-    }
+    },
+    "copy_image": "Kopiera kartan som bild",
+    "copying": "Kopierar bilden…",
+    "copied": "Bilden är kopierad: klistra in den (Ctrl+V) i ett e-postmeddelande eller en bild.",
+    "copy_failed": "Bilden kunde inte kopieras.",
+    "copy_as_png": "Exportera som PNG",
+    "project_pdf": "Exportera projektet som PDF…"
   },
   "classification": {
     "internal": "Intern",
@@ -498,7 +581,8 @@
     "breadcrumb": "Sökväg",
     "file": "Arkiv",
     "file_help": "Öppna en fil, ladda ned en kopia, duplicera, exportera",
-    "members": "Medlemmar"
+    "members": "Medlemmar",
+    "fit": "Visa allt"
   },
   "ribbon": {
     "name": "Kartans menyfliksområde",
@@ -596,6 +680,27 @@
       "necessary": "Nödvändigt utan värde",
       "waste": "Slöseri",
       "none": "Ej klassad"
+    },
+    "replace_detail": "Ersätt detaljkartan med en fil…",
+    "copy_selection_image": "Kopiera markeringen som bild",
+    "file_cascade": {
+      "export": "Exportera kartan",
+      "project": "Projekt",
+      "package": "Utbytespaket",
+      "assistant": "AI-assistent"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 liggande)",
+      "png": "PNG-bild",
+      "svg": "SVG-bild…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Hela projektet som PDF…",
+      "import": "Importera ett paket…",
+      "replace": "Ersätt med ett paket…",
+      "report": "Berättad rapport (Markdown)",
+      "comments": "Presentationskommentarer…"
     }
   },
   "deletion": {
@@ -646,7 +751,8 @@
       "retracer_liens": "automatisk dragning av pilarna",
       "inserer_rangees": "infogning av rader",
       "retirer_rangee": "borttagning av rad",
-      "proposition_ia": "AI-förslag"
+      "proposition_ia": "AI-förslag",
+      "inserer_fichier": "infogning av en fil"
     }
   },
   "command": {
@@ -769,9 +875,6 @@
     "duration_max": "Längsta tid",
     "duration_bounds_order": "Kortaste ≤ tid ≤ längsta",
     "minutes": "minuter",
-    "duration_between": "{{min}} till {{max}} minuter",
-    "duration_at_least": "minst {{min}} minuter",
-    "duration_at_most": "högst {{max}} minuter",
     "duration_value_one": "{{count}} minut",
     "duration_value_other": "{{count}} minuter",
     "fold": "Fäll ihop ”{{section}}”",
@@ -832,6 +935,7 @@
     "clarification_withdrawn": "Frågan borttagen.",
     "read_empty": "Inget bekräftat faktablad för det här steget ännu.",
     "read_validated": "Version bekräftad {{date}} av {{name}}.",
+    "read_draft": "Utkast pågår, ännu inte bekräftat.",
     "document": {
       "add_output": "Lägg till utdata",
       "new_output": "Ny utdata",
@@ -895,7 +999,8 @@
         "file": "Fil",
         "software": "Programvara",
         "other": "Annat"
-      }
+      },
+      "edit_pain": "Redigera i {{code}}"
     },
     "pain_point": {
       "title": "Smärtpunkt",
@@ -924,7 +1029,21 @@
         "implemented": "genomförd",
         "adopted": "införd",
         "dropped": "avbruten"
-      }
+      },
+      "status": "Status",
+      "status_of": "Status för hinder {{code}}",
+      "status_help": "Genomförd, införd eller avbruten: hindret lämnar kartan och dess timmar räknas inte längre.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problem upptäckt, åtgärd att planera",
+        "scored": "hinder bedömt, åtgärd att besluta",
+        "under_review": "åtgärd under utredning, inte beslutad än",
+        "in_progress": "åtgärd pågår",
+        "implemented": "åtgärd utförd, resultat att kontrollera",
+        "adopted": "kontrollerat, det är det nya arbetssättet",
+        "dropped": "vi beslutar att inte hantera det"
+      },
+      "status_now": "Status för hinder {{code}}: {{status}}"
     },
     "lead_time": "Ledtid",
     "lead_time_help": "Tiden från att ett ärende kommer in tills det lämnar steget, väntetid inräknad; räknas inte in i fullständigheten.",
@@ -941,7 +1060,18 @@
       "minute": "minuter",
       "hour": "timmar",
       "day": "arbetsdagar"
-    }
+    },
+    "duration_between_one": "{{min}} till {{max}} minut",
+    "duration_between_other": "{{min}} till {{max}} minuter",
+    "duration_at_least_one": "minst {{min}} minut",
+    "duration_at_least_other": "minst {{min}} minuter",
+    "duration_at_most_one": "högst {{max}} minut",
+    "duration_at_most_other": "högst {{max}} minuter",
+    "step_pain_points": "Stegets smärtpunkter",
+    "step_pain_points_help": "Smärtpunkter kopplade till steget, utan dokument. Beskrivning och plan går bara att läsa.",
+    "pain_points_one": "{{count}} smärtpunkt",
+    "pain_points_other": "{{count}} smärtpunkter",
+    "step_pain_points_help_fill": "Smärtpunkter kopplade till steget, utan dokument. Deras status ändras här; beskrivning och plan går bara att läsa."
   },
   "translations": {
     "title": "Översätt projektet",
@@ -1188,6 +1318,12 @@
         },
         "summaries": {
           "title": "Sammanfattningar"
+        },
+        "comments": {
+          "title": "Presentationskommentarer",
+          "text": "Det presentationen säger om stegen och överlämningarna.",
+          "example": "Skriv kommentarerna till stegen och överlämningarna på den här kartan och dess detaljkartor.",
+          "example_empty": "Skriv kommentarerna till stegen och överlämningarna på den här kartan och dess detaljkartor."
         }
       },
       "thread": "Konversation med assistenten",
@@ -1245,7 +1381,8 @@
         "findings": "Analys",
         "report": "Rapport",
         "summaries": "Sammanfattningar",
-        "proposal": "Förslag"
+        "proposal": "Förslag",
+        "comments": "Presentationskommentarer"
       },
       "pasted": "Svar inklistrat",
       "copy_reply": "Kopiera svaret",
@@ -1401,7 +1538,19 @@
     "resource": "Azure-resurs",
     "resource_help": "Resursens namn: contoso för contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Tomt: standardporten (Ollama 11434, LM Studio 1234)."
+    "port_help": "Tomt: standardporten (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Skriv presentationskommentarerna till de steg och överlämningar på den här kartan och dess detaljkartor som saknar en.",
+      "menu": "Skriv presentationskommentarerna (AI)…",
+      "intro": "Läs varje kommentar igen: behåll, rätta eller förkasta den. Den sägs under presentationen.",
+      "flow": "Överlämning {{labels}}",
+      "map": "Karta: {{name}}",
+      "current": "Nuvarande kommentar: {{text}}",
+      "typed": "Ersätter en kommentar skriven för hand: {{text}}",
+      "save": "Spara de behållna kommentarerna ({{n}})",
+      "saved": "Kommentarer sparade: {{n}}",
+      "done": "Presentationskommentarer sparade: {{n}}"
+    }
   },
   "interface_language": {
     "help": "Språket för menyer och meddelanden, bara för dig. Språket som kartorna visas på väljer du högst upp i fönstret när ett projekt är öppet."
@@ -1856,5 +2005,174 @@
       "closing_lost": "Förlorad tid: {{lost}} per månad.",
       "arrow": "till"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Exportera som BPMN 2.0 (.bpmn)…",
+    "export_title": "Exportera som BPMN 2.0",
+    "export_help": "Filen .bpmn öppnas i BPMN-modelleringsverktyg (Camunda, Signavio, Bizagi…). Den innehåller hela bladet för varje steg, utan dokumentens placering.",
+    "export_button": "Exportera",
+    "export_subprocesses": "Ta med de detaljerade delprocesserna",
+    "export_subprocesses_help": "Varje detaljerat steg öppnas i verktyget som en delprocess.",
+    "export_subprocesses_none": "Kartan har inget detaljerat steg.",
+    "export_details": "Rita dokumenten och irritationsmomenten",
+    "export_details_help": "Utan bock står de kvar i filens dokumentation.",
+    "toolbar": "BPMN 2.0-vy",
+    "badge": "BPMN 2.0-diagram · skrivskyddat",
+    "details": "Detaljer i diagrammet",
+    "export": "Exportera (.bpmn)…",
+    "close": "Tillbaka till kartan",
+    "close_help": "Tillbaka till kartan (Alt+B)",
+    "failed": "Diagrammet kunde inte läsas.",
+    "loading": "Läser diagrammet…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Starthändelse",
+      "endEvent": "Sluthändelse",
+      "intermediateCatchEvent": "Väntan",
+      "manualTask": "Manuell uppgift",
+      "userTask": "Användaruppgift",
+      "serviceTask": "Automatiserad uppgift",
+      "subProcess": "Delprocess",
+      "exclusiveGateway": "Exklusiv gateway",
+      "parallelGateway": "Parallell gateway",
+      "inclusiveGateway": "Inkluderande gateway"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "”{{text}}”",
+      "map": "Karta: {{name}}",
+      "classification": "Klassificering: {{value}}",
+      "language": "Språk: {{language}}",
+      "work_time": "Arbetsdag: {{workday}} h; timmar per heltidsekvivalent och månad: {{fte}} h",
+      "description": "Beskrivning",
+      "wait": "väntan {{hours}} h",
+      "from": "från {{code}}",
+      "volume": "Inkommande volym: {{quantity}} per {{period}}",
+      "periods": {
+        "day": "arbetsdag",
+        "week": "vecka",
+        "month": "månad",
+        "year": "år"
+      },
+      "lane_system": "Simbana för en programvara som agerar på egen hand",
+      "headcount": "Bemanning: {{number}}"
+    },
+    "fit": "Visa allt",
+    "fit_help": "Visa hela diagrammet i fönstret"
+  },
+  "shortcuts": {
+    "title": "Kortkommandon",
+    "sections": {
+      "move": "Förflytta sig",
+      "choose": "Välja",
+      "edit": "Ändra kartan",
+      "display": "Visa",
+      "present": "Presentera",
+      "help": "Hjälp"
+    },
+    "edit_note": "Endast för projektets processledare.",
+    "or": "eller",
+    "move_selection": "Flytta markeringen",
+    "escape": "Stänga en meny, en panel eller ett faktablad; avbryta ”Länka”",
+    "space_held": "Handverktyget så länge tangenten hålls nedtryckt",
+    "enter": "Öppna faktabladet för det valda steget",
+    "type": "Börja skriva namnet på det valda steget",
+    "menu_key": "Menyn för det valda objektet",
+    "wheel": "Rulla; med Skift i sidled",
+    "zoom": "Zooma",
+    "saved": "Påminna om att allt är sparat",
+    "alone_note": "Utan ett enskilt valt steg (annars börjar tangenten skriva dess namn)",
+    "type_key": "en bokstav",
+    "search_keys": "I sökningen: nästa; med Skift föregående; Esc stänger"
+  },
+  "search": {
+    "command_help": "Sök i projektet",
+    "title": "Sök",
+    "field": "Ord att söka efter",
+    "placeholder": "Steg, dokument, verktyg…",
+    "previous": "Föregående (Skift+Retur)",
+    "next": "Nästa (Retur)",
+    "position": "{{index}} av {{count}}",
+    "searching": "Söker…",
+    "none": "Inga resultat.",
+    "too_many": "De första {{shown}} av {{total}} resultaten: avgränsa sökningen.",
+    "short": "Minst två tecken, eller Retur.",
+    "this_map": "Den här kartan",
+    "level": "Nivå {{level}}",
+    "origin": "Originalspråk: {{language}}",
+    "kinds": {
+      "step": "Steg",
+      "lane": "Simbana",
+      "document": "Dokument",
+      "tool": "Verktyg",
+      "pain_point": "Smärtpunkt",
+      "action": "Åtgärd"
+    },
+    "results_one": "{{count}} resultat",
+    "results_other": "{{count}} resultat"
+  },
+  "action_plan": {
+    "command": "Åtgärdsplan",
+    "title": "Åtgärdsplan",
+    "total": "{{hours}} h förlorade per månad på öppna smärtpunkter",
+    "late_count": "Försenade: {{count}}",
+    "count": "Visade smärtpunkter: {{shown}} av {{total}}",
+    "sort": "Sortera efter",
+    "sorts": {
+      "project": "Projektets ordning",
+      "lost": "Förlorade timmar",
+      "due": "Slutdatum"
+    },
+    "filters": "Filter",
+    "filter_open": "Öppna",
+    "filter_late": "Försenade",
+    "filter_no_action": "Utan åtgärd",
+    "late": "Försenad",
+    "no_action": "Ingen åtgärd beslutad",
+    "map": "Karta: {{name}}",
+    "lane": "Simbana: {{name}}",
+    "go_to": "Gå till {{code}}",
+    "edit": "Redigera planen",
+    "edit_of": "Redigera planen för {{code}}",
+    "loading": "Läser in planen …",
+    "empty": "Inga smärtpunkter i det här projektet.",
+    "none": "Ingen smärtpunkt matchar filtren.",
+    "status_since": "{{status}} sedan {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Ångra",
+    "undo_of": "Ångra: återställ {{code}} till ”{{status}}”"
+  },
+  "project_pdf": {
+    "sheet_state": "Faktabladets status: {{state}}",
+    "continued": "{{title}} (forts.)",
+    "file": "projekt",
+    "contents": "Innehåll",
+    "page": "Sida {{page}} av {{total}}",
+    "scope_line": "Karta ”{{name}}” och dess nivåer",
+    "empty_map": "Karta utan steg.",
+    "depth_cut": "Kartor bortom {{max}} nivåer ingår inte i dokumentet.",
+    "sheets_of": "Faktablad · {{map}}",
+    "reading": "Läser kartorna: {{count}}",
+    "reading_sheets": "Läser faktabladen…",
+    "drawing": "Karta {{index}} av {{total}}",
+    "writing": "Skriver dokumentet: sida {{page}}",
+    "too_many_maps": "Fler än {{max}} kartor: välj ”{{scope}}”.",
+    "too_many_pages": "Fler än {{max}} sidor: avmarkera faktabladen eller exportera en detaljkarta och dess nivåer.",
+    "cancelled": "Exporten avbröts.",
+    "title": "Exportera projektet som PDF",
+    "help": "Alla kartor i en enda fil, nivå för nivå, för den som inte har appen.",
+    "scope": "Omfattning",
+    "scope_project": "Hela projektet",
+    "scope_branch": "Den här kartan och dess nivåer",
+    "with_sheets": "Med faktablad",
+    "with_raci": "Med RACI-matris",
+    "with_stream": "Med värdeflöde",
+    "with_plan": "Med åtgärdsplan",
+    "sheets_help": "Faktabladen är de du ser: skicka dokumentet bara till den som får läsa dem.",
+    "button": "Skapa PDF",
+    "progress": "Förlopp",
+    "too_many_maps_below": "Fler än {{max}} kartor: öppna en detaljkarta längre ner och välj ”{{scope}}”.",
+    "too_many_pages_top": "Fler än {{max}} sidor: avmarkera faktabladen."
   }
 }

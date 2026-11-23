@@ -14,6 +14,8 @@ import { openProject } from '../../shared/state/openProject.ts';
 import { chooseProcessLanguage } from '../../shared/state/processLanguage.ts';
 import { Button } from '../../shared/ui/Button.tsx';
 import { Icon } from '../../shared/ui/Icon.tsx';
+import { bpmnView } from './bpmn/bpmnState.ts';
+import { BpmnView } from './bpmn/view/BpmnView.tsx';
 import { Canvas } from './canvas/Canvas.tsx';
 import { Ribbon } from './chrome/Ribbon.tsx';
 import { untranslatedOn } from './model/mapLayout.ts';
@@ -171,6 +173,7 @@ export function MapScreen({ mapId, admin = false, languages = [], desktop = fals
   const error = useStore(editor.store, (state) => state.error);
   const showCodes = useStore(editor.preferences, (state) => state.showCodes);
   const alwaysShowPictos = useStore(editor.preferences, (state) => state.alwaysShowPictos);
+  const bpmn = useStore(bpmnView, (state) => state.open);
   useEffect(() => {
     void editor.store.getState().load(mapId);
     return () => {
@@ -189,7 +192,7 @@ export function MapScreen({ mapId, admin = false, languages = [], desktop = fals
         <Ribbon />
         <MapBanners map={map} />
         <div className="map-workspace">
-          <Canvas map={map} showCodes={showCodes} alwaysShowPictos={alwaysShowPictos} />
+          {bpmn ? <BpmnView map={map} /> : <Canvas map={map} showCodes={showCodes} alwaysShowPictos={alwaysShowPictos} />}
           <MapSidePanel />
         </div>
         <MapFloating />

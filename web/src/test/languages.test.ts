@@ -65,13 +65,16 @@ describe('one language, one file and one line of the configuration (NF12, S-NF-1
       const mine = read(code);
       const rules = new Intl.PluralRules(code);
       const forms = new Set(['other', ...Array.from({ length: 200 }, (_, count) => rules.select(count))]);
+      // A duration can be a decimal (1.5 minutes): Czech gives it `many`, which no integer reaches.
+      const decimalForms = new Set([...forms, ...[0.5, 1.5, 2.25].map((count) => rules.select(count))]);
+      const formsOf = (base: string) => (base.startsWith('sheet.duration_') ? decimalForms : forms);
       const problems = [
         ...[...french].filter(([key]) => !isPlural(key)).flatMap(([key, text]) => {
           const translated = mine.get(key);
           if (translated === undefined) return [`missing ${key}`];
           return variables(translated) === variables(text) ? [] : [`variables of ${key}`];
         }),
-        ...[...plurals].flatMap((base) => [...forms].filter((form) => !mine.has(`${base}_${form}`)).map((form) => `missing ${base}_${form}`)),
+        ...[...plurals].flatMap((base) => [...formsOf(base)].filter((form) => !mine.has(`${base}_${form}`)).map((form) => `missing ${base}_${form}`)),
         ...[...mine.keys()].filter((key) => !french.has(key) && !isPlural(key)).map((key) => `unknown ${key}`),
       ];
       expect([code, problems]).toEqual([code, []]);
@@ -82,6 +85,7 @@ describe('one language, one file and one line of the configuration (NF12, S-NF-1
     const forms = (code: string) => new Set(Array.from({ length: 200 }, (_, count) => new Intl.PluralRules(code).select(count)));
     expect(forms('pl')).toEqual(new Set(['one', 'few', 'many']));
     expect(forms('ja')).toEqual(new Set(['other']));
+    expect(new Intl.PluralRules('cs').select(1.5)).toBe('many');
   });
 
   it('detects a code of a language written in a script, and a cast to a list of languages', () => {

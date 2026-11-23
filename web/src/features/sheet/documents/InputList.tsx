@@ -77,7 +77,7 @@ export function InputList() {
       {inputs.length === 0 && entry === null && <p className="field-hint">{t(fill ? 'sheet.document.no_input_offered' : 'sheet.document.no_input')}</p>}
       {inputs.length > 0 && <ul className="documents-list">{inputs.map((input) => <InputLine key={input.document.id} input={input} onEdit={setEntry} />)}</ul>}
       {entry !== null && (
-        <DocumentForm direction="input" entry={entry} busy={sheet.documentBusy} onChange={setEntry} onCancel={() => { setEntry(null); }} onSave={() => void save()} />
+        <DocumentForm key={entry.id ?? ''} direction="input" entry={entry} busy={sheet.documentBusy} onChange={setEntry} onCancel={() => { setEntry(null); }} onSave={() => void save()} />
       )}
       {entry === null && fill && (
         <div className="documents-actions">

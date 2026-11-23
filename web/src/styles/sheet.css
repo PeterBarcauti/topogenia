@@ -187,3 +187,7 @@ a.document-name { color: var(--accent-strong); }
 .procedure-read .is-check { color: var(--success-text); }
 .sheet-read-free strong { font-size: 12px; }
 .sheet-read-free p { margin: 4px 0 0; white-space: pre-wrap; }
+/* R10: under the pain point a consumer noted, its status and the way to its sheet; the pain points of the step without a document */
+.consumer-pain { display: flex; flex-direction: column; gap: 4px; margin-left: 24px; }
+.consumer-pain .report-pain { margin-left: 0; }
+.step-pain { gap: 8px; }

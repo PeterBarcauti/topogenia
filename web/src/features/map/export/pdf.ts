@@ -27,7 +27,7 @@ export interface PdfHeader {
   readonly footer: string;
 }
 
-/** The image of the map: a PNG as a data address, and its size in pixels of the page before the pixel ratio. */
+/** The image of the map: a PNG or a JPEG as a data address, and its size in pixels of the page before the pixel ratio. */
 export interface MapImage {
   readonly dataUrl: string;
   readonly width: number;
@@ -156,12 +156,24 @@ export function writerOf(doc: JsPdf, draw?: LineDrawer): Write {
 /** The grey of the texts round the image and of the precisions. */
 export const GREY = 80;
 
+/** The width of a line in millimetres, as it will be written. */
+export type LineWidth = (text: string) => number;
+
+/** A text shortened, a character at a time, until it holds in a width with an ellipsis at its end. */
+export function ellipsized(text: string, width: number, measure: LineWidth): string {
+  let cut = Array.from(text.trimEnd());
+  while (cut.length > 1 && measure(`${cut.join('')}…`) > width) cut = cut.slice(0, -1);
+  return `${cut.join('').trimEnd()}…`;
+}
+
+/** A text cut to a width by the measure given, an ellipsis at its end; a text that holds is left whole. */
+export function cutTo(text: string, width: number, measure: LineWidth): string {
+  return measure(text) <= width ? text : ellipsized(text, width, measure);
+}
+
 /** A text cut to a width in the face and size set, an ellipsis at its end; a text drawn as an image is left whole. */
 export function fitted(doc: JsPdf, text: string, width: number): string {
-  if (beyondInter(text) || doc.getTextWidth(text) <= width) return text;
-  let cut = text;
-  while (cut.length > 1 && doc.getTextWidth(`${cut}…`) > width) cut = cut.slice(0, -1);
-  return `${cut.trimEnd()}…`;
+  return beyondInter(text) ? text : cutTo(text, width, (line) => doc.getTextWidth(line));
 }
 
 /** A line of the value stream at its place: its figures on the right of its column, its text cut to the room left. */
@@ -181,13 +193,14 @@ function writeStreamLine(doc: JsPdf, write: Write, placed: PlacedLine): void {
   write(fitted(doc, line.text, x + width - figures.length * STREAM_PAGE.figure - left - 2), left, y, { face, size, grey });
 }
 
-/** The pages of the value stream: the title and the line under it, the sections down three columns, the footer on each. */
-function writeStreamPages(doc: JsPdf, write: Write, content: StreamPdfContent, footer: string): void {
+/** The pages of the value stream: the title and the line under it, the sections down three columns, the footer on each; each page is laid out on the size of its own sheet. */
+export function writeStreamPages(doc: JsPdf, write: Write, content: StreamPdfContent, footer: string): void {
+  doc.addPage('a3', 'landscape');
   const page = { width: doc.internal.pageSize.getWidth(), height: doc.internal.pageSize.getHeight() };
   const placed = streamPlacement(content, page);
   const pages = Math.max(1, ...placed.map((line) => line.page + 1));
   for (let index = 0; index < pages; index++) {
-    doc.addPage('a3', 'landscape');
+    if (index > 0) doc.addPage('a3', 'landscape');
     doc.setTextColor(0);
     write(content.title, PDF_MARGIN, PDF_MARGIN + 4, { face: 'bold', size: 16, grey: false });
     doc.setTextColor(GREY);
@@ -195,6 +208,24 @@ function writeStreamPages(doc: JsPdf, write: Write, content: StreamPdfContent, f
     write(footer, PDF_MARGIN, page.height - PDF_MARGIN + 2, { face: 'regular', size: 8, grey: true });
     for (const line of placed.filter((candidate) => candidate.page === index)) writeStreamLine(doc, write, line);
   }
+}
+
+/**
+ * The page of a map on the sheet now current, A3 landscape: its title, breadcrumb, date and classification, its image
+ * fitted to the room left, its footer (B-2.14-14 to B-2.14-18). The sheet is added by the caller; the page of a map and
+ * the pages of a project are written by it alike.
+ */
+export function writeMapPage(doc: JsPdf, write: Write, image: MapImage, header: PdfHeader): void {
+  const page = { width: doc.internal.pageSize.getWidth(), height: doc.internal.pageSize.getHeight() };
+  const right = page.width - PDF_MARGIN;
+  write(header.title, PDF_MARGIN, PDF_MARGIN + 4, { face: 'bold', size: 16, grey: false });
+  doc.setTextColor(GREY);
+  write(header.subtitle, PDF_MARGIN, PDF_MARGIN + 11, { face: 'regular', size: 10, grey: true });
+  write(header.date, right, PDF_MARGIN + 4, { face: 'regular', size: 10, grey: true, right: true });
+  write(header.classification, right, PDF_MARGIN + 11, { face: 'bold', size: 10, grey: true, right: true });
+  const place = imagePlacement(page, image);
+  doc.addImage(image.dataUrl, image.dataUrl.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG', place.x, place.y, place.width, place.height, undefined, 'FAST');
+  write(header.footer, PDF_MARGIN, page.height - PDF_MARGIN + 2, { face: 'regular', size: 8, grey: true });
 }
 
 /**
@@ -206,18 +237,9 @@ export async function buildPdf(image: MapImage, header: PdfHeader, fonts: PdfFon
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
   registerFonts(doc, fonts);
-  const page = { width: doc.internal.pageSize.getWidth(), height: doc.internal.pageSize.getHeight() };
-  const right = page.width - PDF_MARGIN;
   const write = writerOf(doc, draw);
   doc.setProperties({ title: header.title, creator: PRODUCT_NAME });
-  write(header.title, PDF_MARGIN, PDF_MARGIN + 4, { face: 'bold', size: 16, grey: false });
-  doc.setTextColor(GREY);
-  write(header.subtitle, PDF_MARGIN, PDF_MARGIN + 11, { face: 'regular', size: 10, grey: true });
-  write(header.date, right, PDF_MARGIN + 4, { face: 'regular', size: 10, grey: true, right: true });
-  write(header.classification, right, PDF_MARGIN + 11, { face: 'bold', size: 10, grey: true, right: true });
-  const place = imagePlacement(page, image);
-  doc.addImage(image.dataUrl, 'PNG', place.x, place.y, place.width, place.height, undefined, 'FAST');
-  write(header.footer, PDF_MARGIN, page.height - PDF_MARGIN + 2, { face: 'regular', size: 8, grey: true });
+  writeMapPage(doc, write, image, header);
   if (stream !== null) writeStreamPages(doc, write, stream, header.footer);
   return doc.output('blob');
 }

@@ -107,4 +107,4 @@ droits du démarrage (18456, 262, 1802 en 1.x) donnent un message clair.
 
 `tests/Topogenia.Persistence.Tests/Queries/` (nombre de requêtes, profondeur et fil d'Ariane sur 60 niveaux,
 couloirs, profil), `Purge/` (purge entière, lots et journal, cadre ouvert, arrêt au milieu, garde, droits du rôle),
-`Startup/StartupErrorTests` ; chaque exigence vérifiée par mutation (`docs/couverture-p3/portage-b.md`).
+`Startup/StartupErrorTests` ; chaque exigence vérifiée par mutation (`docs/couverture-p3/portage-b.md` (non publié)).

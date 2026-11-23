@@ -53,6 +53,8 @@ export interface AutoSave {
   /** Something typed is not on the host yet: it waits, or a send has not answered (B-4-46); a failure leaves it waiting. */
   unsaved(): boolean;
   failed(): boolean;
+  /** Calls the listener at each change of {@link state}, which follows each change of {@link unsaved} (ADR 115). */
+  subscribe(listener: () => void): () => void;
 }
 
 /** A queue for the sheet of one step, from the version of the sheet read (null: never saved). */
@@ -92,10 +94,11 @@ export function createAutoSave(calls: AutoSaveCalls, initialVersion: number | nu
     } catch (failure) {
       sends -= 1;
       lastFailed = true;
+      // Never lost: it leaves again at the next send, unless a newer typing waits or is already on its way (B-4-43). Put
+      // back before the state is told, so that who reads `unsaved()` then sees it waiting (ADR 115).
+      if (waiting === null && latest === body) waiting = body;
       state.setState({ status: 'failed' });
       hooks.onFailure(failure);
-      // Never lost: it leaves again at the next send, unless a newer typing waits or is already on its way (B-4-43).
-      if (waiting === null && latest === body) waiting = body;
       // Changed by someone else: the version of the host for the next send, the typing kept under the eyes (B-4-44).
       if (isApiError(failure) && failure.status === 409) await readAgain();
     }
@@ -127,5 +130,8 @@ export function createAutoSave(calls: AutoSaveCalls, initialVersion: number | nu
     version: () => version,
     unsaved: () => waiting !== null || sends > 0,
     failed: () => lastFailed,
+    subscribe: (listener) => state.subscribe(() => {
+      listener();
+    }),
   };
 }

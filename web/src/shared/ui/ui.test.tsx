@@ -161,6 +161,25 @@ describe('the menu drawn from commands (S-3.5-01, B-2.5-36)', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
+  it('a list of choices: named with its values, the checked one takes the focus when asked, each entry shows its two lines and is named by its whole label', async () => {
+    await i18next.changeLanguage('fr');
+    const choice = (id: string, name: string, help: string, checked: boolean) => ({
+      id, label: 'sheet.pain_point.status_choice', labelValues: { status: name, help }, lines: [name, help] as const, icon: undefined, shortcut: undefined, disabled: false, checked,
+    });
+    const onRun = vi.fn();
+    render(<KeyboardProvider><Menu label="sheet.pain_point.status_of" labelValues={{ code: 'VIS-I001' }} testId="status" at={{ x: 40, y: 60 }} focusChecked onRun={onRun} onClose={vi.fn()}
+      items={[choice('reported', 'Signalé', 'problème repéré', false), choice('in_progress', 'En cours', 'action en cours', true)]} /></KeyboardProvider>);
+    const menu = screen.getByRole('menu', { name: 'État de l’irritant VIS-I001' });
+    const current = within(menu).getByRole('menuitemradio', { name: 'En cours — action en cours' });
+    expect([document.activeElement, current.getAttribute('aria-checked')]).toEqual([current, 'true']);
+    expect([...current.querySelectorAll('.menu-name, .menu-help')].map((line) => line.textContent)).toEqual(['En cours', 'action en cours']);
+    expect(current).toHaveClass('menu-item--lines');
+    await userEvent.keyboard('{ArrowUp}');
+    expect(onRun).not.toHaveBeenCalled();
+    await userEvent.keyboard('{Enter}');
+    expect(onRun.mock.calls).toEqual([['reported']]);
+  });
+
   it('is a floating element: the shortcuts of the canvas are silent while it is open (B-2.5-03)', () => {
     const keyboard = createKeyboard();
     const canvas = vi.fn(() => true);

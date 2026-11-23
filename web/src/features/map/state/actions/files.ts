@@ -1,9 +1,11 @@
 // files.ts
-// What the File menu of the map does without a dialog of its own: the copy downloaded, the project to replace read before its dialog (annex B 2.4, ADR 058).
+// What the File menu of the map does without a dialog of its own: the copy of the project downloaded, the copy of the map shown saved (F-208), the project to replace read before its dialog (annex B 2.4, ADR 058).
 
 import { api, type Schema } from '../../../../api/client.ts';
+import { download, exportFileName } from '../../../../shared/download.ts';
 import { messageOf } from '../../../../shared/i18n/errorMessage.ts';
 import { i18next } from '../../../../shared/i18n/i18n.ts';
+import { localizedName } from '../../../../shared/i18n/localizedName.ts';
 import { downloadPmapCopy } from '../../../project/files/pmapCopy.ts';
 import type { MapEditor } from '../editor.ts';
 
@@ -19,6 +21,24 @@ export async function downloadCopy(editor: MapEditor, map: Schema<'MapView'>): P
   try {
     await downloadPmapCopy(projectOf(map));
     editor.notify(i18next.t('files.downloaded'), 'success');
+  } catch (failure) {
+    editor.notify(messageOf(failure), 'error');
+  }
+}
+
+/**
+ * « Enregistrer la carte ouverte (.pmap) » (3.3, lot 4, F-208): the map shown with the maps detailed below it, its sheets as
+ * the person sees them and its comments of presentation (.pmap 1.5), saved by the browser under the name of the map in the
+ * language shown, then said; an export with its event, as the copy of a project. The file opens as a project, and later
+ * inserts as a detailed step of another map.
+ */
+export async function downloadMapCopy(editor: MapEditor, map: Schema<'MapView'>): Promise<void> {
+  try {
+    const text = await api.get('/api/maps/{id}/pmap', { path: { id: map.id }, query: { purpose: 'copy' } });
+    const language = editor.store.getState().shown?.language ?? i18next.language;
+    const name = localizedName({ name: map.name, source_language: map.source_language, name_translations: map.translations }, language);
+    download(new Blob([text], { type: 'application/json' }), exportFileName(map.project_code, name, '.pmap'));
+    editor.notify(i18next.t('files.map_downloaded'), 'success');
   } catch (failure) {
     editor.notify(messageOf(failure), 'error');
   }

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from 'r
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
 import { menuItemsOf, type MenuLine } from '../../../shared/commands/commands.ts';
-import { Menu, type MenuGroup } from '../../../shared/ui/Menu.tsx';
+import { Menu, type MenuGroup, type MenuSubmenu } from '../../../shared/ui/Menu.tsx';
 import { DuplicateDialog } from '../../project/files/DuplicateDialog.tsx';
 import { TargetStateDialog } from '../../project/files/TargetStateDialog.tsx';
 import { OpenPmapDialog } from '../../project/files/OpenPmapDialog.tsx';
@@ -16,27 +16,31 @@ import { FLOW_LABEL_MAX } from '../state/actions/flows.ts';
 import { flowTyped, relabelFlowIn } from '../state/actions/rename.ts';
 import { contextOf, type MapContext } from '../state/commands/context.ts';
 import { FILE_MENU, FLOW_MENU, FLOW_MENU_GROUPS, LANE_MENU, LANE_MENU_GROUPS, MAP_COMMANDS, PANE_MENU, SELECTION_MENU, STEP_MENU, STEP_MENU_GROUPS } from '../state/commands/mapCommands.ts';
+import { FILE_SUBMENUS } from '../state/commands/fileMenu.ts';
 import { runMapCommand, useEditor, useMapState } from '../state/EditorContext.tsx';
 import type { MenuTarget } from '../state/floating.ts';
 import { ArrangementDialog } from './ArrangementDialog.tsx';
 import { CommandBar } from './CommandBar.tsx';
 import { DetailDeleteDialog, LaneDialog, MacroDialog, SelectionDeleteDialog } from './DeletionDialogs.tsx';
 import { ExportSvgDialog } from './ExportSvgDialog.tsx';
+import { InsertPmapDialog } from './InsertPmapDialog.tsx';
+import { ExportBpmnDialog } from '../bpmn/export/ExportBpmnDialog.tsx';
 import { RaciMatrixDialog } from './RaciMatrixDialog.tsx';
 import { RaciPanel } from './RaciPanel.tsx';
 import { StreamEntryField } from './StreamEntryField.tsx';
 import { SummaryDialog } from './SummaryDialog.tsx';
 import { ObjectTranslations, ProjectTranslations } from './TranslationDialogs.tsx';
+import { ProjectPdfDialog } from './ProjectPdfDialog.tsx';
 import { WallPrintDialog } from './WallPrintDialog.tsx';
 
-/** The lines, the groups of choices and the name of the menu of each kind of object, and of the File menu (annex B 2.4). */
-const MENUS: Readonly<Record<MenuTarget['kind'], { lines: readonly MenuLine<MapContext>[]; label: string; groups?: readonly MenuGroup[] }>> = {
+/** The lines, the groups of choices, the submenus and the name of the menu of each kind of object, and of the File menu (annex B 2.4). */
+const MENUS: Readonly<Record<MenuTarget['kind'], { lines: readonly MenuLine<MapContext>[]; label: string; groups?: readonly MenuGroup[]; submenus?: readonly MenuSubmenu[] }>> = {
   step: { lines: STEP_MENU, label: 'menu.step', groups: STEP_MENU_GROUPS },
   selection: { lines: SELECTION_MENU, label: 'menu.selection' },
   pane: { lines: PANE_MENU, label: 'menu.pane' },
   flow: { lines: FLOW_MENU, label: 'menu.flow', groups: FLOW_MENU_GROUPS },
   lane: { lines: LANE_MENU, label: 'menu.lane', groups: LANE_MENU_GROUPS },
-  file: { lines: FILE_MENU, label: 'menu.file' },
+  file: { lines: FILE_MENU, label: 'menu.file', submenus: FILE_SUBMENUS },
 };
 
 function ContextMenu({ target, at, onClose }: { target: MenuTarget; at: { x: number; y: number }; onClose: () => void }) {
@@ -46,7 +50,7 @@ function ContextMenu({ target, at, onClose }: { target: MenuTarget; at: { x: num
   if (context === null) return null;
   const items = menuItemsOf(MAP_COMMANDS, menu.lines, context);
   if (items.length === 0) return null;
-  return <Menu label={menu.label} testId={`menu-${target.kind}`} items={items} groups={menu.groups} at={at} onClose={onClose} onRun={(id) => { runMapCommand(editor, id, target); }} />;
+  return <Menu label={menu.label} testId={`menu-${target.kind}`} items={items} groups={menu.groups} submenus={menu.submenus} at={at} underButton={target.kind === 'file'} onClose={onClose} onRun={(id) => { runMapCommand(editor, id, target); }} />;
 }
 
 /** The floating field of the label of a flow: Enter validates, Escape or a click elsewhere gives up; 60 characters at most (B-2.3-33, B-2.3-34). */
@@ -125,10 +129,16 @@ export function MapFloating() {
       return <TargetStateDialog projectId={map.project_id} sourceName={projectOf(map).name} onClose={close} />;
     case 'export-package':
       return <ExportPackageDialog project={projectOf(map)} onClose={close} />;
+    case 'insert-pmap':
+      return <InsertPmapDialog map={map} stepId={floating.stepId} cell={floating.cell} flowId={floating.flowId} onClose={close} />;
     case 'export-svg':
       return <ExportSvgDialog projectId={map.project_id} onClose={close} />;
+    case 'export-bpmn':
+      return <ExportBpmnDialog map={map} onClose={close} />;
     case 'wall-print':
       return <WallPrintDialog map={map} onClose={close} />;
+    case 'project-pdf':
+      return <ProjectPdfDialog map={map} onClose={close} />;
     case 'summary':
       return <SummaryDialog map={map} onClose={close} />;
     case 'replace':

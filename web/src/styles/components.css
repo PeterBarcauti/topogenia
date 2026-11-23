@@ -100,6 +100,8 @@ body:has(.side-dock) .toasts { right: calc(var(--dock-room) + 16px); bottom: 174
 .menu-item .i { color: var(--text-muted); }
 .menu-item:hover, .menu-item:focus-visible { background: var(--hover); }
 .menu-item[aria-disabled="true"] { opacity: .5; cursor: default; background: none; }
+/* the row of a submenu while its submenu is open (ADR 117) */
+.menu-item[aria-expanded="true"] { background: var(--hover); }
 .menu-icon-space { width: 15px; flex: none; }
 .menu-label { flex: 1; }
 /* validated mock-up: the shortcut in the type of the menu, 12 px, tabular figures */
@@ -125,6 +127,14 @@ body:has(.side-dock) .toasts { right: calc(var(--dock-room) + 16px); bottom: 174
 .menu-swatch .i { color: var(--ink); }
 .menu-swatch-name { display: flex; justify-content: space-between; padding: 0 8px 6px; font-size: 12px; color: var(--text-muted); }
 .menu-swatch-name b { font-weight: 600; color: var(--text); }
+/* an entry on two lines, its name then its help (the status of a pain point, ADR 116) */
+.menu-item--lines { height: auto; min-height: var(--menu-row-height); padding: 6px 8px; align-items: flex-start; }
+.menu-item--lines .menu-label { display: flex; flex-direction: column; gap: 1px; }
+.menu-item--lines .menu-check { margin-top: 1px; }
+.menu-help { font-size: 12px; color: var(--text-muted); }
+/* the button of a status: the status alone and its arrow, which opens its list */
+.status-button { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; }
+.status-button:disabled { opacity: .6; cursor: default; }
 
 /* toolbar (spec 9.5: named groups, 32 px icon buttons) */
 .toolbar { display: flex; align-items: flex-start; gap: 4px; padding: 6px 12px 0; background: var(--surface); border-bottom: 1px solid var(--border); }
@@ -229,3 +239,16 @@ body:has(.side-dock) .toasts { right: calc(var(--dock-room) + 16px); bottom: 174
 .language-card-meter { width: 100%; height: 4px; margin-top: 6px; border-radius: var(--radius-pill); background: var(--lane-even); overflow: hidden; }
 .language-card-meter span { display: block; height: 100%; background: var(--accent); }
 .language-card-percent { font-size: var(--font-size-micro); font-variant-numeric: tabular-nums; color: var(--text-muted); }
+
+/* the panel of the keyboard shortcuts: a table a section, the keys in <kbd> on the right (lot 1 of the 3.4) */
+.shortcuts-section h3 { margin: 0 0 4px; font-size: 13px; }
+.shortcuts-note { margin: 0 0 4px; font-size: var(--font-size-small); color: var(--text-muted); }
+.shortcuts-line-note { display: block; font-size: var(--font-size-small); color: var(--text-muted); }
+.shortcuts-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.shortcuts-table td { padding: 5px 0; border-top: 1px solid var(--lane-separator); vertical-align: top; }
+.shortcuts-keys { text-align: right; white-space: nowrap; padding-left: 12px; color: var(--text-muted); }
+.shortcuts-keys kbd { display: inline-block; min-width: 20px; padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--radius-small);
+  background: var(--hover); font-size: var(--font-size-small); text-align: center; color: var(--text); }
+
+/* the filter of the project list on the home page (lot 2 of the 3.4) */
+.home-filter { width: 200px; max-width: 100%; padding: 4px 10px; }

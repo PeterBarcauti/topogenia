@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
 import { pdfTexts } from '../src/test/pdf.ts';
 import { expect, openMap, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 declare global {
   interface Window {
@@ -57,7 +58,7 @@ test('the map printed large: as many sheets A4 landscape as said, each named, it
   await openMap(page, mapId, 'MUR-E001');
 
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.wall').click();
+  await (await fileEntry(page, 'file.wall')).click();
   const dialog = page.getByRole('dialog', { name: 'Imprimer en grand' });
   await expect(dialog.getByRole('radio', { name: 'A4 paysage' })).toBeChecked();
   await dialog.getByRole('combobox', { name: 'Pages en largeur' }).selectOption('2');

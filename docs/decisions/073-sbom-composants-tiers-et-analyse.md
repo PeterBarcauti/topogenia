@@ -60,3 +60,14 @@ paquet navigateur et dans le `jszip.min.js` qu'il contient n'y étaient justes. 
 sans interpréteur de commandes ; le ZIP est écrit et relu par les tâches du SDK (`build/archive.proj`), plus par
 `tar.exe` ; l'empreinte de chaque fichier du ZIP est écrite à côté de lui. `build/codeql-local.ps1` devient
 `build/codeql-local.mjs`, au même comportement (code 3 sans la CLI). Détail dans l'ADR 076.
+
+## Révision (23/11/2026, pré-audit de la copie 68) : textes des licences et SBOM complet
+
+`THIRD-PARTY-NOTICES.md` porte, après son tableau, le texte de licence de chaque composant livré : le fichier que porte
+son paquet, sinon le texte de la licence qu'il déclare (`build/licences/`, Apache-2.0 par `LICENSE`) précédé de l'avis
+de ses métadonnées (`build/licence-texts.mjs`) ; un même texte n'est écrit qu'une fois. Les paquets portent en plus,
+dans `licenses/microsoft`, la licence du runtime .NET et les listes `THIRD-PARTY-NOTICES.TXT` des paquets de Microsoft
+que la publication porte. Le SBOM nomme au premier niveau chaque composant que les mentions disent livré, ceux du
+fichier assemblé d'exceljs compris, à la version de leur `package.json` embarqué quand il y en a un, et un paquet que
+remplace un cadre partagé de .NET (`System.Security.Cryptography.Pkcs`) ; `build/sbom.mjs` échoue sur un oubli. Un
+analyseur du compilateur seul (`Microsoft.EntityFrameworkCore.Analyzers`) n'est plus compté livré.

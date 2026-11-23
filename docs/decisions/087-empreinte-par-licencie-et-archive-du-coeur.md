@@ -30,7 +30,7 @@ pour une preuve juridique plus faible qu'un dépôt daté.
    un cœur modifié et le signe de sa propre clé n'est vu que par la comparaison des empreintes SHA-256 à l'archive
    (« NOT ONE OF THE BUILDS ARCHIVED »). Pour un `Topogenia.exe` qui embarque le cœur, `verify` authentifie la marque
    sans comparer l'assemblage (F-149).
-2. **Point d'entrée unique** : `node build/core/licence.mjs` (`secret`, `pack`, `verify`). `pack` construit le cœur par
+2. **Point d'entrée unique** : `node build/core/licence.mjs` (non publié) (`secret`, `pack`, `verify`). `pack` construit le cœur par
    sa chaîne, vérifie l'empreinte dans l'assemblage obscurci, puis archive ; `verify` lit l'empreinte d'un assemblage ou
    d'un paquet trouvé, l'authentifie par le secret et nomme son licencié. La chaîne refuse un `dotnet pack` sans
    empreinte.
@@ -38,7 +38,7 @@ pour une preuve juridique plus faible qu'un dépôt daté.
    l'obscurci, la carte des noms, une copie des sources du domaine, un manifeste (licence, licencié, version, date,
    empreinte, empreintes SHA-256) ; un registre des licences, qui refuse un même numéro pour deux licenciés. La clé, le
    secret et l'archive sont refusés dans le dépôt.
-4. Rien de cela n'entre dans le dépôt public : `build/core` reste chez le titulaire (ADR 074).
+4. Rien de cela n'entre dans le dépôt public : `build/core` (non publié) reste chez le titulaire (ADR 074).
 
 ## Conséquences
 

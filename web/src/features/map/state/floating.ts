@@ -4,7 +4,7 @@
 import { createStore, type StoreApi } from 'zustand/vanilla';
 import type { Schema } from '../../../api/client.ts';
 import type { ReplacedProject } from '../../project/package/ImportPackageDialog.tsx';
-import type { Point } from '../model/geometry/grid.ts';
+import type { GridCell, Point } from '../model/geometry/grid.ts';
 
 /**
  * What a menu acts on: a step (and the point of the window it was opened at, where its RACI panel opens), the steps chosen,
@@ -47,10 +47,15 @@ export type Floating =
   | { readonly kind: 'duplicate' }
   | { readonly kind: 'target' }
   | { readonly kind: 'export-package' }
+  /** A .pmap file inserted as a detailed step, at the cell of the menu of the map if any, or replacing the detail of a step (3.3, F-208). */
+  | { readonly kind: 'insert-pmap'; readonly stepId?: string; readonly cell?: GridCell; readonly flowId?: string }
   // The export of the map as an image SVG, its copy on option (plan 3.1, L7).
   | { readonly kind: 'export-svg' }
+  | { readonly kind: 'export-bpmn' }
   // The poster of the map for a wall: its paper, its pages across, the marks of the analysis (Makigami M9).
   | { readonly kind: 'wall-print' }
+  // The whole project, or the map shown and its levels, as one PDF (lot 5 of the 3.4, ADR 113).
+  | { readonly kind: 'project-pdf' }
   /** The panel of the summary of the map: its sentence, its state, write it, ask it again (plan 3.1, lot R). */
   | { readonly kind: 'summary' }
   | { readonly kind: 'replace'; readonly replaced: ReplacedProject }

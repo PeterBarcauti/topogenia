@@ -3,20 +3,17 @@
 
 import type { Schema } from '../../../api/client.ts';
 import type { Translate } from '../../../shared/i18n/i18n.ts';
-import { localizedName } from '../../../shared/i18n/localizedName.ts';
+import { planEntries } from '../plan/actionPlan.ts';
 import type { Sheet } from './workbook.ts';
 
 type ActionPlanView = Schema<'ActionPlanView'>;
-type NamedText = Schema<'NamedText'>;
-
-/** A name of the plan in the language shown, else as it was entered. */
-const shown = (named: NamedText | null | undefined, language: string): string =>
-  named == null ? '' : localizedName({ name: named.text, source_language: named.source_language, name_translations: named.translations }, language);
 
 /**
  * The action plan as a sheet, in the order of the host (the map, then the levels below it, the reading order, the codes):
  * map, step code and label, lane, pain point code and description, action, owner, due date (`yyyy-mm-dd`, which Excel
  * sorts), status, hours lost per month; null when the plan holds no pain point, so that the workbook has no empty sheet.
+ * The rows are the cells of the entries the panel shows (ADR 112): no value is made here. No late column: a file is read
+ * again weeks later.
  */
 export function actionPlanSheet(plan: ActionPlanView, language: string, t: Translate): Sheet | null {
   if (plan.lines.length === 0) return null;
@@ -24,10 +21,7 @@ export function actionPlanSheet(plan: ActionPlanView, language: string, t: Trans
     name: t('export.sheet_action_plan'),
     headers: [t('export.plan.map'), t('raci.column_code'), t('raci.column_step'), t('export.stream.lane'), t('export.plan.pain_point'),
       t('export.plan.description'), t('export.plan.action'), t('export.plan.owner'), t('export.plan.due'), t('export.plan.status'), t('export.plan.lost')],
-    rows: plan.lines.map((line) => [
-      shown(line.map, language), line.step_code, shown(line.step, language), shown(line.lane, language), line.code, line.description,
-      line.action ?? '', line.owner ?? '', line.due_date ?? '', t(`sheet.pain_point.statuses.${line.status}`), line.lost_hours_per_month ?? '',
-    ]),
+    rows: planEntries(plan, language, t).map((entry) => entry.cells),
     widths: [28, 12, 36, 22, 12, 40, 40, 22, 12, 14, 12],
   };
 }

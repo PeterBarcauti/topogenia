@@ -1,0 +1,213 @@
+/* bpmn.css */
+/* The view of a map as a diagram BPMN 2.0 (ADR 106): its bar, its canvas, the frames of the pool and of the lanes in the tints of the map, the forms, the flows, the documents and the notes, in the tokens of the charter. */
+
+.bpmn-view {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bpmn-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.bpmn-badge {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bpmn-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.bpmn-toolbar-gap {
+  flex: 1;
+}
+
+.bpmn-canvas {
+  flex: 1;
+  min-height: 0;
+}
+
+.bpmn-drawing {
+  overflow: visible;
+  font-family: inherit;
+}
+
+.bpmn-lane-body {
+  fill: var(--surface);
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.bpmn-pool .bpmn-lane-band {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.bpmn-lane-name {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bpmn-lane--1 .bpmn-lane-band { fill: var(--lane-1-pastel); stroke: var(--lane-1-ink); }
+.bpmn-lane--2 .bpmn-lane-band { fill: var(--lane-2-pastel); stroke: var(--lane-2-ink); }
+.bpmn-lane--3 .bpmn-lane-band { fill: var(--lane-3-pastel); stroke: var(--lane-3-ink); }
+.bpmn-lane--4 .bpmn-lane-band { fill: var(--lane-4-pastel); stroke: var(--lane-4-ink); }
+.bpmn-lane--5 .bpmn-lane-band { fill: var(--lane-5-pastel); stroke: var(--lane-5-ink); }
+.bpmn-lane--6 .bpmn-lane-band { fill: var(--lane-6-pastel); stroke: var(--lane-6-ink); }
+.bpmn-lane--7 .bpmn-lane-band { fill: var(--lane-7-pastel); stroke: var(--lane-7-ink); }
+.bpmn-lane--8 .bpmn-lane-band { fill: var(--lane-8-pastel); stroke: var(--lane-8-ink); }
+
+.bpmn-lane--1 .bpmn-lane-name { fill: var(--lane-1-ink); }
+.bpmn-lane--2 .bpmn-lane-name { fill: var(--lane-2-ink); }
+.bpmn-lane--3 .bpmn-lane-name { fill: var(--lane-3-ink); }
+.bpmn-lane--4 .bpmn-lane-name { fill: var(--lane-4-ink); }
+.bpmn-lane--5 .bpmn-lane-name { fill: var(--lane-5-ink); }
+.bpmn-lane--6 .bpmn-lane-name { fill: var(--lane-6-ink); }
+.bpmn-lane--7 .bpmn-lane-name { fill: var(--lane-7-ink); }
+.bpmn-lane--8 .bpmn-lane-name { fill: var(--lane-8-ink); }
+
+.bpmn-flow,
+.bpmn-data-flow,
+.bpmn-association {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.5;
+}
+
+.bpmn-data-flow {
+  stroke-dasharray: 5 4;
+}
+
+.bpmn-association {
+  stroke-dasharray: 2 3;
+}
+
+.bpmn-arrow {
+  fill: var(--edge);
+}
+
+.bpmn-edge-label rect {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.bpmn-form {
+  fill: var(--surface);
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+
+.bpmn-event--end {
+  stroke: var(--text);
+  stroke-width: 3.5;
+}
+
+.bpmn-event-inner {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+
+.bpmn-gateway-marker path,
+.bpmn-gateway-marker circle,
+.bpmn-marker path {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.5;
+}
+
+.bpmn-marker rect {
+  fill: var(--surface);
+  stroke: var(--text-muted);
+  stroke-width: 1;
+}
+
+.bpmn-icon {
+  color: var(--text-muted);
+}
+
+.bpmn-text {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.bpmn-text--small {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* The drawing is one node that React Flow cannot choose nor drag, so it takes no pointer (pointer-events: none on its
+   wrapper): the forms of the steps take it back, the click and the double click reach them, the empty places stay the
+   pane's, which moves the view (seen by the journey of the 3.3 in a real browser). */
+.bpmn-node {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.bpmn-node:hover .bpmn-form,
+.bpmn-node:focus-visible .bpmn-form {
+  stroke: var(--accent);
+}
+
+.bpmn-node:focus {
+  outline: none;
+}
+
+.bpmn-node:focus-visible .bpmn-form {
+  stroke-width: 3;
+}
+
+.bpmn-node.is-untranslated .bpmn-text {
+  font-style: italic;
+}
+
+.bpmn-node--subProcess {
+  cursor: zoom-in;
+}
+
+/* A document or a store takes the pointer back, as the forms of the steps: its whole name shows on hover (R8). */
+.bpmn-datum {
+  pointer-events: all;
+}
+
+.bpmn-data {
+  fill: var(--surface);
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+
+.bpmn-note-back {
+  fill: var(--danger-soft);
+  stroke: none;
+}
+
+.bpmn-note {
+  fill: none;
+  stroke: var(--danger-muted);
+  stroke-width: 2;
+}
+
+.bpmn-note + .bpmn-text--small,
+.bpmn-note ~ .bpmn-text--small {
+  fill: var(--text-muted-on-danger-soft);
+}

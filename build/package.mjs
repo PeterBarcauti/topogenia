@@ -7,7 +7,9 @@ import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, delimiter, join, relative } from 'node:path';
 import { parseArgs } from 'node:util';
+import { normalize, otherLastModified, releaseDay, withLastModified } from './archive-dates.mjs';
 import { root } from './components.mjs';
+import { microsoftNotices } from './licence-texts.mjs';
 
 const fail = (message) => {
   console.error(message);
@@ -179,6 +181,13 @@ function stageOf(published, deps, core, product, version) {
   const stage = join(artifacts, `${product}-${version}-${{ Desktop: 'portable', Server: 'server', Store: 'store' }[mode]}`);
   rmSync(stage, { recursive: true, force: true });
   cpSync(published, stage, { recursive: true });
+  // The endpoints of the static assets carry the hour each file of wwwroot was built: the release day instead, as the
+  // entries of the package (contre-visite 68, CV-P2-02).
+  const endpoints = join(stage, `${product}.staticwebassets.endpoints.json`);
+  if (!existsSync(endpoints)) fail(`The endpoints of the static assets are missing: ${endpoints}`);
+  const dated = withLastModified(readFileSync(endpoints, 'utf8'), releaseDay());
+  if (!dated.includes('"Last-Modified"') || otherLastModified(dated, releaseDay()).length > 0) fail('The endpoints of the static assets keep the hour of the build');
+  writeFileSync(endpoints, dated);
   if (mode === 'Desktop') {
     copyTemplate('build/portable-readme.txt', join(stage, 'README.txt'), product, version);
   } else if (mode === 'Server') {
@@ -195,6 +204,14 @@ function stageOf(published, deps, core, product, version) {
   cpSync(join(core, 'LICENSE.md'), join(licenses, 'CORE-LICENSE.md'));
   cpSync(join(root, 'web', 'node_modules', 'inter-font', 'LICENSE.md'), join(licenses, 'Inter-OFL-1.1.md'));
   cpSync(join(root, 'web', 'node_modules', 'lucide-react', 'LICENSE'), join(licenses, 'Lucide-ISC.txt'));
+  // The notices of the packages of Microsoft the publication carries, and the licence of the runtime of .NET the desktop
+  // embeds (pre-audit 68, P2-05): THIRD-PARTY-NOTICES.md names them, the folder holds them.
+  const notices = microsoftNotices(deps);
+  if (mode !== 'Server' && !notices.some((notice) => notice.name.startsWith('Microsoft.NETCore.App.Runtime.') && notice.name.endsWith('-LICENSE.txt'))) {
+    fail('The licence of the runtime of .NET is not found in its pack');
+  }
+  mkdirSync(join(licenses, 'microsoft'));
+  for (const notice of notices) cpSync(notice.source, join(licenses, 'microsoft', notice.name));
   const sbom = `${stage}.cdx.json`;
   const runtime = mode === 'Server' ? join(published, `${product}.runtimeconfig.json`) : '-';
   run('The SBOM', process.execPath, [join(root, 'build', 'sbom.mjs'), mode, deps, runtime, sbom]);
@@ -215,11 +232,13 @@ const REQUIRED_BY_MODE = {
 };
 const FORBIDDEN = /\.(pdb|ps1|psm1|bat|cmd|vbs|wsf|cs|csproj|snk)$|EndToEnd|appsettings\.Development/i;
 
-/** The ZIP written by the SDK (the ZipDirectory task of MSBuild), then read back by it: it must give the staged files, byte for byte. */
+/** The ZIP written by the SDK (the ZipDirectory task of MSBuild), its entries dated by convention, then read back by it: it must give the staged files, byte for byte. */
 function zip(stage, product) {
   const file = `${stage}.zip`;
   rmSync(file, { force: true });
   run('The ZIP', 'dotnet', ['msbuild', archiveProject, '-t:Zip', '-nologo', '-v:minimal', `-p:Folder=${stage}`, `-p:Archive=${file}`]);
+  // Every entry dated the release day at midnight UTC: the dates of the files staged tell neither the hour nor the zone of the build (pre-audit 68, P2-04).
+  normalize(file);
   const back = `${stage}-read`;
   unzip(file, back);
   const names = namesOf(back);
@@ -250,6 +269,9 @@ function msix(stage, product, version) {
   rmSync(file, { force: true });
   const makeappx = kitTool('makeappx.exe');
   run('makeappx pack', makeappx, ['pack', '/d', stage, '/p', file, '/o'], { capture: true });
+  // The entries dated as those of the ZIP, the ones makeappx writes included, before any signature (pre-audit 68, P2-04);
+  // the map of blocks hashes the content, not the headers, and the unpacking below checks it.
+  normalize(file);
   if (signing.certificate) sign(file);
   const back = `${stage}-read`;
   rmSync(back, { recursive: true, force: true });

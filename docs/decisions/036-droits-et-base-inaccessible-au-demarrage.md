@@ -11,7 +11,7 @@ La 1.x traduisait au démarrage les erreurs de connexion et de droits (18456, 26
 (A-5-10). En 2.0, `SchemaMigrations.CheckAsync` lit les deux historiques des migrations : sous un compte sans droit
 sur le schéma `topogenia` (membre de `topogenia_bi` seulement, ou d'aucun rôle), SQL Server cache leurs métadonnées,
 EF Core et le catalogue les voient absents, et le contrôle concluait « en retard » (constat de
-`docs/couverture-p3/portage-b.md`). L'hôte aurait alors demandé `--migrate` au lieu de signaler les droits.
+`docs/couverture-p3/portage-b.md` (non publié)). L'hôte aurait alors demandé `--migrate` au lieu de signaler les droits.
 
 ## Décision
 

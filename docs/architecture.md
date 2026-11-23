@@ -31,7 +31,7 @@ Règles vérifiées par `tests/Topogenia.Architecture.Tests` : voir la spec 3.2 
 
 ### 2.1 Enregistrements du modèle
 
-Le modèle (`src/Topogenia.Domain/Model/`) est fait d'**enregistrements immuables publics**
+Le modèle (`src/Topogenia.Domain/Model/` (non publié)) est fait d'**enregistrements immuables publics**
 (`sealed record`) : ils n'ont ni état privé ni méthode qui les modifie. Une opération ne
 modifie jamais un enregistrement : elle en construit un nouveau (`record with { ... }`) et le
 **remplace** dans l'espace de projet par `Put` ; `SoftDelete` et `Remove` suppriment
@@ -340,7 +340,7 @@ Ports (`src/Topogenia.Application/Ports/`, interfaces et types de données seule
 | `IClock` | Heure UTC du serveur (D08) | hôte, `Composition/SystemClock` ; horloge fixe dans les tests |
 | `IPackageExporter` | Paquet d'échange d'un projet (spec 7.2) : utilisateurs qu'il nomme, octets du paquet, nom du fichier (A-1.2-16) ; l'Application ne voit jamais le format (ADR 051) | P5-T01 (`Interchange/Packages/PackageExporter`) |
 | `IPackageImporter` | Lecture d'un paquet reçu (`Read` : garde-fous de la spec 5.4, montée de version, reconstruction d'essai ; rend le code, les logins, les membres et les comptes de l'aperçu) et reconstruction de ses enregistrements sous un code, avec les utilisateurs de l'import (`Build`, `ImportPlan`) ; le format reste caché (ADR 052, 053) | P5-T02 (`Interchange/Packages/PackageImporter`) |
-| `IPmapFormat` | Fichier `.pmap` (version courante 1.4, versions lues 1.1 à 1.4) : lecture d'un texte (`Read`, fautes `FileError`), document d'un projet pour la copie (`Outline`, fiches selon ce que voit le demandeur) ou pour la duplication (`Model`, tous les niveaux, AR-118), écriture, construction d'un nouveau projet par les règles du domaine (`Build`), nom du fichier (ADR 054) | P5-T04 (`Interchange/Pmap/PmapFiles`) |
+| `IPmapFormat` | Fichier `.pmap` (version courante 1.5, versions lues 1.1 à 1.5) : lecture d'un texte (`Read`, fautes `FileError`), document d'un projet pour la copie (`Outline`, fiches selon ce que voit le demandeur) ou pour la duplication (`Model`, tous les niveaux, AR-118), commentaires de présentation et glossaire d'une copie entière (`PmapExtras`, ADR 105), écriture, construction d'un nouveau projet par les règles du domaine (`Build`), nom du fichier (ADR 054) | P5-T04 (`Interchange/Pmap/PmapFiles`) |
 | `IAssistantSettingsStore` | Réglages de l'assistant de l'installation, un seul enregistrement (3.0) : lus sans unité de travail, écrits dans l'unité de la requête qui les change, leur version avancée d'un | `Persistence/Assistant/AssistantSettingsStore` |
 | `ISecretProtector` | Protection d'un secret par l'hôte (clé d'API) : le magasin ne garde que le texte protégé, le secret n'est lu que pour un appel | hôte, `Assistant/DataProtectionSecrets` |
 | `IAssistantConnector` | Un connecteur de la liste : un appel qui vérifie qu'il atteint son modèle, et les échanges du volet | `Topogenia.Assistant` : `AnthropicConnector`, `BedrockConnector`, `OpenAiCompatibleConnector` (ADR 098) |

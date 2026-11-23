@@ -230,6 +230,75 @@ public sealed class PmapRoutesTests(ApiHosts hosts) : IClassFixture<ApiHosts>
         Assert.Equal("PMAP_PROFONDEUR_COUPEE", cut.Headers[PmapApi.WarningHeader]);
     }
 
+    /// <summary>
+    /// The copy of a map read for a .bpmn (`purpose=bpmn`) is the same text as the copy, a file to keep; read for the view
+    /// in BPMN 2.0 (`purpose=view`), without any event, it holds no more than the map shows (no comment, no glossary) and
+    /// names no file (audit of the copy 64, P2-03); another purpose is refused (ADR 106). Whether an event is written, and
+    /// what the copy of the view leaves out, are held by the tests of the application and of the format.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
+    public async Task The_copy_of_a_map_is_read_for_the_view_or_for_a_bpmn_and_another_purpose_is_refused(EngineKind kind)
+    {
+        var project = await ProjectAsync(kind);
+        using var admin = project.Admin;
+        var opened = await OpenAsync(admin, TestPmaps.WithComments);
+        var mapId = opened.GetProperty("root_map_id").GetGuid();
+        static string Body(ApiResponse reply) => reply.Body[reply.Body.IndexOf("\"project\"", StringComparison.Ordinal)..];
+        static string? AttachmentOf(ApiResponse reply) => reply.Headers.TryGetValue("Content-Disposition", out var value) ? value : null;
+
+        var copy = await admin.GetAsync($"/api/maps/{mapId}/pmap");
+        var view = await admin.GetAsync($"/api/maps/{mapId}/pmap?purpose=view");
+        var bpmn = await admin.GetAsync($"/api/maps/{mapId}/pmap?purpose=bpmn");
+
+        Assert.Equal((200, 200), (view.Status, bpmn.Status));
+        Assert.Equal(Body(copy), Body(bpmn));
+        Assert.Contains("\"comment\"", Body(copy), StringComparison.Ordinal);
+        Assert.DoesNotContain("\"comment\"", Body(view), StringComparison.Ordinal);
+        Assert.StartsWith("attachment", AttachmentOf(copy), StringComparison.Ordinal);
+        Assert.Null(AttachmentOf(view));
+        (await admin.GetAsync($"/api/maps/{mapId}/pmap?purpose=autre")).Refused(400, "VALEUR_INVALIDE");
+    }
+
+    /// <summary>The lines of the comments of the steps, then of the flows, of a map, as `text@language` in order, one text.</summary>
+    private static async Task<string> CommentsAsync(ApiClient client, Guid mapId)
+    {
+        static string Lines(JsonElement lines) =>
+            string.Join(" | ", lines.EnumerateArray().Select(line => $"{line.GetProperty("text").GetString()}@{line.GetProperty("language").GetString()}").Order(StringComparer.Ordinal));
+        return Lines((await client.GetAsync($"/api/maps/{mapId}/presentation-comments")).Ok()) + " / "
+            + Lines((await client.GetAsync($"/api/maps/{mapId}/flow-presentation-comments")).Ok());
+    }
+
+    /// <summary>
+    /// A file 1.5 opens with its comments, its glossary and its pain points in their status (ADR 116); a copy of the project
+    /// and the copy of its map write them again in 1.5 and open again as they were; a duplication keeps them (ADR 105).
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
+    public async Task A_file_1_5_opens_with_its_comments_and_its_glossary_and_its_copies_and_its_duplication_keep_them(EngineKind kind)
+    {
+        var project = await ProjectAsync(kind);
+        using var admin = project.Admin;
+        const string expected = "It all starts here.@en | Tout part d'ici.@fr / La demande change de mains.@fr";
+
+        var opened = await OpenAsync(admin, TestPmaps.WithComments);
+        var id = opened.GetProperty("id").GetGuid();
+        var copy = (await admin.GetAsync($"/api/projects/{id}/pmap?with_sheets=true")).Body;
+        var branch = (await admin.GetAsync($"/api/maps/{opened.GetProperty("root_map_id").GetGuid()}/pmap")).Body;
+        var duplicated = (await admin.PostAsync($"/api/projects/{id}/duplicate", new { code = ApiProject.NewCode() })).Ok(201);
+
+        Assert.Equal(expected, await CommentsAsync(admin, opened.GetProperty("root_map_id").GetGuid()));
+        Assert.Equal("demande = request", (await admin.GetAsync($"/api/projects/{id}")).Ok().GetProperty("translation_glossary").GetString());
+        Assert.All(new[] { copy, branch }, text =>
+        {
+            Assert.Contains("\"version\": \"1.5\"", text, StringComparison.Ordinal);
+            Assert.Contains("\"pain_point_status\": \"reported\"", text, StringComparison.Ordinal);
+            Assert.Contains("\"pain_point_status\": \"dropped\"", text, StringComparison.Ordinal);
+        });
+        foreach (var again in new[] { await OpenAsync(admin, copy), await OpenAsync(admin, branch), duplicated })
+            Assert.Equal(expected, await CommentsAsync(admin, again.GetProperty("root_map_id").GetGuid()));
+    }
+
     [Theory]
     [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
     public async Task A_duplication_copies_the_maps_and_the_translations_of_the_steps_without_the_sheets(EngineKind kind)

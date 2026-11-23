@@ -106,6 +106,31 @@ public static class CommentLineRules
         return writes;
     }
 
+    /// <summary>
+    /// What a comment written by the assistant for a subject (the practice `comments`, F-130) changes, among the lines
+    /// kept of the subject: its original, in the language of origin of the subject, written with the source of the
+    /// assistant, and the automatic translations of the former original dropped, as a typed original drops them. An
+    /// original typed by a person stays unless <paramref name="replaceTyped"/>: the person accepted its replacement in the
+    /// review. The same text already written writes nothing.
+    /// </summary>
+    public static IReadOnlyList<CommentLineWrite> Drafted(CommentSubject subject, IReadOnlyList<CommentLine> kept, string text, bool replaceTyped,
+        OperationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(kept);
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(context);
+        var lines = kept.Where(comment => comment.SubjectId == subject.Id).ToList();
+        var original = Original(subject, lines);
+        if (original is { Source: CommentSource.Manual } && !replaceTyped)
+            return [];
+        if (original is not null && string.Equals(original.Text, text, StringComparison.Ordinal))
+            return [];
+        var writes = new List<CommentLineWrite> { Write(subject.Id, subject.SourceLanguage, text, CommentSource.Assistant, original, context) };
+        if (!PresentationCommentRules.SameText(original?.Text, text))
+            writes.AddRange(lines.Where(comment => !subject.WritesOriginalIn(comment.Language) && IsAutomatic(comment.Source)).Select(Removal));
+        return writes;
+    }
+
     /// <summary>The line of a subject in a language written over the one kept (none: created), its version moved on by one, by the actor of the context at its time.</summary>
     public static CommentLineWrite Write(Guid subjectId, string language, string text, CommentSource source, CommentLine? kept, OperationContext context)
     {

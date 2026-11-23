@@ -37,6 +37,21 @@ public sealed class QueryRunner
         this.currentUser = currentUser;
     }
 
+    /// <summary>
+    /// The right of a request on a project checked alone, before the request receives what it reads (the file of an
+    /// insertion, independent review of the 3.3, as the opening of a file since the audit 3.2.0): the user, then the right
+    /// that <paramref name="request"/> declares on <paramref name="target"/>, the same policy as <see cref="RunAsync{TResult}"/>
+    /// and <see cref="CommandRunner.RunAsync{TResult}"/>; nothing loaded, locked nor written. The run checks the whole right again.
+    /// </summary>
+    public async Task DemandAsync(Type request, AccessTarget target, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var user = currentUser.User ?? throw new DomainException(ErrorCodes.NotAuthenticated, RefusalKind.Forbidden);
+        var requirement = AccessPolicy.RequirementOf(request);
+        AccessPolicy.DemandUser(requirement, user);
+        AccessPolicy.Demand(requirement, user, await access.FindAsync(target, user.Id, cancellationToken), inTrash: false);
+    }
+
     public async Task<TResult> RunAsync<TResult>(ProjectQuery<TResult> query, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -47,6 +62,7 @@ public sealed class QueryRunner
         AccessPolicy.DemandUser(requirement, user);
         var found = await access.FindAsync(query.Target, user.Id, cancellationToken);
         var role = AccessPolicy.Demand(requirement, user, found, query.TargetsTrash);
+        query.CheckRequest();
         var content = query.ReadsMapView ? query.Content | views.Content : query.Content;
         var workspace = await store.LoadAsync(found!.ProjectId, content, cancellationToken) ?? throw DomainException.NotFound();
         if (requirement is RequiresSheetFillAttribute)

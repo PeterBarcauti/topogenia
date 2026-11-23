@@ -1,10 +1,11 @@
 // SystemEndpoints.cs
-// The HTTP entry points of the host itself: health, anonymous and minimal in server mode, the command « Quit » and the sample project of the desktop mode (annex A 1, spec 5.2, 5.3, 6.1).
+// The HTTP entry points of the host itself: health, anonymous and minimal in server mode, the command « Quit », the writes a page still has to send and the sample project of the desktop mode (annex A 1, spec 5.2, 5.3, 6.1, ADR 115).
 
 using Microsoft.Extensions.Options;
 using Topogenia.Host.Api.Exchange;
 using Topogenia.Host.Api.Health;
 using Topogenia.Host.Composition;
+using Topogenia.Host.Desktop;
 using Topogenia.Host.Startup;
 
 namespace Topogenia.Host.Endpoints;
@@ -12,7 +13,8 @@ namespace Topogenia.Host.Endpoints;
 /// <summary>
 /// Each route reads the request and calls its handler (spec 3.2). The health is the only anonymous route, in server mode
 /// only (spec 5.3, A-4-03): an anonymous caller gets `{status}` alone, an authenticated one the version, the state of the
-/// database and the time; in desktop mode it needs the session cookie like any route (AR-46).
+/// database and the time; in desktop mode it needs the session cookie like any route (AR-46). The writes that a page
+/// declares (ADR 115) are the desktop mode only, INTROUVABLE in server mode like the command « Quit ».
 /// </summary>
 public static class SystemEndpoints
 {
@@ -33,6 +35,11 @@ public static class SystemEndpoints
         {
             DesktopQuit.Stop(lifetime, options);
             return TypedResults.Accepted((string?)null);
+        }).WithTags("System");
+        routes.MapPost("/api/desktop/writes", (DesktopWritesBody body, HttpContext context) =>
+        {
+            DesktopWrites.Of(context.RequestServices).Declare(body);
+            return TypedResults.NoContent();
         }).WithTags("System");
         routes.MapPost("/api/desktop/sample-project", async (SampleProjectApi api, CancellationToken token) =>
         {

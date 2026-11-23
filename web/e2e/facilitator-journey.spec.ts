@@ -30,19 +30,25 @@ async function homeBeforeAnything(page: Page): Promise<void> {
   await page.goto('/');
   // The texts of the home page changed by AR-88 (« Décrire un processus », 1.x « Apporter ma pierre »).
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cartographiez vos processus réels pour automatiser les actions répétitives et gagner en efficacité.');
-  await expect(page.getByRole('button', { name: 'Décrire un processus' })).toBeDisabled();
+  // With no project the administrator is offered the starts by the main button (ADR 111), no longer a disabled button.
+  await expect(page.getByRole('button', { name: 'Décrire un processus' })).toBeEnabled();
   await expect(page.getByTestId('home-empty')).toContainText('Aucun projet pour l’instant');
   // No Translations button without an open map (B-1.2-12).
   await expect(page.getByTestId('header-translations')).toHaveCount(0);
 }
 
 async function createProject(page: Page): Promise<void> {
+  // « New project » is a menu of starts (ADR 111): the blank map first; the name comes first and the code follows it.
   await page.getByRole('button', { name: 'Nouveau projet' }).click();
+  await page.getByTestId('home-start-menu-blank').click();
+  await page.getByLabel('Nom en français').fill('Processus visites');
+  await expect(page.getByLabel('Code court')).toHaveValue('PROVIS');
+  // A code typed replaces the proposal, upper-cased and cut to three letters (the digit is no letter).
   await page.getByLabel('Code court').fill('vis9');
   await expect(page.getByLabel('Code court')).toHaveValue('VIS');
+  await page.getByText('Plus d’options').click();
   // The language of the process is the one of the interface; the name translated into English at once (ADR 083).
   await expect(page.getByLabel('Langue du processus')).toHaveValue('fr');
-  await page.getByLabel('Nom en français').fill('Processus visites');
   await page.getByLabel('Traduire le nom en…').selectOption('en');
   await page.getByLabel('Nom en anglais').fill('Visits process');
   await page.getByRole('button', { name: 'Créer le projet' }).click();

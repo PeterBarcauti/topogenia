@@ -1,8 +1,10 @@
 // documentWrites.ts
-// The writes of the documents of a sheet, each with the version of what it changes: declare, change and remove a document, use one, stop using it, describe its use (annex B 4, A 2.11).
+// The writes of the documents of a sheet, each with the version of what it changes: declare, change and remove a document, use one, stop using it, describe its use, choose the status of its pain point, of a pain point of the step without a document, or of the one a consumer of an output noted (annex B 4, A 2.11, ADR 116, R10).
 
 import { api, type Schema } from '../../../api/client.ts';
+import { isApiError } from '../../../api/errors.ts';
 import { documentBody, type Direction, type DocumentEntry } from '../model/documents.ts';
+import type { StatusCode } from '../model/painPointStatus.ts';
 import type { SheetValue } from '../SheetContext.tsx';
 
 /**
@@ -41,6 +43,55 @@ export function tickDocument(sheet: SheetValue, documentId: string, used: boolea
 /** The use described: the wait, the share usable as is, the pain point raised on the producer and its time lost (B-4-71 to B-4-76). */
 export function describeUse(sheet: SheetValue, documentId: string, use: Schema<'DocumentUseBody'>): Promise<boolean> {
   return tickDocument(sheet, documentId, true, use);
+}
+
+/** The version of a pain point in the sheet last received: one a use shows, or one of the step without a document (R10). */
+function versionOfPainPoint(sheet: SheetValue, painPointId: string): number {
+  const view = sheet.received();
+  return [...view.pain_points, ...view.step_pain_points].find((pain) => pain.id === painPointId)?.version ?? 0;
+}
+
+/**
+ * The status of a pain point chosen in the list (ADR 116), under the step whose sheet this is: one carried by a use of
+ * the step, or one raised on the step that no use carries (R10). In the queue of the documents, after the writes of the
+ * use asked before it (the pain point may be born of one), with the version of the pain point they gave back. Changed by
+ * someone else meanwhile: the refusal is said and the sheet read again, so that the list shows the status it has now.
+ */
+export function setPainPointStatus(sheet: SheetValue, painPointId: string, status: StatusCode): Promise<boolean> {
+  const id = sheet.props.step.id;
+  return sheet.runDocument(async () => {
+    try {
+      return await api.put('/api/steps/{id}/pain-points/{painPointId}/status', { path: { id, painPointId }, body: { status }, version: versionOfPainPoint(sheet, painPointId) });
+    } catch (failure) {
+      if (isApiError(failure) && failure.status === 409) await readAgain(sheet);
+      throw failure;
+    }
+  });
+}
+
+/**
+ * The status of the pain point a consumer of an output noted, chosen on the sheet of the producer (R10): written under the
+ * step that receives, whose sheet the host answers with; this sheet is read again then, in the same queue.
+ */
+export function setConsumerPainPointStatus(sheet: SheetValue, consumerId: string, painPointId: string, status: StatusCode): Promise<boolean> {
+  return sheet.runDocument(async () => {
+    try {
+      await api.put('/api/steps/{id}/pain-points/{painPointId}/status', { path: { id: consumerId, painPointId }, body: { status }, version: versionOfPainPoint(sheet, painPointId) });
+    } catch (failure) {
+      if (isApiError(failure) && failure.status === 409) await readAgain(sheet);
+      throw failure;
+    }
+    return api.get('/api/steps/{id}/sheet', { path: { id: sheet.props.step.id } });
+  });
+}
+
+/** The sheet read again after a conflict; a failure to read it leaves the sheet as it was, the refusal said already. */
+async function readAgain(sheet: SheetValue): Promise<void> {
+  try {
+    sheet.apply(await api.get('/api/steps/{id}/sheet', { path: { id: sheet.props.step.id } }));
+  } catch {
+    // The message of the conflict is said by the queue.
+  }
 }
 
 export const NO_USE: Schema<'DocumentUseBody'> = {

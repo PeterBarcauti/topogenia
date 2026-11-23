@@ -14,6 +14,9 @@ en ligne ne sont offertes que pour un projet dont la classification peut quitter
 (points 1 et 12), parce que Chrome n'a aucune stratégie qui les coupe ; la voix choisie est retenue par le navigateur
 (point 12). **Révision du 12/11/2026 au soir (essai J6 du porteur du projet)** : Échap qui ferme ce qui est ouvert
 dans la scène ne quitte jamais la présentation, quoi que le navigateur fasse du plein écran (point 11).
+**Révision du 19/11/2026 (essai de la 3.3 par le porteur du projet)** : à 0,5 la voix est trop lente, à 1,5 beaucoup
+trop rapide pour être comprise ; la vitesse 1 est la bonne. Les vitesses offertes sont des crans fins autour d'elle,
+comme dans les lecteurs de podcasts : 0,75, 0,9, 1, 1,1 et 1,25 (point 6).
 
 ## Contexte
 
@@ -92,7 +95,7 @@ code et sur le marché (étude sourcée du 10/11) :
    l'étape choisie (révision du 12/11 : le chemin principal du cœur n'y est qu'une étape, et le parcours partait
    d'elle). Refusé : un second mode « chemin principal seul » (question posée au porteur, restée sans réponse ;
    tranché : le parcours complet remplace l'ancien, un mode court pourra s'ajouter). Limite gardée (inscrite dans
-   `a-peaufiner.md`, F-171) : le cadrage d'un passage dont les flèches partent ensemble vers des étapes éloignées, ou
+   `a-peaufiner.md` (non publié), F-171) : le cadrage d'un passage dont les flèches partent ensemble vers des étapes éloignées, ou
    d'un retour au branchement, peut être large. La durée d'un passage à plusieurs flèches est celle de la plus longue,
    et chaque flèche emporte ses documents (point 7).
 4. **Les scènes** : ouverture, **en pause** (lot J10, demande du porteur du projet : « il doit être par défaut sur stop
@@ -125,7 +128,8 @@ code et sur le marché (étude sourcée du 10/11) :
    aux lecteurs d'écran (`aria-live`), sauf pendant que la voix le lit (révision).
 6. **Le rythme** (`model/timing.ts`) : une phrase dure le temps de la lire à 15 colonnes par seconde (sous les 17 de
    Netflix : une salle lit de loin en écoutant), 1,6 s au moins, 7 s au plus ; un passage dure son vol (selon la longueur
-   de la flèche) ou ses phrases ; vitesses 0,5 à 2. La présentation s'ouvre en pause (point 4) ; Lire ou Espace lance le récit.
+   de la flèche) ou ses phrases ; vitesses 0,75, 0,9, 1, 1,1 et 1,25 (révision du 19/11 : 0,5 à 2 au départ), la voix
+   à la vitesse montrée. La présentation s'ouvre en pause (point 4) ; Lire ou Espace lance le récit.
 7. **La caméra** (`model/camera.ts` ; lot J10, relecture indépendante, S2 : une étape est cadrée avec les flèches qui
    partent d'elle et les étapes où elles mènent, un passage avec ses flèches et leurs bouts, un saut sans flèche par
    son arrivée seule ; l'arrêt suivant n'est cadré que si une flèche éclairée y mène : le parcours complet saute de
@@ -182,7 +186,7 @@ code et sur le marché (étude sourcée du 10/11) :
     n'agit qu'une fois, ses répétitions ne font plus rien ; Entrée de même : ses répétitions, après le champ qu'elle
     a fermé, ne font plus avancer le récit, et dans le champ elles n'envoient rien (relectures du 13/11/2026). Quand rien n'est ouvert, quitter le plein écran par le
     navigateur quitte toujours la présentation. Ce qu'un navigateur fait d'Échap en plein écran ne se joue pas dans
-    les tests (F-129 de `docs/a-peaufiner.md`) : la règle est prouvée par des tests qui envoient la touche puis
+    les tests (F-129 de `docs/a-peaufiner.md` (non publié)) : la règle est prouvée par des tests qui envoient la touche puis
     l'événement du plein écran, dans l'ordre où un navigateur les donne.
 12. **La voix**, éteinte par défaut (bouton « Voix », touche V) : elle lit la phrase affichée, et l'horloge attend
     qu'elle ait fini ; seules les voix du poste sont offertes, les voix en ligne après une case cochée qui dit que le
@@ -310,7 +314,8 @@ code et sur le marché (étude sourcée du 10/11) :
 - Essais de l'interface pour le lot J10, par sujet : le parcours complet (`model/tour.test.ts`,
   `model/tourShapes.test.ts`) ; le commentaire d'une flèche (`PresenterCommentFlow.test.tsx`,
   `PresenterCommentEdges.test.tsx`) ; les messages coupés et l'horloge (`PresenterMessagesClock.test.tsx`,
-  `model/player.test.ts`) ; la voix du projet (`projectVoices.test.ts`, `PresenterVoiceProject.test.tsx`, ADR 103) ;
+  `model/player.test.ts`) ; les vitesses, le bouton, plus et moins, la voix à la vitesse montrée
+  (`PresenterSpeed.test.tsx`, `presenterStore.test.ts`, révision du 19/11) ; la voix du projet (`projectVoices.test.ts`, `PresenterVoiceProject.test.tsx`, ADR 103) ;
   le libellé d'attente de l'assistant (`waitingLabel.test.tsx`, ADR 098). La ligne d'un document et ses deux boutons
   sont à l'ADR 104.
 - Reste pour la suite : une voix libre de qualité livrée avec l'application (étude), l'essai des télécommandes.

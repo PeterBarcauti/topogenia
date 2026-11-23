@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) wurde nicht beendet. Versuchen Sie es erneut oder schließen Sie das Konsolenfenster.",
     "quit_unsaved": "Eine Eingabe im Steckbrief ist noch nicht gespeichert: $t(app.name) bleibt geöffnet. Versuchen Sie es erneut, sobald der Steckbrief gespeichert ist.",
     "stopped": "$t(app.name) wurde beendet. Dieser Tab kann geschlossen werden.",
-    "stopped_help": "Um es wieder zu verwenden, öffnen Sie es erneut."
+    "stopped_help": "Um es wieder zu verwenden, öffnen Sie es erneut.",
+    "help_menu": "Hilfe-Menü",
+    "help_online": "Online-Hilfe (auf Englisch)",
+    "update_check": "Nach Updates suchen",
+    "update_check_help": "Öffnet die Versionsseite der Website. Installiert: {{version}} vom {{date}}.",
+    "update_check_store_help": "Öffnet die Seite im Microsoft Store, der die Updates installiert.",
+    "quit_text_unsaved": "Ein geöffnetes Formular ist nicht gespeichert: seine Eingabe geht verloren.",
+    "quit_anyway": "Trotzdem beenden"
   },
   "keys": {
     "Shift": "Umschalt",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Leertaste",
     "Enter": "Eingabe",
-    "ArrowUp": "Nach oben"
+    "ArrowUp": "Nach oben",
+    "ArrowLeft": "Nach links",
+    "ArrowRight": "Nach rechts",
+    "ArrowDown": "Nach unten",
+    "Backspace": "Rücktaste",
+    "Wheel": "Mausrad"
   },
   "errors": {
     "RESEAU": "$t(app.name) antwortet nicht. Prüfen Sie, ob $t(app.name) noch läuft (oder die Netzwerkverbindung, wenn es auf einem Server läuft).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Unerwartete Antwort des Servers. Laden Sie die Seite neu.",
     "ACCES_REFUSE": "Keine Berechtigung für diese Seite.",
     "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten.",
-    "RESUMES_A_JOUR": "Alle Karten haben eine aktuelle Zusammenfassung. Um eine neu zu schreiben, die Karte öffnen und auf „i“ neben ihrem Titel klicken."
+    "RESUMES_A_JOUR": "Alle Karten haben eine aktuelle Zusammenfassung. Um eine neu zu schreiben, die Karte öffnen und auf „i“ neben ihrem Titel klicken.",
+    "COLLECTION_TROP_DE_PROCESSUS": "Die Sammlung enthält zu viele Prozesse."
   },
   "home": {
     "eyebrow": "Um Ihre Prozesse mit KI zu beschleunigen, beschreiben Sie sie zuerst.",
@@ -79,7 +92,24 @@
     "sample_title": "Beispielprojekt",
     "sample_text": "Ein fiktives, bereits beschriebenes Projekt, um eine vollständige Karte kennenzulernen: Bahnen, Entscheidungen, Unterkarte, Steckbriefe, Dokumente und Schwachstellen. Es lässt sich wie jedes Projekt löschen.",
     "sample_create": "Beispielprojekt erstellen",
-    "sample_created": "Beispielprojekt {{code}} erstellt."
+    "sample_created": "Beispielprojekt {{code}} erstellt.",
+    "filter": "Projekte filtern",
+    "filter_placeholder": "Code oder Name",
+    "filter_count": "{{shown}} von {{total}}",
+    "filter_none": "Kein Projekt entspricht.",
+    "update_line": "Diese Version stammt vom {{date}}.",
+    "update_link": "Prüfen, ob eine neuere existiert",
+    "update_close": "Hinweis schließen",
+    "button_start_help": "Einen Ausgangspunkt wählen.",
+    "start_menu": "Projekt beginnen",
+    "start_sample": "Beispielprojekt",
+    "start_gallery": "Vorlagengalerie",
+    "start_gallery_help": "Wird im Browser geöffnet.",
+    "start_blank": "Leere Karte…",
+    "new_project_help": "Mit einer leeren Karte, einem Beispiel oder einer Vorlage beginnen.",
+    "new_project_help_no_sample": "Mit einer leeren Karte oder einer Vorlage beginnen.",
+    "new_project_help_no_gallery": "Mit einer leeren Karte oder einem Beispiel beginnen.",
+    "new_project_help_blank": "Mit einer leeren Karte beginnen."
   },
   "roles": {
     "facilitator": "Moderator",
@@ -112,7 +142,7 @@
     "properties": "Projekteigenschaften…",
     "properties_title": "Eigenschaften des Projekts {{code}}",
     "sharing_group": "Freigabegruppe der Dokumente",
-    "sharing_group_help": "Wird in den Steckbriefen bei einer freigegebenen Eingabe genannt (z. B. Team Finanzen). Leer: „die Freigabegruppe des Projekts“.",
+    "sharing_group_help": "Name der Personengruppe, die die Dokumente des Projekts lesen darf. Erscheint im Feld „Mit der Gruppe geteilt“ jedes Dokuments in einem Steckbrief. Leer: „die Freigabegruppe des Projekts“.",
     "properties_read_only": "Nur ein Moderator des Projekts kann diese Eigenschaften ändern.",
     "properties_saved": "Projekteigenschaften gespeichert.",
     "language": "Sprache des Prozesses",
@@ -121,12 +151,14 @@
     "workday_hours": "Arbeitstag (Stunden)",
     "workday_hours_help": "Von 1 bis 24 h, standardmäßig 7: rechnet die Durchlaufzeiten in Arbeitstage um.",
     "fte_hours": "Stunden pro VZÄ und Monat",
-    "fte_hours_help": "Von 1 bis 744 h, standardmäßig 151,67: rechnet den Aufwand in Vollzeitäquivalente um."
+    "fte_hours_help": "Von 1 bis 744 h, standardmäßig 151,67: rechnet den Aufwand in Vollzeitäquivalente um.",
+    "code_proposed": "Aus dem Namen vorgeschlagen.",
+    "more_options": "Weitere Optionen"
   },
   "files": {
     "open": "Datei öffnen…",
     "open_title": "Datei öffnen",
-    "open_help": "Die Datei wird ein neues Projekt: eine .pmap-Datei (heruntergeladene Kopie oder Antwort einer KI, die eine Skizze gelesen hat), eine Excel- oder CSV-Tabelle, ein Mermaid-Diagramm (.mmd, .md) oder ein mit bearbeitbarer Kopie exportiertes SVG-Bild.",
+    "open_help": "Die Datei wird ein neues Projekt: eine .pmap-Datei (heruntergeladene Kopie oder Antwort einer KI, die eine Skizze gelesen hat), eine Sammlung von Modellen (.pmaps), eine Excel- oder CSV-Tabelle, ein Mermaid-Diagramm (.mmd, .md) oder ein mit bearbeitbarer Kopie exportiertes SVG-Bild.",
     "choose": "Datei auswählen…",
     "or_paste": "Oder fügen Sie den Inhalt hier ein, zum Beispiel die Antwort einer KI:",
     "area": "Inhalt der .pmap-Datei hier einfügen oder ablegen",
@@ -192,7 +224,52 @@
     "target_name": "{{name}} (Soll-Zustand)",
     "target_label": "Bezeichnung der Referenz",
     "target_label_default": "Ist-Zustand",
-    "target_button": "Erstellen"
+    "target_button": "Erstellen",
+    "map_download": "Geöffnete Karte speichern (.pmap)",
+    "map_downloaded": "Karte mit ihren Detailkarten, Blättern und Kommentaren gespeichert: Die .pmap-Datei liegt im Ordner Downloads.",
+    "insert": "Datei als detaillierten Schritt einfügen…",
+    "insert_here": "Datei hier einfügen…",
+    "insert_title": "Datei als detaillierten Schritt einfügen",
+    "insert_help": "Die Datei wird zu einem neuen detaillierten Schritt dieser Karte. Es ist eine Kopie: Spätere Änderungen an der Datei ändern die Karte nicht. Eine .pmap-Datei, eine Excel- oder CSV-Tabelle, ein Mermaid-Diagramm oder ein SVG-Bild mit seiner Kopie.",
+    "replace_title": "Detaillierung durch eine Datei ersetzen",
+    "replace_help": "Die Detaillierung von „{{label}}“ kommt in den Papierkorb und die Datei tritt an ihre Stelle. Strg+Z macht alles rückgängig.",
+    "insert_counts": "Schritte: {{steps}} · Bahnen: {{lanes}} · Verbindungen: {{flows}} · Karten: {{maps}} · Blätter: {{sheets}}",
+    "insert_too_deep": "Diese Datei hat {{depth}} Kartenebenen; unter dieser Karte sind höchstens {{room}} möglich.",
+    "insert_too_large": "Diese Datei ist größer als {{max}} MB: Sie kann nicht eingefügt werden.",
+    "insert_package": "Dies ist ein Austauschpaket: Es wird als Projekt importiert, nicht eingefügt.",
+    "insert_dropped": "Ausgelassene Übersetzungen (hier nicht konfigurierte Sprachen): {{languages}}",
+    "insert_label": "Bezeichnung des Schritts",
+    "insert_lane": "Bahn",
+    "insert_after": "Einfügen nach",
+    "insert_at_start": "Am Anfang der Karte",
+    "insert_sheets": "Blätter übernehmen",
+    "insert_sheets_help": "Die Blätter, ihre Dokumente und ihre Schwachstellen kommen als Entwurf an, zum Prüfen und Freigeben.",
+    "insert_button": "Einfügen",
+    "replace_button": "Ersetzen",
+    "inserted": "Datei eingefügt. Schritte: {{steps}} · Karten: {{maps}}",
+    "insert_on_flow": "Auf dem Pfeil {{from}} → {{to}}",
+    "insert_on_flow_here": "Datei auf diesem Pfeil einfügen…",
+    "collection_title": "Sammlung „{{name}}“",
+    "collection_help": "Für jeden angekreuzten Prozess wird ein Projekt angelegt. Vor „Projekte anlegen“ wird nichts geschrieben.",
+    "collection_all": "Alle auswählen",
+    "collection_ticked": "Ausgewählt: {{count}} von {{total}}",
+    "collection_points": "Zu prüfende Punkte: {{count}}",
+    "collection_details": "Beschreibung und zu prüfende Punkte",
+    "collection_code_free": "{{code}} ist bereits vergeben.",
+    "collection_invalid": "Kann nicht geöffnet werden:",
+    "collection_create": "Projekte anlegen",
+    "collection_creating": "Anlegen {{done}} von {{total}}…",
+    "collection_done": "Projekte angelegt",
+    "collection_created": "{{code}} angelegt.",
+    "collection_failed": "Nicht angelegt: {{reason}}",
+    "collection_retry": "Erneut versuchen",
+    "collection_unnamed": "Prozess {{rank}}",
+    "insert_collection": "Eine Sammlung wird über „Datei öffnen…“ geöffnet. Eines ihrer Modelle einzeln einfügen.",
+    "open_too_large": "Diese Datei ist größer als {{max}} MB: Sie kann nicht geöffnet werden.",
+    "collection_none": "Kein Projekt angelegt",
+    "collection_code_twice": "{{code}} ist auch einer anderen Zeile zugewiesen.",
+    "collection_fix": "Text korrigieren",
+    "remote_locations": "Netzwerk- oder Webadressen in den Blättern: {{count}}, vor dem Öffnen eines Dokuments prüfen."
   },
   "package": {
     "export": "Projekt exportieren ({{extension}})…",
@@ -369,7 +446,13 @@
       "due": "Fällig am",
       "status": "Status",
       "lost": "Verlorene Stunden pro Monat"
-    }
+    },
+    "copy_image": "Karte als Bild kopieren",
+    "copying": "Bild wird kopiert …",
+    "copied": "Bild kopiert: mit Strg+V in eine E-Mail oder Folie einfügen.",
+    "copy_failed": "Das Bild konnte nicht kopiert werden.",
+    "copy_as_png": "Als PNG exportieren",
+    "project_pdf": "Projekt als PDF exportieren…"
   },
   "classification": {
     "internal": "Intern",
@@ -498,7 +581,8 @@
     "breadcrumb": "Navigationspfad",
     "file": "Datei",
     "file_help": "Datei öffnen, Kopie herunterladen, duplizieren, exportieren",
-    "members": "Mitglieder"
+    "members": "Mitglieder",
+    "fit": "Alles zeigen"
   },
   "ribbon": {
     "name": "Menüband der Karte",
@@ -596,6 +680,27 @@
       "necessary": "Notwendig, ohne Wert",
       "waste": "Verschwendung",
       "none": "Nicht eingestuft"
+    },
+    "replace_detail": "Detaillierung durch eine Datei ersetzen…",
+    "copy_selection_image": "Auswahl als Bild kopieren",
+    "file_cascade": {
+      "export": "Karte exportieren",
+      "project": "Projekt",
+      "package": "Austauschpaket",
+      "assistant": "KI-Assistent"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 quer)",
+      "png": "PNG-Bild",
+      "svg": "SVG-Bild…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Ganzes Projekt als PDF…",
+      "import": "Paket importieren…",
+      "replace": "Durch ein Paket ersetzen…",
+      "report": "Erzählter Bericht (Markdown)",
+      "comments": "Präsentationskommentare…"
     }
   },
   "deletion": {
@@ -646,7 +751,8 @@
       "retracer_liens": "automatischer Verlauf der Pfeile",
       "inserer_rangees": "Einfügen von Zeilen",
       "retirer_rangee": "Entfernen einer Zeile",
-      "proposition_ia": "KI-Vorschlag"
+      "proposition_ia": "KI-Vorschlag",
+      "inserer_fichier": "Einfügen einer Datei"
     }
   },
   "command": {
@@ -769,9 +875,6 @@
     "duration_max": "Längste Dauer",
     "duration_bounds_order": "Kürzeste ≤ Dauer ≤ längste",
     "minutes": "Minuten",
-    "duration_between": "{{min}} bis {{max}} Minuten",
-    "duration_at_least": "mindestens {{min}} Minuten",
-    "duration_at_most": "höchstens {{max}} Minuten",
     "duration_value_one": "{{count}} Minute",
     "duration_value_other": "{{count}} Minuten",
     "fold": "„{{section}}“ einklappen",
@@ -832,6 +935,7 @@
     "clarification_withdrawn": "Frage entfernt.",
     "read_empty": "Noch kein bestätigter Steckbrief für diesen Schritt.",
     "read_validated": "Am {{date}} von {{name}} bestätigte Version.",
+    "read_draft": "Entwurf in Bearbeitung, noch nicht bestätigt.",
     "document": {
       "add_output": "Ausgabe hinzufügen",
       "new_output": "Neue Ausgabe",
@@ -895,7 +999,8 @@
         "file": "Datei",
         "software": "Software",
         "other": "Sonstiges"
-      }
+      },
+      "edit_pain": "In {{code}} bearbeiten"
     },
     "pain_point": {
       "title": "Schwachstelle",
@@ -924,7 +1029,21 @@
         "implemented": "umgesetzt",
         "adopted": "etabliert",
         "dropped": "verworfen"
-      }
+      },
+      "status": "Status",
+      "status_of": "Status des Reibungspunkts {{code}}",
+      "status_help": "Umgesetzt, etabliert oder verworfen: Der Reibungspunkt verschwindet von der Karte, seine Stunden zählen nicht mehr.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "Problem erkannt, Maßnahme einzuplanen",
+        "scored": "Reibungspunkt bewertet, Maßnahme zu entscheiden",
+        "under_review": "Maßnahme wird geprüft, noch nicht entschieden",
+        "in_progress": "Maßnahme wird umgesetzt",
+        "implemented": "Maßnahme erledigt, Ergebnis zu prüfen",
+        "adopted": "geprüft, ab jetzt die neue Arbeitsweise",
+        "dropped": "wird bewusst nicht weiterverfolgt"
+      },
+      "status_now": "Status des Reibungspunkts {{code}}: {{status}}"
     },
     "lead_time": "Durchlaufzeit",
     "lead_time_help": "Zeit von der Ankunft eines Vorgangs bis zum Verlassen des Schritts, einschließlich Wartezeiten; zählt nicht zur Vollständigkeit.",
@@ -941,7 +1060,18 @@
       "minute": "Minuten",
       "hour": "Stunden",
       "day": "Arbeitstage"
-    }
+    },
+    "duration_between_one": "{{min}} bis {{max}} Minute",
+    "duration_between_other": "{{min}} bis {{max}} Minuten",
+    "duration_at_least_one": "mindestens {{min}} Minute",
+    "duration_at_least_other": "mindestens {{min}} Minuten",
+    "duration_at_most_one": "höchstens {{max}} Minute",
+    "duration_at_most_other": "höchstens {{max}} Minuten",
+    "step_pain_points": "Schwachstellen des Schritts",
+    "step_pain_points_help": "Dem Schritt zugeordnete Schwachstellen ohne Dokument. Beschreibung und Plan sind nur lesbar.",
+    "pain_points_one": "{{count}} Schwachstelle",
+    "pain_points_other": "{{count}} Schwachstellen",
+    "step_pain_points_help_fill": "Dem Schritt zugeordnete Schwachstellen ohne Dokument. Ihr Status wird hier geändert; Beschreibung und Plan sind nur lesbar."
   },
   "translations": {
     "title": "Projekt übersetzen",
@@ -1188,6 +1318,12 @@
         },
         "summaries": {
           "title": "Zusammenfassungen"
+        },
+        "comments": {
+          "title": "Präsentationskommentare",
+          "text": "Was die Präsentation zu den Schritten und Übergaben sagt.",
+          "example": "Schreibe die Kommentare der Schritte und Übergaben dieser Karte und ihrer Detailkarten.",
+          "example_empty": "Schreibe die Kommentare der Schritte und Übergaben dieser Karte und ihrer Detailkarten."
         }
       },
       "thread": "Austausch mit dem Assistenten",
@@ -1245,7 +1381,8 @@
         "findings": "Analyse",
         "report": "Bericht",
         "summaries": "Zusammenfassungen",
-        "proposal": "Vorschlag"
+        "proposal": "Vorschlag",
+        "comments": "Präsentationskommentare"
       },
       "pasted": "Antwort eingefügt",
       "copy_reply": "Antwort kopieren",
@@ -1401,7 +1538,19 @@
     "resource": "Azure-Ressource",
     "resource_help": "Der Name der Ressource: contoso für contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Leer: der Standardport (Ollama 11434, LM Studio 1234)."
+    "port_help": "Leer: der Standardport (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Schreibe die Präsentationskommentare der Schritte und Übergaben dieser Karte und ihrer Detailkarten, die noch keinen haben.",
+      "menu": "Präsentationskommentare schreiben (KI)…",
+      "intro": "Jeden Kommentar noch einmal lesen: behalten, korrigieren oder verwerfen. Er wird während der Präsentation gesprochen.",
+      "flow": "Übergabe {{labels}}",
+      "map": "Karte: {{name}}",
+      "current": "Aktueller Kommentar: {{text}}",
+      "typed": "Ersetzt einen von Hand eingegebenen Kommentar: {{text}}",
+      "save": "Behaltene Kommentare speichern ({{n}})",
+      "saved": "Kommentare gespeichert: {{n}}",
+      "done": "Präsentationskommentare gespeichert: {{n}}"
+    }
   },
   "interface_language": {
     "help": "Die Sprache der Menüs und Meldungen, nur für Sie. Die Sprache, in der die Karten angezeigt werden, wählen Sie oben im Fenster, wenn ein Projekt geöffnet ist."
@@ -1856,5 +2005,174 @@
       "closing_lost": "Zeitverlust: {{lost}} pro Monat.",
       "arrow": "nach"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Als BPMN 2.0 exportieren (.bpmn)…",
+    "export_title": "Als BPMN 2.0 exportieren",
+    "export_help": "Die .bpmn-Datei öffnet sich in BPMN-Modellierern (Camunda, Signavio, Bizagi…). Sie enthält das ganze Blatt jedes Schritts, ohne den Speicherort der Dokumente.",
+    "export_button": "Exportieren",
+    "export_subprocesses": "Detaillierte Teilprozesse einschließen",
+    "export_subprocesses_help": "Jeder detaillierte Schritt öffnet sich im Modellierer als Teilprozess.",
+    "export_subprocesses_none": "Die Karte hat keinen detaillierten Schritt.",
+    "export_details": "Dokumente und Störfaktoren zeichnen",
+    "export_details_help": "Abgewählt bleiben sie in der Dokumentation der Datei beschrieben.",
+    "toolbar": "BPMN-2.0-Ansicht",
+    "badge": "BPMN-2.0-Diagramm · schreibgeschützt",
+    "details": "Details im Diagramm",
+    "export": "Exportieren (.bpmn)…",
+    "close": "Zurück zur Karte",
+    "close_help": "Zurück zur Karte (Alt+B)",
+    "failed": "Das Diagramm konnte nicht gelesen werden.",
+    "loading": "Diagramm wird gelesen…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Startereignis",
+      "endEvent": "Endereignis",
+      "intermediateCatchEvent": "Wartezeit",
+      "manualTask": "Manuelle Aufgabe",
+      "userTask": "Benutzeraufgabe",
+      "serviceTask": "Automatisierte Aufgabe",
+      "subProcess": "Teilprozess",
+      "exclusiveGateway": "Exklusives Gateway",
+      "parallelGateway": "Paralleles Gateway",
+      "inclusiveGateway": "Inklusives Gateway"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "„{{text}}“",
+      "map": "Karte: {{name}}",
+      "classification": "Klassifizierung: {{value}}",
+      "language": "Sprache: {{language}}",
+      "work_time": "Arbeitstag: {{workday}} h; Stunden eines VZÄ pro Monat: {{fte}} h",
+      "description": "Beschreibung",
+      "wait": "Wartezeit {{hours}} h",
+      "from": "von {{code}}",
+      "volume": "Eingangsvolumen: {{quantity}} pro {{period}}",
+      "periods": {
+        "day": "Arbeitstag",
+        "week": "Woche",
+        "month": "Monat",
+        "year": "Jahr"
+      },
+      "lane_system": "Bahn einer Software, die selbständig arbeitet",
+      "headcount": "Personalstärke: {{number}}"
+    },
+    "fit": "Alles zeigen",
+    "fit_help": "Das ganze Diagramm im Fenster zeigen"
+  },
+  "shortcuts": {
+    "title": "Tastenkürzel",
+    "sections": {
+      "move": "Navigieren",
+      "choose": "Auswählen",
+      "edit": "Karte ändern",
+      "display": "Anzeigen",
+      "present": "Präsentieren",
+      "help": "Hilfe"
+    },
+    "edit_note": "Dem Moderator des Projekts vorbehalten.",
+    "or": "oder",
+    "move_selection": "Auswahl verschieben",
+    "escape": "Menü, Bereich oder Steckbrief schließen; „Verbinden“ beenden",
+    "space_held": "Handwerkzeug, solange die Taste gedrückt ist",
+    "enter": "Steckbrief des gewählten Schritts öffnen",
+    "type": "Namen des gewählten Schritts eingeben",
+    "menu_key": "Menü des gewählten Objekts",
+    "wheel": "Scrollen; mit Umschalt waagerecht",
+    "zoom": "Zoomen",
+    "saved": "Erinnern, dass alles gespeichert ist",
+    "alone_note": "Ohne einzeln gewählten Schritt (sonst beginnt die Taste seinen Namen)",
+    "type_key": "ein Buchstabe",
+    "search_keys": "In der Suche: weiter; mit Umschalt zurück; Esc schließt"
+  },
+  "search": {
+    "command_help": "Im Projekt suchen",
+    "title": "Suchen",
+    "field": "Gesuchtes Wort",
+    "placeholder": "Schritt, Dokument, Hilfsmittel…",
+    "previous": "Zurück (Umschalt+Eingabe)",
+    "next": "Weiter (Eingabe)",
+    "position": "{{index}} von {{count}}",
+    "searching": "Suche läuft…",
+    "none": "Kein Ergebnis.",
+    "too_many": "Die ersten {{shown}} von {{total}} Ergebnissen: Suche eingrenzen.",
+    "short": "Mindestens zwei Zeichen oder Eingabe.",
+    "this_map": "Diese Karte",
+    "level": "Ebene {{level}}",
+    "origin": "Ursprungssprache: {{language}}",
+    "kinds": {
+      "step": "Schritt",
+      "lane": "Bahn",
+      "document": "Dokument",
+      "tool": "Hilfsmittel",
+      "pain_point": "Schwachstelle",
+      "action": "Maßnahme"
+    },
+    "results_one": "{{count}} Ergebnis",
+    "results_other": "{{count}} Ergebnisse"
+  },
+  "action_plan": {
+    "command": "Maßnahmenplan",
+    "title": "Maßnahmenplan",
+    "total": "{{hours}} h Verlust pro Monat bei offenen Schwachstellen",
+    "late_count": "Überfällig: {{count}}",
+    "count": "Angezeigte Schwachstellen: {{shown}} von {{total}}",
+    "sort": "Sortieren nach",
+    "sorts": {
+      "project": "Reihenfolge im Projekt",
+      "lost": "Verlorene Stunden",
+      "due": "Fälligkeit"
+    },
+    "filters": "Filter",
+    "filter_open": "Offen",
+    "filter_late": "Überfällig",
+    "filter_no_action": "Ohne Maßnahme",
+    "late": "Überfällig",
+    "no_action": "Keine Maßnahme beschlossen",
+    "map": "Karte: {{name}}",
+    "lane": "Bahn: {{name}}",
+    "go_to": "Gehe zu {{code}}",
+    "edit": "Plan bearbeiten",
+    "edit_of": "Plan von {{code}} bearbeiten",
+    "loading": "Plan wird geladen …",
+    "empty": "Keine Schwachstellen in diesem Projekt.",
+    "none": "Keine Schwachstelle entspricht den Filtern.",
+    "status_since": "{{status}} seit {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Rückgängig",
+    "undo_of": "Rückgängig: {{code}} auf „{{status}}“ zurücksetzen"
+  },
+  "project_pdf": {
+    "sheet_state": "Status des Steckbriefs: {{state}}",
+    "continued": "{{title}} (Fortsetzung)",
+    "file": "projekt",
+    "contents": "Inhalt",
+    "page": "Seite {{page}} von {{total}}",
+    "scope_line": "Karte „{{name}}“ und ihre Ebenen",
+    "empty_map": "Karte ohne Schritte.",
+    "depth_cut": "Karten jenseits von {{max}} Ebenen sind nicht in diesem Dokument.",
+    "sheets_of": "Steckbriefe · {{map}}",
+    "reading": "Karten werden gelesen: {{count}}",
+    "reading_sheets": "Steckbriefe werden gelesen…",
+    "drawing": "Karte {{index}} von {{total}}",
+    "writing": "Dokument wird geschrieben: Seite {{page}}",
+    "too_many_maps": "Mehr als {{max}} Karten: „{{scope}}“ wählen.",
+    "too_many_pages": "Mehr als {{max}} Seiten: die Steckbriefe abwählen oder eine Detailkarte und ihre Ebenen exportieren.",
+    "cancelled": "Export abgebrochen.",
+    "title": "Projekt als PDF exportieren",
+    "help": "Alle Karten in einer Datei, Ebene für Ebene, für alle ohne die Anwendung.",
+    "scope": "Umfang",
+    "scope_project": "Gesamtes Projekt",
+    "scope_branch": "Diese Karte und ihre Ebenen",
+    "with_sheets": "Mit Steckbriefen",
+    "with_raci": "Mit RACI-Matrix",
+    "with_stream": "Mit Wertstrom",
+    "with_plan": "Mit Maßnahmenplan",
+    "sheets_help": "Die Steckbriefe sind die, die Sie sehen: das Dokument nur an Personen weitergeben, die sie lesen dürfen.",
+    "button": "PDF erstellen",
+    "progress": "Fortschritt",
+    "too_many_maps_below": "Mehr als {{max}} Karten: eine tiefer liegende Detailkarte öffnen, dann „{{scope}}“ wählen.",
+    "too_many_pages_top": "Mehr als {{max}} Seiten: die Steckbriefe abwählen."
   }
 }

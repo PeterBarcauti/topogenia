@@ -1,5 +1,5 @@
 // PmapWriter.cs
-// Writing of a .pmap 1.1 document: readable JSON in the order of the format, the optional properties only when they say something.
+// Writing of a .pmap document in the oldest version that holds it (1.2 to 1.5): readable JSON in the order of the format, the optional properties only when they say something.
 
 using System.Globalization;
 using System.Text;
@@ -33,8 +33,7 @@ public static class PmapWriter
         {
             writer.WriteStartObject();
             writer.WriteString("format", PmapFormat.Name);
-            writer.WriteString("version", CarriesSummaries(document.Map) || CarriesMakigami(document.Map) ? PmapFormat.Version
-                : CarriesRoutes(document.Map) ? PmapFormat.VersionWithoutSummaries : PmapFormat.VersionWithoutRoutes);
+            writer.WriteString("version", VersionOf(document));
             writer.WriteString("generated_by", generatedBy);
             writer.WriteString("generated_at", DateTime.SpecifyKind(generatedAt, DateTimeKind.Utc).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'", CultureInfo.InvariantCulture));
             Project(writer, document.Project);
@@ -61,7 +60,19 @@ public static class PmapWriter
         Optional(writer, "description", project.Description);
         Optional(writer, "workday_hours", project.WorkdayHours);
         Optional(writer, "fte_hours_per_month", project.FteHoursPerMonth);
+        Optional(writer, "glossary", project.Glossary);
         Translations(writer, project.Translations);
+        writer.WriteEndObject();
+    }
+
+    /// <summary>The comment of presentation of a step or a flow (1.5): its original when it has one, its other lines as translations.</summary>
+    private static void Comment(Utf8JsonWriter writer, PmapComment? comment)
+    {
+        if (comment is null)
+            return;
+        writer.WriteStartObject("comment");
+        Optional(writer, "text", comment.Text);
+        Translations(writer, comment.Translations);
         writer.WriteEndObject();
     }
 
@@ -96,6 +107,7 @@ public static class PmapWriter
             Optional(writer, "share", flow.Share);
             Route(writer, flow.Route);
             Translations(writer, flow.Translations);
+            Comment(writer, flow.Comment);
             writer.WriteEndObject();
         }
         writer.WriteEndArray();
@@ -143,6 +155,7 @@ public static class PmapWriter
             Map(writer, step.SubMap);
         }
         Translations(writer, step.Translations);
+        Comment(writer, step.Comment);
         if (step.Sheet is not null)
             Sheet(writer, step.Sheet);
         writer.WriteEndObject();
@@ -192,6 +205,8 @@ public static class PmapWriter
                 if (use.PercentCompleteAccurate is { } percent)
                     writer.WriteNumber("percent_complete_accurate", percent);
                 Optional(writer, "pain_point", use.PainPoint);
+                Optional(writer, "pain_point_code", use.PainPointCode);
+                Optional(writer, "pain_point_status", use.PainPointStatus);
                 Optional(writer, "lost_hours_per_month", use.LostHoursPerMonth);
                 Optional(writer, "action", use.Action);
                 Optional(writer, "owner", use.Owner);
@@ -257,8 +272,24 @@ public static class PmapWriter
         writer.WriteEndObject();
     }
 
-    /// <summary>Whether a flow of a map or of one of its detailed maps carries a route chosen by the user: the version it needs (ADR 091).</summary>
-    /// <summary>True when a map of the document carries a summary (1.4, ADR 094).</summary>
+    /// <summary>
+    /// The oldest version that holds what the document carries, so that an older application still opens it: 1.5 with an
+    /// addition of a whole copy, 1.4 with a summary or a property of the Makigami, 1.3 with a route, 1.2 otherwise.
+    /// </summary>
+    private static string VersionOf(PmapDocument document) =>
+        CarriesExtras(document) ? PmapFormat.Version
+        : CarriesSummaries(document.Map) || CarriesMakigami(document.Map) ? PmapFormat.VersionWithoutExtras
+        : CarriesRoutes(document.Map) ? PmapFormat.VersionWithoutSummaries : PmapFormat.VersionWithoutRoutes;
+
+    /// <summary>True when the document carries an addition of a whole copy (1.5, ADR 105): a glossary, a comment, the code or the status of a pain point.</summary>
+    private static bool CarriesExtras(PmapDocument document) => document.Project.Glossary is not null || CarriesExtras(document.Map);
+
+    private static bool CarriesExtras(PmapMap map) =>
+        map.Flows.Any(flow => flow.Comment is not null)
+        || map.Steps.Any(step => step.Comment is not null
+            || (step.Sheet is { } sheet && sheet.Uses.Any(use => use.PainPointCode is not null || use.PainPointStatus is not null))
+            || (step.SubMap is { } subMap && CarriesExtras(subMap)));
+
     /// <summary>
     /// Whether a step or a document of the map or its sub-maps carries a value class or a medium (1.4, Makigami M1, M3), a
     /// sheet a bound of its duration or a use the action plan of its pain point (1.4, Makigami M5, M7).
@@ -270,9 +301,11 @@ public static class PmapWriter
                 || sheet.Uses.Any(use => use.Action is not null || use.Owner is not null || use.DueDate is not null)))
             || (step.SubMap is { } subMap && CarriesMakigami(subMap)));
 
+    /// <summary>True when a map of the document carries a summary (1.4, ADR 094).</summary>
     private static bool CarriesSummaries(PmapMap map) =>
         map.Summary is not null || map.Steps.Any(step => step.SubMap is { } subMap && CarriesSummaries(subMap));
 
+    /// <summary>Whether a flow of a map or of one of its detailed maps carries a route chosen by the user: the version it needs (ADR 091).</summary>
     private static bool CarriesRoutes(PmapMap map) =>
         map.Flows.Any(flow => flow.Route is not null) || map.Steps.Any(step => step.SubMap is { } subMap && CarriesRoutes(subMap));
 

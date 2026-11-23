@@ -28,6 +28,8 @@
   "REOUVERTE": "Aplikace byla spuštěna podruhé: otevírá se v prohlížeči.",
   "ICONE_OUVRIR": "Otevřít {product}",
   "ICONE_QUITTER": "Ukončit {product}",
+  "ICONE_QUITTER_ATTENTE": "Něco zadaného v kartě ještě není uloženo. Přesto ukončit?",
+  "ICONE_QUITTER_NON_VALIDE": "Otevřený formulář není uložen: to, co je v něm zadáno, bude ztraceno. Přesto ukončit?",
   "SAUVEGARDES_DOSSIER": "Zálohy jsou ve složce {folder}.",
   "RESTAURATION_PROPOSEE": "Dostupné zálohy, od nejnovější po nejstarší. Změny provedené po zvolené záloze v ní nejsou; aktuální soubor a jeho žurnál zůstanou uloženy vedle, nesmažou se:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

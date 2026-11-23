@@ -66,7 +66,8 @@ public sealed class ErrorResponses
             details["errors"] = rows.Select(row => RowError(row, language)).ToList();
         else if (errors is IEnumerable<FileError> faults)
             details["errors"] = faults.Select(fault => FileFault(fault, language)).ToList();
-        return new ErrorBody(refusal.Code, messages.Format(refusal.Code, language, details), details);
+        var code = refusal.Code == ErrorCodes.RequestTooLarge && details.GetValueOrDefault("unit") is "KB" ? SizeWords.RequestTooLargeKilobytes : refusal.Code;
+        return new ErrorBody(refusal.Code, messages.Format(code, language, details), details);
     }
 
     /// <summary>
@@ -134,6 +135,12 @@ public static class TimeWords
     /// <summary>Every key of the words, which each message file holds next to the codes.</summary>
     public static IEnumerable<string> Keys =>
         new[] { Minutes, Hours, Days }.SelectMany(unit => Forms.Select(form => $"{unit}_{form}")).Append(JustNow).Append(Someone);
+}
+
+/// <summary>The text of REQUETE_TROP_GROSSE for a limit told in KB (`unit` is `KB`), beside the codes in each message file (ADR 115).</summary>
+public static class SizeWords
+{
+    public const string RequestTooLargeKilobytes = "REQUETE_TROP_GROSSE_KO";
 }
 
 /// <summary>How long ago a change happened (1.x `Durees.IlYa`), in the language of the user, its plural form chosen by the count.</summary>

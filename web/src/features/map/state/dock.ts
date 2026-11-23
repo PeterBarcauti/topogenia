@@ -7,8 +7,8 @@ import type { FloatingState } from './floating.ts';
 import type { MapState } from './mapStore.ts';
 import type { PreferencesState, PreferenceStorage } from './preferences.ts';
 
-/** The panels of the right, in the order they cover each other: the remainder of a frame, the sheet, the assistant, the value stream or the analysis. */
-export type DockPanel = 'remainder' | 'sheet' | 'assistant' | 'stream' | 'analysis';
+/** The panels of the right, in the order they cover each other: the remainder of a frame, the sheet, the search or the action plan, the assistant, the value stream or the analysis. */
+export type DockPanel = 'remainder' | 'sheet' | 'search' | 'plan' | 'assistant' | 'stream' | 'analysis';
 
 /**
  * The width of the panels in pixels: at first (the token `--side-panel-width`), its least, its share of the window at

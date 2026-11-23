@@ -4,7 +4,7 @@
 import { screen, within } from '@testing-library/react';
 import type { Schema } from '../../../api/client.ts';
 import { i18next, loadLanguage } from '../../../shared/i18n/i18n.ts';
-import { allSections, renderSheet } from '../../../test/sheetPanel.tsx';
+import { allSections, mountSheet, renderSheet } from '../../../test/sheetPanel.tsx';
 import { AUTHOR_ID, contentOf, documentOf, inputOf, painPointOf, sheetViewOf, documentUseOf } from '../../../test/sheets.ts';
 
 const reader = { fill: false, validate: false, request_clarification: false, assign: false };
@@ -102,6 +102,28 @@ describe('the duration and the lead time agree with their number (audit 3.2)', (
   });
 });
 
+describe('the bounds of the duration agree with the number that precedes the word (F-205)', () => {
+  it('« au moins 1 minute », « au plus 1 minute », « 0,5 à 1 minute », « 1 à 2 minutes », then in English', async () => {
+    const boundsOf = async (language: string, bounds: Record<string, number | null>) => {
+      await i18next.changeLanguage(language);
+      const content = contentOf({ duration_minutes: null, ...bounds });
+      const shown = await renderSheet(sheetViewOf({ status: 'validated', is_draft: false, validated, content, permissions: reader }));
+      const text = screen.getByTestId('sheet-read-duration').querySelector('dd')?.textContent;
+      shown.unmount();
+      return text;
+    };
+    expect(await boundsOf('fr', { duration_min_minutes: 1 })).toBe('au moins 1 minute');
+    expect(await boundsOf('fr', { duration_max_minutes: 1 })).toBe('au plus 1 minute');
+    expect(await boundsOf('fr', { duration_min_minutes: 0.5, duration_max_minutes: 1 })).toBe('0,5 à 1 minute');
+    expect(await boundsOf('fr', { duration_min_minutes: 1, duration_max_minutes: 2 })).toBe('1 à 2 minutes');
+    expect(await boundsOf('fr', { duration_min_minutes: 2 })).toBe('au moins 2 minutes');
+    expect(await boundsOf('en', { duration_min_minutes: 1 })).toBe('at least 1 minute');
+    expect(await boundsOf('en', { duration_max_minutes: 1 })).toBe('at most 1 minute');
+    expect(await boundsOf('en', { duration_min_minutes: 1, duration_max_minutes: 1.5 })).toBe('1 to 1.5 minutes');
+    expect(await boundsOf('en', { duration_min_minutes: 0.5, duration_max_minutes: 1 })).toBe('0.5 to 1 minute');
+  });
+});
+
 describe('the action plan of a pain point, under it (Makigami M7; audit 3.1 V3, U3)', () => {
   /** The sheet of a reader whose input « Devis » has the pain point p1, its action plan as given. */
   const read = (plan: Partial<Schema<'PainPoint'>>) => {
@@ -149,6 +171,46 @@ describe('no validated version (B-4-60, B-4-61)', () => {
     const outputs = [{ document: documentOf('o1', { step_id: 's2', name: 'Facture' }), used_by: [] }];
     await renderSheet(sheetViewOf({ status: 'empty', is_draft: false, permissions: reader, outputs }), {}, { folded: { ...allSections(false), tools: true } });
     expect(screen.getByTestId('sheet-fold-all')).toHaveTextContent('Tout replier');
+  });
+});
+
+describe('the sheet read only of the view in BPMN 2.0, for who may fill it (ADR 106; audit of the copy 64, P1-03)', () => {
+  const author = { fill: true, validate: true, request_clarification: true, assign: true };
+  const readOnly = async (view: Schema<'SheetView'>) => {
+    const shown = mountSheet({ 'GET /api/steps/s2/sheet': { json: view } }, { readOnly: true, onReport: vi.fn() });
+    await screen.findByTestId('sheet-read');
+    return shown;
+  };
+
+  it('a draft never validated: its content, said as a draft, never « Aucune fiche validée »', async () => {
+    await readOnly(sheetViewOf({ status: 'draft', is_draft: true, validated: null, permissions: author, content: contentOf({ purpose: 'Facturer', free_text: 'Notes' }) }));
+    expect(screen.getByTestId('sheet-read-draft')).toHaveTextContent('Brouillon en cours, pas encore validé.');
+    expect([screen.queryByTestId('sheet-read-empty'), screen.queryByTestId('sheet-read-validated')]).toEqual([null, null]);
+    expect(screen.getByTestId('sheet-read-purpose')).toHaveTextContent('Facturer');
+    expect(screen.getByTestId('sheet-read-free')).toHaveTextContent('Notes');
+  });
+
+  it('a draft after a validated version: the draft, never under the date of the version validated before it', async () => {
+    await readOnly(sheetViewOf({ status: 'draft', is_draft: true, validated, permissions: author, content: contentOf({ purpose: 'Facturer autrement' }) }));
+    expect(screen.getByTestId('sheet-read-draft')).toBeInTheDocument();
+    expect(screen.queryByTestId('sheet-read-validated')).toBeNull();
+    expect(screen.getByTestId('sheet-read-purpose')).toHaveTextContent('Facturer autrement');
+  });
+
+  it('nothing to write in the whole panel: neither the responsible, nor the clarification, nor a document, nor a pain point to report, nor the saving', async () => {
+    const external = inputOf(documentOf('e1', { direction: 'input', step_id: 's2', name: 'Relevé bancaire' }), { producer: null, near: false, used: true });
+    const outputs = [{ document: documentOf('o1', { step_id: 's2', name: 'Facture' }), used_by: [documentUseOf('o1', 's3')] }];
+    await readOnly(sheetViewOf({
+      status: 'draft', is_draft: true, validated: null, permissions: author, inputs: [external], outputs, clarification_request: 'Préciser la fréquence',
+      responsible: { user_id: AUTHOR_ID, origin: 'step' }, content: contentOf({ purpose: 'Facturer' }),
+    }));
+    const panel = screen.getByTestId('sheet-panel');
+    expect(['input-e1', 'output-o1'].map((id) => within(panel).queryByTestId(id) === null)).toEqual([false, false]);
+    expect(panel.querySelectorAll('input, textarea, select')).toHaveLength(0);
+    const writes = ['Modifier « Relevé bancaire »', 'Retirer « Relevé bancaire »', 'Modifier « Facture »', 'Retirer « Facture »', 'Entrée extérieure', 'Ajouter une sortie', 'Autre…'];
+    expect(writes.filter((name) => within(panel).queryByRole('button', { name }) !== null)).toEqual([]);
+    expect([screen.queryByTestId('sheet-clarification-edit'), screen.queryByTestId('sheet-clarification-withdraw'), screen.queryByTestId('sheet-saving'),
+      panel.querySelector('[data-testid^="output-report-"]')]).toEqual([null, null, null, null]);
   });
 });
 

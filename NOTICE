@@ -2,7 +2,14 @@ Topogenia
 Copyright 2026 Peter Barcauti
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE),
-except the core of the domain (src/Topogenia.Domain and tests/Topogenia.Domain.Tests),
-which is proprietary and licensed separately (see LICENSE.md in each of these folders).
+except the core of the domain (the assembly Topogenia.Domain and its tests), which is
+proprietary and licensed separately. The core is not in the public repository: it ships
+as the package Topogenia.Core, whose LICENSE.md holds its licence, copied as
+licenses/CORE-LICENSE.md in the packages of the product.
 
 Third-party components and their licences are listed in THIRD-PARTY-NOTICES.md.
+
+The source repository holds, in web/src/test/oracle/bpmn-2.0.2, the five XML schemas of
+the Business Process Model and Notation (BPMN) 2.0.2 specification, copied unchanged.
+They are copyright Object Management Group, Inc. and remain under the terms of that
+specification. They are used by the tests only and are not part of the product.

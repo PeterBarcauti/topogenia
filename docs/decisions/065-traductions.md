@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-P6-T08 (`plan.md`, phase 6) porte l'interface de l'annexe B 5 : 28 lignes, dont 22 « à faire », et les six lignes
+P6-T08 (`plan.md` (non publié), phase 6) porte l'interface de l'annexe B 5 : 28 lignes, dont 22 « à faire », et les six lignes
 couvertes côté serveur (B-5-04, 05, 06, 22, 23, 28) à compléter par l'interface ; plus B-8.1-45 et B-8.2-12 (le glossaire
 en données, réglage du projet, spec 10). Les routes de l'hôte sont faites depuis la phase 4 (`GET/PUT
 /api/projects/{id}/translations`, `PUT /api/steps/{id}/translations`, `PUT /api/flows/{id}/translations`, `PATCH
@@ -109,7 +109,7 @@ plus tard suit la même voie.
 - Interface : `features/translations/model/workbook.test.ts`, `workbookReader.test.ts`,
   `features/translations/translationsDialog.test.tsx`, `importWorkbook.test.tsx`, `features/map/panels/translations.test.tsx`,
   `app/translationsButton.test.tsx`, `shared/i18n/localizedName.test.ts`, `styles/translations.test.ts`.
-- Mutations sur une copie du web (`Travail/outils-p6-t08/mutate-t08.py`, journal `Travail/mutations-p6-t08.log`) : 81
+- Mutations sur une copie du web (outil et journal de travail, non publiés) : 81
   mutations, 77 tuées au premier passage, 3 après renfort des tests (le titre du glossaire absent quand il n'y en a pas,
   le compte rendu d'avant effacé par un nouveau classeur, le champ du fichier vidé après chaque choix), une équivalente
   retirée du code avec sa garde (envoi sans changement, déjà empêché par le bouton désactivé) : 80 sur 80. Avant le lot,
@@ -118,7 +118,7 @@ plus tard suit la même voie.
 - Délais : exceljs lit et écrit lentement dans jsdom, davantage sous la suite entière (un test hors délai à 1 s sous la
   charge d'une compilation) ; les attentes de ses résultats passent à 5 s et les tests qui manipulent un classeur à 15 s,
   comme les tests lents de la carte (`MapScreen.test.tsx`) ; aucune assertion ne change.
-- Vérification visuelle dans Chromium sans tête sous la CSP de l'hôte (`Travail/outils-p6-t08/capture-t08.mjs`) : classeur
+- Vérification visuelle dans Chromium sans tête sous la CSP de l'hôte (script de travail, non publié) : classeur
   construit et téléchargé par le navigateur, relu (trois feuilles, contrôle `veryHidden`, glossaire en fin de consigne),
   rapporté, compte rendu, traduction manuelle ; aucune violation de la politique, aucune erreur ; une sonde finale prouve
   que la politique est en vigueur (`eval` refusé à un script de la page).

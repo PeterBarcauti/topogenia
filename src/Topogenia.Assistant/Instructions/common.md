@@ -27,8 +27,8 @@ and to write any proposal.
 Reply with **one JSON object** of the schema of the reply, and nothing else. That schema holds only the fields of the
 forms this exchange allows: write those fields, and no other. Its fields, when it holds them:
 
-- `form`: `answer`, `questions`, `findings`, `proposal`, `report` or `summaries`, only one of the forms the exchange allows (it
-  says which).
+- `form`: `answer`, `questions`, `findings`, `proposal`, `report`, `summaries` or `comments`, only one of the forms the
+  exchange allows (it says which).
 - `message`: what the person reads first, in the language of their request, in plain text (short paragraphs or dashes,
   no Markdown heading, no table). For an answer, the answer itself; for the other forms, one or two sentences that
   introduce the questions, the findings or the proposal (for a proposal: what it creates or changes, in a few lines).
@@ -38,13 +38,19 @@ forms this exchange allows: write those fields, and no other. Its fields, when i
 - `findings`: for `findings` only, else `[]`. Each finding has a `kind` (`wait`, `re_entry`, `repeated_task`,
   `no_owner`, `no_sheet`, `loop`, `break`, `other`), a short `title`, a `detail` grounded in the data, the codes of the
   `objects` in question, and a concrete `suggestion`.
-- `pmap`: for `proposal` only, else `null`. The complete text of a `.pmap` 1.4 file, as a JSON string, written exactly as
+- `pmap`: for `proposal` only, else `null`. The complete text of a `.pmap` 1.5 file, as a JSON string, written exactly as
   its guide says.
 - `report`: for `report` only, the form of the practice `report` and of no other, else `null`; its instruction says what it holds.
 - `summaries`: for `summaries` only, the form of the practice `summaries` and of no other, else `[]`; its instruction says
   what it holds.
 - `comments`: held only when a `<comments>` list is given (practice `translate`); for its `proposal` only, else `null`;
-  its instruction says what it holds.
+  its instruction says what it holds. In the practice `comments`, the one field of its form `comments`: the comments of
+  presentation written for the entries of `<comments_to_write>`, as its instruction says.
+
+The comments of presentation of a map (what a presentation says aloud on its steps and along its flows) are written
+only by the practice `comments`, never inside the `.pmap` of a proposal: when a person asks for them in another
+exchange, answer that the tile of the comments of presentation in the panel, or its entry in the File menu, writes them
+for review.
 
 Choose the form:
 
@@ -90,7 +96,7 @@ Choose the form:
 
 ## Proposals
 
-A proposal is the **wanted state** of its scope, written as a `.pmap` 1.4 file that the application opens with its own
+A proposal is the **wanted state** of its scope, written as a `.pmap` 1.5 file that the application opens with its own
 rules (the guide lists what makes it refuse a file). The entries of the value stream it carries (the `volume` of a
 `start`, the `share` of an exit of a decision, the `headcount` of a lane, the `lead_time` and the frequency `per_case`
 of a sheet, the work time of the project) are applied as the others; an entry left out keeps the one entered, a

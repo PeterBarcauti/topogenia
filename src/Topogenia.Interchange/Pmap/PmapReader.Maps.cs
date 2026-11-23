@@ -24,10 +24,14 @@ internal sealed partial class PmapReading
     private static readonly string[] LaneProperties12 = [.. LaneProperties, "headcount"];
     private static readonly string[] StepProperties12 = [.. StepProperties, "volume"];
     private static readonly string[] StepProperties14 = [.. StepProperties12, "value_class"];
+
+    // The version 1.5 adds the comment of presentation of a step and of a flow (ADR 105).
+    private static readonly string[] StepProperties15 = [.. StepProperties14, CommentField];
     private static readonly string[] FlowProperties12 = [.. FlowProperties, "share"];
 
     // The version 1.3 adds the route a user chose for a flow (ADR 091); in a file of an earlier version it is unknown.
     private static readonly string[] FlowProperties13 = [.. FlowProperties12, "route"];
+    private static readonly string[] FlowProperties15 = [.. FlowProperties13, CommentField];
     private static readonly string[] RouteProperties = ["from", "to", "via"];
     private static readonly string[] PassageProperties = ["aisle", "column", "lane", "row", "edge"];
     private static readonly IReadOnlyList<string> Sides = Codes.All<FlowSide>();
@@ -164,7 +168,7 @@ internal sealed partial class PmapReading
             Fault(path, FileErrorCodes.StepShape);
             return null;
         }
-        Properties(element, path, summaries ? StepProperties14 : valueStream ? StepProperties12 : StepProperties);
+        Properties(element, path, extras ? StepProperties15 : summaries ? StepProperties14 : valueStream ? StepProperties12 : StepProperties);
         var id = Identifier(element, path, StepKind);
         if (id is not null)
             stepIds.Add(id);
@@ -183,6 +187,7 @@ internal sealed partial class PmapReading
         var raci = Raci(element, path, laneIds, lane, noContent);
         var subMap = SubMap(element, path, noContent, depth);
         var translations = Translations(element, path, PmapFormat.StepLabelMax);
+        var comment = Comment(element, path);
         currentStep = id ?? string.Empty;
         var sheet = Sheet(element, path, noContent);
         var volume = Volume(element, path);
@@ -197,7 +202,10 @@ internal sealed partial class PmapReading
         // A sub-map without a step details nothing: it is left out (A-2.17-25).
         if (subMap is { Steps.Count: 0 })
             subMap = null;
-        return new PmapStep(id, lane, label, type, column, row, automation, raci, subMap, translations, sheet) { Volume = volume, ValueClass = valueClass };
+        return new PmapStep(id, lane, label, type, column, row, automation, raci, subMap, translations, sheet)
+        {
+            Volume = volume, ValueClass = valueClass, Comment = comment,
+        };
     }
 
     /// <summary>
@@ -368,13 +376,14 @@ internal sealed partial class PmapReading
             Fault(path, FileErrorCodes.FlowShape);
             return null;
         }
-        Properties(element, path, routes ? FlowProperties13 : valueStream ? FlowProperties12 : FlowProperties);
+        Properties(element, path, extras ? FlowProperties15 : routes ? FlowProperties13 : valueStream ? FlowProperties12 : FlowProperties);
         var source = End(element, "source", path, stepIds);
         var target = End(element, "target", path, stepIds);
         var label = Entered(element, "label", path, PmapFormat.FlowLabelMax, required: false);
         var translations = Translations(element, path, PmapFormat.FlowLabelMax);
         var share = Number(element, "share", path);
         var route = routes && !settings.Proposal ? Route(element, path, laneIds, placed) : null;
+        var comment = Comment(element, path);
         if (source is null || target is null)
             return null;
         if (source == target)
@@ -382,7 +391,7 @@ internal sealed partial class PmapReading
             Fault(path, FileErrorCodes.SelfFlow, ("step", source));
             return null;
         }
-        return new PmapFlow(source, target, label, translations) { Share = share, Route = route };
+        return new PmapFlow(source, target, label, translations) { Share = share, Route = route, Comment = comment };
     }
 
     /// <summary>

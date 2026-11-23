@@ -7,6 +7,7 @@ import type { components } from '../src/api/generated/schema.ts';
 import { pdfTexts } from '../src/test/pdf.ts';
 import type { ProjectRead } from './support/api.ts';
 import { expect, openMap, openSheetOf, stepOf, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 type ProjectItem = components['schemas']['ProjectListItem'];
 type SheetRead = components['schemas']['SheetView'];
@@ -15,7 +16,7 @@ type SheetRead = components['schemas']['SheetView'];
 async function pdfOfTheMap(page: Page): Promise<string[]> {
   const download = page.waitForEvent('download');
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.pdf').click();
+  await (await fileEntry(page, 'file.pdf')).click();
   const file = await download;
   return pdfTexts(readFileSync(await file.path()).toString('latin1')).map((text) => text.text);
 }
@@ -28,8 +29,11 @@ const nextWrite = (page: Page, projectId: string, setting: string): Promise<Requ
 async function createConfidential(page: Page): Promise<void> {
   await page.goto('/');
   await page.getByRole('button', { name: 'Nouveau projet' }).click();
-  await page.getByLabel('Code court').fill('PAIE');
+  await page.getByTestId('home-start-menu-blank').click();
   await page.getByLabel('Nom en français').fill('Paie mensuelle');
+  await page.getByLabel('Code court').fill('PAIE');
+  // The classification is among the options, folded under the name and the code (ADR 111).
+  await page.getByText('Plus d’options').click();
   const level = page.getByRole('combobox', { name: 'Classification' });
   await expect(level).toHaveValue('internal');
   await level.selectOption({ label: 'Confidentiel' });

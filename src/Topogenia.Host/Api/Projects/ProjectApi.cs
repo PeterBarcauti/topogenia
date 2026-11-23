@@ -1,9 +1,10 @@
 // ProjectApi.cs
-// The routes of the projects turned into their requests: create, list, detail, label of the sharing group, classification, glossary of the translations (annex A 1 projets, A 2.1, spec 4.1).
+// The routes of the projects turned into their requests: create, code proposed, list, detail, label of the sharing group, classification, glossary of the translations, search (annex A 1 projets, A 2.1, spec 4.1, ADR 110, ADR 111).
 
 using Topogenia.Application.Commands;
 using Topogenia.Application.Projects;
 using Topogenia.Application.Queries;
+using Topogenia.Application.Search;
 using Topogenia.Domain.Projects;
 using Topogenia.Domain.Values;
 
@@ -42,6 +43,18 @@ public sealed record OriginLanguageBody(string? Language);
 /// <summary>`PUT /api/projects/{id}/work-time` (3.0, ADR 085): the working day and the hours of a full-time equivalent in a month; an absent value is kept.</summary>
 public sealed record WorkTimeBody(decimal? WorkdayHours, decimal? FteHoursPerMonth);
 
+/// <summary>
+/// `POST /api/projects/{id}/search` (3.4, lot 2, ADR 110): the word, in the body and never in the address; the language
+/// shown (absent: the language of origin alone); the map open, put first (unknown: ignored).
+/// </summary>
+public sealed record SearchBody(string? Text, string? Language, Guid? MapId);
+
+/// <summary>
+/// `POST /api/projects/code-proposal` (3.4, lot 3, ADR 111 point 7): the name of the new project, in the body and never in
+/// the address.
+/// </summary>
+public sealed record CodeProposalBody(string? Name);
+
 /// <summary>Reads the bodies of the project routes into the requests of the domain and runs them.</summary>
 public sealed class ProjectApi
 {
@@ -58,6 +71,12 @@ public sealed class ProjectApi
         this.languages = languages;
     }
 
+    /// <summary>The longest body of a search: 4 KB, refused before it is read (ADR 110 point 4).</summary>
+    public const long SearchLimit = 4 * 1024;
+
+    /// <summary>The longest body of a proposal of code: 4 KB, refused before it is read (ADR 111 point 7).</summary>
+    public const long CodeProposalLimit = 4 * 1024;
+
     public static IReadOnlyList<MemberEntry>? Members(IEnumerable<MemberBody>? members) =>
         members?.Select(member => new MemberEntry(member.Login, member.Role, member.IsSponsor, member.IsKeyContributor)).ToList();
 
@@ -69,11 +88,25 @@ public sealed class ProjectApi
         return users.RunAsync(new CreateProjectCommand(request), cancellationToken);
     }
 
+    /// <summary>The code proposed from the name of a new project, free among the live projects and the trash: a read, nothing written.</summary>
+    public Task<ProposedProjectCode> ProposeCodeAsync(CodeProposalBody body, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(body);
+        return users.RunAsync(new ProposeProjectCodeQuery(body.Name), cancellationToken);
+    }
+
     public Task<IReadOnlyList<ProjectListItem>> ListAsync(CancellationToken cancellationToken) =>
         users.RunAsync(new ListProjectsQuery(), cancellationToken);
 
     public Task<ProjectDetail> GetAsync(Guid projectId, CancellationToken cancellationToken) =>
         queries.RunAsync(new GetProjectQuery(projectId), cancellationToken);
+
+    /// <summary>The search of a word in the whole project, as the member may read it (ADR 110): a read, nothing written.</summary>
+    public Task<ProjectSearchView> SearchAsync(Guid projectId, SearchBody body, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(body);
+        return queries.RunAsync(new ProjectSearchQuery(projectId, body.Text, body.Language, body.MapId), cancellationToken);
+    }
 
     /// <summary>Changes the label, then reads the project again (the command touches no map).</summary>
     public async Task<ProjectDetail> ChangeSharingGroupLabelAsync(Guid projectId, SharingGroupLabelBody body, string? ifMatch,

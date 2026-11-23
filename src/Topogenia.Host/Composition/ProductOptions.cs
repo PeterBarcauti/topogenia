@@ -147,6 +147,13 @@ public sealed class ProductOptions
     /// <summary>The retention of the audit trail in days (spec 5.5: configurable, a year by default).</summary>
     public int AuditRetentionDays { get; set; } = Application.Audit.AuditTrail.DefaultRetentionDays;
 
+    /// <summary>
+    /// The links to the site of the product (ADR 111 point 3): shown by default; false hides them all, « Check for updates »,
+    /// the reminder of the home page and the gallery of templates, in both modes (the profile then gives no link). Read at
+    /// the start: in `settings.json` of the desktop mode (true or false of JSON alone), in the settings of the server mode.
+    /// </summary>
+    public bool SiteLinks { get; set; } = true;
+
     public AppSettings ToSettings() => new(RecommendedDepth, RaciLetters, TrashRetentionDays);
 
     /// <summary>The options of the configuration, bound once (for what is decided before the services exist).</summary>

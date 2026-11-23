@@ -24,6 +24,11 @@ function start(path: string, routes: FakeRoutes, profile: Partial<Schema<'Profil
   return sent;
 }
 
+/** Opens the folded « Plus d’options » of the form. */
+const openOptions = () => userEvent.click(screen.getByText('Plus d’options'));
+
+const PROPOSAL = 'POST /api/projects/code-proposal';
+
 beforeEach(async () => {
   await i18next.changeLanguage('fr');
 });
@@ -42,6 +47,7 @@ describe('the creation of a project (B-1.4-01 to B-1.4-14)', () => {
 
   it('the language of the process, the one of the interface first, its name 200 at most, a translation of the name added; description 4000, folder 400; the code filtered', async () => {
     start('/projects/new', {}, { is_admin: true, languages: ['fr', 'en', 'es'] });
+    await userEvent.click(await screen.findByText('Plus d’options'));
     const language = await screen.findByRole('combobox', { name: 'Langue du processus' });
     expect([(language as HTMLSelectElement).value, within(language).getAllByRole('option').map((option) => option.textContent)])
       .toEqual(['fr', ['Français · français', 'English · anglais', 'Español · espagnol']]);
@@ -69,6 +75,7 @@ describe('the creation of a project (B-1.4-01 to B-1.4-14)', () => {
     expect(create).toBeEnabled();
     await userEvent.clear(screen.getByRole('textbox', { name: 'Nom en français' }));
     expect(create).toBeDisabled();
+    await openOptions();
     // A translation of the name alone does not make a project: the language of the process wants its name.
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Traduire le nom en…' }), 'en');
     await userEvent.type(screen.getByRole('textbox', { name: 'Nom en anglais' }), 'Visits');
@@ -79,6 +86,7 @@ describe('the creation of a project (B-1.4-01 to B-1.4-14)', () => {
     const sent = start('/projects/new', { 'POST /api/projects': { json: { id: 'p-new', code: 'VIS', root_map_id: 'm-new', invited_user_ids: [] }, status: 201 } },
       { is_admin: true, languages: ['fr', 'en'] });
     await userEvent.type(await screen.findByRole('textbox', { name: 'Code court' }), 'VIS');
+    await openOptions();
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Langue du processus' }), 'en');
     await userEvent.type(screen.getByRole('textbox', { name: 'Nom en anglais' }), 'Visits');
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Traduire le nom en…' }), 'fr');
@@ -102,9 +110,67 @@ describe('the creation of a project (B-1.4-01 to B-1.4-14)', () => {
 
 });
 
+describe('the name first, the code proposed (3.4, lot 3)', () => {
+  const proposing = (code: string | null) => ({ [PROPOSAL]: { json: { code } } });
+
+  it('the name comes first, the code proposed says so', async () => {
+    const sent = start('/projects/new', proposing('GDA'), { is_admin: true });
+    const name = await screen.findByRole('textbox', { name: 'Nom en français' });
+    const code = screen.getByRole('textbox', { name: 'Code court' });
+    expect(name.compareDocumentPosition(code) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(code).toHaveAccessibleDescription('3 à 6 lettres majuscules, unique et définitif (ex. VIS).');
+    await userEvent.type(name, 'Gestion des achats');
+    await waitFor(() => { expect(code).toHaveValue('GDA'); });
+    expect(code).toHaveAccessibleDescription('Proposé d’après le nom.');
+    expect(callsTo(sent, 'POST', '/api/projects/code-proposal').map((call) => call.body)).toEqual([{ name: 'Gestion des achats' }]);
+    // The person changes it: it is hers, the name no longer moves it, the help is the usual one.
+    await userEvent.type(code, 'x');
+    expect(code).toHaveValue('GDAX');
+    expect(code).toHaveAccessibleDescription('3 à 6 lettres majuscules, unique et définitif (ex. VIS).');
+  });
+
+  it('a name without proposal leaves the code empty, to be typed', async () => {
+    const sent = start('/projects/new', proposing(null), { is_admin: true });
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Nom en français' }), 'RH');
+    await waitFor(() => { expect(callsTo(sent, 'POST', '/api/projects/code-proposal')).toHaveLength(1); });
+    expect(screen.getByRole('textbox', { name: 'Code court' })).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Créer le projet' })).toBeDisabled();
+  });
+
+  it('More options is folded and holds the language, the translations of the name, the description, the folder, the classification and the members', async () => {
+    start('/projects/new', {}, { is_admin: true, languages: ['fr', 'en'] });
+    const summary = await screen.findByText('Plus d’options');
+    const options = summary.closest('details');
+    expect(options).not.toBeNull();
+    expect(options).not.toHaveAttribute('open');
+    await userEvent.click(summary);
+    expect(options).toHaveAttribute('open');
+    const inside = [
+      screen.getByRole('combobox', { name: 'Langue du processus' }), screen.getByRole('combobox', { name: 'Traduire le nom en…' }),
+      screen.getByRole('textbox', { name: 'Description' }), screen.getByRole('textbox', { name: 'Dossier partagé (OneDrive)' }),
+      screen.getByRole('combobox', { name: 'Classification' }), screen.getByRole('button', { name: 'Ajouter une personne' }),
+    ];
+    expect(inside.map((field) => options?.contains(field))).toEqual([true, true, true, true, true, true]);
+    // Nothing the creation requires is folded.
+    expect([screen.getByRole('textbox', { name: 'Nom en français' }), screen.getByRole('textbox', { name: 'Code court' })].map((field) => options?.contains(field)))
+      .toEqual([false, false]);
+  });
+
+  it('a refusal of the host at creation is said as before, the code proposed kept', async () => {
+    start('/projects/new', { ...proposing('ACHATS'), 'POST /api/projects': { refused: 409, code: 'PROJET_CODE_EXISTANT', message: 'Le code ACHATS est déjà pris.' } }, { is_admin: true });
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Nom en français' }), 'Achats');
+    await waitFor(() => { expect(screen.getByRole('textbox', { name: 'Code court' })).toHaveValue('ACHATS'); });
+    await userEvent.click(screen.getByRole('button', { name: 'Créer le projet' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Le code ACHATS est déjà pris.');
+    expect(window.location.pathname).toBe('/projects/new');
+    expect(screen.getByRole('textbox', { name: 'Code court' })).toHaveValue('ACHATS');
+  });
+});
+
 describe('the members and the refusals of a creation (B-1.4-01 to B-1.4-14)', () => {
   it('the editor lists the three roles and removes a line', async () => {
     start('/projects/new', {}, { is_admin: true });
+    await userEvent.click(await screen.findByText('Plus d’options'));
     await userEvent.click(await screen.findByRole('button', { name: 'Ajouter une personne' }));
     const role = screen.getByRole('combobox', { name: 'Rôle' });
     expect(within(role).getAllByRole('option').map((option) => option.textContent)).toEqual(['Animateur', 'Contributeur', 'Lecteur']);
@@ -125,6 +191,7 @@ describe('the members and the refusals of a creation (B-1.4-01 to B-1.4-14)', ()
 describe('the classification chosen at the creation (S-4.1-07, Q5)', () => {
   it('Interne by default, the three levels of the closed list, the one chosen sent', async () => {
     const sent = start('/projects/new', { 'POST /api/projects': { json: { id: 'p-new', code: 'PAI', root_map_id: 'm-new', invited_user_ids: [] }, status: 201 } }, { is_admin: true });
+    await userEvent.click(await screen.findByText('Plus d’options'));
     const level = await screen.findByRole('combobox', { name: 'Classification' });
     expect([(level as HTMLSelectElement).value, within(level).getAllByRole('option').map((option) => option.textContent)])
       .toEqual(['internal', ['Interne', 'Confidentiel', 'Strictement confidentiel']]);

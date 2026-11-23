@@ -1,7 +1,7 @@
 // PresenterFlow.tsx
 // The map of a presentation (ADR 097): its own React Flow, read only (nothing moved, chosen nor deleted), the scene lit on it, the camera that frames it, the light of a passage, the lanes named on the left and a small map « you are here »; a step clicked becomes the stop shown, and the field of a comment written follows it, its text kept first (ADR 099 revised, essai J6 of 3.2).
 
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo } from 'react';
 import { ConnectionMode, MiniMap, ReactFlow, useStore as useFlowStore, ViewportPortal } from '@xyflow/react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
@@ -17,6 +17,7 @@ import { moveWritten, showFlow, showsFlow } from './comments.ts';
 import { diveInto, showStep } from './dive.ts';
 import { spotOf, spotlit } from './model/spotlight.ts';
 import { PresenterForks } from './PresenterForks.tsx';
+import { PresenterLaneNames } from './PresenterLaneNames.tsx';
 import { PresenterLight } from './PresenterLight.tsx';
 import { usePresenterCamera } from './usePresenterCamera.ts';
 import type { Presentation } from './usePresentation.ts';
@@ -26,19 +27,10 @@ const NODE_TYPES = { step: StepNodeView, lane: LaneBackground };
 /** The lowest zoom of the stage: the whole of a large map at the opening. */
 const PRESENTER_MIN_ZOOM = 0.05;
 
-/** The lanes named on the left of the screen, beside the band of each one in the view; the lane of the step shown lit. */
+/** The lanes named on the left of the screen, beside the band of each one in the view. */
 function PresenterLanes({ lanes, active, dim }: { lanes: readonly LaneBand[]; active: string | null; dim: boolean }) {
-  const transform = useFlowStore((state) => state.transform);
-  const [, y, zoom] = transform;
-  return (
-    <div className="presenter-lanes" aria-hidden="true" data-testid="presenter-lanes">
-      {lanes.map((band) => {
-        const style = { top: `${String(band.top * zoom + y)}px`, height: `${String(band.height * zoom)}px`, '--ink': `var(--lane-${String(band.tint)}-ink)` } as CSSProperties;
-        const name = ['presenter-lane', band.lane.id === active && 'is-active', dim && band.lane.id !== active && 'is-dim'].filter(Boolean).join(' ');
-        return <div key={band.lane.id} className={name} style={style}><span>{band.name}</span></div>;
-      })}
-    </div>
-  );
+  const [, y, zoom] = useFlowStore((state) => state.transform);
+  return <PresenterLaneNames lanes={lanes} active={active} dim={dim} y={y} zoom={zoom} />;
 }
 
 /** The step of the small map in the colour of the charter, the one shown in the colour of the accent. */

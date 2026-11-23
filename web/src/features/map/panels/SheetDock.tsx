@@ -10,6 +10,7 @@ import { laneName, stepLabel } from '../model/mapLayout.ts';
 import { focusBackOnStep } from '../canvas/stepFocus.ts';
 import { assignStep, showSheetSummary } from '../state/actions/sheet.ts';
 import { useEditor, useMapLanguage } from '../state/EditorContext.tsx';
+import { bpmnView } from '../bpmn/bpmnState.ts';
 
 /**
  * The project of the map, read once when a sheet first opens (`GET /api/projects/{id}`, open to every member): its
@@ -46,6 +47,8 @@ export function SheetDock({ map, stepId, project, report }: { map: Schema<'MapVi
   // since the map opened; a section folded or unfolded by hand is so for this opening only, the panel being new for
   // each step. A pain point asked here unfolds the inputs for this opening (ADR 102 point 2); a fold by hand ends it.
   const unfolded = useStore(editor.store, (state) => state.sheetsUnfolded);
+  // In the view in BPMN 2.0 the sheet is read only: it is changed on the map (ADR 106).
+  const bpmnOpen = useStore(bpmnView, (state) => state.open);
   const [own, setOwn] = useState<Partial<Record<SheetSection, boolean>>>({});
   const [asked, setAsked] = useState<string | null>(null);
   if (report.focus !== asked) {
@@ -53,11 +56,13 @@ export function SheetDock({ map, stepId, project, report }: { map: Schema<'MapVi
     if (report.focus !== null) setOwn((current) => ({ ...current, inputs: false }));
   }
   const folded = Object.fromEntries(SHEET_SECTIONS.map((section) => [section, own[section] ?? !unfolded])) as Record<SheetSection, boolean>;
-  // Closed while the focus is in it (Escape, its button), the panel gives the focus back to its step, still drawn then.
-  useLayoutEffect(() => () => {
-    focusBackOnStep(stepId, '[data-testid="sheet-panel"]');
-  }, [stepId]);
   const step = map.steps.find((candidate) => candidate.id === stepId);
+  // Closed while the focus is in it (Escape, its button), the panel gives the focus back to its step, still drawn then:
+  // on the map, or in the view in BPMN 2.0, where the form of the step is named by its code.
+  const code = step?.code;
+  useLayoutEffect(() => () => {
+    focusBackOnStep(stepId, '[data-testid="sheet-panel"]', code);
+  }, [stepId, code]);
   if (step === undefined) return null;
   const lane = map.lanes.find((candidate) => candidate.id === step.lane_id);
   return (
@@ -77,6 +82,6 @@ export function SheetDock({ map, stepId, project, report }: { map: Schema<'MapVi
       onAssign={(userId) => assignStep(editor, step.id, userId)}
       notify={editor.notify}
       desktop={editor.desktop}
-      onReport={report.onReport} painFocus={report.focus} onPainFocused={report.onFocused} />
+      onReport={report.onReport} painFocus={report.focus} onPainFocused={report.onFocused} readOnly={bpmnOpen} />
   );
 }

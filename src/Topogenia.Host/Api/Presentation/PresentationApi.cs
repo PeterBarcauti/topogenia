@@ -14,6 +14,16 @@ namespace Topogenia.Host.Api.Presentation;
 /// </summary>
 public sealed record PresentationCommentBody(string? Text, string? Language);
 
+/// <summary>
+/// One comment of `POST /api/maps/{id}/presentation-comments` (F-130): its step or its flow, the text kept from the review,
+/// the version of the original read (0 when there was none), and whether the person accepted to replace an original typed
+/// by hand (false when absent).
+/// </summary>
+public sealed record CommentDraftBody(Guid? StepId, Guid? FlowId, string? Text, int? Version, bool? Replace);
+
+/// <summary>`POST /api/maps/{id}/presentation-comments` (3.3, lot 3, F-130): the comments written by the assistant and kept after review.</summary>
+public sealed record CommentDraftsBody(IReadOnlyList<CommentDraftBody>? Comments);
+
 /// <summary>Every line of the comment of the step after the change: its original and its translations; none when it has no comment left.</summary>
 public sealed record PresentationCommentReply(IReadOnlyList<PresentationCommentView> Comments);
 
@@ -45,6 +55,16 @@ public sealed class PresentationApi(UserRunner users)
         ArgumentNullException.ThrowIfNull(body);
         var request = SetPresentationCommentRequest.WithVersion(stepId, body.Text, body.Language, ApiInput.Version(ifMatch));
         return new PresentationCommentReply(await users.RunAsync(request, cancellationToken));
+    }
+
+    /// <summary>The comments written by the assistant for the steps and the flows of a map, kept after review (F-130).</summary>
+    public Task<CommentDraftsResult> WriteDraftsAsync(Guid mapId, CommentDraftsBody body, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(body);
+        var drafts = ApiInput.Required(body.Comments, WriteCommentDraftsRequest.Field)
+            .Select(item => new CommentDraftWrite(item.StepId, item.FlowId, item.Text, item.Version, item.Replace ?? false))
+            .ToList();
+        return users.RunAsync(new WriteCommentDraftsRequest(mapId, drafts), cancellationToken);
     }
 
     public Task<IReadOnlyList<FlowPresentationCommentView>> ReadFlowsAsync(Guid mapId, CancellationToken cancellationToken) =>

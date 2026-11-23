@@ -123,4 +123,22 @@ public sealed class PmapSheetReadingTests
         Assert.Equal(FileErrorCodes.Required, Assert.Single(Faults(Steps("""{ "outputs": [{ "id": "d1", "name": "Bon" }] }""", """{ "uses": [{ "wait_hours": 1 }] }"""))).Code);
         Assert.Equal(FileErrorCodes.DuplicateId, Assert.Single(Faults(Steps("""{ "outputs": [{ "id": "e2", "name": "Bon" }] }"""))).Code);
     }
+
+    [Fact]
+    public void The_addresses_of_documents_that_reach_another_machine_are_counted_once_each_at_every_level()
+    {
+        // Pre-audit 68, P3-02: a web address or a network path is said before a link is followed; a drive path stays on the machine.
+        var document = Read(Doc($$"""
+            { "lanes": [{{TwoLanes}}],
+              "steps": [{ "id": "e1", "lane": "c1", "label": "Produire", "sheet": {
+                            "outputs": [{ "name": "Bon", "location": "\\\\serveur\\achats\\bon.pdf" }, { "name": "Copie", "location": "C:\\Achats\\bon.pdf" }],
+                            "inputs": [{ "name": "Devis", "location": "https://exemple.test/devis" }, { "name": "Devis bis", "location": "https://exemple.test/devis" }] } },
+                        { "id": "e2", "lane": "c2", "label": "Détailler", "sub_map": { "lanes": [{ "id": "c3", "name": "Comptable" }],
+                            "steps": [{ "id": "e3", "lane": "c3", "label": "Classer", "sheet": { "inputs": [{ "name": "Note", "location": "http://exemple.test/note" }] } }] } }] }
+            """));
+
+        Assert.Equal(3, document.RemoteLocations);
+        Assert.Equal(0, Read(Steps("""{ "outputs": [{ "name": "Bon", "location": "D:/Achats/bon.pdf" }] }""")).RemoteLocations);
+        Assert.Equal(0, Read(Steps("{}")).RemoteLocations);
+    }
 }

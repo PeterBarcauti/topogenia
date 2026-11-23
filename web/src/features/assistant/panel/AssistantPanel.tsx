@@ -16,6 +16,7 @@ import { useShortcutLabel } from '../../../shared/ui/useShortcutLabel.ts';
 import { OpenPmapDialog } from '../../project/files/OpenPmapDialog.tsx';
 import { useEditor, useMapState } from '../../map/state/EditorContext.tsx';
 import { saveReport } from '../../map/state/actions/exports.ts';
+import { writeCommentDrafts } from '../../map/state/actions/commentDrafts.ts';
 import { writeSummaries } from '../../map/state/actions/summaries.ts';
 import type { StepMark } from '../../map/state/mapStore.ts';
 import { AssistantThread, type ThreadContext } from './AssistantThread.tsx';
@@ -153,6 +154,7 @@ export function AssistantPanel() {
   const context: ThreadContext = {
     store, status, home: false, reveal, saveReport: (report, model) => saveReport(editor, report, model),
     saveSummaries: (summaries, model) => writeSummaries(editor, summaries.map((summary) => ({ ...summary, origin: 'ai', model }))),
+    saveComments: (comments) => writeCommentDrafts(editor, comments),
     ...(editor.admin && canPropose ? { createProject: (pmap: string) => { setCreating({ pmap, origin: map.id }); } } : {}),
     ...(canPropose ? { proposals: proposalsOf(editor) } : {}),
   };

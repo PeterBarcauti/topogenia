@@ -34,6 +34,29 @@ public sealed record ProfileView(
     /// command « Quit » and, while he has no project, the sample project. Set by the host, which alone knows its mode.
     /// </summary>
     public bool Desktop { get; init; }
+
+    /// <summary>
+    /// The desktop mode runs from the package of the Microsoft Store (ADR 088, ADR 111 point 4): « Check for updates » opens
+    /// the page of the Store, and no reminder is shown, the Store updating by itself. False in server mode. Set by the host.
+    /// </summary>
+    public bool Store { get; init; }
+
+    /// <summary>
+    /// The addresses the interface opens in the browser (ADR 111 points 2 and 3), or null when the operation hides every link
+    /// to the site (the switch `SiteLinks`): then neither « Check for updates », nor the reminder, nor the gallery. Set by
+    /// the host, which alone reads the switch.
+    /// </summary>
+    public ProductLinks? Links { get; init; }
+}
+
+/// <summary>
+/// The site of the product and its page of the Store (ADR 111 point 2), opened by the browser on a click, never called by
+/// the application; the interface builds the pages of the site (versions, gallery) on the base it receives.
+/// </summary>
+public sealed record ProductLinks(string Site, string StorePage)
+{
+    /// <summary>The two addresses of the identity of the product, the only ones written.</summary>
+    public static ProductLinks OfProduct { get; } = new(ProductIdentity.Site, ProductIdentity.StorePage);
 }
 
 public static class ProfileViews

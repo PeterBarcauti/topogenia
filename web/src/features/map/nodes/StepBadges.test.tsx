@@ -27,6 +27,18 @@ describe('the gauge of the sheet (B-2.10-20 to B-2.10-25)', () => {
     expect(within(screen.getByTestId('step-VIS-E004')).getByTestId('step-gauge')).toHaveAttribute('title', 'Fiche à revoir, complétée à 60 %');
   });
 
+  it('on a gateway, runs along the lower contour of the diamond, from the left point by the bottom point, as long as the completeness (R14)', async () => {
+    const map = sampleMap();
+    await showMap({ ...map, steps: map.steps.map((step) => (step.id === 's3' ? { ...step, sheet: sheetOf({ status: 'validated', completeness: 50 }) } : step)) });
+    const gauge = within(screen.getByTestId('step-VIS-E003')).getByTestId('step-gauge');
+    const line = within(gauge).getByTestId('step-gauge-contour');
+    expect(gauge).toHaveClass('step-gauge--contour');
+    expect(gauge).toHaveAttribute('title', 'Fiche validée, complétée à 50 %');
+    expect([line.getAttribute('class'), line.getAttribute('points'), line.getAttribute('pathLength'), line.getAttribute('stroke-dasharray')])
+      .toEqual(['gauge--validated', '1,32 85,63 169,32', '100', '50 100']);
+    expect(within(screen.getByTestId('step-VIS-E002')).queryByTestId('step-gauge-contour')).toBeNull();
+  });
+
   it('in English, a validated sheet is said « validated », as the sheet says it (audit 3.2 UX-MOY-06)', async () => {
     await i18next.changeLanguage('en');
     const map = sampleMap();

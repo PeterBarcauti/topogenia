@@ -1,11 +1,11 @@
 <!-- PMAP_GUIDE_IA.md -->
-<!-- Guide à donner à une IA pour traduire une description de processus, un récit compris, en fichier .pmap 1.4 -->
+<!-- Guide à donner à une IA pour traduire une description de processus, un récit compris, en fichier .pmap 1.5 -->
 
-# Guide .pmap pour une IA : traduire un processus en fichier (format 1.4)
+# Guide .pmap pour une IA : traduire un processus en fichier (format 1.5)
 
 Ce guide suffit pour produire un fichier `.pmap` que l'application ouvre du premier coup, à partir de n'importe quelle
 description d'un processus : récit, compte rendu d'entretien, procédure, tableau, photo de croquis. Référence complète :
-`docs/format-pmap.md` et `schemas/pmap-1.4.schema.json`.
+`docs/format-pmap.md` et `schemas/pmap-1.5.schema.json`.
 
 **Sortie attendue : un seul objet JSON, rien avant, rien après.** Noms de propriétés et valeurs codées en anglais
 minuscule, exactement comme ci-dessous ; textes (noms, libellés) dans la langue du processus. Toute propriété inconnue
@@ -16,7 +16,7 @@ fait refuser le fichier.
 ```
 {
   "format": "topogenia",                 obligatoire, toujours "topogenia"
-  "version": "1.4",                      obligatoire, toujours "1.4"
+  "version": "1.5",                      obligatoire, toujours "1.5"
   "generated_by": "...",                 facultatif, informatif
   "project": { "name": "...", ... },     obligatoire
   "map": { "lanes": [...], "steps": [...], "flows": [...] },   obligatoire, carte racine
@@ -37,6 +37,7 @@ fait refuser le fichier.
 | `translations` | non | `{ "en": "Supplier invoice processing" }` |
 | `workday_hours` | non | Journée de travail en heures, 1 à 24 (7 par défaut) : **seulement si la source la donne** (section 7 bis) |
 | `fte_hours_per_month` | non | Heures d'un ETP par mois, 1 à 744 (151,67 par défaut) : **seulement si la source les donne** |
+| `glossary` | non | 1.5 : glossaire du projet, un terme par ligne (`facture = invoice`), 4 000 car. max ; **seulement s'il est donné** |
 
 **map** (carte racine, et toute carte détaillée `sub_map`)
 
@@ -72,6 +73,7 @@ fait refuser le fichier.
 | `raci` | non | Rôles des **autres** couloirs de la carte : `{ "dir": "A", "com": "I" }` (section 5) |
 | `sub_map` | non | Carte détaillée de l'étape, même forme que `map` (section 6) |
 | `translations` | non | Libellé dans l'autre langue |
+| `comment` | non | 1.5 : ce que la présentation dit de l'étape à la place de ses propres phrases, une à trois phrases, 500 car. max : `{ "text": "...", "translations": { "en": "..." } }` ; **seulement si on te le demande** |
 | `sheet` | non | Fiche de l'étape (section 7) |
 | `volume` | non | Sur un `start` seulement : `{ "quantity": 120, "period": "month" }`, quantité 0 à 1 000 000, période `day` (jour ouvré), `week`, `month`, `year` ; **seulement s'il est donné** |
 
@@ -95,6 +97,7 @@ fait refuser le fichier.
 | `translations` | non | Libellé dans l'autre langue |
 | `share` | non | Sur une flèche qui sort d'une `decision` ou d'un `inclusive` seulement : part des dossiers en %, 0 à 100 (2 décimales) ; **seulement si elle est donnée** |
 | `route` | non | **Ne pas l'écrire** : c'est le tracé que la personne choisit dans l'application ; une proposition l'ignore |
+| `comment` | non | 1.5 : ce que la présentation dit pendant le passage d'une étape à la suivante, même forme que celui d'une étape ; **seulement si on te le demande** |
 
 **summary** (d'une carte, facultatif)
 
@@ -218,6 +221,8 @@ forme), `calculate` (calculer), `check` (contrôler), `chase` (relancer), `file`
   le temps perdu qu'il coûte, si la source le chiffre. L'irritant est rattaché à l'étape qui produit le document.
 - 1.4 : le plan d'actions de l'irritant, seulement si la source le décide : `action` (ce qui sera fait), `owner` (qui
   le porte, tel que la source le nomme), `due_date` (l'échéance, `aaaa-mm-jj`) ; jamais sans `pain_point`.
+- 1.5 : `pain_point_code` et `pain_point_status` sont écrits par l'application dans une copie (le code de l'irritant et
+  son état) ; **ne pas les écrire**, et les garder tels quels quand le fichier donné en porte.
 - Durées et volumes approximatifs (« environ », « à peu près ») : les écrire et le signaler dans `uncertainties`.
 - Jamais de nom de personne, d'adresse électronique ni de donnée confidentielle dans une fiche : un rôle à la place.
 
@@ -243,7 +248,7 @@ fréquence des fiches, la journée de travail et les heures d'un ETP du projet. 
 
 Vérifier avant de rendre le fichier :
 
-- [ ] `format` = `"topogenia"`, `version` = `"1.4"`, `project.name` et `map.lanes` présents.
+- [ ] `format` = `"topogenia"`, `version` = `"1.5"`, `project.name` et `map.lanes` présents.
 - [ ] Aucune propriété hors de ce guide ; valeurs codées exactement comme écrites ici.
 - [ ] Chaque `id` est unique dans tout le fichier (couloirs, étapes et documents, toutes cartes).
 - [ ] Chaque `step.lane` et chaque clé de `raci` désigne un couloir de la **même** carte.
@@ -270,7 +275,7 @@ automatisé, RACI, carte détaillée placée automatiquement, traductions, fiche
 ```json
 {
   "format": "topogenia",
-  "version": "1.4",
+  "version": "1.5",
   "generated_by": "Exemple du guide pour IA",
   "project": {
     "code": "FAC",
@@ -376,7 +381,7 @@ deux heures par mois. »
 ```json
 {
   "format": "topogenia",
-  "version": "1.4",
+  "version": "1.5",
   "generated_by": "Exemple du guide pour IA, depuis un récit",
   "project": { "name": "Réapprovisionnement des consommables", "language": "fr" },
   "map": {

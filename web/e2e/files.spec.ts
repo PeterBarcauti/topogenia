@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import type { Locator, Page } from '@playwright/test';
 import Ajv2020 from 'ajv/dist/2020.js';
 import type { Api } from './support/api.ts';
+import { fileEntry } from './support/file-menu.ts';
 import { expect, stepOf, test } from './support/journey.ts';
 
 const REPOSITORY = new URL('../../', import.meta.url);
@@ -121,20 +122,22 @@ test('the answer of an AI pasted: the fault said at its place, corrected, the ma
 /** The copy downloaded from the File menu: its name and its text. */
 async function downloadCopy(page: Page): Promise<{ name: string; text: string }> {
   const menu = await openFileMenu(page);
-  const entries = await menu.getByRole('menuitem').allTextContents();
-  // The target state is made by an administrator, next to the duplicate (ADR 095 point 10).
-  expect(entries.slice(0, 13)).toEqual([
-    'Ouvrir un fichier…', expect.stringMatching(new RegExp('^Importer un paquet \\.\\w+…$')), 'Télécharger une copie (.pmap)', 'Dupliquer le projet…', 'Créer l’état cible…',
-    'Exporter en PDF (A3 paysage)', 'Imprimer en grand…', 'Exporter en image PNG', 'Exporter en image SVG…', 'Exporter en Excel', 'Exporter en Markdown (Mermaid)',
-    'Rapport raconté par l’IA (Markdown)', 'Résumer les cartes',
+  // The File menu in cascade (ADR 117): three entries at a click, four groups, the properties of the project last; each group holds the commands of the
+  // administrator and of the facilitator in the order of ADR 095 point 10 (the target state next to the duplicate), ADR 106 (BPMN after Markdown) and ADR 107.
+  expect(await menu.getByRole('menuitem').allTextContents()).toEqual([
+    'Ouvrir un fichier…', 'Enregistrer la carte ouverte (.pmap)', 'Copier la carte en image', 'Exporter la carte', 'Projet', 'Paquet d’échange', 'Assistant IA', 'Propriétés du projet…',
   ]);
-  // Then the package of exchange of the facilitator (ADR 058 § 8, ADR 062 § 5), and the properties of the project last (ADR 069).
-  expect(entries.slice(13)).toEqual([
-    expect.stringMatching(new RegExp('^Exporter le projet \\(\\.\\w+\\)…$')), expect.stringMatching(new RegExp('^Remplacer par un paquet \\.\\w+…$')),
-    'Propriétés du projet…',
-  ]);
+  const group = async (name: string) => {
+    await menu.getByRole('menuitem', { name, exact: true }).click();
+    return page.getByRole('menu', { name, exact: true }).getByRole('menuitem').allTextContents();
+  };
+  expect(await group('Exporter la carte')).toEqual(['PDF (A3 paysage)', 'Image PNG', 'Image SVG…', 'Excel', 'Markdown (Mermaid)', 'BPMN 2.0 (.bpmn)…', 'Imprimer en grand…']);
+  expect(await group('Projet')).toEqual(['Tout le projet en PDF…', 'Télécharger une copie (.pmap)', 'Insérer un fichier comme étape détaillée…', 'Dupliquer le projet…', 'Créer l’état cible…']);
+  // The package of exchange of the facilitator (ADR 058 § 8, ADR 062 § 5).
+  expect(await group('Paquet d’échange')).toEqual([expect.stringMatching(new RegExp('^Exporter le projet \\(\\.\\w+\\)…$')), 'Importer un paquet…', 'Remplacer par un paquet…']);
+  expect(await group('Assistant IA')).toEqual(['Rapport raconté (Markdown)', 'Résumer les cartes', 'Commentaires de présentation…']);
   const download = page.waitForEvent('download');
-  await menu.getByRole('menuitem', { name: 'Télécharger une copie (.pmap)' }).click();
+  await (await fileEntry(page, 'file.download')).click();
   const file = await download;
   await expect(page.getByText('Copie des cartes téléchargée')).toBeVisible();
   return { name: file.suggestedFilename(), text: readFileSync(await file.path(), 'utf-8') };
@@ -166,8 +169,8 @@ async function reopen(page: Page, copy: { name: string; text: string }, code: st
 
 /** The project of the map duplicated from the File menu: the name proposed, the code typed; the copy opens (B-1.6-22). */
 async function duplicateAs(page: Page, code: string): Promise<void> {
-  const menu = await openFileMenu(page);
-  await menu.getByRole('menuitem', { name: 'Dupliquer le projet…' }).click();
+  await openFileMenu(page);
+  await (await fileEntry(page, 'file.duplicate')).click();
   const dialog = page.getByRole('dialog', { name: 'Dupliquer le projet' });
   await expect(dialog.getByRole('textbox', { name: 'Nom du projet' })).toHaveValue('Clôture mensuelle des visites (copie)');
   await dialog.getByRole('textbox', { name: 'Code court' }).fill(code);

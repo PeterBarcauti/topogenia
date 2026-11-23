@@ -266,10 +266,13 @@ public sealed class FlowCommentRoutesTests(ApiHosts hosts) : IClassFixture<ApiHo
         (await admin.GetAsync($"/api/maps/{project.RootMapId}/flow-presentation-comments")).Refused(404, "INTROUVABLE");
     }
 
-    /// <summary>« Dupliquer » goes through a `.pmap` copy, which carries no comment of presentation (ADR 099, point 7): the copy has none on its flows.</summary>
+    /// <summary>
+    /// « Dupliquer » goes through a `.pmap` copy, which carries the comments of presentation since the 1.5 (ADR 105,
+    /// revising ADR 099 point 7): the copy and the duplicated project have the comment of the flow, the source keeps its own.
+    /// </summary>
     [Theory]
     [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
-    public async Task A_duplicated_project_has_no_comment_on_its_flows(EngineKind kind)
+    public async Task A_duplicated_project_keeps_the_comment_of_its_flows(EngineKind kind)
     {
         var project = await ProjectAsync(kind);
         using var facilitator = project.Facilitator;
@@ -277,13 +280,13 @@ public sealed class FlowCommentRoutesTests(ApiHosts hosts) : IClassFixture<ApiHo
         var (_, flow, _) = await ChainAsync(project);
         (await facilitator.PutAsync(CommentUrl(flow), new { text = "La commande part.", language = "fr" }, 0)).Ok();
         var copy = (await facilitator.GetAsync($"/api/projects/{project.Id}/pmap")).Body;
-        Assert.DoesNotContain("La commande part.", copy, StringComparison.Ordinal);
+        Assert.Contains("La commande part.", copy, StringComparison.Ordinal);
 
         var duplicated = (await admin.PostAsync($"/api/projects/{project.Id}/duplicate", new { code = ApiProject.NewCode() })).Ok(201);
 
         var root = (await admin.GetAsync($"/api/projects/{duplicated.GetProperty("id").GetGuid()}")).Ok().GetProperty("root_map_id").GetGuid();
         Assert.Equal(2, (await admin.GetAsync($"/api/maps/{root}")).Ok().GetProperty("map").GetProperty("flows").GetArrayLength());
-        Assert.Empty(await SaidAsync(admin, root));
+        Assert.Single(await SaidAsync(admin, root));
         Assert.Single(await SaidAsync(facilitator, project.RootMapId));
     }
 }

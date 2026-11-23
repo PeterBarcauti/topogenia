@@ -138,13 +138,17 @@ describe('the bar of the editor in the header (B-2.1-01 to B-2.1-06)', () => {
 });
 
 describe('the File menu of the map (B-2.4-52 to B-2.4-58, ADR 058)', () => {
-  // The summaries of the maps, written in the structure: the facilitator's only (plan 3.1, lot R).
-  const SUMMARIES = 'Résumer les cartes';
-  // The poster for a wall under the PDF (Makigami M9).
-  const EXPORTS = ['| Exporter en PDF (A3 paysage)', 'Imprimer en grand…', 'Exporter en image PNG', 'Exporter en image SVG…', 'Exporter en Excel', 'Exporter en Markdown (Mermaid)', 'Rapport raconté par l’IA (Markdown)'];
+  // The rows of the File menu in cascade (ADR 117): three entries at a click, four groups after a separator, the properties after another.
+  const AT_A_CLICK = ['Enregistrer la carte ouverte (.pmap)', 'Copier la carte en image'];
   const PROPERTIES = '| Propriétés du projet…';
   const entries = () => within(screen.getByRole('menu', { name: 'Menu Fichier' })).getAllByRole('menuitem')
     .map((item) => `${item.classList.contains('menu-item--group') ? '| ' : ''}${item.textContent}`);
+  /** The entries of a group of the menu, its short labels, once it is opened by a click on its row. */
+  const group = async (name: string) => {
+    await userEvent.click(within(screen.getByRole('menu', { name: 'Menu Fichier' })).getByRole('menuitem', { name }));
+    return within(screen.getByRole('menu', { name })).getAllByRole('menuitem').map((item) => `${item.classList.contains('menu-item--group') ? '| ' : ''}${item.textContent}`);
+  };
+  const EXPORTS = ['PDF (A3 paysage)', 'Image PNG', 'Image SVG…', 'Excel', 'Markdown (Mermaid)', 'BPMN 2.0 (.bpmn)…', '| Imprimer en grand…'];
 
   it('an administrator who leads the project: the .pmap files, the exports of the map, then the package of exchange; the menu under its button', async () => {
     startOnMap(subMap(), { is_admin: true });
@@ -153,24 +157,49 @@ describe('the File menu of the map (B-2.4-52 to B-2.4-58, ADR 058)', () => {
     await userEvent.click(file);
     const menu = screen.getByRole('menu', { name: 'Menu Fichier' });
     expect([menu.style.left, menu.style.top]).toEqual(['120px', '43px']);
-    expect(entries()).toEqual([
-      // The target state is made by an administrator, as a duplicate (ADR 095 point 10).
-      'Ouvrir un fichier…', `Importer un paquet ${PACKAGE_EXTENSION}…`, 'Télécharger une copie (.pmap)', 'Dupliquer le projet…', 'Créer l’état cible…', ...EXPORTS, SUMMARIES, `| Exporter le projet (${PACKAGE_EXTENSION})…`, `Remplacer par un paquet ${PACKAGE_EXTENSION}…`,
-      PROPERTIES,
-    ]);
+    expect(entries()).toEqual(['Ouvrir un fichier…', ...AT_A_CLICK, '| Exporter la carte', 'Projet', 'Paquet d’échange', 'Assistant IA', PROPERTIES]);
+    expect(await group('Exporter la carte')).toEqual(EXPORTS);
+    // The target state is made by an administrator, as a duplicate (ADR 095 point 10).
+    expect(await group('Projet')).toEqual(['Tout le projet en PDF…', 'Télécharger une copie (.pmap)', 'Insérer un fichier comme étape détaillée…', 'Dupliquer le projet…', 'Créer l’état cible…']);
+    expect(await group('Paquet d’échange')).toEqual([`Exporter le projet (${PACKAGE_EXTENSION})…`, 'Importer un paquet…', 'Remplacer par un paquet…']);
+    expect(await group('Assistant IA')).toEqual(['Rapport raconté (Markdown)', 'Résumer les cartes', 'Commentaires de présentation…']);
   });
 
-  it('a facilitator who is not an administrator: the copy, the exports, then the package of exchange', async () => {
+  it('a header menu too long for the window stays under its button and scrolls', async () => {
+    const height = window.innerHeight;
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 400 });
+    try {
+      startOnMap(subMap(), { is_admin: true });
+      const file = await screen.findByTestId('header-file');
+      vi.spyOn(file, 'getBoundingClientRect').mockReturnValue(new DOMRect(120, 9, 90, 30));
+      // Drawn, the menu of 21 entries is higher than the window: it does not go up on its button.
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function box(this: HTMLElement) {
+        return this.classList.contains('menu') ? new DOMRect(120, 43, 240, 760) : new DOMRect();
+      });
+      await userEvent.click(file);
+      const menu = screen.getByRole('menu', { name: 'Menu Fichier' });
+      expect([menu.style.left, menu.style.top, menu.style.maxHeight]).toEqual(['120px', '43px', '349px']);
+    } finally {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: height });
+    }
+  });
+
+  it('a facilitator who is not an administrator: the copy, the exports, then the package of exchange, without the files of the administrator', async () => {
     startOnMap(subMap());
     await userEvent.click(await screen.findByTestId('header-file'));
-    expect(entries()).toEqual(['Télécharger une copie (.pmap)', ...EXPORTS, SUMMARIES, `| Exporter le projet (${PACKAGE_EXTENSION})…`, `Remplacer par un paquet ${PACKAGE_EXTENSION}…`, PROPERTIES]);
+    expect(entries()).toEqual([...AT_A_CLICK, '| Exporter la carte', 'Projet', 'Paquet d’échange', 'Assistant IA', PROPERTIES]);
+    expect(await group('Projet')).toEqual(['Tout le projet en PDF…', 'Télécharger une copie (.pmap)', 'Insérer un fichier comme étape détaillée…']);
+    expect(await group('Paquet d’échange')).toEqual([`Exporter le projet (${PACKAGE_EXTENSION})…`, 'Remplacer par un paquet…']);
+    expect(await group('Assistant IA')).toEqual(['Rapport raconté (Markdown)', 'Résumer les cartes', 'Commentaires de présentation…']);
   });
 
-  it('a reader who is not an administrator: the copy and the exports of the map, and no Members button', async () => {
+  it('a reader who is not an administrator: the copy and the exports of the map, no group of the package of exchange, and no Members button', async () => {
     startOnMap(subMap({ rights: { structure: false, role: 'reader' } }));
     await userEvent.click(await screen.findByTestId('header-file'));
     expect(screen.queryByTestId('header-members')).toBeNull();
-    expect(entries()).toEqual(['Télécharger une copie (.pmap)', ...EXPORTS, PROPERTIES]);
+    expect(entries()).toEqual([...AT_A_CLICK, '| Exporter la carte', 'Projet', 'Assistant IA', PROPERTIES]);
+    expect(await group('Projet')).toEqual(['Tout le projet en PDF…', 'Télécharger une copie (.pmap)']);
+    expect(await group('Assistant IA')).toEqual(['Rapport raconté (Markdown)']);
   });
 
   it('« Propriétés du projet… » opens the properties of the project, for a reader too (spec 4.1)', async () => {

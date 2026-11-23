@@ -90,11 +90,11 @@ describe('the empty map (B-2.1-48)', () => {
 });
 
 describe('the controls of the canvas (B-2.1-41 to B-2.1-47)', () => {
-  it('zoom in, zoom out and back to the start, no fit view nor lock', async () => {
+  it('zoom in, zoom out, show all and back to the start, no fit view of React Flow nor lock', async () => {
     const canvas = await showMap(sampleMap());
     const controls = canvas.querySelector('.react-flow__controls') as HTMLElement;
     expect(controls).toHaveClass('map-controls', 'bottom', 'right');
-    expect(within(controls).getAllByRole('button').map((button) => button.getAttribute('title'))).toEqual(['Zoom avant', 'Zoom arrière', 'Revenir au début de la carte']);
+    expect(within(controls).getAllByRole('button').map((button) => button.getAttribute('title'))).toEqual(['Zoom avant', 'Zoom arrière', 'Tout voir (Maj+1)', 'Revenir au début de la carte']);
     expect([controls.querySelector('.react-flow__controls-fitview'), controls.querySelector('.react-flow__controls-interactive')]).toEqual([null, null]);
   });
 

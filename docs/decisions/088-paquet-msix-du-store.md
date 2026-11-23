@@ -62,4 +62,4 @@ l'éditeur (11.16).
 - Le paquet garde la fenêtre de la console du mode Poste (messages de démarrage, restauration proposée) ; la fermer
   arrête l'application, comme pour le ZIP.
 - Une identité de paquet changée dans Partner Center se recopie dans le manifeste ; une règle d'architecture la fige.
-- La fiche du Store, la politique de confidentialité et la soumission se font hors du dépôt (`REPRISE_PUBLICATION.md`).
+- La fiche du Store, la politique de confidentialité et la soumission se font hors du dépôt (procédure de publication du titulaire).

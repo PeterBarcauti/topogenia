@@ -4,7 +4,7 @@
 import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { i18next } from '../../../shared/i18n/i18n.ts';
-import { fitInWindow, menuPlacement } from '../../../shared/ui/menuPlacement.ts';
+import { fitInWindow, menuPlacement, menuUnder } from '../../../shared/ui/menuPlacement.ts';
 import { showEditor } from '../../../test/editor.tsx';
 import { callsTo, fakeApi } from '../../../test/fakeApi.ts';
 import { MAP_ID, replyOf, sampleMap } from '../../../test/maps.ts';
@@ -29,9 +29,9 @@ const node = (canvas: HTMLElement, id: string) => within(canvas).getByTestId(`rf
 describe('a context menu (B-2.4-01 to B-2.4-09)', () => {
   it('opens at the pointer, named, its first enabled entry focused; its entries show their choice, their red, their groups and their shortcuts', async () => {
     const { canvas } = await showEditor(sampleMap());
-    rightClick(node(canvas, 's2'), 300, 50);
+    rightClick(node(canvas, 's2'), 300, 20);
     const menu = screen.getByRole('menu', { name: 'Menu de l’étape' });
-    expect([menu.style.left, menu.style.top]).toEqual(['300px', '50px']);
+    expect([menu.style.left, menu.style.top]).toEqual(['300px', '20px']);
     expect(document.activeElement).toBe(within(menu).getByTestId('menu-step-step.sheet'));
     const task = within(menu).getByTestId('menu-step-step.type.task');
     expect([task.getAttribute('role'), task.getAttribute('aria-checked'), task.querySelector('.menu-check.is-on') !== null]).toEqual(['menuitemradio', 'true', true]);
@@ -103,6 +103,26 @@ describe('a context menu (B-2.4-01 to B-2.4-09)', () => {
       expect(notes).toEqual([['Code VIS-E002 copié', 'success']]);
     });
     expect(writeText).toHaveBeenCalledWith('VIS-E002');
+  });
+});
+
+describe('a menu of the header (lot 1 of the 3.4)', () => {
+  it('stays under its button, moved left only to stay in the window, and scrolls in the room left under the button', () => {
+    expect(menuUnder({ x: 120, y: 43 }, { width: 1000, height: 768 })).toEqual({ x: 120, y: 43, maxHeight: 717 });
+    expect(menuUnder({ x: 900, y: 43 }, { width: 1000, height: 400 })).toEqual({ x: 760, y: 43, maxHeight: 349 });
+  });
+});
+
+describe('the presentation from the menu of a step (ADR 097)', () => {
+  it('Present from this step starts the presentation at the step of the menu, not at the step chosen before the click', async () => {
+    const { canvas, editor } = await showEditor(sampleMap());
+    act(() => {
+      editor.store.setState({ selection: { steps: ['s3'], flows: [] } });
+    });
+    rightClick(node(canvas, 's2'), 300, 50);
+    await userEvent.click(screen.getByTestId('menu-step-present.from'));
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect([editor.presenter.getState().active, editor.presenter.getState().from]).toEqual([true, 's2']);
   });
 });
 

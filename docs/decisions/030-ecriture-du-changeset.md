@@ -110,7 +110,7 @@ interblocage SQL Server ; la vraie base occupée SQLite est dans `Sqlite/RealBus
 production), `ChunkTests`, `UnlockedWriteTests` (contrat des
 enregistrements sans version, deux moteurs : sans verrou, sous le verrou d'un autre projet, sous le verrou du
 projet) ; chaque exigence vérifiée par mutation
-(`docs/couverture-p3/unite-de-travail-chargeur.md`).
+(`docs/couverture-p3/unite-de-travail-chargeur.md` (non publié)).
 
 ## Révision du 24/10/2026, porte P3 round 4 (Sécurité m2)
 
@@ -119,4 +119,4 @@ modification versionnée d'un enregistrement d'un autre projet, sous le verrou d
 deux moteurs). C'est voulu par ce contrat : un enregistrement versionné est protégé par sa version (`CONFLIT_VERSION`),
 et la sérialisation de la spec 4.7 est l'affaire des gestionnaires de la phase 4, qui verrouillent le projet qu'ils
 modifient. Défense en profondeur possible (refuser toute écriture hors des projets verrouillés) : non retenue en phase 3,
-à réexaminer en P4 quand les gestionnaires existeront ; noté dans `docs/questions.md`.
+à réexaminer en P4 quand les gestionnaires existeront ; noté dans `docs/questions.md` (non publié).

@@ -20,7 +20,7 @@ public sealed partial class RightsMatrixTests
     /// lane of the sub-map, the codes of Before and After, the frame of a dissolution and a project in the trash when asked.
     /// </summary>
     private sealed record Targets(ApiProject Project, DetailedRow Row, Guid Flow, Guid OtherLane, Guid SubMapLane, (string Before, string After) Codes,
-        Guid? Frame, Guid? Trashed, Guid? Snapshot = null, Guid? TargetState = null)
+        Guid? Frame, Guid? Trashed, Guid? Snapshot = null, Guid? TargetState = null, Guid? PainPoint = null)
     {
         public Guid Lane => Project.FirstLaneId;
 
@@ -30,6 +30,9 @@ public sealed partial class RightsMatrixTests
 
         /// <summary>The use of the document of Macro by After.</summary>
         public string UseUrl => $"/api/steps/{Row.After}/uses/{Document}";
+
+        /// <summary>The status of the pain point that the use of the document by After raised on Macro (ADR 116).</summary>
+        public string PainPointStatusUrl => $"/api/steps/{Row.After}/pain-points/{PainPoint}/status";
     }
 
     /// <summary>
@@ -37,12 +40,14 @@ public sealed partial class RightsMatrixTests
     /// answer INTROUVABLE on an empty stack (ADR 042), which the table must not take for a refusal. <see cref="Version"/>
     /// reads, as the client would before writing, the version of the record that the route checks: it is sent in
     /// `If-Match` when the handler reads it. <see cref="NeedsUse"/> makes the use of <see cref="Targets.UseUrl"/> first,
+    /// <see cref="NeedsPainPoint"/> the same use with a pain point (<see cref="Targets.PainPoint"/>),
     /// <see cref="Sheet"/> the sheet of Before that the route needs (a draft to validate, a validated sheet to question, a
     /// sheet questioned whose question is changed or withdrawn).
     /// </summary>
     private sealed record Entry(string Name, string Method, Func<Targets, string> Url, Func<Targets, object?> Body, Right Right,
         bool NeedsFrame = false, bool NeedsTrash = false, int Stack = 0, Func<Targets, ApiClient, Task<int>>? Version = null, bool NeedsUse = false,
-        SheetState Sheet = SheetState.None, Func<Targets, Task>? Prepare = null, bool NeedsSnapshot = false, bool NeedsTarget = false);
+        SheetState Sheet = SheetState.None, Func<Targets, Task>? Prepare = null, bool NeedsSnapshot = false, bool NeedsTarget = false,
+        bool NeedsPainPoint = false);
 
     private enum SheetState
     {
@@ -59,6 +64,8 @@ public sealed partial class RightsMatrixTests
         new("PUT /api/me/last-project", "PUT", _ => "/api/me/last-project", t => new { project_id = t.Project.Id }, Right.Reader),
         new("GET /api/projects", "GET", _ => "/api/projects", _ => null, Right.Authenticated),
         new("POST /api/projects", "POST", _ => "/api/projects", _ => new { code = ApiProject.NewCode(), name = "Visites" }, Right.Admin),
+        // The code proposed from the name of a new project (3.4, lot 3, ADR 111 point 7): a read of the administrator, the name in the body.
+        new("POST /api/projects/code-proposal", "POST", _ => "/api/projects/code-proposal", _ => new { name = "Visites" }, Right.Admin),
         new("GET /api/projects/{id}", "GET", t => $"/api/projects/{t.Project.Id}", _ => null, Right.Reader),
         new("DELETE /api/projects/{id}", "DELETE", t => $"/api/projects/{t.Project.Id}?confirmation={t.Project.Code}", _ => null, Right.Facilitator,
             Version: (t, _) => ProjectVersionAsync(t.Project)),
@@ -82,6 +89,8 @@ public sealed partial class RightsMatrixTests
         new("PUT /api/projects/{id}/presentation-voices/{language}", "PUT", t => $"/api/projects/{t.Project.Id}/presentation-voices/fr",
             _ => new { name = "Hortense", local = true }, Right.Facilitator, Version: (t, caller) => VoiceVersionAsync(t, caller)),
         new("POST /api/projects/{id}/export", "POST", t => $"/api/projects/{t.Project.Id}/export", _ => new { without_people = true }, Right.Facilitator),
+        // The search of a word in the whole project (3.4, lot 2, ADR 110): a read of every member, the tools under the rights of the sheets.
+        new("POST /api/projects/{id}/search", "POST", t => $"/api/projects/{t.Project.Id}/search", _ => new { text = "commande", language = "en" }, Right.Reader),
         new("POST /api/projects/import/preview", "POST", _ => "/api/projects/import/preview?with_members=false", _ => TestPackages.Minimal("PKG"), Right.Admin),
         new("POST /api/projects/import", "POST", _ => $"/api/projects/import?with_members=false&code={ApiProject.NewCode()}", _ => TestPackages.Minimal("PKG"),
             Right.Admin),
@@ -91,6 +100,9 @@ public sealed partial class RightsMatrixTests
             Right.Facilitator, Version: (t, _) => ProjectVersionAsync(t.Project)),
         new("GET /api/projects/{id}/pmap", "GET", t => $"/api/projects/{t.Project.Id}/pmap?with_sheets=true", _ => null, Right.Reader),
         new("POST /api/projects/import-pmap", "POST", _ => "/api/projects/import-pmap", _ => new { content = TestPmaps.Minimal, code = ApiProject.NewCode() }, Right.Admin),
+        // The preview of a template collection (3.4, lot 6, ADR 114): a read of the administrator, the collection in the body.
+        new("POST /api/projects/import-collection/preview", "POST", _ => "/api/projects/import-collection/preview",
+            _ => new { content = TestPmaps.Collection(TestPmaps.Minimal) }, Right.Admin),
         new("POST /api/projects/{id}/duplicate", "POST", t => $"/api/projects/{t.Project.Id}/duplicate", _ => new { code = ApiProject.NewCode() }, Right.Admin),
         // The photos of the indicators and the target state (Makigami M6, M8, ADR 095).
         new("GET /api/projects/{id}/snapshots", "GET", t => $"/api/projects/{t.Project.Id}/snapshots", _ => null, Right.Reader),
@@ -148,11 +160,18 @@ public sealed partial class RightsMatrixTests
         new("POST /api/maps/{id}/assistant/preview", "POST", t => $"/api/maps/{t.Root}/assistant/preview", _ => Proposed, Right.Facilitator),
         new("POST /api/maps/{id}/assistant/apply", "POST", t => $"/api/maps/{t.Root}/assistant/apply", _ => Proposed, Right.Facilitator,
             Version: (t, caller) => PreviewVersionAsync(t, caller)),
+        // A .pmap file inserted as a detailed step (3.3, F-208, ADR 108): the facilitator's, as the opening of a file.
+        new("POST /api/maps/{id}/insert-pmap/preview", "POST", t => $"/api/maps/{t.Root}/insert-pmap/preview", _ => new { content = TestPmaps.Minimal },
+            Right.Facilitator),
+        new("POST /api/maps/{id}/insert-pmap", "POST", t => $"/api/maps/{t.Root}/insert-pmap",
+            t => new { content = TestPmaps.Minimal, lane_id = t.Lane, flow_id = t.Flow }, Right.Facilitator, Version: (t, caller) => InsertionVersionAsync(t, caller)),
         new("DELETE /api/maps/{id}", "DELETE", t => $"/api/maps/{t.Row.SubMap}", _ => null, Right.Facilitator, Version: (t, _) => MapVersionAsync(t, t.Row.SubMap)),
         new("GET /api/maps/{id}/history", "GET", t => $"/api/maps/{t.Root}/history", _ => null, Right.Reader),
         new("GET /api/maps/{id}/action-plan", "GET", t => $"/api/maps/{t.Root}/action-plan", _ => null, Right.Reader),
         new("GET /api/maps/{id}/presentation-comments", "GET", t => $"/api/maps/{t.Root}/presentation-comments", _ => null, Right.Reader),
         new("GET /api/maps/{id}/flow-presentation-comments", "GET", t => $"/api/maps/{t.Root}/flow-presentation-comments", _ => null, Right.Reader),
+        new("POST /api/maps/{id}/presentation-comments", "POST", t => $"/api/maps/{t.Root}/presentation-comments",
+            t => new { comments = new[] { new { step_id = t.Row.Before, text = "La commande part chez le fournisseur." } } }, Right.Facilitator),
         new("POST /api/maps/{id}/undo", "POST", t => $"/api/maps/{t.Root}/undo", _ => null, Right.Facilitator, Stack: 1),
         new("POST /api/maps/{id}/redo", "POST", t => $"/api/maps/{t.Root}/redo", _ => null, Right.Facilitator, Stack: 2),
         new("POST /api/maps/{id}/lanes", "POST", t => $"/api/maps/{t.Root}/lanes", _ => new { name = "Achats" }, Right.Facilitator),
@@ -195,6 +214,8 @@ public sealed partial class RightsMatrixTests
             Version: (t, _) => t.Project.StepVersionAsync(t.Row.Before)),
         new("POST /api/steps/{id}/insert", "POST", t => $"/api/steps/{t.Row.Before}/insert", _ => new { position = "after", label = "Contrôler" },
             Right.Facilitator),
+        new("POST /api/steps/{id}/replace-pmap", "POST", t => $"/api/steps/{t.Row.Macro}/replace-pmap", _ => new { content = TestPmaps.Minimal },
+            Right.Facilitator, Version: (t, caller) => InsertionVersionAsync(t, caller)),
         new("POST /api/steps/{id}/dissolve", "POST", t => $"/api/steps/{t.Row.Macro}/dissolve", _ => null, Right.Facilitator,
             Version: (t, _) => t.Row.MacroVersionAsync()),
         new("PUT /api/steps/{id}/translations", "PUT", t => $"/api/steps/{t.Row.Before}/translations", _ => new { translations = new { en = "Order" } },
@@ -225,6 +246,9 @@ public sealed partial class RightsMatrixTests
         new("GET /api/steps/{id}/documents/available", "GET", t => $"/api/steps/{t.Row.After}/documents/available", _ => null, Right.Reader),
         new("PUT /api/steps/{id}/uses/{documentId}", "PUT", t => t.UseUrl, _ => new { wait_hours = 1 }, Right.SheetFill, Version: (t, _) => UseVersionAsync(t)),
         new("DELETE /api/steps/{id}/uses/{documentId}", "DELETE", t => t.UseUrl, _ => null, Right.SheetFill, Version: (t, _) => UseVersionAsync(t), NeedsUse: true),
+        // The status of a pain point (3.4, lot 4b, ADR 116): the right to fill the sheet of the receiving step, If-Match on the pain point.
+        new("PUT /api/steps/{id}/pain-points/{painPointId}/status", "PUT", t => t.PainPointStatusUrl, _ => new { status = "implemented" }, Right.SheetFill,
+            Version: (t, _) => PainPointVersionAsync(t), NeedsPainPoint: true),
     ];
 
     private static readonly Entry[] DissolutionsAndFlows =
@@ -261,6 +285,10 @@ public sealed partial class RightsMatrixTests
     /// <summary>The structure version a preview of the proposal reads, which its application gives back (3.0, lot 3).</summary>
     private static async Task<int> PreviewVersionAsync(Targets targets, ApiClient caller) =>
         (await caller.PostAsync($"/api/maps/{targets.Root}/assistant/preview", Proposed)).Ok().GetProperty("structure_version").GetInt32();
+
+    /// <summary>The structure version the preview of an insertion reads, as the dialog sends it back (ADR 108).</summary>
+    private static async Task<int> InsertionVersionAsync(Targets targets, ApiClient caller) =>
+        (await caller.PostAsync($"/api/maps/{targets.Root}/insert-pmap/preview", new { content = TestPmaps.Minimal })).Ok().GetProperty("structure_version").GetInt32();
 
     private static async Task<int> AssistantVersionAsync(Targets targets)
     {
@@ -329,6 +357,11 @@ public sealed partial class RightsMatrixTests
     private static async Task<int> DocumentVersionAsync(Targets targets) =>
         (await SheetAsync(targets, targets.Row.Macro)).GetProperty("outputs").EnumerateArray().Select(output => output.GetProperty("document"))
             .Single(document => document.GetProperty("id").GetGuid() == targets.Document).GetProperty("version").GetInt32();
+
+    /// <summary>The version of the pain point raised by the use of the document by After, as the sheet of After shows it.</summary>
+    private static async Task<int> PainPointVersionAsync(Targets targets) =>
+        (await SheetAsync(targets, targets.Row.After)).GetProperty("pain_points").EnumerateArray()
+            .Single(point => point.GetProperty("id").GetGuid() == targets.PainPoint).GetProperty("version").GetInt32();
 
     /// <summary>The version of the use of the document by After, or <see cref="NoRecord"/> when After does not use it yet.</summary>
     private static async Task<int> UseVersionAsync(Targets targets)

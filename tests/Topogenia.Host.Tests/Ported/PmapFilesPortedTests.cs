@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Topogenia.Domain.Values;
-using Topogenia.Host.Composition;
 using Topogenia.Host.Tests.Infrastructure;
 using Topogenia.Host.Tests.Steps;
 using Topogenia.Persistence.Tests.Infrastructure;
@@ -307,19 +306,28 @@ public sealed partial class PmapFilesPortedTests(ApiHosts hosts) : IClassFixture
         return client;
     }
 
-    /// <summary>T-FICR-09: the RACI letters of an opening follow the setting `RaciLetters` (S refused in ACI, accepted in ASCI).</summary>
+    /// <summary>
+    /// T-FICR-09, revised by the owner of the project on 16/11/2026: an opening takes every letter of the RACI (A, S, C, I)
+    /// whatever the setting `RaciLetters`, which says what a person types, as the package does; a copy of a project that
+    /// holds an S opens again in ACI. Another letter is still refused.
+    /// </summary>
     [Theory]
     [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
-    public async Task The_raci_letters_of_an_opening_follow_the_setting(EngineKind kind)
+    public async Task An_opening_takes_every_letter_of_the_raci_whatever_the_setting(EngineKind kind)
     {
         var project = await ProjectAsync(kind);
         using var admin = project.Admin;
         var file = Repository("samples", "cloture-mensuelle.pmap").Replace("\"raci\": { \"nord\": \"C\" }", "\"raci\": { \"nord\": \"S\" }", StringComparison.Ordinal);
 
-        var refused = (await admin.PostAsync("/api/projects/import-pmap", new { content = file, code = ApiProject.NewCode() })).Refused(400, "FICHIER_INVALIDE");
+        var opened = (await admin.PostAsync("/api/projects/import-pmap", new { content = file, code = ApiProject.NewCode() })).Ok(201);
+        var copy = (await admin.GetAsync($"/api/projects/{opened.GetProperty("id").GetGuid()}/pmap")).Body;
+        var duplicated = await admin.PostAsync($"/api/projects/{opened.GetProperty("id").GetGuid()}/duplicate", new { code = ApiProject.NewCode() });
 
+        Assert.Contains("\": \"S\"", copy, StringComparison.Ordinal);
+        (await admin.PostAsync("/api/projects/import-pmap", new { content = copy, code = ApiProject.NewCode() })).Ok(201);
+        duplicated.Ok(201);
+        var unknown = file.Replace("\"nord\": \"S\"", "\"nord\": \"X\"", StringComparison.Ordinal);
+        var refused = (await admin.PostAsync("/api/projects/import-pmap", new { content = unknown, code = ApiProject.NewCode() })).Refused(400, "FICHIER_INVALIDE");
         Assert.Equal("PMAP_RACI_ROLE", refused.GetProperty("errors")[0].GetProperty("code").GetString());
-        await project.Host.WithServicesAsync(services => services.PostConfigure<ProductOptions>(options => options.RaciLetters = "ASCI"), Logins.Admin,
-            async configured => (await configured.PostAsync("/api/projects/import-pmap", new { content = file, code = ApiProject.NewCode() })).Ok(201));
     }
 }

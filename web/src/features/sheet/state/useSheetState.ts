@@ -67,15 +67,53 @@ function useLoading(props: SheetPanelProps, apply: (view: SheetView) => void, st
 }
 
 /**
+ * The writes of the documents in their order, and whether one is asked and not answered: a queue `pendingWrites` follows,
+ * told at each write asked and answered (ADR 115).
+ */
+function createDocumentQueue() {
+  let pending = 0;
+  let queue: Promise<unknown> = Promise.resolve();
+  const listeners = new Set<() => void>();
+  const changed = () => {
+    for (const listener of [...listeners]) listener();
+  };
+  return {
+    unsaved: () => pending > 0,
+    flush: () => queue.then(() => undefined),
+    subscribe(listener: () => void) {
+      const own = () => {
+        listener();
+      };
+      listeners.add(own);
+      return () => {
+        listeners.delete(own);
+      };
+    },
+    add<T>(write: () => Promise<T>): Promise<T> {
+      pending += 1;
+      changed();
+      const next = queue.then(write).finally(() => {
+        pending -= 1;
+        changed();
+      });
+      queue = next;
+      return next;
+    },
+  };
+}
+
+/**
  * The writes of the documents, one at a time (B-4-63): each leaves once the one before is answered (audit 3.1 V3, U1),
- * its sheet applied, the map read again; a refusal said. Busy while one is asked and not answered.
+ * its sheet applied, the map read again; a refusal said. Busy while one is asked and not answered; followed with the
+ * saving of the sheet, so that « Quit » and the action plan read again wait for them (ADR 112 point 5).
  */
 function useDocumentWrites(props: SheetPanelProps, apply: (view: SheetView) => void) {
   const [asked, setAsked] = useState(0);
-  const queue = useRef<Promise<unknown>>(Promise.resolve());
+  const [writes] = useState(createDocumentQueue);
+  useEffect(() => trackWrites(writes), [writes]);
   const run = (call: () => Promise<SheetView>): Promise<boolean> => {
     setAsked((count) => count + 1);
-    const write = queue.current.then(async () => {
+    return writes.add(async () => {
       try {
         apply(await call());
         props.onMapChanged();
@@ -87,8 +125,6 @@ function useDocumentWrites(props: SheetPanelProps, apply: (view: SheetView) => v
         setAsked((count) => count - 1);
       }
     });
-    queue.current = write;
-    return write;
   };
   return { busy: asked > 0, run };
 }
@@ -137,7 +173,15 @@ export function useSheetState(props: SheetPanelProps): SheetState {
     // closing sends it all the same (ADR 095, M5 point 1; audit 3.1 V3, U2).
     save.change(bodyOf(next), { hold: boundOutOfOrder(next) !== null });
   };
-  const value: SheetValue | null = view === null ? null
-    : { props, view, draft, edit, apply, save, runDocument: documents.run, documentBusy: documents.busy, received: () => received.current ?? view, nameOf };
+  // The sheet read only (the view in BPMN 2.0, ADR 106): what is drawn in it reads its rights from the sheet, so the sheet
+  // given to them has none, and no document of it reports a pain point; the writes of the panel keep the sheet as read
+  // (audit of the copy 64, P1-03).
+  const readOnly = props.readOnly === true;
+  const value: SheetValue | null = view === null ? null : {
+    props: readOnly ? { ...props, onReport: undefined } : props, view: readOnly ? { ...view, permissions: NO_RIGHT } : view,
+    draft, edit, apply, save, runDocument: documents.run, documentBusy: documents.busy, received: () => received.current ?? view, nameOf,
+  };
   return { value, mode, setMode };
 }
+
+const NO_RIGHT: Schema<'SheetPermissions'> = { fill: false, validate: false, request_clarification: false, assign: false };

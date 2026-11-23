@@ -42,9 +42,13 @@ describe('one place for each rule (annex B 8.1)', () => {
   it('the pattern and the filter of a project code are written once, for the four forms that take one (B-8.1-24)', () => {
     expect(where(/\[A-Z\]\{3,6\}/)).toEqual(['features/project/files/pmapText.ts 1']);
     expect(where(/\[\^A-Z\]/)).toEqual(['features/project/files/pmapText.ts 1']);
-    for (const form of ['features/project/NewProjectScreen.tsx', 'features/project/files/DuplicateDialog.tsx', 'features/project/files/OpenPmapDialog.tsx', 'features/project/package/ImportPackageDialog.tsx']) {
+    for (const form of ['features/project/files/DuplicateDialog.tsx', 'features/project/files/OpenPmapDialog.tsx', 'features/project/package/ImportPackageDialog.tsx']) {
       expect([form, /import \{ PROJECT_CODE, (headerOf, )?typedCode \}/.test(code(form))]).toEqual([form, true]);
     }
+    // The new project filters its code through the hook of the proposed code (lot 3 of the 3.4), which takes the filter from the same place.
+    expect(/import \{ PROJECT_CODE \} from '\.\/files\/pmapText\.ts'/.test(code('features/project/NewProjectScreen.tsx'))).toBe(true);
+    expect(/import \{ useCodeProposal \} from '\.\/useCodeProposal\.ts'/.test(code('features/project/NewProjectScreen.tsx'))).toBe(true);
+    expect(/import \{ typedCode \} from '\.\/files\/pmapText\.ts'/.test(code('features/project/useCodeProposal.ts'))).toBe(true);
   });
 
   it('a date is written in the language of the interface, its day by formatDate alone; no locale tag in the code (B-8.1-25)', () => {

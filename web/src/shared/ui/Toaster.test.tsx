@@ -53,6 +53,53 @@ describe('the store of the notifications', () => {
   });
 });
 
+describe('a notification with a key', () => {
+  it('replaces the one of the same key, in its place in the stack, and takes the text, the kind and the id of the new one', () => {
+    const store = createToastStore();
+    store.getState().notify('Avant');
+    const first = store.getState().notify('Export en cours…', 'info', undefined, 'export');
+    store.getState().notify('Après');
+    const second = store.getState().notify('Export terminé', 'success', undefined, 'export');
+    expect(second).not.toBe(first);
+    expect(store.getState().toasts.map((toast) => [toast.text, toast.kind])).toEqual([['Avant', 'info'], ['Export terminé', 'success'], ['Après', 'info']]);
+  });
+
+  it('gives the replacement its own delay: the delay of the one replaced no longer closes it', () => {
+    vi.useFakeTimers();
+    const store = createToastStore();
+    store.getState().notify('Export en cours…', 'info', undefined, 'export');
+    vi.advanceTimersByTime(3000);
+    store.getState().notify('Export terminé', 'success', undefined, 'export');
+    vi.advanceTimersByTime(3499);
+    expect(store.getState().toasts.map((toast) => toast.text)).toEqual(['Export terminé']);
+    vi.advanceTimersByTime(1);
+    expect(store.getState().toasts).toEqual([]);
+  });
+
+  it('leaves alone the notifications of another key and those without key', () => {
+    const store = createToastStore();
+    store.getState().notify('Un', 'info', undefined, 'export');
+    store.getState().notify('Deux');
+    store.getState().notify('Trois');
+    store.getState().notify('Quatre', 'info', undefined, 'other');
+    store.getState().notify('Cinq', 'info', undefined, 'export');
+    expect(store.getState().toasts.map((toast) => toast.text)).toEqual(['Cinq', 'Deux', 'Trois', 'Quatre']);
+  });
+
+  it('shows one notification at a time for a key, the screen showing the one that replaced', () => {
+    const store = createToastStore();
+    render(<Toaster store={store} />);
+    act(() => {
+      store.getState().notify('Export en cours…', 'info', undefined, 'export');
+    });
+    act(() => {
+      store.getState().notify('Export terminé', 'success', undefined, 'export');
+    });
+    expect(screen.queryByText('Export en cours…')).toBeNull();
+    expect(screen.getByText('Export terminé')).toBeTruthy();
+  });
+});
+
 describe('the stack shown (B-1.2-15, B-1.2-16, B-1.2-19)', () => {
   it('shows each notification with its state icon, an error as an alert, the others as a status', () => {
     const store = createToastStore();

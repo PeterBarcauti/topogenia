@@ -1,7 +1,7 @@
 // viewport.ts
 // The view hooked to the top of the map: bounded above, below, left and right, the zoom kept (annex B 2.2, AR-19).
 
-import { BOTTOM_MARGIN, INITIAL_VIEW, RIGHT_MARGIN, TOP_MARGIN } from './constants.ts';
+import { BOTTOM_MARGIN, INITIAL_VIEW, MIN_ZOOM, RIGHT_MARGIN, TOP_MARGIN } from './constants.ts';
 
 /** A view of the canvas: its shift in pixels of the screen and its zoom. */
 export interface View {
@@ -30,4 +30,18 @@ export function boundView(view: View, map: Extent, screen: Extent): View {
   const xMax = INITIAL_VIEW.x;
   const xMin = Math.min(xMax, screen.width - map.width * zoom - RIGHT_MARGIN);
   return { x: Math.min(xMax, Math.max(xMin, view.x)), y: Math.min(yMax, Math.max(yMin, view.y)), zoom };
+}
+
+/**
+ * The view that shows the whole map: the largest zoom that holds it between the headers and the right margin, the top
+ * margin and the bottom margin, never above 1 (the texts of the steps are made for 100 %) nor under the smallest zoom;
+ * from the start of the map. A map too large even at the smallest zoom shows its start. A screen not measured yet, or a
+ * map without size, gives the opening view.
+ */
+export function fitView(map: Extent, screen: Extent): View {
+  if (screen.width <= 0 || screen.height <= 0) return INITIAL_VIEW;
+  const across = map.width > 0 ? (screen.width - INITIAL_VIEW.x - RIGHT_MARGIN) / map.width : Infinity;
+  const down = map.height > 0 ? (screen.height - TOP_MARGIN - BOTTOM_MARGIN) / map.height : Infinity;
+  const zoom = Math.min(1, Math.max(MIN_ZOOM, Math.min(across, down)));
+  return { x: INITIAL_VIEW.x, y: TOP_MARGIN, zoom };
 }

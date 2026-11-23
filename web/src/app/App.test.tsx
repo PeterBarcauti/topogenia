@@ -81,8 +81,8 @@ describe('the header (B-1.2-07 to B-1.2-14)', () => {
     expect(within(header).getByText('Boostez vos processus avec l’IA')).toBeInTheDocument();
     expect(screen.getByTestId('header-user')).toHaveTextContent('CBCamille Bernard');
     expect(within(header).queryByRole('button', { name: /pour moi|for me/i })).not.toBeInTheDocument();
-    // Without a project open, no language of the process: the account alone, its menu holding the language of the interface (ADR 083).
-    expect(within(header).getAllByRole('button').map((button) => button.getAttribute('data-testid'))).toEqual(['header-user']);
+    // Without a project open, no language of the process: the Help menu (lot 1 of the 3.4) and the account, its menu holding the language of the interface (ADR 083).
+    expect(within(header).getAllByRole('button').map((button) => button.getAttribute('data-testid'))).toEqual(['header-help', 'header-user']);
   });
 
 });

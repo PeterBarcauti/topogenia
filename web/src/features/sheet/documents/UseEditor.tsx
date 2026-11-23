@@ -1,5 +1,5 @@
 // UseEditor.tsx
-// The use of a ticked input: its wait, its share usable as is (%C&A) and the pain point noted where it is suffered (always offered, F-118), raised on the producing step; sent on leaving a field, the fields open while the host answers (annex B 4).
+// The use of a ticked input: its wait, its share usable as is (%C&A) and the pain point noted where it is suffered (always offered, F-118), raised on the producing step, its status once the host holds it (ADR 116); sent on leaving a field, the fields open while the host answers (annex B 4).
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Flame } from 'lucide-react';
@@ -8,7 +8,8 @@ import type { Schema } from '../../../api/client.ts';
 import { Icon } from '../../../shared/ui/Icon.tsx';
 import { currentUse, bodyOfUse, entryOfUse, retyped, type UseEntry } from '../model/documents.ts';
 import { useSheet } from '../SheetContext.tsx';
-import { describeUse } from './documentWrites.ts';
+import { describeUse, setPainPointStatus } from './documentWrites.ts';
+import { PainPointStatusField } from './PainPointStatusField.tsx';
 
 /** Enter leaves the field, which sends the use (B-4-75). */
 const leaveOnEnter = (event: KeyboardEvent<HTMLElement>) => {
@@ -82,11 +83,12 @@ function ActionPlan({ name, field }: { name: string; field: ReturnType<typeof us
 
 export function UseEditor({ input, painPoint }: { input: Schema<'ProposedInput'>; painPoint: Schema<'PainPoint'> | null }) {
   const { t } = useTranslation();
+  const sheet = useSheet();
   const { entry, field } = useFields(input, painPoint);
   const name = input.document.name;
   // Asked from the outputs of the producer (F-118): the pain point of this document takes the caret as the sheet is
   // drawn; the panel forgets the request then, taken or not (R4-10).
-  const wanted = useSheet().props.painFocus === input.document.id;
+  const wanted = sheet.props.painFocus === input.document.id;
   const area = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (wanted) area.current?.focus();
@@ -120,6 +122,9 @@ export function UseEditor({ input, painPoint }: { input: Schema<'ProposedInput'>
               <input className="field-control" type="number" min={0} max={99999} step={0.5} aria-label={t('sheet.pain_point.lost_of', { name })} onKeyDown={leaveOnEnter} {...field('lost')} />
               {t('sheet.pain_point.lost_unit')}
             </label>
+            {painPoint !== null && (
+              <PainPointStatusField painPoint={painPoint} testId={`use-status-${painPoint.id}`} write={(status) => setPainPointStatus(sheet, painPoint.id, status)} />
+            )}
             <ActionPlan name={name} field={field} />
           </>
         )}

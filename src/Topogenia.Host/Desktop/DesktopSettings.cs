@@ -1,5 +1,5 @@
 // DesktopSettings.cs
-// The optional settings.json of the user in desktop mode (port, data file, language), laid over the configuration (spec 6.1).
+// The optional settings.json of the user in desktop mode (port, data file, language, links to the site), laid over the configuration (spec 6.1, ADR 111).
 
 using System.Globalization;
 using System.Text.Json;
@@ -35,7 +35,8 @@ public sealed class DesktopSettingsException : Exception
 
 /// <summary>
 /// `settings.json` in the folder of the product (spec 6.1): an optional JSON object with `Port` (0 to 65535), `DataFile`
-/// (a path, relative to the folder of the product) and `Language` (the default language of the interface). No
+/// (a path, relative to the folder of the product), `Language` (the default language of the interface) and `SiteLinks`
+/// (true or false: the links to the site, ADR 111). No
 /// configuration is needed to start; a file that is present must be right: an unknown property, a value of the wrong type
 /// or out of range stops the start with PARAMETRES_INVALIDES and the property, rather than being ignored (a misspelled
 /// property would otherwise be silently lost). The values are laid over the configuration of the host.
@@ -49,6 +50,7 @@ public static class DesktopSettings
         ["Port"] = $"{ProductOptions.Section}:Desktop:Port",
         ["DataFile"] = $"{ProductOptions.Section}:Desktop:DataFile",
         ["Language"] = $"{ProductOptions.Section}:Languages:Default",
+        ["SiteLinks"] = $"{ProductOptions.Section}:{nameof(ProductOptions.SiteLinks)}",
     };
 
     /// <summary>Lays the settings file of the desktop mode over the configuration; nothing in server mode or without the file.</summary>
@@ -89,6 +91,13 @@ public static class DesktopSettings
 
     private static string ValueOf(JsonProperty property)
     {
+        // The links to the site (ADR 111 point 3): true or false of JSON, nothing else (not the text "false", nor 0).
+        if (property.Name.Equals("SiteLinks", StringComparison.OrdinalIgnoreCase))
+        {
+            return property.Value.ValueKind is JsonValueKind.True or JsonValueKind.False
+                ? property.Value.GetBoolean().ToString(CultureInfo.InvariantCulture)
+                : throw new DesktopSettingsException(property.Name);
+        }
         if (property.Name.Equals("Port", StringComparison.OrdinalIgnoreCase))
         {
             return property.Value.ValueKind == JsonValueKind.Number && property.Value.TryGetInt32(out var port) && port is >= 0 and <= 65535

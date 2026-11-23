@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-P6-T09 (`plan.md`, phase 6) porte l'annexe B 2.14 (31 lignes « à faire »), B-0-04 (bibliothèques chargées à la demande),
+P6-T09 (`plan.md` (non publié), phase 6) porte l'annexe B 2.14 (31 lignes « à faire »), B-0-04 (bibliothèques chargées à la demande),
 les entrées d'export du menu Fichier que l'ADR 062 avait laissées (B-2.4-56 à B-2.4-58), le cadre jamais exporté
 (B-2.9-20, ADR 063), la jauge absente des exports (B-2.10-26), la marge des couloirs dessinée dans l'export (B-2.12-25),
 les exports non annulables (B-2.6-45), l'état « export en cours » (B-7-20), le module dédié (B-8.1-06, B-8.1-22,
@@ -113,12 +113,12 @@ servis mais jamais chargés ; leur retrait à la construction est inscrit au reg
   capture), `features/map/canvas/exportState.test.tsx`, `features/map/panels/fileMenu.test.tsx`, `app/EditorBar.test.tsx`
   (entrées du menu par rôle), `styles/map.test.ts` (règles `.is-exporting`), `features/translations/model/workbook.test.ts`
   (créateur du classeur des traductions).
-- Mutations sur une copie du web (`Travail/outils-p6-t09/mutate-t09.py`, journal `Travail/mutations-p6-t09.log`) : 132
+- Mutations sur une copie du web (outil et journal de travail, non publiés) : 132
   mutations, 128 tuées au premier passage, 4 après renfort des tests (la date et la classification finissent exactement
   sur la marge, largeur mesurée par jsPDF ; rôles d'une même lettre donnés hors de l'ordre des couloirs ; la capture
   attend au moins 50 ms après l'état d'export ; le classeur anglais nomme étapes et couloirs dans la langue affichée) :
   132 sur 132.
-- Vérification visuelle dans Chromium sans tête **sous la CSP de l'hôte** (`Travail/outils-p6-t09/capture-t09.mjs`) : les
+- Vérification visuelle dans Chromium sans tête **sous la CSP de l'hôte** (script de travail, non publié) : les
   trois exports lancés depuis le menu Fichier, fichiers enregistrés puis relus (PNG 6244 × 904, PDF A3 et son image
   6244 × 856, classeur à trois onglets) ; aucune violation de la politique ni erreur de console après la correction des
   polices (14 violations `base-uri` avant) ; sonde finale : `eval` refusé à un script de la page.

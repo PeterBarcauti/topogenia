@@ -28,6 +28,8 @@
   "REOUVERTE": "A doua pornire: browserul se deschide pe aplicație.",
   "ICONE_OUVRIR": "Deschidere {product}",
   "ICONE_QUITTER": "Ieșire din {product}",
+  "ICONE_QUITTER_ATTENTE": "O modificare din fișă nu este încă salvată. Închideți totuși?",
+  "ICONE_QUITTER_NON_VALIDE": "Un formular deschis nu este salvat: ce s-a introdus în el se va pierde. Închideți totuși?",
   "SAUVEGARDES_DOSSIER": "Copiile de rezervă se află în {folder}.",
   "RESTAURATION_PROPOSEE": "Copii de rezervă disponibile, de la cea mai recentă la cea mai veche. Modificările făcute după copia aleasă nu sunt incluse; fișierul actual și jurnalul lui vor fi păstrate alături, fără a fi șterse:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

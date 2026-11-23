@@ -178,4 +178,4 @@ comprise ; migration arrêtée avant chacune de ses instructions puis avant chac
 `ef_temp_*` laissée, contrôle « en retard », migration suivante `UpToDate`, schéma identique à un fichier migré d'un
 coup, chaque ligne présente, `integrity_check` et `foreign_key_check` vides) ; `Schema/MigrationDescentTests` (deux
 moteurs) ; `Sqlite/MigrationRollbackTests` (descente complète refusée par la carte détaillée : fichier en retard aussitôt,
-remigré, données intactes). Mutations : voir `docs/couverture-p3/r3-c.md`.
+remigré, données intactes). Mutations : voir `docs/couverture-p3/r3-c.md` (non publié).

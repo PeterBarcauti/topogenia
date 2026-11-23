@@ -398,3 +398,52 @@ test('lot J10: a presentation opens paused; the handoff between two steps takes 
   await page.keyboard.press('Escape');
   await expect(stage(page)).toHaveCount(0);
 });
+
+/** The lane names of the stage at the opening, with their box and its band (F-209); a masked name has no box. A name shortened by « … » is allowed: what counts is that its box stays in its band. */
+async function laneNames(page: Page): Promise<{ text: string; shown: boolean; top: number; bottom: number; band: { top: number; bottom: number }; lines: number }[]> {
+  return page.locator('.presenter-lane').evaluateAll((lanes) => lanes.map((lane) => {
+    const span = lane.querySelector('span') as HTMLElement;
+    const band = lane.getBoundingClientRect();
+    const box = span.getBoundingClientRect();
+    const lineHeight = Number.parseFloat(getComputedStyle(span).lineHeight);
+    return {
+      text: span.textContent, shown: getComputedStyle(span).display !== 'none', top: box.top, bottom: box.bottom, band: { top: band.top, bottom: band.bottom },
+      lines: Math.round(box.height / lineHeight),
+    };
+  }));
+}
+
+test('F-209: in a small window, each lane name fits in its band or is masked, and no two names overlap', async ({ page, api }) => {
+  await page.setViewportSize({ width: 1024, height: 576 });
+  const mapId = await imported(page, api);
+  await openMap(page, mapId);
+  await page.getByTestId('ribbon-present').click();
+  await expect(stage(page)).toBeVisible();
+  await page.waitForTimeout(1300);
+  const names = await laneNames(page);
+  expect(names.length).toBeGreaterThan(1);
+  const drawn = names.filter((name) => name.shown);
+  for (const name of drawn) {
+    expect(name.top, name.text).toBeGreaterThanOrEqual(name.band.top - 0.5);
+    expect(name.bottom, name.text).toBeLessThanOrEqual(name.band.bottom + 0.5);
+  }
+  for (const [index, name] of drawn.entries()) {
+    const next = drawn[index + 1];
+    if (next !== undefined) expect(name.bottom, `${name.text} / ${next.text}`).toBeLessThanOrEqual(next.top + 0.5);
+  }
+});
+
+test('F-209: in a large window, a long lane name keeps its two lines', async ({ page, api }) => {
+  await page.setViewportSize({ width: 1440, height: 810 });
+  const mapId = await imported(page, api);
+  await openMap(page, mapId);
+  await page.getByTestId('ribbon-present').click();
+  await expect(stage(page)).toBeVisible();
+  await page.waitForTimeout(1300);
+  const names = await laneNames(page);
+  const longest = names.reduce((most, name) => (name.text.length > most.text.length ? name : most));
+  expect(longest.shown, longest.text).toBe(true);
+  expect(longest.lines, longest.text).toBeGreaterThanOrEqual(2);
+  expect(longest.top, longest.text).toBeGreaterThanOrEqual(longest.band.top - 0.5);
+  expect(longest.bottom, longest.text).toBeLessThanOrEqual(longest.band.bottom + 0.5);
+});

@@ -1,11 +1,11 @@
 // quit.test.tsx
-// The command « Quit » of the desktop mode: the menu of the account in the header, the confirmation, the host asked to stop, the page left (spec 5.2, S-5.2-16).
+// The command « Quit » of the desktop mode: the menu of the account in the header, the confirmation, which says a form changed and not validated (R11), the host asked to stop, the page left (spec 5.2, S-5.2-16).
 
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Schema } from '../api/client.ts';
 import { PRODUCT_NAME, i18next } from '../shared/i18n/i18n.ts';
-import { trackWrites } from '../shared/state/pendingWrites.ts';
+import { trackUnsavedForm, trackWrites } from '../shared/state/pendingWrites.ts';
 import { toasts } from '../shared/ui/toasts.ts';
 import { callsTo, fakeApi, type FakeReply } from '../test/fakeApi.ts';
 import { fakeSource, profileOf } from '../test/profiles.ts';
@@ -108,5 +108,35 @@ describe('the command « Quit » (S-5.2-16)', () => {
     expect(callsTo(sent, 'POST', '/api/desktop/quit')).toEqual([]);
     expect(screen.queryByTestId('page-stopped')).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+});
+
+describe('the command « Quit » and a form not validated (R11)', () => {
+  it('a form changed and not validated: the confirmation says its typing is lost, Annuler first; « Quitter quand même » stops the host (R11)', async () => {
+    const sent = start({ desktop: true });
+    const release = trackUnsavedForm();
+    try {
+      let confirm = await askToQuit();
+      expect(confirm).toHaveTextContent('Un formulaire ouvert n’est pas enregistré : sa saisie sera perdue.');
+      expect(document.activeElement).toBe(within(confirm).getByRole('button', { name: 'Annuler' }));
+      expect(within(confirm).queryByRole('button', { name: 'Quitter' })).toBeNull();
+      await userEvent.click(within(confirm).getByRole('button', { name: 'Annuler' }));
+      expect(callsTo(sent, 'POST', '/api/desktop/quit')).toEqual([]);
+      confirm = await askToQuit();
+      await userEvent.click(within(confirm).getByRole('button', { name: 'Quitter quand même' }));
+      await screen.findByTestId('page-stopped');
+      expect(callsTo(sent, 'POST', '/api/desktop/quit')).toHaveLength(1);
+    } finally {
+      release();
+    }
+  });
+
+  it('the form validated or given up, the confirmation is the usual one again (R11)', async () => {
+    start({ desktop: true });
+    const release = trackUnsavedForm();
+    release();
+    const confirm = await askToQuit();
+    expect(confirm).not.toHaveTextContent('Un formulaire ouvert');
+    expect(within(confirm).getByRole('button', { name: 'Quitter' })).toBeInTheDocument();
   });
 });

@@ -52,12 +52,20 @@ export function nugetLicence(id, version) {
   return url ? `url: ${url}` : 'unknown';
 }
 
+/**
+ * The packages of the restore graph of a project, each with whether it ships something: an analyzer of the compiler
+ * alone (its files under analyzers/, no asset for the run) is a tool of the build, never in a package.
+ */
 function nugetPackages(project) {
   const assets = join(root, project, 'obj', 'project.assets.json');
   if (!existsSync(assets)) throw new Error(`Restore ${project} first (missing ${assets})`);
-  return Object.entries(JSON.parse(readFileSync(assets, 'utf8')).libraries)
+  const graph = JSON.parse(readFileSync(assets, 'utf8'));
+  const targets = Object.values(graph.targets).reduce((all, target) => ({ ...all, ...target }), {});
+  const runs = (key) => ['runtime', 'runtimeTargets', 'native', 'resource']
+    .some((kind) => Object.keys(targets[key]?.[kind] ?? {}).some((file) => !file.endsWith('_._')));
+  return Object.entries(graph.libraries)
     .filter(([key, value]) => value.type === 'package' && key.split('/')[0] !== CORE_PACKAGE)
-    .map(([key]) => key.split('/'));
+    .map(([key, value]) => [...key.split('/'), runs(key) || !(value.files ?? []).some((file) => file.startsWith('analyzers/'))]);
 }
 
 const nameOf = (path) => path.replace(/^.*node_modules\//, '');
@@ -71,12 +79,12 @@ function carriedBy(mapFile) {
     if (at < 0) return;
     const [scope, rest] = source.slice(at + 'node_modules/'.length).split('/');
     const id = scope.startsWith('@') ? `${scope}/${rest}` : scope;
-    // browserify carries a package.json as a module: `module.exports={...}`.
-    const licence = source.endsWith(`node_modules/${id}/package.json`)
-      ? JSON.parse(map.sourcesContent[index].replace(/^module\.exports\s*=\s*/, '').replace(/;?\s*$/, '')).license : undefined;
+    // browserify carries a package.json as a module: `module.exports={...}`; its version is the one carried (pre-audit 68, P2-06).
+    const manifest = source.endsWith(`node_modules/${id}/package.json`)
+      ? JSON.parse(map.sourcesContent[index].replace(/^module\.exports\s*=\s*/, '').replace(/;?\s*$/, '')) : undefined;
     const bundled = /\.min\.js$/.test(source) ? source.slice(source.lastIndexOf(`node_modules/${id}/`)) : null;
-    const known = carried.get(id) ?? { licence: undefined, bundled: false };
-    carried.set(id, { licence: licence ?? known.licence, bundled: known.bundled || bundled !== null });
+    const known = carried.get(id) ?? { licence: undefined, version: undefined, bundled: false };
+    carried.set(id, { licence: manifest?.license ?? known.licence, version: manifest?.version ?? known.version, bundled: known.bundled || bundled !== null });
   });
   return carried;
 }
@@ -86,9 +94,10 @@ export function components() {
   const nuget = new Map();
   for (const [list, usage] of [[SHIPPED, 'livré'], [TESTS, 'tests']]) {
     for (const project of list) {
-      for (const [id, version] of nugetPackages(project)) {
+      for (const [id, version, ships] of nugetPackages(project)) {
         const key = `${id}@${version}`;
-        if (!nuget.has(key) || usage === 'livré') nuget.set(key, { id, version, licence: nugetLicence(id, version), usage });
+        const used = usage === 'livré' && !ships ? 'développement' : usage;
+        if (!nuget.has(key) || used === 'livré') nuget.set(key, { id, version, licence: nugetLicence(id, version), usage: used });
       }
     }
   }
@@ -121,15 +130,15 @@ export function components() {
   };
 
   const carried = new Map();
-  const carry = (id, host, licence, through) => {
+  const carry = (id, host, licence, through, read) => {
     if (carried.has(id) || id === host.id) return;
     const known = byName.get(id)?.value.license ?? licence ?? RECORDED[id];
     if (known === undefined) throw new Error(`No licence for ${id}, carried in ${host.file}: record it in RECORDED`);
     const recorded = byName.get(id)?.value.license === undefined && licence === undefined;
     const part = PARTS[id];
     carried.set(id, {
-      id, licence: part ? `(${known} AND ${part})` : known, usage: 'livré', host: host.id,
-      version: `dans ${host.id} ${host.version}${through ? `, par ${through}` : ''}${recorded ? ', licence relevée' : ''}`,
+      id, licence: part ? `(${known} AND ${part})` : known, usage: 'livré', host: host.id, carriedVersion: read,
+      version: `dans ${host.id} ${host.version}${through ? `, par ${through}` : ''}${read ? `, version ${read}` : ''}${recorded ? ', licence relevée' : ''}`,
     });
   };
   for (const item of served) {
@@ -139,7 +148,7 @@ export function components() {
       // The packages of the interface installed (npm ci): without them, what a bundle carries is unknown, never left out.
       if (!existsSync(mapFile)) throw new Error(`${mapFile} is missing: install the packages of the interface (npm ci in web)`);
       const inside = carriedBy(mapFile);
-      for (const [id, { licence }] of inside) carry(id, host, licence, null);
+      for (const [id, { licence, version }] of inside) carry(id, host, licence, null, version);
       // A bundle inside the bundle, without a map of its own (jszip.min.js): it carries its dependencies of the lock.
       for (const [id, { bundled }] of inside) {
         if (!bundled || id === host.id) continue;

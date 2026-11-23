@@ -28,6 +28,8 @@
   "REOUVERTE": "İkinci kez başlatıldı: tarayıcı uygulamayı açıyor.",
   "ICONE_OUVRIR": "{product} uygulamasını aç",
   "ICONE_QUITTER": "{product} uygulamasından çık",
+  "ICONE_QUITTER_ATTENTE": "Karttaki bir giriş henüz kaydedilmedi. Yine de çıkılsın mı?",
+  "ICONE_QUITTER_NON_VALIDE": "Açık bir form kaydedilmedi: içine girilenler kaybolacak. Yine de çıkılsın mı?",
   "SAUVEGARDES_DOSSIER": "Yedeklerin bulunduğu klasör: {folder}.",
   "RESTAURATION_PROPOSEE": "Kullanılabilir yedekler, en yeniden en eskiye. Seçilen yedekten sonra yapılan değişiklikler yedekte yoktur; mevcut dosya ve günlüğü silinmeden yanında saklanacak:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

@@ -8,7 +8,10 @@ import { TableError, tableToPmap } from './tableImport.ts';
 import { csvRows, decodeCsv, workbookSheets } from './tableRead.ts';
 
 /** The extensions the dialog of the opening takes, the .pmap first. */
-export const OPENED_FILES = '.pmap,application/json,.xlsx,.csv,.mmd,.md,.svg';
+export const OPENED_FILES = '.pmap,.pmaps,application/json,.xlsx,.csv,.mmd,.md,.svg';
+
+/** The first bytes of a ZIP archive, which a package of exchange is: read as text, never the start of a .pmap (AR-154). */
+export const ZIP_SIGNATURE = 'PK\u0003\u0004';
 
 /** The name of a file without its extension: the name of the project proposed. */
 const baseOf = (name: string): string => name.replace(/\.[^.]+$/, '');

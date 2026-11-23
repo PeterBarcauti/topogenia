@@ -1,5 +1,5 @@
 // flowElements.ts
-// The map laid out, as React Flow draws it: lane backgrounds, the frame of a dissolution, steps with their four handles and their states, flows on their routed paths; with the value stream layer, the cartouches under the steps and the block under the lanes; with the layer « Analysis », the handoffs marked and the rest faded while a tile holds the focus (annex B 2.9, 3.1 to 3.4, spec 14.5, plan 3.1).
+// The map laid out, as React Flow draws it: lane backgrounds, the frame of a dissolution, steps with their four handles and their states, flows on their routed paths; with the value stream layer, the cartouches under the steps and the block under the lanes; with the layer « Analysis », the handoffs marked and the rest faded while a tile holds the focus; while a selection is copied as an image, the rest of the map left out (annex B 2.9, 3.1 to 3.4, spec 14.5, plan 3.1, ADR 109).
 
 import { Position, type Edge, type Node, type NodeHandle } from '@xyflow/react';
 import type { Schema } from '../../../api/client.ts';
@@ -112,6 +112,8 @@ export interface ElementStates {
   readonly showStream: boolean;
   /** An image of the map is being captured: the steps outside the frame are drawn as the others (B-2.14-11). */
   readonly exporting: boolean;
+  /** The steps of a selection whose image is being captured, null else: the rest of the map is left out of it (ADR 109). */
+  readonly captured: ReadonlySet<string> | null;
   /** The steps a preview of a proposal marks. */
   readonly marks: Readonly<Record<string, StepMark>>;
   /** The marks of the layer « Analysis », null while it is off (plan 3.1). */
@@ -123,8 +125,20 @@ export interface ElementStates {
 /** The display of a map that cannot be changed, nothing chosen: the elements as the lot 1 drew them. */
 export const VIEW_ONLY: ElementStates = {
   showCodes: true, canEdit: false, selection: { steps: [], flows: [] }, cut: new Set(), linkSource: null, editing: null, quickAdd: false, showRaci: false,
-  showStream: false, exporting: false, marks: {}, analysis: null, focus: null,
+  showStream: false, exporting: false, captured: null, marks: {}, analysis: null, focus: null,
 };
+
+/** The class of an element left out of the image of a selection, hidden while it is captured (ADR 109). */
+export const LEFT_OUT_CLASS = 'is-left-out';
+
+/** The class of a lane whose name, in the margin of the map, stays out of the image of a selection (ADR 109). */
+const NAME_LEFT_OUT_CLASS = 'is-name-left-out';
+
+/** The class of a node or a flow: left out while a selection is captured and it is not in it. */
+const leftOut = (states: ElementStates, kept: boolean): { className?: string } => (states.captured === null || kept ? {} : { className: LEFT_OUT_CLASS });
+
+/** The identifier of the node of the cartouche of a step under the value stream layer. */
+export const cardIdOf = (stepId: string): string => `card:${stepId}`;
 
 /** The one frame of a map (A-2.9: one open frame a map). */
 export const FRAME_NODE = 'dissolution-frame';
@@ -162,10 +176,11 @@ export const stepHandles = (): NodeHandle[] =>
  * The background of a lane: from the margin of the headers to the end of the map, behind everything; the pointer goes
  * through it, so that a rectangle of selection or a double click starts anywhere on the background (B-2.3-08, B-3.1-20).
  */
-function laneNode(band: LaneBand, mapWidth: number): LaneNode {
+function laneNode(band: LaneBand, mapWidth: number, states: ElementStates): LaneNode {
   return {
     id: `lane:${band.lane.id}`, type: 'lane', position: { x: -LANE_HEADER_WIDTH, y: band.top }, width: mapWidth + LANE_HEADER_WIDTH, height: band.height,
     zIndex: -1, draggable: false, selectable: false, connectable: false, focusable: false, style: { pointerEvents: 'none' }, data: { band },
+    ...(states.captured === null ? {} : { className: NAME_LEFT_OUT_CLASS }),
   };
 }
 
@@ -185,7 +200,7 @@ function stepNode(figure: StepFigure, states: ElementStates, ranks: { rank: numb
   const id = figure.step.id;
   return {
     id, type: 'step', position: { x: figure.box.x, y: figure.box.y }, width: STEP_WIDTH, height: STEP_HEIGHT, handles: stepHandles(),
-    selected: states.selection.steps.includes(id), draggable: states.canEdit, connectable: states.canEdit,
+    selected: states.selection.steps.includes(id), draggable: states.canEdit, connectable: states.canEdit, ...leftOut(states, states.captured?.has(id) === true),
     data: {
       figure: states.exporting && figure.outside ? { ...figure, outside: false } : figure, showCodes: states.showCodes, cut: states.cut.has(id), linkSource: states.linkSource === id, editing: states.editing === id, connectable: states.canEdit,
       quickAdd: states.quickAdd ? { above: ranks.rank > 0, below: ranks.rank < ranks.count - 1 } : null, showRaci: states.showRaci,
@@ -200,10 +215,11 @@ function stepNode(figure: StepFigure, states: ElementStates, ranks: { rank: numb
  * What the value stream layer hangs under a step: under the flows as the lanes, so that a flow that passes stays seen;
  * centred on the axis of the step, under the label of a gateway (spec 14.5). Its own cases take the pointer.
  */
-function cardNode(figure: StepFigure, stream: StreamFigure): CardNode {
+function cardNode(figure: StepFigure, stream: StreamFigure, states: ElementStates): CardNode {
   const height = stream.kind === 'card' ? STREAM_CARD.height : STREAM_LINE_HEIGHT;
   return {
-    id: `card:${figure.step.id}`, type: 'card', position: { x: figure.box.x + (STEP_WIDTH - STREAM_CARD.width) / 2, y: figure.box.y + STEP_HEIGHT + figure.streamTop },
+    ...leftOut(states, states.captured?.has(figure.step.id) === true),
+    id: cardIdOf(figure.step.id), type: 'card', position: { x: figure.box.x + (STEP_WIDTH - STREAM_CARD.width) / 2, y: figure.box.y + STEP_HEIGHT + figure.streamTop },
     width: STREAM_CARD.width, height, zIndex: -1, draggable: false, selectable: false, connectable: false, focusable: false, data: { figure: stream, code: figure.step.code },
   };
 }
@@ -223,13 +239,16 @@ function litSteps(layout: MapLayout, analysis: AnalysisMarks | null, focus: Anal
   return new Set([...flows.flatMap((flow) => [flow.route.sourceId, flow.route.targetId]), ...Object.keys(analysis.detailed)]);
 }
 
+/** A flow stays in the image of a selection when its two ends are chosen; its label goes with it. */
 function flowEdge(flow: MapLayout['flows'][number], states: ElementStates): FlowEdge {
   const handoff = states.analysis?.handoffs.get(flow.route.id) ?? null;
+  const kept = states.captured === null || (states.captured.has(flow.route.sourceId) && states.captured.has(flow.route.targetId));
   return {
     id: flow.route.id, source: flow.route.sourceId, target: flow.route.targetId, sourceHandle: flow.route.sourceSide, targetHandle: flow.route.targetSide,
-    type: flow.route.kind, markerEnd: handoff === null ? ARROW_MARKER : HANDOFF_MARKER, selected: states.selection.flows.includes(flow.route.id),
+    type: flow.route.kind, markerEnd: handoff === null ? ARROW_MARKER : HANDOFF_MARKER, selected: states.selection.flows.includes(flow.route.id), ...leftOut(states, kept),
     data: {
-      path: flow.route.path, label: flow.route.label, text: flow.text, untranslated: flow.untranslated, documents: flow.documents, share: flow.share, handoff,
+      // The label is drawn outside the flow, over the view: a flow left out draws none.
+      path: flow.route.path, label: kept ? flow.route.label : null, text: flow.text, untranslated: flow.untranslated, documents: flow.documents, share: flow.share, handoff,
       rankAt: handoff !== null && states.focus?.tile === 'handoffs' ? middleOf(flow.route.points) : null,
       faded: states.focus !== null && (handoff === null || states.focus.tile !== 'handoffs'),
     },
@@ -262,9 +281,9 @@ export function flowElements(layout: MapLayout, states: ElementStates = VIEW_ONL
   const rank = new Map(layout.lanes.map((band, index) => [band.lane.id, index]));
   const lit = litSteps(layout, states.analysis, states.focus);
   const nodes: MapNode[] = [
-    ...layout.lanes.map((band) => laneNode(band, layout.width)),
+    ...layout.lanes.map((band) => laneNode(band, layout.width, states)),
     ...(layout.frame === null ? [] : [frameNode(layout.frame)]),
-    ...layout.steps.flatMap((figure) => (figure.stream === null ? [] : [cardNode(figure, figure.stream)])),
+    ...layout.steps.flatMap((figure) => (figure.stream === null ? [] : [cardNode(figure, figure.stream, states)])),
     ...layout.steps.map((figure) => stepNode(figure, states, { rank: rank.get(figure.step.lane_id) ?? 0, count: layout.lanes.length }, lit)),
   ];
   return { nodes, edges: layout.flows.map((flow) => flowEdge(flow, states)) };

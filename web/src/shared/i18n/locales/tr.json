@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) durmadı. Yeniden deneyin veya konsol penceresini kapatın.",
     "quit_unsaved": "Karttaki bir giriş henüz kaydedilmedi: $t(app.name) açık kalıyor. Kart kaydedildikten sonra yeniden deneyin.",
     "stopped": "$t(app.name) durduruldu. Bu sekme kapatılabilir.",
-    "stopped_help": "Yeniden kullanmak için uygulamayı tekrar açın."
+    "stopped_help": "Yeniden kullanmak için uygulamayı tekrar açın.",
+    "help_menu": "Yardım menüsü",
+    "help_online": "Çevrimiçi yardım (İngilizce)",
+    "update_check": "Güncellemeleri denetle",
+    "update_check_help": "Web sitesinin sürümler sayfasını açar. Yüklü: {{date}} tarihli {{version}}.",
+    "update_check_store_help": "Güncellemeleri yükleyen Microsoft Store sayfasını açar.",
+    "quit_text_unsaved": "Açık bir form kaydedilmedi: içine girilenler kaybolacak.",
+    "quit_anyway": "Yine de çık"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Boşluk",
     "Enter": "Enter",
-    "ArrowUp": "Yukarı"
+    "ArrowUp": "Yukarı",
+    "ArrowLeft": "Sol",
+    "ArrowRight": "Sağ",
+    "ArrowDown": "Aşağı",
+    "Backspace": "Backspace",
+    "Wheel": "Tekerlek"
   },
   "errors": {
     "RESEAU": "$t(app.name) yanıt vermiyor. $t(app.name) uygulamasının hâlâ çalıştığını (sunucudaysa ağ bağlantısını) kontrol edin.",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Sunucudan beklenmeyen yanıt. Sayfayı yeniden yükleyin.",
     "ACCES_REFUSE": "Bu sayfa için yetkiniz yok.",
     "UNKNOWN": "Beklenmeyen bir hata oluştu.",
-    "RESUMES_A_JOUR": "Tüm haritaların güncel bir özeti var. Birini yeniden yazmak için haritayı açın ve başlığının yanındaki “i” simgesine tıklayın."
+    "RESUMES_A_JOUR": "Tüm haritaların güncel bir özeti var. Birini yeniden yazmak için haritayı açın ve başlığının yanındaki “i” simgesine tıklayın.",
+    "COLLECTION_TROP_DE_PROCESSUS": "Koleksiyonda çok fazla süreç var."
   },
   "home": {
     "eyebrow": "Süreçlerinizi yapay zekayla güçlendirmek için önce onları tanımlayın.",
@@ -79,7 +92,24 @@
     "sample_title": "Örnek proje",
     "sample_text": "Eksiksiz bir haritayı keşfetmek için önceden tanımlanmış, kurgusal bir proje: kulvarlar, kararlar, alt harita, kartlar, belgeler ve aksaklıklar. Her proje gibi silinebilir.",
     "sample_create": "Örnek projeyi oluştur",
-    "sample_created": "{{code}} örnek projesi oluşturuldu."
+    "sample_created": "{{code}} örnek projesi oluşturuldu.",
+    "filter": "Projeleri süz",
+    "filter_placeholder": "Kod veya ad",
+    "filter_count": "{{shown}} / {{total}}",
+    "filter_none": "Eşleşen proje yok.",
+    "update_line": "Bu sürüm {{date}} tarihlidir.",
+    "update_link": "Daha yeni bir sürüm olup olmadığına bak",
+    "update_close": "Hatırlatmayı kapat",
+    "button_start_help": "Bir başlangıç noktası seçin.",
+    "start_menu": "Proje başlat",
+    "start_sample": "Örnek proje",
+    "start_gallery": "Şablon galerisi",
+    "start_gallery_help": "Tarayıcıda açılır.",
+    "start_blank": "Boş harita…",
+    "new_project_help": "Boş bir haritayla, bir örnekle veya bir şablonla başlayın.",
+    "new_project_help_no_sample": "Boş bir haritayla veya bir şablonla başlayın.",
+    "new_project_help_no_gallery": "Boş bir haritayla veya bir örnekle başlayın.",
+    "new_project_help_blank": "Boş bir haritayla başlayın."
   },
   "roles": {
     "facilitator": "Kolaylaştırıcı",
@@ -112,7 +142,7 @@
     "properties": "Proje özellikleri…",
     "properties_title": "{{code}} projesinin özellikleri",
     "sharing_group": "Belge paylaşım grubu",
-    "sharing_group_help": "Paylaşılan bir girdi için kartlarda adı geçer (ör. Finans ekibi). Boşsa: “projenin paylaşım grubu”.",
+    "sharing_group_help": "Projenin belgelerini okuyabilen kişi grubunun adı. Bir kartta her belgenin “Gruba açık” kutusunda görünür. Boşsa: “projenin paylaşım grubu”.",
     "properties_read_only": "Bu özellikleri yalnızca projenin bir kolaylaştırıcısı değiştirebilir.",
     "properties_saved": "Proje özellikleri kaydedildi.",
     "language": "Süreç dili",
@@ -121,12 +151,14 @@
     "workday_hours": "İş günü (saat)",
     "workday_hours_help": "1 ile 24 saat arası, varsayılan 7: akış sürelerini iş gününe çevirir.",
     "fte_hours": "TZE başına aylık saat",
-    "fte_hours_help": "1 ile 744 saat arası, varsayılan 151,67: iş yükünü tam zaman eşdeğerine çevirir."
+    "fte_hours_help": "1 ile 744 saat arası, varsayılan 151,67: iş yükünü tam zaman eşdeğerine çevirir.",
+    "code_proposed": "Addan yola çıkılarak önerildi.",
+    "more_options": "Diğer seçenekler"
   },
   "files": {
     "open": "Dosya aç…",
     "open_title": "Dosya aç",
-    "open_help": "Dosya yeni bir proje olur: bir .pmap dosyası (indirilen kopya ya da bir taslağı okuyan bir yapay zekânın yanıtı), bir Excel ya da CSV tablosu, bir Mermaid diyagramı (.mmd, .md) veya düzenlenebilir kopyasıyla dışa aktarılmış bir SVG görseli.",
+    "open_help": "Dosya yeni bir proje olur: bir .pmap dosyası (indirilen kopya ya da bir taslağı okuyan bir yapay zekânın yanıtı), bir şablon koleksiyonu (.pmaps), bir Excel ya da CSV tablosu, bir Mermaid diyagramı (.mmd, .md) veya düzenlenebilir kopyasıyla dışa aktarılmış bir SVG görseli.",
     "choose": "Dosya seç…",
     "or_paste": "Ya da içeriğini buraya yapıştırın, örneğin bir yapay zekanın yanıtını:",
     "area": ".pmap dosyasının içeriğini buraya yapıştırın veya bırakın",
@@ -192,7 +224,52 @@
     "target_name": "{{name}} (hedef durum)",
     "target_label": "Referansın etiketi",
     "target_label_default": "Mevcut durum",
-    "target_button": "Oluştur"
+    "target_button": "Oluştur",
+    "map_download": "Açık haritayı kaydet (.pmap)",
+    "map_downloaded": "Harita ayrıntılı haritaları, kartları ve yorumlarıyla kaydedildi: .pmap dosyası İndirilenler klasöründe.",
+    "insert": "Dosyayı ayrıntılı adım olarak ekle…",
+    "insert_here": "Dosyayı buraya ekle…",
+    "insert_title": "Dosyayı ayrıntılı adım olarak ekle",
+    "insert_help": "Dosya bu haritanın yeni bir ayrıntılı adımı olur. Bu bir kopyadır: dosyayı sonradan değiştirmek haritayı değiştirmez. Bir .pmap dosyası, Excel veya CSV tablosu, Mermaid diyagramı ya da kopyasıyla bir SVG görüntüsü.",
+    "replace_title": "Ayrıntıyı bir dosyayla değiştir",
+    "replace_help": "“{{label}}” adımının ayrıntısı çöp kutusuna gider ve dosya onun yerini alır. Ctrl+Z hepsini geri alır.",
+    "insert_counts": "Adımlar: {{steps}} · Kulvarlar: {{lanes}} · Bağlantılar: {{flows}} · Haritalar: {{maps}} · Kartlar: {{sheets}}",
+    "insert_too_deep": "Bu dosyada {{depth}} harita düzeyi var; bu haritanın altında en fazla {{room}} olabilir.",
+    "insert_too_large": "Bu dosya {{max}} MB'ı aşıyor: eklenemez.",
+    "insert_package": "Bu bir değişim paketi: proje olarak içe aktarılır, eklenmez.",
+    "insert_dropped": "Dışarıda bırakılan çeviriler (burada yapılandırılmamış diller): {{languages}}",
+    "insert_label": "Adımın adı",
+    "insert_lane": "Kulvar",
+    "insert_after": "Şundan sonra yerleştir",
+    "insert_at_start": "Haritanın başına",
+    "insert_sheets": "Kartları da al",
+    "insert_sheets_help": "Kartlar, belgeleri ve sorun noktaları taslak olarak gelir; gözden geçirilip onaylanmalıdır.",
+    "insert_button": "Ekle",
+    "replace_button": "Değiştir",
+    "inserted": "Dosya eklendi. Adımlar: {{steps}} · Haritalar: {{maps}}",
+    "insert_on_flow": "Ok üzerine: {{from}} → {{to}}",
+    "insert_on_flow_here": "Bu okun üzerine dosya ekle…",
+    "collection_title": "“{{name}}” koleksiyonu",
+    "collection_help": "İşaretlenen her süreç için bir proje oluşturulur. “Projeleri oluştur”dan önce hiçbir şey yazılmaz.",
+    "collection_all": "Tümünü işaretle",
+    "collection_ticked": "İşaretlenen: {{count}} / {{total}}",
+    "collection_points": "Kontrol edilecek noktalar: {{count}}",
+    "collection_details": "Açıklama ve kontrol edilecek noktalar",
+    "collection_code_free": "{{code}} zaten kullanılıyor.",
+    "collection_invalid": "Açılamıyor:",
+    "collection_create": "Projeleri oluştur",
+    "collection_creating": "Oluşturuluyor {{done}} / {{total}}…",
+    "collection_done": "Projeler oluşturuldu",
+    "collection_created": "{{code}} oluşturuldu.",
+    "collection_failed": "Oluşturulmadı: {{reason}}",
+    "collection_retry": "Yeniden dene",
+    "collection_unnamed": "Süreç {{rank}}",
+    "insert_collection": "Bir koleksiyon “Dosya aç…” ile açılır. Şablonlarından birini tek başına ekleyin.",
+    "open_too_large": "Bu dosya {{max}} MB'ı aşıyor: açılamaz.",
+    "collection_none": "Hiçbir proje oluşturulmadı",
+    "collection_code_twice": "{{code}} başka bir satıra da verilmiş.",
+    "collection_fix": "Metni düzelt",
+    "remote_locations": "Kartlardaki ağ veya web adresleri: {{count}}, bir belgeyi açmadan önce kontrol edin."
   },
   "package": {
     "export": "Projeyi dışa aktar ({{extension}})…",
@@ -369,7 +446,13 @@
       "due": "Son tarih",
       "status": "Durum",
       "lost": "Ayda kaybedilen saat"
-    }
+    },
+    "copy_image": "Haritayı görüntü olarak kopyala",
+    "copying": "Görüntü kopyalanıyor…",
+    "copied": "Görüntü kopyalandı: bir e-postaya veya slayta yapıştırın (Ctrl+V).",
+    "copy_failed": "Görüntü kopyalanamadı.",
+    "copy_as_png": "PNG olarak dışa aktar",
+    "project_pdf": "Projeyi PDF olarak dışa aktar…"
   },
   "classification": {
     "internal": "Şirket içi",
@@ -498,7 +581,8 @@
     "breadcrumb": "Gezinti yolu",
     "file": "Dosya",
     "file_help": "Dosya aç, kopya indir, çoğalt, dışa aktar",
-    "members": "Üyeler"
+    "members": "Üyeler",
+    "fit": "Tümünü göster"
   },
   "ribbon": {
     "name": "Harita şeridi",
@@ -596,6 +680,27 @@
       "necessary": "Gerekli, katma değersiz",
       "waste": "İsraf",
       "none": "Sınıflandırılmamış"
+    },
+    "replace_detail": "Ayrıntıyı bir dosyayla değiştir…",
+    "copy_selection_image": "Seçimi görüntü olarak kopyala",
+    "file_cascade": {
+      "export": "Haritayı dışa aktar",
+      "project": "Proje",
+      "package": "Değişim paketi",
+      "assistant": "YZ asistanı"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 yatay)",
+      "png": "PNG resmi",
+      "svg": "SVG resmi…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Tüm projeyi PDF olarak…",
+      "import": "Paketi içe aktar…",
+      "replace": "Paketle değiştir…",
+      "report": "Anlatılan rapor (Markdown)",
+      "comments": "Sunum yorumları…"
     }
   },
   "deletion": {
@@ -646,7 +751,8 @@
       "retracer_liens": "okların otomatik güzergâhı",
       "inserer_rangees": "satır ekleme",
       "retirer_rangee": "satır kaldırma",
-      "proposition_ia": "yapay zeka önerisi"
+      "proposition_ia": "yapay zeka önerisi",
+      "inserer_fichier": "dosya ekleme"
     }
   },
   "command": {
@@ -769,9 +875,6 @@
     "duration_max": "En uzun süre",
     "duration_bounds_order": "En kısa ≤ süre ≤ en uzun",
     "minutes": "dakika",
-    "duration_between": "{{min}} ile {{max}} dakika arası",
-    "duration_at_least": "en az {{min}} dakika",
-    "duration_at_most": "en çok {{max}} dakika",
     "duration_value_one": "{{count}} dakika",
     "duration_value_other": "{{count}} dakika",
     "fold": "“{{section}}” bölümünü daralt",
@@ -832,6 +935,7 @@
     "clarification_withdrawn": "Soru kaldırıldı.",
     "read_empty": "Bu adım için henüz onaylanmış kart yok.",
     "read_validated": "{{date}} tarihinde {{name}} tarafından onaylanan sürüm.",
+    "read_draft": "Taslak sürüyor, henüz onaylanmadı.",
     "document": {
       "add_output": "Çıktı ekle",
       "new_output": "Yeni çıktı",
@@ -895,7 +999,8 @@
         "file": "Dosya",
         "software": "Yazılım",
         "other": "Diğer"
-      }
+      },
+      "edit_pain": "{{code}} adımında düzenle"
     },
     "pain_point": {
       "title": "Aksaklık",
@@ -924,7 +1029,21 @@
         "implemented": "uygulandı",
         "adopted": "benimsendi",
         "dropped": "vazgeçildi"
-      }
+      },
+      "status": "Durum",
+      "status_of": "{{code}} sorununun durumu",
+      "status_help": "Uygulandı, benimsendi veya vazgeçildi: sorun haritadan çıkar ve saatleri artık sayılmaz.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "sorun tespit edildi, eylem planlanacak",
+        "scored": "sorun değerlendirildi, eylem kararlaştırılacak",
+        "under_review": "eylem inceleniyor, henüz karar verilmedi",
+        "in_progress": "eylem uygulanıyor",
+        "implemented": "eylem tamamlandı, sonuç doğrulanacak",
+        "adopted": "doğrulandı, yeni çalışma biçimi bu",
+        "dropped": "ele almamaya karar verildi"
+      },
+      "status_now": "{{code}} sorununun durumu: {{status}}"
     },
     "lead_time": "Akış süresi",
     "lead_time_help": "Bir dosyanın adıma gelişinden adımdan çıkışına kadar geçen süre, beklemeler dahil; tamamlanma oranına sayılmaz.",
@@ -941,7 +1060,18 @@
       "minute": "dakika",
       "hour": "saat",
       "day": "iş günü"
-    }
+    },
+    "duration_between_one": "{{min}} ile {{max}} dakika arası",
+    "duration_between_other": "{{min}} ile {{max}} dakika arası",
+    "duration_at_least_one": "en az {{min}} dakika",
+    "duration_at_least_other": "en az {{min}} dakika",
+    "duration_at_most_one": "en çok {{max}} dakika",
+    "duration_at_most_other": "en çok {{max}} dakika",
+    "step_pain_points": "Adımın aksaklıkları",
+    "step_pain_points_help": "Adıma bağlı, belgesiz aksaklıklar. Açıklama ve plan yalnızca okunur.",
+    "pain_points_one": "{{count}} aksaklık",
+    "pain_points_other": "{{count}} aksaklık",
+    "step_pain_points_help_fill": "Adıma bağlı, belgesiz aksaklıklar. Durumları burada değiştirilir; açıklama ve plan yalnızca okunur."
   },
   "translations": {
     "title": "Projeyi çevir",
@@ -1188,6 +1318,12 @@
         },
         "summaries": {
           "title": "Özetler"
+        },
+        "comments": {
+          "title": "Sunum yorumları",
+          "text": "Sunumun adımlar ve devirler hakkında söyledikleri.",
+          "example": "Bu haritanın ve ayrıntılı haritalarının adımlarının ve devirlerinin yorumlarını yaz.",
+          "example_empty": "Bu haritanın ve ayrıntılı haritalarının adımlarının ve devirlerinin yorumlarını yaz."
         }
       },
       "thread": "Asistanla yazışmalar",
@@ -1245,7 +1381,8 @@
         "findings": "Analiz",
         "report": "Rapor",
         "summaries": "Özetler",
-        "proposal": "Öneri"
+        "proposal": "Öneri",
+        "comments": "Sunum yorumları"
       },
       "pasted": "Yapıştırılan yanıt",
       "copy_reply": "Yanıtı kopyala",
@@ -1401,7 +1538,19 @@
     "resource": "Azure kaynağı",
     "resource_help": "Kaynağın adı: contoso.openai.azure.com için contoso.",
     "port": "Bağlantı noktası",
-    "port_help": "Boş: varsayılan bağlantı noktası (Ollama 11434, LM Studio 1234)."
+    "port_help": "Boş: varsayılan bağlantı noktası (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Bu haritada ve ayrıntılı haritalarında yorumu olmayan adımların ve devirlerin sunum yorumlarını yaz.",
+      "menu": "Sunum yorumlarını yaz (YZ)…",
+      "intro": "Her yorumu yeniden okuyun: saklayın, düzeltin ya da bırakın. Sunum sırasında söylenecek.",
+      "flow": "Devir {{labels}}",
+      "map": "Harita: {{name}}",
+      "current": "Geçerli yorum: {{text}}",
+      "typed": "Elle yazılmış bir yorumun yerine geçer: {{text}}",
+      "save": "Saklanan yorumları kaydet ({{n}})",
+      "saved": "Kaydedilen yorumlar: {{n}}",
+      "done": "Kaydedilen sunum yorumları: {{n}}"
+    }
   },
   "interface_language": {
     "help": "Menülerin ve mesajların dili, yalnızca sizin için. Haritaların görüntülendiği dil, bir proje açıkken pencerenin üst kısmından seçilir."
@@ -1856,5 +2005,174 @@
       "closing_lost": "Kaybedilen süre: ayda {{lost}}.",
       "arrow": "ardından"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "BPMN 2.0 olarak dışa aktar (.bpmn)…",
+    "export_title": "BPMN 2.0 olarak dışa aktar",
+    "export_help": ".bpmn dosyası BPMN modelleme araçlarında açılır (Camunda, Signavio, Bizagi…). Belgelerin konumu olmadan her adımın tüm kartını taşır.",
+    "export_button": "Dışa aktar",
+    "export_subprocesses": "Ayrıntılı alt süreçleri dahil et",
+    "export_subprocesses_help": "Her ayrıntılı adım araçta bir alt süreç olarak açılır.",
+    "export_subprocesses_none": "Haritada ayrıntılı adım yok.",
+    "export_details": "Belgeleri ve sorun noktalarını çiz",
+    "export_details_help": "İşaretlenmezse dosyanın belgelerinde yazılı kalırlar.",
+    "toolbar": "BPMN 2.0 görünümü",
+    "badge": "BPMN 2.0 diyagramı · salt okunur",
+    "details": "Diyagramda ayrıntılar",
+    "export": "Dışa aktar (.bpmn)…",
+    "close": "Haritaya dön",
+    "close_help": "Haritaya dön (Alt+B)",
+    "failed": "Diyagram okunamadı.",
+    "loading": "Diyagram okunuyor…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Başlangıç olayı",
+      "endEvent": "Bitiş olayı",
+      "intermediateCatchEvent": "Bekleme",
+      "manualTask": "Manuel görev",
+      "userTask": "Kullanıcı görevi",
+      "serviceTask": "Otomatik görev",
+      "subProcess": "Alt süreç",
+      "exclusiveGateway": "Özel geçit",
+      "parallelGateway": "Paralel geçit",
+      "inclusiveGateway": "Kapsayıcı geçit"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "“{{text}}”",
+      "map": "Harita: {{name}}",
+      "classification": "Sınıflandırma: {{value}}",
+      "language": "Dil: {{language}}",
+      "work_time": "İş günü: {{workday}} sa; aylık bir TZE saati: {{fte}} sa",
+      "description": "Açıklama",
+      "wait": "{{hours}} sa bekleme",
+      "from": "{{code}} adımından",
+      "volume": "Gelen hacim: {{period}} başına {{quantity}}",
+      "periods": {
+        "day": "iş günü",
+        "week": "hafta",
+        "month": "ay",
+        "year": "yıl"
+      },
+      "lane_system": "Kendi başına çalışan bir yazılımın kulvarı",
+      "headcount": "Personel sayısı: {{number}}"
+    },
+    "fit": "Tümünü göster",
+    "fit_help": "Diyagramın tamamını pencerede göster"
+  },
+  "shortcuts": {
+    "title": "Klavye kısayolları",
+    "sections": {
+      "move": "Gezinme",
+      "choose": "Seçme",
+      "edit": "Haritayı değiştirme",
+      "display": "Görüntüleme",
+      "present": "Sunum yap",
+      "help": "Yardım"
+    },
+    "edit_note": "Proje kolaylaştırıcısına ayrılmıştır.",
+    "or": "veya",
+    "move_selection": "Seçimi taşı",
+    "escape": "Menüyü, paneli veya kartı kapat; «Bağla» işlemini durdur",
+    "space_held": "Tuş basılı tutulduğu sürece El aracı",
+    "enter": "Seçili adımın kartını aç",
+    "type": "Seçili adımın adını yazmaya başla",
+    "menu_key": "Seçili nesnenin menüsü",
+    "wheel": "Kaydır; Shift ile yatay",
+    "zoom": "Yakınlaştır",
+    "saved": "Her şeyin kaydedildiğini hatırlat",
+    "alone_note": "Tek bir adım seçili değilken (aksi halde tuş adını yazmaya başlar)",
+    "type_key": "bir harf",
+    "search_keys": "Aramada: sonraki; Shift ile önceki; Esc kapatır"
+  },
+  "search": {
+    "command_help": "Projede ara",
+    "title": "Ara",
+    "field": "Aranacak sözcük",
+    "placeholder": "Adım, belge, araç…",
+    "previous": "Önceki (Shift+Enter)",
+    "next": "Sonraki (Enter)",
+    "position": "{{index}} / {{count}}",
+    "searching": "Aranıyor…",
+    "none": "Sonuç yok.",
+    "too_many": "{{total}} sonuçtan ilk {{shown}} tanesi: aramayı daraltın.",
+    "short": "En az iki karakter veya Enter.",
+    "this_map": "Bu harita",
+    "level": "Seviye {{level}}",
+    "origin": "Özgün dil: {{language}}",
+    "kinds": {
+      "step": "Adım",
+      "lane": "Kulvar",
+      "document": "Belge",
+      "tool": "Araç",
+      "pain_point": "Aksaklık",
+      "action": "Eylem"
+    },
+    "results_one": "{{count}} sonuç",
+    "results_other": "{{count}} sonuç"
+  },
+  "action_plan": {
+    "command": "Eylem planı",
+    "title": "Eylem planı",
+    "total": "Açık aksaklıklarda ayda {{hours}} sa kayıp",
+    "late_count": "Gecikmiş: {{count}}",
+    "count": "Gösterilen aksaklıklar: {{shown}} / {{total}}",
+    "sort": "Sıralama ölçütü",
+    "sorts": {
+      "project": "Projenin sırası",
+      "lost": "Kaybedilen saat",
+      "due": "Son tarih"
+    },
+    "filters": "Filtreler",
+    "filter_open": "Açık",
+    "filter_late": "Gecikmiş",
+    "filter_no_action": "Eylemsiz",
+    "late": "Gecikmiş",
+    "no_action": "Karara bağlanmış eylem yok",
+    "map": "Harita: {{name}}",
+    "lane": "Kulvar: {{name}}",
+    "go_to": "{{code}} öğesine git",
+    "edit": "Planı düzenle",
+    "edit_of": "{{code}} planını düzenle",
+    "loading": "Plan yükleniyor…",
+    "empty": "Bu projede aksaklık yok.",
+    "none": "Filtrelere uyan aksaklık yok.",
+    "status_since": "{{date}} tarihinden beri {{status}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Geri al",
+    "undo_of": "Geri al: {{code}} sorununu “{{status}}” durumuna döndür"
+  },
+  "project_pdf": {
+    "sheet_state": "Kart durumu: {{state}}",
+    "continued": "{{title}} (devam)",
+    "file": "proje",
+    "contents": "İçindekiler",
+    "page": "Sayfa {{page}} / {{total}}",
+    "scope_line": "“{{name}}” haritası ve seviyeleri",
+    "empty_map": "Adımsız harita.",
+    "depth_cut": "{{max}} seviyeden sonraki haritalar bu belgede yer almaz.",
+    "sheets_of": "Kartlar · {{map}}",
+    "reading": "Haritalar okunuyor: {{count}}",
+    "reading_sheets": "Kartlar okunuyor…",
+    "drawing": "Harita {{index}} / {{total}}",
+    "writing": "Belge yazılıyor: sayfa {{page}}",
+    "too_many_maps": "{{max}} haritadan fazla: “{{scope}}” seçeneğini belirleyin.",
+    "too_many_pages": "{{max}} sayfadan fazla: kartların işaretini kaldırın veya ayrıntılı bir haritayı ve seviyelerini dışa aktarın.",
+    "cancelled": "Dışa aktarma iptal edildi.",
+    "title": "Projeyi PDF olarak dışa aktar",
+    "help": "Tüm haritalar tek dosyada, seviye seviye, uygulamaya sahip olmayanlar için.",
+    "scope": "Kapsam",
+    "scope_project": "Tüm proje",
+    "scope_branch": "Bu harita ve seviyeleri",
+    "with_sheets": "Kartlarla birlikte",
+    "with_raci": "RACI matrisiyle birlikte",
+    "with_stream": "Değer akışıyla birlikte",
+    "with_plan": "Eylem planıyla birlikte",
+    "sheets_help": "Kartlar sizin gördüğünüz kartlardır: belgeyi yalnızca bunları okuyabilecek kişilere gönderin.",
+    "button": "PDF oluştur",
+    "progress": "İlerleme",
+    "too_many_maps_below": "{{max}} haritadan fazla: daha alt seviyedeki ayrıntılı bir haritayı açın, ardından “{{scope}}” seçeneğini belirleyin.",
+    "too_many_pages_top": "{{max}} sayfadan fazla: kartların işaretini kaldırın."
   }
 }

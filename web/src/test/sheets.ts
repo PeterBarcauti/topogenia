@@ -46,7 +46,7 @@ export const inputOf = (document: Document, overrides: Partial<Schema<'ProposedI
 export const sheetViewOf = (overrides: Partial<SheetView> = {}): SheetView => ({
   step_id: 's2', status: 'empty', completeness: 0, content: contentOf(), is_draft: true, validated: null, clarification_request: null, responsible: null,
   permissions: { fill: true, validate: true, request_clarification: false, assign: false }, suggestions: { frequency: null, tools: [] }, inputs: [],
-  outputs: [], pain_points: [], updated_at: null, updated_by: null, version: null, ...overrides,
+  outputs: [], pain_points: [], step_pain_points: [], updated_at: null, updated_by: null, version: null, ...overrides,
 });
 
 export const memberOf = (userId: string, name: string, role: Schema<'MemberRole'> = 'contributor'): Schema<'MemberView'> => ({

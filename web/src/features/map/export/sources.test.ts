@@ -29,7 +29,7 @@ describe('the libraries of the exports (B-0-04)', () => {
     expect(LIBRARIES.map(loading)).toEqual([
       ['features/map/export/workbook.ts', 'features/project/files/tableRead.ts', 'features/translations/model/workbook.ts', 'features/translations/model/workbookReader.ts'],
       // The poster for a wall loads jsPDF as the PDF of the map does (Makigami M9).
-      ['features/map/export/pdf.ts', 'features/map/export/wallPdf.ts'], ['features/map/export/capture.ts'],
+      ['features/map/export/pdf.ts', 'features/map/export/project/projectPdf.ts', 'features/map/export/wallPdf.ts'], ['features/map/export/capture.ts'],
     ]);
   });
 
@@ -44,7 +44,7 @@ describe('the type of the translator (B-8.1-26)', () => {
     expect(files.filter(({ text }) => /type Translate\s*=/.test(text)).map(({ path }) => path)).toEqual(['shared/i18n/i18n.ts']);
     // The files that name the type in their code, its word in a comment aside.
     const users = files.filter(({ path, text }) => path !== 'shared/i18n/i18n.ts' && /^(?!\s*(\/\/|\*)).*\bTranslate\b/m.test(text));
-    expect(users.map(({ path }) => path).sort()).toEqual(['features/map/export/actionPlanSheet.ts', 'features/map/export/markdown.ts', 'features/map/export/report.ts', 'features/map/export/streamPdf.ts', 'features/map/export/streamSheets.ts', 'features/map/export/svgSteps.ts', 'features/map/export/workbook.ts', 'features/map/model/valueStream.ts', 'features/map/presenter/model/documentVoice.ts', 'features/map/presenter/model/script.ts', 'features/map/presenter/model/voice.ts', 'features/map/presenter/usePresentation.ts', 'features/map/state/actions/exports.ts', 'features/project/files/fileConversion.ts', 'features/project/files/mermaidImport.ts', 'features/project/files/tableImport.ts', 'features/translations/model/workbook.ts', 'features/translations/useWorkbook.ts']);
+    expect(users.map(({ path }) => path).sort()).toEqual(['features/map/bpmn/bpmnSource.ts', 'features/map/bpmn/export/exportBpmn.ts', 'features/map/bpmn/model/bpmnDocumentation.ts', 'features/map/bpmn/model/bpmnMapping.ts', 'features/map/export/actionPlanSheet.ts', 'features/map/export/markdown.ts', 'features/map/export/report.ts', 'features/map/export/streamPdf.ts', 'features/map/export/streamSheets.ts', 'features/map/export/svgSteps.ts', 'features/map/export/workbook.ts', 'features/map/model/valueStream.ts', 'features/map/panels/insertPmapForm.ts', 'features/map/plan/actionPlan.ts', 'features/map/presenter/model/documentVoice.ts', 'features/map/presenter/model/script.ts', 'features/map/presenter/model/voice.ts', 'features/map/presenter/usePresentation.ts', 'features/map/state/actions/exports.ts', 'features/map/state/shownTexts.ts', 'features/project/files/fileConversion.ts', 'features/project/files/mermaidImport.ts', 'features/project/files/tableImport.ts', 'features/translations/model/workbook.ts', 'features/translations/useWorkbook.ts']);
     expect(users.filter(({ text }) => !/import [^;]*\bTranslate\b[^;]*from '(\.\.\/)+shared\/i18n\/i18n\.ts'/.test(text)).map(({ path }) => path)).toEqual([]);
   });
 });

@@ -274,7 +274,7 @@ Vérification : `tests/Topogenia.Persistence.Tests/Sqlite/HandCopyTests.cs` (sep
 correction : fermeture qui réécrivait le journal, journal étranger rejoué, fichier abîmé accepté), `RestoreSourceTests`
 (identité, formes de chemin, lecture seule, copie en WAL), `RestoreTests` (inchangés, la fermeture propre par
 `CloseAsync`). Le redémarrage de l'application est un nouveau processus : les tests le figurent par
-`SqliteDataFileGuard.Forget`. Mutations : voir `docs/couverture-p3/r3-c.md`.
+`SqliteDataFileGuard.Forget`. Mutations : voir `docs/couverture-p3/r3-c.md` (non publié).
 
 ## Révision du 24/10/2026, porte P3 round 4 (données B1) : la fermeture d'une connexion n'échoue jamais
 

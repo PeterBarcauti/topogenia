@@ -26,7 +26,7 @@ Confirmé par le porteur du projet le 22/10/2026 (spec Q1).
 ## Conséquences
 
 - Les tests 1.x sont portés par intention et renommés en anglais (spec 11).
-- La table de correspondance des routes 1.x → 2.0 est tenue dans `docs/couverture.md`.
+- La table de correspondance des routes 1.x → 2.0 est tenue dans `docs/couverture.md` (non publié).
 
 ## Vérification
 

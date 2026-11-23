@@ -24,14 +24,19 @@ export interface SheetProject {
   readonly sharingGroupLabel: string | null;
 }
 
-/** The sections that fold, in the order of the sheet (AR-91, essai J10): the key facts, the inputs, the procedure, the outputs, the tools. */
-export type SheetSection = 'facts' | 'inputs' | 'procedure' | 'outputs' | 'tools';
+/**
+ * The sections that fold, in the order of the sheet (AR-91, essai J10): the key facts, the inputs, the procedure, the
+ * outputs, the pain points of the step without a document (R10, drawn only when there is one), the tools.
+ */
+export type SheetSection = 'facts' | 'inputs' | 'procedure' | 'outputs' | 'pain_points' | 'tools';
 
 /** The sections in the order they are drawn. */
-export const SHEET_SECTIONS: readonly SheetSection[] = ['facts', 'inputs', 'procedure', 'outputs', 'tools'];
+export const SHEET_SECTIONS: readonly SheetSection[] = ['facts', 'inputs', 'procedure', 'outputs', 'pain_points', 'tools'];
 
 export interface SheetPanelProps {
   readonly step: SheetStep;
+  /** The sheet read only whatever the rights of the person: the view in BPMN 2.0 changes nothing (ADR 106). */
+  readonly readOnly?: boolean;
   /** Null while it is read, or when it could not be. */
   readonly project: SheetProject | null;
   /** The code of a step of the map, null for a step the map does not show. */

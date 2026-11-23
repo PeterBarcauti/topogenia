@@ -1,12 +1,12 @@
 // usePresentation.ts
 // The presentation of the map shown (ADR 097): the map laid out in the language shown, its tour from the step chosen, its scenes and what each says in that language (the comments of presentation of its steps included, ADR 099; nothing for the steps, or for the ways between them, while the presenter turned their messages off, lot J10), their times, the traces of the flows.
 
-import i18next from 'i18next';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
 import type { Schema } from '../../../api/client.ts';
-import { loadLanguage, type Translate } from '../../../shared/i18n/i18n.ts';
+import type { Translate } from '../../../shared/i18n/i18n.ts';
+import { useShownTexts } from '../state/shownTexts.ts';
 import { useTextMeasure } from '../canvas/useTextMeasure.ts';
 import type { LaneRows } from '../model/gridShape.ts';
 import { layoutMap, type MapLayout } from '../model/mapLayout.ts';
@@ -37,22 +37,6 @@ function namesOf(layout: MapLayout): Names {
   const lanes = new Map(layout.lanes.map((band) => [band.lane.id, { name: band.name, tint: band.tint }]));
   const flows = new Map(layout.flows.map((flow) => [flow.route.id, { text: flow.text, documents: flow.documents }]));
   return { step: (id) => steps.get(id) ?? null, lane: (id) => lanes.get(id) ?? null, flow: (id) => flows.get(id) ?? null };
-}
-
-/** The texts of the language shown, read when it is first shown; those of the interface until then, or if it cannot be read. */
-function useShownTexts(language: string): Translate {
-  const { i18n } = useTranslation();
-  const [ready, setReady] = useState<string | null>(null);
-  useEffect(() => {
-    let live = true;
-    loadLanguage(language).then(() => {
-      if (live) setReady(language);
-    }, () => undefined);
-    return () => {
-      live = false;
-    };
-  }, [language]);
-  return useMemo(() => i18next.getFixedT(ready ?? i18n.language), [ready, i18n.language]);
 }
 
 /** No rows kept for a lane: a detail dived into (F-120). */

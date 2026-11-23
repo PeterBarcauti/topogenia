@@ -1,8 +1,9 @@
 // ClarificationRequest.tsx
-// The facilitator asks the author a clarification on a validated sheet: a question of 1000 characters at most, then the sheet goes « à revoir » (annex B 4).
+// The facilitator asks the author a clarification on a validated sheet: a question of 1000 characters at most, then the sheet goes « à revoir » (annex B 4); a question typed and not sent is followed for « Quit » (R11).
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUnsavedForm } from '../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../shared/ui/Button.tsx';
 import { useSheet } from './SheetContext.tsx';
 import { askClarification } from './state/sheetActions.ts';
@@ -12,6 +13,7 @@ export function ClarificationRequest() {
   const sheet = useSheet();
   const [text, setText] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  useUnsavedForm(text !== null && text.trim() !== '');
   if (!sheet.view.permissions.request_clarification || sheet.view.status !== 'validated') return null;
   if (text === null) {
     return <Button testId="sheet-ask-clarification" variant="secondary" className="sheet-ask" onClick={() => { setText(''); }}>{t('sheet.ask_clarification')}</Button>;

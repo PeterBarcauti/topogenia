@@ -113,7 +113,7 @@ public sealed class AssistantExchanges(
         if (!prompt.Forms.Contains(reply.Form))
             return new AssistantExchangeResult(null, AssistantFailures.FormRefused, Codes.Of(reply.Form), 0, null);
         if (NoMapAsked(reply, prompt))
-            return new AssistantExchangeResult(null, AssistantFailures.InvalidReply, NoMapAskedReason, 0, null);
+            return new AssistantExchangeResult(null, AssistantFailures.InvalidReply, NothingAskedReason(reply), 0, null);
         return new AssistantExchangeResult(View(reply, Faults(reply.Pmap), context, prompt, null, 0), null, null, 0, null);
     }
 
@@ -151,7 +151,7 @@ public sealed class AssistantExchanges(
             if (!prepared.Prompt.Forms.Contains(reply.Form))
                 return await Failed(AssistantFailures.FormRefused, Codes.Of(reply.Form), reply.Form);
             if (NoMapAsked(reply, prepared.Prompt))
-                return await Failed(AssistantFailures.InvalidReply, NoMapAskedReason);
+                return await Failed(AssistantFailures.InvalidReply, NothingAskedReason(reply));
             var faults = Faults(reply.Pmap);
             if (faults.Count > 0)
             {
@@ -200,11 +200,14 @@ public sealed class AssistantExchanges(
         var history = AssistantAskRules.HistoryOf(ask.History);
         var selection = AssistantAskRules.SelectionOf(ask.Selection);
         var translation = intent == AssistantIntent.Translate;
-        var context = await queries.RunAsync(new AssistantContextQuery(mapId, format, packages, selection, withTexts: true) { WholeTree = translation },
+        var context = await queries.RunAsync(new AssistantContextQuery(mapId, format, packages, selection, withTexts: true) { WholeTree = translation, Drafts = intent == AssistantIntent.Comments },
             cancellationToken);
         // The summaries are written in the structure, as the translations: the facilitator's (plan 3.1, lot R).
-        if (intent is AssistantIntent.Create or AssistantIntent.Modify or AssistantIntent.Translate or AssistantIntent.Summaries && !context.CanPropose)
+        if (intent is AssistantIntent.Create or AssistantIntent.Modify or AssistantIntent.Translate or AssistantIntent.Summaries or AssistantIntent.Comments && !context.CanPropose)
             throw DomainException.Forbidden();
+        // The comments of presentation are written for the steps of the map open and of its detailed maps (F-130): a map without one has nothing to say.
+        if (intent == AssistantIntent.Comments && context.CommentTargets.Count == 0)
+            throw DomainException.InvalidValue("intent");
         var summaries = intent == AssistantIntent.Summaries ? AssistantSummaryTargets.Asked(context.SummaryTargets, ask.Maps) : [];
         var target = translation ? TargetOf(ask.Language, context.ProjectLanguage) : null;
         var stored = await SettingsAsync(cancellationToken);
@@ -215,6 +218,8 @@ public sealed class AssistantExchanges(
             ? [AssistantForm.Report]
             : intent == AssistantIntent.Summaries
             ? [AssistantForm.Summaries]
+            : intent == AssistantIntent.Comments
+            ? [AssistantForm.Comments]
             : translation
             ? [AssistantForm.Proposal, AssistantForm.Answer]
             : context.CanPropose
@@ -229,6 +234,7 @@ public sealed class AssistantExchanges(
             Attachments = files.Current, Languages = new AssistantLanguages(context.ProjectLanguage, languages.Languages) { Target = target },
             PainPoints = intent == AssistantIntent.Report ? context.PainPoints : [],
             SummaryMaps = summaries,
+            CommentDrafts = intent == AssistantIntent.Comments ? context.CommentTargets : [],
             Comments = comments,
             FlowComments = target is null ? [] : AssistantCommentTargets.OfFlows(context.TreeFlows, context.TreeFlowComments, target, comments.Count),
             Indicators = intent is AssistantIntent.Free or AssistantIntent.Analyze or AssistantIntent.Ask or AssistantIntent.Report ? context.Indicators : null,
@@ -331,7 +337,8 @@ public sealed class AssistantExchanges(
             + prompt.History.Sum(turn => (long)turn.Request.Length + turn.Reply.Length) + prompt.Selection.Sum(code => (long)code.Length + 1)
             + AttachmentsOf(prompt).Sum(attachment => (long)(attachment.Text?.Length ?? 0))
             + prompt.Comments.Sum(comment => (long)comment.Reference.Length + comment.Original.Length)
-            + prompt.FlowComments.Sum(comment => (long)comment.Reference.Length + comment.Original.Length);
+            + prompt.FlowComments.Sum(comment => (long)comment.Reference.Length + comment.Original.Length)
+            + prompt.CommentDrafts.Sum(target => (long)target.Reference.Length + target.Context.Length + (target.Current?.Length ?? 0));
         if (size > AssistantBounds.PromptMax)
             throw new DomainException(AssistantErrors.ContentTooLarge, RefusalKind.TooLarge, new Dictionary<string, object?> { ["max"] = AssistantBounds.PromptMax });
     }
@@ -361,12 +368,16 @@ public sealed class AssistantExchanges(
     /// <summary>Why a reply of summaries is refused when none of its sentences is on a map asked.</summary>
     private const string NoMapAskedReason = "summaries without a map asked";
 
+    /// <summary>Why a reply none of whose texts is on what was asked is refused: a map for the summaries, a step or a flow listed for the comments (the map open and its detailed maps).</summary>
+    private static string NothingAskedReason(AssistantReply reply) => reply.Form == AssistantForm.Comments ? "comments without a step asked" : NoMapAskedReason;
+
     /// <summary>
     /// A reply of summaries none of whose sentences is on a map asked: nothing to review, an invalid reply rather than a
     /// message alone (audit 3.1 V2, 4.6.3).
     /// </summary>
     private static bool NoMapAsked(AssistantReply reply, AssistantPrompt prompt) =>
-        reply.Form == AssistantForm.Summaries && AssistantSummariesReader.Views(reply.Summaries ?? [], prompt.SummaryMaps).Count == 0;
+        (reply.Form == AssistantForm.Summaries && AssistantSummariesReader.Views(reply.Summaries ?? [], prompt.SummaryMaps).Count == 0)
+        || (reply.Form == AssistantForm.Comments && AssistantCommentsReader.DraftViews(reply.Comments ?? [], prompt.CommentDrafts).Count == 0);
 
     /// <summary>The request that sends a proposal back to the model: the faults found by the format, each at its place in the file.</summary>
     private static string CorrectionRequest(IReadOnlyList<FileError> faults)
@@ -419,11 +430,14 @@ public sealed class AssistantExchanges(
         var translated = proposal is { Faults.Count: 0 } ? reply.Comments : null;
         var comments = translated is not null && prompt.Comments.Count > 0 ? AssistantCommentsReader.Views(translated, prompt.Comments) : null;
         var flowComments = translated is not null && prompt.FlowComments.Count > 0 ? AssistantCommentsReader.FlowViews(translated, prompt.FlowComments) : null;
+        // The comments written for the map open and its detailed maps (F-130), matched to the steps and the flows listed only.
+        var drafts = reply.Form == AssistantForm.Comments ? AssistantCommentsReader.DraftViews(reply.Comments ?? [], prompt.CommentDrafts) : null;
         return new AssistantReplyView(Codes.Of(reply.Form), reply.Message, reply.Questions, reply.Findings, proposal, objects, reply.Raw, cost, duration, report,
             summaries)
         {
             Comments = comments,
             FlowComments = flowComments,
+            CommentDrafts = drafts,
         };
     }
 

@@ -1,8 +1,9 @@
 // ClarificationNote.tsx
-// The question the facilitator asked the author, in the warning colours of the head of the sheet; the facilitator rewrites it in place or removes it (annex B 4, B-4-12, spec 3.0 section 16).
+// The question the facilitator asked the author, in the warning colours of the head of the sheet; the facilitator rewrites it in place or removes it (annex B 4, B-4-12, spec 3.0 section 16); a question rewritten and not saved is followed for « Quit » (R11).
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUnsavedForm } from '../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../shared/ui/Button.tsx';
 import { useSheet } from './SheetContext.tsx';
 import { changeClarification, withdrawClarification } from './state/sheetActions.ts';
@@ -12,6 +13,7 @@ export function ClarificationNote({ text }: { text: string }) {
   const sheet = useSheet();
   const [draft, setDraft] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  useUnsavedForm(draft !== null && draft !== text);
   const facilitator = sheet.view.permissions.request_clarification;
   /** A write of the question, then the field closed and its notification; a refusal is said by the write. */
   const run = async (write: () => Promise<boolean>, done: string) => {

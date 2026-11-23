@@ -26,7 +26,14 @@
     "quit_failed": "Aplikace $t(app.name) se neukončila. Zkuste to znovu, nebo zavřete okno konzole.",
     "quit_unsaved": "Něco zadaného v kartě ještě není uloženo: aplikace $t(app.name) zůstává otevřená. Zkuste to znovu, až bude karta uložena.",
     "stopped": "Aplikace $t(app.name) je ukončena. Tento panel prohlížeče můžete zavřít.",
-    "stopped_help": "Chcete-li ji znovu použít, znovu ji otevřete."
+    "stopped_help": "Chcete-li ji znovu použít, znovu ji otevřete.",
+    "help_menu": "Nabídka Nápověda",
+    "help_online": "Online nápověda (v angličtině)",
+    "update_check": "Vyhledat aktualizace",
+    "update_check_help": "Otevře stránku verzí na webu. Nainstalováno: {{version}} z {{date}}.",
+    "update_check_store_help": "Otevře stránku v Microsoft Store, který aktualizace instaluje.",
+    "quit_text_unsaved": "Otevřený formulář není uložen: to, co je v něm zadáno, bude ztraceno.",
+    "quit_anyway": "Přesto ukončit"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Mezerník",
     "Enter": "Enter",
-    "ArrowUp": "Šipka nahoru"
+    "ArrowUp": "Šipka nahoru",
+    "ArrowLeft": "Šipka doleva",
+    "ArrowRight": "Šipka doprava",
+    "ArrowDown": "Šipka dolů",
+    "Backspace": "Backspace",
+    "Wheel": "Kolečko myši"
   },
   "errors": {
     "RESEAU": "Aplikace $t(app.name) neodpovídá. Zkontrolujte, zda je $t(app.name) stále spuštěná (nebo síťové připojení, pokud běží na serveru).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Neočekávaná odpověď serveru. Načtěte stránku znovu.",
     "ACCES_REFUSE": "K této stránce nemáte oprávnění.",
     "UNKNOWN": "Došlo k neočekávané chybě.",
-    "RESUMES_A_JOUR": "Všechny mapy mají aktuální shrnutí. Chcete-li některé přepsat, otevřete mapu a klikněte na „i“ vedle jejího názvu."
+    "RESUMES_A_JOUR": "Všechny mapy mají aktuální shrnutí. Chcete-li některé přepsat, otevřete mapu a klikněte na „i“ vedle jejího názvu.",
+    "COLLECTION_TROP_DE_PROCESSUS": "Kolekce obsahuje příliš mnoho procesů."
   },
   "home": {
     "eyebrow": "Chcete-li zefektivnit své procesy pomocí AI, začněte jejich popisem.",
@@ -83,7 +96,24 @@
     "sample_title": "Ukázkový projekt",
     "sample_text": "Smyšlený, již popsaný projekt, na kterém poznáte úplnou mapu: dráhy, rozhodnutí, podmapu, karty, dokumenty a problémová místa. Odstraňuje se jako každý jiný projekt.",
     "sample_create": "Vytvořit ukázkový projekt",
-    "sample_created": "Ukázkový projekt {{code}} byl vytvořen."
+    "sample_created": "Ukázkový projekt {{code}} byl vytvořen.",
+    "filter": "Filtrovat projekty",
+    "filter_placeholder": "Kód nebo název",
+    "filter_count": "{{shown}} z {{total}}",
+    "filter_none": "Žádný projekt neodpovídá.",
+    "update_line": "Tato verze pochází z {{date}}.",
+    "update_link": "Zjistit, zda existuje novější",
+    "update_close": "Zavřít připomenutí",
+    "button_start_help": "Vyberte výchozí bod.",
+    "start_menu": "Zahájit projekt",
+    "start_sample": "Ukázkový projekt",
+    "start_gallery": "Galerie šablon",
+    "start_gallery_help": "Otevře se v prohlížeči.",
+    "start_blank": "Prázdná mapa…",
+    "new_project_help": "Začít s prázdnou mapou, ukázkou nebo šablonou.",
+    "new_project_help_no_sample": "Začít s prázdnou mapou nebo šablonou.",
+    "new_project_help_no_gallery": "Začít s prázdnou mapou nebo ukázkou.",
+    "new_project_help_blank": "Začít s prázdnou mapou."
   },
   "roles": {
     "facilitator": "Moderátor",
@@ -116,7 +146,7 @@
     "properties": "Vlastnosti projektu…",
     "properties_title": "Vlastnosti projektu {{code}}",
     "sharing_group": "Skupina pro sdílení dokumentů",
-    "sharing_group_help": "Uvádí se v kartách u sdíleného vstupu (např. Finanční tým). Prázdné: „skupina pro sdílení projektu“.",
+    "sharing_group_help": "Název skupiny osob, které mohou číst dokumenty projektu. Uvádí se u pole „Sdíleno se skupinou“ každého dokumentu v kartě. Prázdné: „skupina pro sdílení projektu“.",
     "properties_read_only": "Tyto vlastnosti může měnit jen moderátor projektu.",
     "properties_saved": "Vlastnosti projektu uloženy.",
     "language": "Jazyk procesu",
@@ -125,12 +155,14 @@
     "workday_hours": "Pracovní den (hodiny)",
     "workday_hours_help": "Od 1 do 24 h, výchozí hodnota 7: převádí průběžné doby na pracovní dny.",
     "fte_hours": "Hodiny na FTE za měsíc",
-    "fte_hours_help": "Od 1 do 744 h, výchozí hodnota 151,67: převádí zatížení na ekvivalenty plného úvazku (FTE)."
+    "fte_hours_help": "Od 1 do 744 h, výchozí hodnota 151,67: převádí zatížení na ekvivalenty plného úvazku (FTE).",
+    "code_proposed": "Navrženo podle názvu.",
+    "more_options": "Další možnosti"
   },
   "files": {
     "open": "Otevřít soubor…",
     "open_title": "Otevřít soubor",
-    "open_help": "Soubor se stane novým projektem: soubor .pmap (stažená kopie nebo odpověď AI, která přečetla náčrt), tabulka Excel nebo CSV, diagram Mermaid (.mmd, .md) nebo obrázek SVG exportovaný s upravitelnou kopií.",
+    "open_help": "Soubor se stane novým projektem: soubor .pmap (stažená kopie nebo odpověď AI, která přečetla náčrt), kolekce modelů (.pmaps), tabulka Excel nebo CSV, diagram Mermaid (.mmd, .md) nebo obrázek SVG exportovaný s upravitelnou kopií.",
     "choose": "Vybrat soubor…",
     "or_paste": "Nebo sem vložte jeho obsah, například odpověď AI:",
     "area": "Sem vložte nebo přetáhněte obsah souboru .pmap",
@@ -196,7 +228,52 @@
     "target_name": "{{name}} (cílový stav)",
     "target_label": "Popisek výchozího stavu",
     "target_label_default": "Současný stav",
-    "target_button": "Vytvořit"
+    "target_button": "Vytvořit",
+    "map_download": "Uložit otevřenou mapu (.pmap)",
+    "map_downloaded": "Mapa uložena se svými podrobnými mapami, listy a komentáři: soubor .pmap je ve složce Stažené soubory.",
+    "insert": "Vložit soubor jako podrobný krok…",
+    "insert_here": "Vložit soubor sem…",
+    "insert_title": "Vložit soubor jako podrobný krok",
+    "insert_help": "Soubor se stane novým podrobným krokem této mapy. Je to kopie: pozdější změna souboru mapu nezmění. Soubor .pmap, tabulka Excel nebo CSV, diagram Mermaid nebo obrázek SVG s jeho kopií.",
+    "replace_title": "Nahradit podrobnou mapu souborem",
+    "replace_help": "Podrobná mapa kroku „{{label}}“ jde do koše a soubor zaujme její místo. Ctrl+Z vrátí vše zpět.",
+    "insert_counts": "Kroky: {{steps}} · Dráhy: {{lanes}} · Propojení: {{flows}} · Mapy: {{maps}} · Listy: {{sheets}}",
+    "insert_too_deep": "Tento soubor má {{depth}} úrovní map; pod touto mapou jich smí mít nejvýše {{room}}.",
+    "insert_too_large": "Tento soubor přesahuje {{max}} MB: nelze jej vložit.",
+    "insert_package": "Toto je balíček pro výměnu: importuje se jako projekt, nevkládá se.",
+    "insert_dropped": "Vynechané překlady (jazyky, které zde nejsou nastaveny): {{languages}}",
+    "insert_label": "Název kroku",
+    "insert_lane": "Dráha",
+    "insert_after": "Umístit za",
+    "insert_at_start": "Na začátek mapy",
+    "insert_sheets": "Převzít listy",
+    "insert_sheets_help": "Listy, jejich dokumenty a problémová místa přijdou jako koncept, ke kontrole a pak ke schválení.",
+    "insert_button": "Vložit",
+    "replace_button": "Nahradit",
+    "inserted": "Soubor vložen. Kroky: {{steps}} · Mapy: {{maps}}",
+    "insert_on_flow": "Na šipce {{from}} → {{to}}",
+    "insert_on_flow_here": "Vložit soubor na tuto šipku…",
+    "collection_title": "Kolekce „{{name}}“",
+    "collection_help": "Pro každý zaškrtnutý proces se vytvoří projekt. Před „Vytvořit projekty“ se nic nezapíše.",
+    "collection_all": "Zaškrtnout vše",
+    "collection_ticked": "Zaškrtnuto: {{count}} z {{total}}",
+    "collection_points": "Body ke kontrole: {{count}}",
+    "collection_details": "Popis a body ke kontrole",
+    "collection_code_free": "{{code}} je už obsazen.",
+    "collection_invalid": "Nelze otevřít:",
+    "collection_create": "Vytvořit projekty",
+    "collection_creating": "Vytváření {{done}} z {{total}}…",
+    "collection_done": "Projekty vytvořeny",
+    "collection_created": "{{code}} vytvořen.",
+    "collection_failed": "Nevytvořeno: {{reason}}",
+    "collection_retry": "Zkusit znovu",
+    "collection_unnamed": "Proces {{rank}}",
+    "insert_collection": "Kolekce se otevírá přes „Otevřít soubor…“. Vložte jeden z jejích modelů samostatně.",
+    "open_too_large": "Tento soubor přesahuje {{max}} MB: nelze jej otevřít.",
+    "collection_none": "Žádný projekt nevytvořen",
+    "collection_code_twice": "{{code}} je přidělen i jinému řádku.",
+    "collection_fix": "Opravit text",
+    "remote_locations": "Síťové nebo webové adresy v listech: {{count}}, před otevřením dokumentu je zkontrolujte."
   },
   "package": {
     "export": "Exportovat projekt ({{extension}})…",
@@ -375,7 +452,13 @@
       "due": "Termín",
       "status": "Stav",
       "lost": "Ztracené hodiny měsíčně"
-    }
+    },
+    "copy_image": "Kopírovat mapu jako obrázek",
+    "copying": "Kopíruje se obrázek…",
+    "copied": "Obrázek zkopírován: vložte jej (Ctrl+V) do e-mailu nebo snímku.",
+    "copy_failed": "Obrázek se nepodařilo zkopírovat.",
+    "copy_as_png": "Exportovat jako PNG",
+    "project_pdf": "Exportovat projekt do PDF…"
   },
   "classification": {
     "internal": "Interní",
@@ -514,7 +597,8 @@
     "breadcrumb": "Navigační cesta",
     "file": "Soubor",
     "file_help": "Otevřít soubor, stáhnout kopii, duplikovat, exportovat",
-    "members": "Členové"
+    "members": "Členové",
+    "fit": "Zobrazit vše"
   },
   "ribbon": {
     "name": "Pás karet mapy",
@@ -614,6 +698,27 @@
       "necessary": "Nutné bez hodnoty",
       "waste": "Plýtvání",
       "none": "Nezařazeno"
+    },
+    "replace_detail": "Nahradit podrobnou mapu souborem…",
+    "copy_selection_image": "Kopírovat výběr jako obrázek",
+    "file_cascade": {
+      "export": "Exportovat mapu",
+      "project": "Projekt",
+      "package": "Výměnný balíček",
+      "assistant": "Asistent AI"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 na šířku)",
+      "png": "Obrázek PNG",
+      "svg": "Obrázek SVG…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Celý projekt do PDF…",
+      "import": "Importovat balíček…",
+      "replace": "Nahradit balíčkem…",
+      "report": "Vyprávěná zpráva (Markdown)",
+      "comments": "Komentáře k prezentaci…"
     }
   },
   "deletion": {
@@ -666,7 +771,8 @@
       "retracer_liens": "automatická trasa šipek",
       "inserer_rangees": "vložení řádků",
       "retirer_rangee": "odebrání řádku",
-      "proposition_ia": "návrh AI"
+      "proposition_ia": "návrh AI",
+      "inserer_fichier": "vložení souboru"
     }
   },
   "command": {
@@ -791,9 +897,6 @@
     "duration_max": "Nejdelší doba",
     "duration_bounds_order": "Nejkratší ≤ doba ≤ nejdelší",
     "minutes": "minut",
-    "duration_between": "{{min}} až {{max}} min",
-    "duration_at_least": "nejméně {{min}} min",
-    "duration_at_most": "nejvýše {{max}} min",
     "duration_value_one": "{{count}} min",
     "duration_value_few": "{{count}} min",
     "duration_value_many": "{{count}} min",
@@ -860,6 +963,7 @@
     "clarification_withdrawn": "Otázka odebrána.",
     "read_empty": "Pro tento krok zatím není žádná potvrzená karta.",
     "read_validated": "Verzi potvrdil(a) {{name}} dne {{date}}.",
+    "read_draft": "Rozpracovaný koncept, zatím nepotvrzený.",
     "document": {
       "add_output": "Přidat výstup",
       "new_output": "Nový výstup",
@@ -923,7 +1027,8 @@
         "file": "Soubor",
         "software": "Software",
         "other": "Jiné"
-      }
+      },
+      "edit_pain": "Upravit v {{code}}"
     },
     "pain_point": {
       "title": "Problémové místo",
@@ -952,7 +1057,21 @@
         "implemented": "realizováno",
         "adopted": "zavedeno",
         "dropped": "zrušeno"
-      }
+      },
+      "status": "Stav",
+      "status_of": "Stav problému {{code}}",
+      "status_help": "Realizováno, zavedeno nebo zrušeno: problém zmizí z mapy a jeho hodiny se už nepočítají.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problém zjištěn, opatření k naplánování",
+        "scored": "problém vyhodnocen, opatření k rozhodnutí",
+        "under_review": "opatření se posuzuje, zatím nerozhodnuto",
+        "in_progress": "opatření se provádí",
+        "implemented": "opatření provedeno, výsledek k ověření",
+        "adopted": "ověřeno, je to nový způsob práce",
+        "dropped": "rozhodli jsme se jím nezabývat"
+      },
+      "status_now": "Stav problému {{code}}: {{status}}"
     },
     "lead_time": "Průběžná doba",
     "lead_time_help": "Doba od příchodu případu do jeho odchodu z kroku včetně čekání; nezapočítává se do úplnosti.",
@@ -975,7 +1094,26 @@
       "minute": "minuty",
       "hour": "hodiny",
       "day": "pracovní dny"
-    }
+    },
+    "duration_between_one": "{{min}} až {{max}} min",
+    "duration_between_few": "{{min}} až {{max}} min",
+    "duration_between_other": "{{min}} až {{max}} min",
+    "duration_at_least_one": "nejméně {{min}} min",
+    "duration_at_least_few": "nejméně {{min}} min",
+    "duration_at_least_other": "nejméně {{min}} min",
+    "duration_at_most_one": "nejvýše {{max}} min",
+    "duration_at_most_few": "nejvýše {{max}} min",
+    "duration_at_most_other": "nejvýše {{max}} min",
+    "duration_between_many": "{{min}} až {{max}} min",
+    "duration_at_least_many": "nejméně {{min}} min",
+    "duration_at_most_many": "nejvýše {{max}} min",
+    "step_pain_points": "Problémová místa kroku",
+    "step_pain_points_help": "Problémová místa přiřazená ke kroku, bez dokumentu. Popis a plán jsou jen ke čtení.",
+    "pain_points_one": "{{count}} problémové místo",
+    "pain_points_few": "{{count}} problémová místa",
+    "pain_points_many": "{{count}} problémových míst",
+    "pain_points_other": "{{count}} problémových míst",
+    "step_pain_points_help_fill": "Problémová místa přiřazená ke kroku, bez dokumentu. Jejich stav se mění zde; popis a plán jsou jen ke čtení."
   },
   "translations": {
     "title": "Přeložit projekt",
@@ -1238,6 +1376,12 @@
         },
         "summaries": {
           "title": "Shrnutí"
+        },
+        "comments": {
+          "title": "Komentáře k prezentaci",
+          "text": "Co prezentace říká o krocích a předáních.",
+          "example": "Napiš komentáře ke krokům a předáním této mapy a jejích podrobných map.",
+          "example_empty": "Napiš komentáře ke krokům a předáním této mapy a jejích podrobných map."
         }
       },
       "thread": "Konverzace s asistentem",
@@ -1315,7 +1459,8 @@
         "findings": "Analýza",
         "report": "Zpráva",
         "summaries": "Shrnutí",
-        "proposal": "Návrh"
+        "proposal": "Návrh",
+        "comments": "Komentáře k prezentaci"
       },
       "pasted": "Odpověď vložena",
       "copy_reply": "Kopírovat odpověď",
@@ -1481,7 +1626,19 @@
     "resource": "Prostředek Azure",
     "resource_help": "Název prostředku: contoso pro contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Prázdné: výchozí port (Ollama 11434, LM Studio 1234)."
+    "port_help": "Prázdné: výchozí port (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Napiš komentáře k prezentaci pro kroky a předání této mapy a jejích podrobných map, které žádný nemají.",
+      "menu": "Napsat komentáře k prezentaci (AI)…",
+      "intro": "Přečtěte si každý komentář: ponechte ho, opravte ho, nebo ho vyřaďte. Zazní během prezentace.",
+      "flow": "Předání {{labels}}",
+      "map": "Mapa: {{name}}",
+      "current": "Současný komentář: {{text}}",
+      "typed": "Nahrazuje komentář zadaný ručně: {{text}}",
+      "save": "Uložit ponechané komentáře ({{n}})",
+      "saved": "Uložené komentáře: {{n}}",
+      "done": "Uložené komentáře k prezentaci: {{n}}"
+    }
   },
   "interface_language": {
     "help": "Jazyk nabídek a zpráv, jen pro vás. Jazyk, ve kterém se zobrazují mapy, se volí v horní části okna, když je otevřený projekt."
@@ -1949,5 +2106,176 @@
       "closing_lost": "Ztracený čas: {{lost}} za měsíc.",
       "arrow": "do"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Exportovat do BPMN 2.0 (.bpmn)…",
+    "export_title": "Exportovat do BPMN 2.0",
+    "export_help": "Soubor .bpmn se otevře v nástrojích pro modelování BPMN (Camunda, Signavio, Bizagi…). Obsahuje celý list každého kroku, bez umístění dokumentů.",
+    "export_button": "Exportovat",
+    "export_subprocesses": "Zahrnout podrobné podprocesy",
+    "export_subprocesses_help": "Každý podrobný krok se v nástroji otevře jako podproces.",
+    "export_subprocesses_none": "Mapa nemá žádný podrobný krok.",
+    "export_details": "Kreslit dokumenty a problémová místa",
+    "export_details_help": "Bez zaškrtnutí zůstanou popsány v dokumentaci souboru.",
+    "toolbar": "Zobrazení BPMN 2.0",
+    "badge": "Diagram BPMN 2.0 · jen ke čtení",
+    "details": "Podrobnosti v diagramu",
+    "export": "Exportovat (.bpmn)…",
+    "close": "Zpět na mapu",
+    "close_help": "Zpět na mapu (Alt+B)",
+    "failed": "Diagram se nepodařilo načíst.",
+    "loading": "Načítání diagramu…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Počáteční událost",
+      "endEvent": "Koncová událost",
+      "intermediateCatchEvent": "Čekání",
+      "manualTask": "Ruční úloha",
+      "userTask": "Uživatelská úloha",
+      "serviceTask": "Automatizovaná úloha",
+      "subProcess": "Podproces",
+      "exclusiveGateway": "Exkluzivní brána",
+      "parallelGateway": "Paralelní brána",
+      "inclusiveGateway": "Inkluzivní brána"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "„{{text}}“",
+      "map": "Mapa: {{name}}",
+      "classification": "Klasifikace: {{value}}",
+      "language": "Jazyk: {{language}}",
+      "work_time": "Pracovní den: {{workday}} h; hodiny úvazku za měsíc: {{fte}} h",
+      "description": "Popis",
+      "wait": "čekání {{hours}} h",
+      "from": "z {{code}}",
+      "volume": "Vstupní objem: {{quantity}} za {{period}}",
+      "periods": {
+        "day": "pracovní den",
+        "week": "týden",
+        "month": "měsíc",
+        "year": "rok"
+      },
+      "lane_system": "Dráha softwaru, který jedná sám",
+      "headcount": "Počet osob: {{number}}"
+    },
+    "fit": "Zobrazit vše",
+    "fit_help": "Zobrazit celý diagram v okně"
+  },
+  "shortcuts": {
+    "title": "Klávesové zkratky",
+    "sections": {
+      "move": "Pohyb",
+      "choose": "Výběr",
+      "edit": "Úprava mapy",
+      "display": "Zobrazení",
+      "present": "Prezentace",
+      "help": "Nápověda"
+    },
+    "edit_note": "Jen pro moderátora projektu.",
+    "or": "nebo",
+    "move_selection": "Přesunout výběr",
+    "escape": "Zavřít nabídku, panel nebo kartu; zastavit „Propojit“",
+    "space_held": "Nástroj Ruka, dokud je klávesa stisknutá",
+    "enter": "Otevřít kartu vybraného kroku",
+    "type": "Začít psát název vybraného kroku",
+    "menu_key": "Nabídka vybraného objektu",
+    "wheel": "Posouvat; se Shift vodorovně",
+    "zoom": "Přiblížit",
+    "saved": "Připomenout, že vše je uloženo",
+    "alone_note": "Bez jednotlivě vybraného kroku (jinak klávesa začne jeho název)",
+    "type_key": "písmeno",
+    "search_keys": "Ve vyhledávání: další; se Shiftem předchozí; Esc zavře"
+  },
+  "search": {
+    "command_help": "Hledat v projektu",
+    "title": "Hledat",
+    "field": "Hledané slovo",
+    "placeholder": "Krok, dokument, nástroj…",
+    "previous": "Předchozí (Shift+Enter)",
+    "next": "Další (Enter)",
+    "position": "{{index}} z {{count}}",
+    "searching": "Hledání…",
+    "none": "Žádné výsledky.",
+    "too_many": "Prvních {{shown}} z {{total}} výsledků: upřesněte hledání.",
+    "short": "Alespoň dva znaky, nebo Enter.",
+    "this_map": "Tato mapa",
+    "level": "Úroveň {{level}}",
+    "origin": "Původní jazyk: {{language}}",
+    "kinds": {
+      "step": "Krok",
+      "lane": "Dráha",
+      "document": "Dokument",
+      "tool": "Nástroj",
+      "pain_point": "Problémové místo",
+      "action": "Akce"
+    },
+    "results_one": "{{count}} výsledek",
+    "results_few": "{{count}} výsledky",
+    "results_many": "{{count}} výsledků",
+    "results_other": "{{count}} výsledku"
+  },
+  "action_plan": {
+    "command": "Akční plán",
+    "title": "Akční plán",
+    "total": "{{hours}} h ztraceno měsíčně na otevřených problémových místech",
+    "late_count": "Po termínu: {{count}}",
+    "count": "Zobrazená problémová místa: {{shown}} z {{total}}",
+    "sort": "Řadit podle",
+    "sorts": {
+      "project": "Pořadí v projektu",
+      "lost": "Ztracené hodiny",
+      "due": "Termín"
+    },
+    "filters": "Filtry",
+    "filter_open": "Otevřená",
+    "filter_late": "Po termínu",
+    "filter_no_action": "Bez akce",
+    "late": "Po termínu",
+    "no_action": "Nebyla určena žádná akce",
+    "map": "Mapa: {{name}}",
+    "lane": "Dráha: {{name}}",
+    "go_to": "Přejít na {{code}}",
+    "edit": "Upravit plán",
+    "edit_of": "Upravit plán pro {{code}}",
+    "loading": "Načítání plánu…",
+    "empty": "V tomto projektu nejsou žádná problémová místa.",
+    "none": "Filtrům neodpovídá žádné problémové místo.",
+    "status_since": "{{status}} od {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Zpět",
+    "undo_of": "Zpět: vrátit {{code}} do stavu „{{status}}“"
+  },
+  "project_pdf": {
+    "sheet_state": "Stav karty: {{state}}",
+    "continued": "{{title}} (pokračování)",
+    "file": "projekt",
+    "contents": "Obsah",
+    "page": "Strana {{page}} z {{total}}",
+    "scope_line": "Mapa „{{name}}“ a její úrovně",
+    "empty_map": "Mapa bez kroků.",
+    "depth_cut": "Mapy za {{max}} úrovněmi nejsou v tomto dokumentu.",
+    "sheets_of": "Karty · {{map}}",
+    "reading": "Čtení map: {{count}}",
+    "reading_sheets": "Čtení karet…",
+    "drawing": "Mapa {{index}} z {{total}}",
+    "writing": "Zápis dokumentu: strana {{page}}",
+    "too_many_maps": "Více než {{max}} map: zvolte „{{scope}}“.",
+    "too_many_pages": "Více než {{max}} stran: zrušte výběr karet nebo exportujte podrobnou mapu a její úrovně.",
+    "cancelled": "Export zrušen.",
+    "title": "Exportovat projekt do PDF",
+    "help": "Všechny mapy v jednom souboru, úroveň po úrovni, pro ty, kdo aplikaci nemají.",
+    "scope": "Rozsah",
+    "scope_project": "Celý projekt",
+    "scope_branch": "Tato mapa a její úrovně",
+    "with_sheets": "S kartami",
+    "with_raci": "S maticí RACI",
+    "with_stream": "S hodnotovým tokem",
+    "with_plan": "S akčním plánem",
+    "sheets_help": "Karty jsou ty, které vidíte: dokument posílejte jen těm, kdo je smějí číst.",
+    "button": "Vytvořit PDF",
+    "progress": "Průběh",
+    "too_many_maps_below": "Více než {{max}} map: otevřete podrobnou mapu na nižší úrovni a zvolte „{{scope}}“.",
+    "too_many_pages_top": "Více než {{max}} stran: zrušte výběr karet."
   }
 }

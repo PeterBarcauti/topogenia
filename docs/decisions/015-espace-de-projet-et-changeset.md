@@ -57,7 +57,7 @@ NF05 est de 300 ms en Poste pour une carte de 150 étapes.
 ## Vérification
 
 - Tests du traceur et du `ChangeSet` (aller, inverse, objets touchés) dans
-  `tests/Topogenia.Domain.Tests/` (P2-T05) ; pile annulée puis rétablie sur les mêmes objets
+  `tests/Topogenia.Domain.Tests/` (non publié) (P2-T05) ; pile annulée puis rétablie sur les mêmes objets
   et écriture concurrente refusée : `Structure/UndoStackTests` (AR-81).
 - Tests d'`undo` après chaque type d'opération (P4-T03) ; mesure NF05 consignée dans
-  `docs/journal.md`.
+  `docs/journal.md` (non publié).

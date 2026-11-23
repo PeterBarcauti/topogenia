@@ -1,7 +1,7 @@
 // Canvas.tsx
 // The canvas of the map with React Flow: lanes, steps, routed flows, bounded view scrolled by the wheel and zoomed by Ctrl and the wheel, dots, zoom controls, mini map, fixed lane headers; the value stream layer under the steps (its summary in its panel); the tools, the selection and the gestures of the edition; its state while an image is captured (annex B 2.1 to 2.4, 2.14, spec 14.5, spec 3.0 section 15.1).
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
 import {
   Background, BackgroundVariant, ConnectionMode, ControlButton, Controls, MiniMap, ReactFlow, ReactFlowProvider, SelectionMode, useReactFlow, useStore as useFlowStore,
   useStoreApi, ViewportPortal,
@@ -14,6 +14,7 @@ import { Icon } from '../../../shared/ui/Icon.tsx';
 import { LaneHeaders } from '../chrome/LaneHeaders.tsx';
 import { EDGE_TYPES } from '../edges/RoutedEdge.tsx';
 import { DOT_GAP, MAX_ZOOM, MIN_ZOOM, geometryCssVariables } from '../model/geometry/constants.ts';
+import type { View } from '../model/geometry/viewport.ts';
 import { layoutMap, type MapLayout } from '../model/mapLayout.ts';
 import { withRowsDraft } from '../model/laneRows.ts';
 import { drawnSidesOf } from '../model/routeGestures.ts';
@@ -26,9 +27,11 @@ import { StreamCardView } from '../nodes/StreamCard.tsx';
 import { stepsNamed, takeArrival } from '../state/arrival.ts';
 import { useEditor, useMapState } from '../state/EditorContext.tsx';
 import { withRouteDraft } from '../state/mapStore.ts';
+import { handedPlace, useTellView, type PlacedStep } from '../state/viewHandover.ts';
 import { ArrowMarker } from './ArrowMarker.tsx';
 import { DropPreviewView } from './DropPreview.tsx';
 import { ExportCaption } from './ExportCaption.tsx';
+import { FitButton, useFit } from './FitControl.tsx';
 import { flowElements, rowBandNodes, type FlowEdge, type MapNode } from './flowElements.ts';
 import { useBoundedViewport } from './useBoundedViewport.ts';
 import { useCanvasKeys } from './useCanvasKeys.ts';
@@ -110,7 +113,7 @@ function MapFlow({ map, showCodes, alwaysShowPictos }: CanvasProps) {
   const states = useElementStates(editor, map, showCodes);
   const { nodes, edges } = useMemo(() => flowElements(layout, states), [layout, states]);
   const root = useRef<HTMLDivElement>(null);
-  const bounds = useCaptureTarget(editor, root, nodes);
+  const bounds = useCaptureTarget(editor, root, nodes, layout.flows);
   const { dragged, preview, ...selectionAndDrag } = useSelectionAndDrag(editor, map);
   // The steps dragged where the pointer holds them; the rows their drop or a pull would give a lane, in its colour (ADR 096).
   const shown = useMemo((): MapNode[] => {
@@ -123,9 +126,13 @@ function MapFlow({ map, showCodes, alwaysShowPictos }: CanvasProps) {
   useCanvasKeys(editor, pointer);
   const width = useFlowStore((state) => state.width);
   const height = useFlowStore((state) => state.height);
-  const { view, change, backToStart } = useBoundedViewport({ width: layout.width, height: layout.height }, { width, height });
+  const { view, change, backToStart, fit } = useBoundedViewport({ width: layout.width, height: layout.height }, { width, height });
+  const placed = useMemo(() => layout.steps.map((figure): PlacedStep => ({ code: figure.step.code, box: figure.box })), [layout]);
+  useTellView(map.id, 'map', root, placed, view, width, height);
+  useHandedStart(map.id, placed, root, change);
   useHeaderWheel(root, view, change);
   useReveal(editor);
+  useFit(editor, fit);
   useDrawnSides(editor, layout);
   useArrival(editor, map);
   const labels = useFlowLabels();
@@ -147,6 +154,7 @@ function MapFlow({ map, showCodes, alwaysShowPictos }: CanvasProps) {
         <Background variant={BackgroundVariant.Dots} gap={DOT_GAP} color="var(--canvas-dot)" />
         <MiniMap<MapNode> pannable zoomable nodeColor={minimapColour} className="map-minimap" />
         <Controls showFitView={false} showInteractive={false} position="bottom-right" className="map-controls">
+          <FitButton />
           <ControlButton onClick={backToStart} title={t('map.back_to_start')} aria-label={t('map.back_to_start')} data-testid="map-back-to-start">
             <Icon icon={ArrowLeftToLine} />
           </ControlButton>
@@ -162,6 +170,20 @@ function MapFlow({ map, showCodes, alwaysShowPictos }: CanvasProps) {
  * Gives the editor the way to put steps in view (the codes of a reply of the assistant, spec 3.0 section 3.4): the first
  * step at the centre of the canvas, at the zoom of now, by React Flow, whose move the bounded view takes as any other.
  */
+/**
+ * A switch from the view in BPMN 2.0 puts the step it showed in the middle where it stood, at its zoom (trial of the 3.3);
+ * any other opening starts at the start of the map (B-7-09). Once, before the first painting.
+ */
+function useHandedStart(mapId: string, steps: readonly PlacedStep[], root: RefObject<HTMLDivElement | null>, change: (view: View) => void) {
+  const done = useRef(false);
+  useLayoutEffect(() => {
+    if (done.current) return;
+    done.current = true;
+    const view = handedPlace(mapId, 'map', steps, root.current);
+    if (view !== null) change(view);
+  }, [mapId, steps, root, change]);
+}
+
 /** The ends of the flows drawn, given to the menu of a flow that chooses an end on a gateway (audit 3.1.0 3.3, audit 3.1 V2 3.3). */
 function useDrawnSides(editor: ReturnType<typeof useEditor>, layout: MapLayout) {
   useEffect(() => {

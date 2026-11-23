@@ -40,7 +40,7 @@ public sealed class ImportRoutesTests(ApiHosts hosts) : IClassFixture<ApiHosts>
     /// when <paramref name="held"/> is false, its length announced or not; returns the reply and the bytes the host read of
     /// the body before it answered.
     /// </summary>
-    private static async Task<(ApiResponse Reply, int Read)> SendGatedAsync(ApiHost host, string login, string url, byte[] bytes, string type,
+    internal static async Task<(ApiResponse Reply, int Read)> SendGatedAsync(ApiHost host, string login, string url, byte[] bytes, string type,
         bool held = true, bool announced = true, int? ifMatch = null)
     {
         var body = new GatedBody(bytes);
@@ -226,6 +226,34 @@ public sealed class ImportRoutesTests(ApiHosts hosts) : IClassFixture<ApiHosts>
         var (opened, fileRead) = await SendGatedAsync(project.Host, Logins.Contributor, "/api/projects/import-pmap", file, "application/json");
         opened.Refused(403, "ACCES_REFUSE");
         Assert.Equal(0, fileRead);
+    }
+
+    [Theory]
+    [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
+    public async Task A_user_without_the_right_to_insert_a_file_is_refused_before_a_byte_of_it_is_read(EngineKind kind)
+    {
+        var project = await ProjectAsync(kind);
+        using var facilitator = project.Facilitator;
+        var step = (await facilitator.PostAsync($"/api/maps/{project.RootMapId}/steps", new { lane_id = project.FirstLaneId, column = 0, label = "Besoin" }))
+            .Ok().GetProperty("id").GetGuid();
+        var version = await project.ProjectVersionAsync();
+        // A file that is no .pmap: read first, it would answer FICHIER_INVALIDE whoever sends it (independent review of the 3.3).
+        var file = JsonSerializer.SerializeToUtf8Bytes(new { content = "{ pas un fichier", lane_id = project.FirstLaneId, column = 0, row = 0, with_sheets = false });
+        (string Login, string Url, int Status, string Code)[] refused =
+        [
+            (Logins.Contributor, $"/api/maps/{project.RootMapId}/insert-pmap/preview", 403, "ACCES_REFUSE"),
+            (Logins.Reader, $"/api/maps/{project.RootMapId}/insert-pmap", 403, "ACCES_REFUSE"),
+            (Logins.Contributor, $"/api/steps/{step}/replace-pmap", 403, "ACCES_REFUSE"),
+            (Logins.Stranger, $"/api/maps/{project.RootMapId}/insert-pmap/preview", 404, "INTROUVABLE"),
+            (Logins.Stranger, $"/api/maps/{project.RootMapId}/insert-pmap", 404, "INTROUVABLE"),
+            (Logins.Stranger, $"/api/steps/{step}/replace-pmap", 404, "INTROUVABLE"),
+        ];
+        foreach (var (login, url, status, code) in refused)
+        {
+            var (reply, read) = await SendGatedAsync(project.Host, login, url, file, "application/json", ifMatch: version);
+            reply.Refused(status, code);
+            Assert.Equal((login, url, 0), (login, url, read));
+        }
     }
 
     [Theory]

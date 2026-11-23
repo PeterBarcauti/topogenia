@@ -4,6 +4,7 @@
 import type { Page } from '@playwright/test';
 import type { Api } from './support/api.ts';
 import { expect, openMap, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 /**
  * The expense claims with their sheets: 120 claims a month, entered by the employee in 2 days, validated by the manager in
@@ -61,7 +62,7 @@ test('the target state made from the File menu compares its process with its ref
   const { mapId, code } = await claims(api);
   await openMap(page, mapId, 'NDF-E007');
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.target').click();
+  await (await fileEntry(page, 'file.target')).click();
   const dialog = page.getByRole('dialog', { name: 'Créer l’état cible' });
   await expect(dialog.getByLabel('Nom du projet')).toHaveValue('Notes de frais (état cible)');
   await expect(dialog.getByLabel('Libellé de la référence')).toHaveValue('État actuel');

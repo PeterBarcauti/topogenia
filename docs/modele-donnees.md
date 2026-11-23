@@ -6,7 +6,7 @@
 Ce document décrit les tables de la base de Topogenia 3.0 (celles de la 2.0, plus les paramètres de l'assistant,
 § 6.25), sur ses deux moteurs (SQL Server en mode
 Serveur, SQLite en mode Poste), et leur correspondance avec les enregistrements du domaine
-(`src/Topogenia.Domain/Model/*.cs`) et avec le schéma 1.x (les scripts de la base 1.x,
+(`src/Topogenia.Domain/Model/*.cs` (non publié)) et avec le schéma 1.x (les scripts de la base 1.x,
 `MODELE_DONNEES.md`, lu sans modification). Il fait foi pour le modèle EF Core
 (`src/Topogenia.Persistence/Model/`) et pour les migrations des deux fournisseurs
 (`src/Topogenia.Persistence.SqlServer/Migrations/`, vingt-six, dont celles des rôles et des vues `bi` du § 10 ;
@@ -1573,7 +1573,7 @@ l'étape (`step.source_language`) est l'original, les autres ses traductions.
   ligne écrite entre-temps est `CONFLIT_VERSION`. Une ligne supprimée n'est pas gardée : récrite, elle repart de la
   version 1, et une écriture qui avait lu la version 1 d'avant la suppression n'est donc pas refusée ; la présentation
   relit les commentaires à l'ouverture du champ pour ne pas écrire sur un texte qu'elle n'a pas montré
-  (`docs/a-peaufiner.md`, F-131). Les lignes d'une même requête (un original et les traductions qu'il
+  (`docs/a-peaufiner.md` (non publié), F-131). Les lignes d'une même requête (un original et les traductions qu'il
   fait tomber, un import de classeur, une traduction par l'assistant) sont écrites en une seule fois : toutes ou
   aucune. Hors du journal des opérations : pas d'annulation. Un texte vide supprime la ligne ; celui de l'original,
   toutes les lignes de l'étape ; dans la langue d'origine d'une étape sans original, rien.

@@ -28,6 +28,8 @@
   "REOUVERTE": "Ismételt indítás: a böngésző megnyitja az alkalmazást.",
   "ICONE_OUVRIR": "{product} megnyitása",
   "ICONE_QUITTER": "{product} bezárása",
+  "ICONE_QUITTER_ATTENTE": "Az adatlap egyik bejegyzése még nincs mentve. Mégis kilép?",
+  "ICONE_QUITTER_NON_VALIDE": "Egy megnyitott űrlap nincs mentve: a beírt adatok elvesznek. Mégis kilép?",
   "SAUVEGARDES_DOSSIER": "A biztonsági mentések helye: {folder}.",
   "RESTAURATION_PROPOSEE": "Elérhető biztonsági mentések, a legújabbtól a legrégebbiig. A kiválasztott mentés után végzett módosítások nincsenek benne; a jelenlegi fájl és a naplója mellette megmarad, nem törlődik:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

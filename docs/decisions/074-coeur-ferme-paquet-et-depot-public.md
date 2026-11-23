@@ -18,35 +18,35 @@ installation (4.3, 4.4) : la séparation s'écrit et se prouve sur des dossiers 
 1. **Le nom du produit** : `ProductIdentity.cs` passe dans `src/Topogenia.Application` (espace `Topogenia.Application`).
    `Directory.Build.props`, `build/sbom.mjs` et `web/scripts/build-mockup.mjs` le lisent là ; les règles D13 suivent
    (ADR 013). Les règles qui nommaient l'assemblage du domaine par ce type le nomment par `DomainException`.
-2. **La bascule** (`Directory.Build.props`) : `UseCorePackage` vaut `false` là où `src/Topogenia.Domain` existe, `true`
+2. **La bascule** (`Directory.Build.props`) : `UseCorePackage` vaut `false` là où `src/Topogenia.Domain` (non publié) existe, `true`
    ailleurs ; l'application, l'échange et la persistance référencent alors le paquet `Topogenia.Core` (version centrale
    2.0.0) au lieu du projet, restauré depuis `CoreFeed` (`artifacts/core-feed` par défaut). Rien à régler à la main : la
    copie de travail compile ses sources, le dépôt public le paquet.
-3. **La chaîne du cœur** tient dans `build/core/Topogenia.Core.csproj`, en une commande :
-   `dotnet pack build/core/Topogenia.Core.csproj -c Release -p:CoreKeyFile=<clé>`. Elle construit le domaine en Release
+3. **La chaîne du cœur** tient dans `build/core/Topogenia.Core.csproj` (non publié), en une commande :
+   `dotnet pack build/core/Topogenia.Core.csproj -c Release -p:CoreKeyFile=<clé>` (non publié). Elle construit le domaine en Release
    avec le nom fort, dans `artifacts/core/` (son `obj` et son `bin` habituels ne bougent pas) ; la clé est celle du
    titulaire (`sn.exe -k 2048`, outil du SDK .NET Framework livré avec Visual Studio), gardée hors du dépôt : la chaîne
    refuse une clé absente ou posée dans le dépôt. Obfuscar 2.2.50 (MIT, 15/12/2025, paquet NuGet de la chaîne, jamais
-   livré ni copié dans le dépôt public) l'obscurcit selon `build/core/obfuscar.xml` : l'API publique reste (l'application,
+   livré ni copié dans le dépôt public) l'obscurcit selon `build/core/obfuscar.xml` (non publié) : l'API publique reste (l'application,
    la persistance et l'échange s'en servent), les noms privés et internes sont renommés (2 883 à cette version), les
    chaînes restent telles qu'écrites (codes d'erreur et clés du contrat, que le dépôt public connaît), le nom fort est
    redonné. Le paquet porte l'assemblage, la documentation XML de sa seule API publique et `LICENSE.md` (acceptation
-   exigée), sans symboles : `build/core/public-docs.mjs` ne garde de la documentation que les membres que
+   exigée), sans symboles : `build/core/public-docs.mjs` (non publié) ne garde de la documentation que les membres que
    l'obscurcissement a gardés (597 sur 750), les autres rendraient les noms qu'il a retirés ; le générateur OpenAPI ne lit
    que la documentation des références de projet, l'hôte lui donne celle du paquet dans le dépôt public, et le contrat
    y a les mêmes descriptions que dans la copie de travail ; la carte des noms (`Mapping.txt`, utile pour lire une pile d'appels) reste dans
    `artifacts/core/out`, chez le titulaire. La chaîne écrit l'empreinte SHA-256 à côté du paquet et retire du cache NuGet
    la copie de la même version, pour qu'une restauration prenne le paquet neuf.
 4. **Le dépôt privé est la copie de travail** : elle garde tout, le domaine, ses tests, la chaîne et les règles
-   d'architecture sur toutes les sources. `node build/split.mjs <destination>` écrit le dépôt public hors d'elle : ce que
-   Git garderait (`.gitignore`), moins le domaine, ses tests, `build/core` et le script lui-même ; la solution sans les
+   d'architecture sur toutes les sources. `node build/split.mjs <destination>` (non publié) écrit le dépôt public hors d'elle : ce que
+   Git garderait (`.gitignore`), moins le domaine, ses tests, `build/core` (non publié) et le script lui-même ; la solution sans les
    deux projets du cœur ; le paquet dans `artifacts/core-feed`. Il refuse une destination dans la copie, autour d'elle,
    ou un dossier qui n'est ni vide ni une copie publique écrite par lui ; un `.git` de la destination est gardé : la
    séparation suivante se lit comme un diff. **Écart à l'ADR 048**, qui écrivait un dépôt privé `topogenia-core` réduit au
    domaine : un titulaire seul travaillerait alors dans deux dépôts pour tout changement qui touche le domaine et ce qui
    s'en sert, avec un paquet à refaire entre les deux. La copie de travail en tient lieu ; son nom de dépôt Git, s'il en
    devient un, est au choix du titulaire.
-5. **La preuve** (`split.mjs` sans `--no-proof`) : dans la copie publique, la restauration (les fichiers de
+5. **La preuve** (`split.mjs` (non publié) sans `--no-proof`) : dans la copie publique, la restauration (les fichiers de
    verrouillage réécrits pour le paquet), la construction à 0 avertissement, l'assemblage du domaine à côté des tests
    identique, empreinte comprise, à celui du paquet, les paquets npm de l'interface (`npm ci --ignore-scripts`, lus par les
    règles des composants tiers), puis tous les tests de la solution.
@@ -74,13 +74,13 @@ installation (4.3, 4.4) : la séparation s'écrit et se prouve sur des dossiers 
    `CORE_PACKAGE_URL`, variable `CORE_PACKAGE_SHA256`, vérifiée) ; sans elles, l'étape échoue en disant pourquoi. La copie
    qui a les sources du cœur saute cette étape. Rendre le paquet public (le porter dans Git) serait une décision de
    licence du titulaire, pas de la construction.
-10. **La destination de `split.mjs`** (garde-fou, même round) : un dossier non vide n'est vidé que s'il a la solution de
+10. **La destination de `split.mjs` (non publié)** (garde-fou, même round) : un dossier non vide n'est vidé que s'il a la solution de
    la copie, la bascule du cœur dans son `Directory.Build.props`, aucune source du cœur, et en haut seulement ce que la
    séparation écrit ou ce que Git ignore ; sinon le script échoue sans rien effacer (prouvé sur deux leurres).
 
 ## Conséquences
 
-- Le dépôt public compile et passe ses tests avec le seul paquet (chiffres au journal, `Travail/split-p7-t04b.log`).
+- Le dépôt public compile et passe ses tests avec le seul paquet (chiffres au journal de la construction).
 - Le paquet n'est pas dans le dépôt public (`artifacts/` est ignoré) : celui qui reçoit la licence écrite reçoit le
   paquet et le pose dans `artifacts/core-feed` (`CONTRIBUTING.md`). Aucun flux de paquets public.
 - Un correctif proposé au dépôt public se reporte à la main dans la copie de travail, puis une nouvelle séparation.
@@ -95,11 +95,18 @@ installation (4.3, 4.4) : la séparation s'écrit et se prouve sur des dossiers 
 Le dépôt public reçoit le code, ses tests, les décisions, l'architecture, les formats et les guides. Les documents de
 travail du porteur du projet n'y vont pas : journal de la construction, consignes données aux agents, relevés de
 couverture, questions, état, plan, rapports de recette. Ils ne servent pas un lecteur du code. Le découpage les garde
-(liste `WORKING` de `build/split.mjs`), comme il garde le cœur.
+(liste `WORKING` de `build/split.mjs` (non publié)), comme il garde le cœur.
 
 ## Vérification
 
-`dotnet pack build/core/Topogenia.Core.csproj -c Release -p:CoreKeyFile=...` (paquet, jeton, empreinte) ;
-`node build/split.mjs ../topogenia-public` (preuve complète) ; dans la copie de travail, `DependencyRulesTests`
+`dotnet pack build/core/Topogenia.Core.csproj -c Release -p:CoreKeyFile=...` (non publié) (paquet, jeton, empreinte) ;
+`node build/split.mjs ../topogenia-public` (non publié) (preuve complète) ; dans la copie de travail, `DependencyRulesTests`
 (dont `The_domain_is_built_from_its_sources_or_comes_signed_from_its_package` et la condition du paquet du cœur) et toute
 la suite d'architecture sans test sauté.
+
+## Révision (23/11/2026, pré-audit de la copie 68) : aucun renvoi mort ni dossier du poste
+
+Le découpage garde le texte des documents, sauf ceci : un chemin qu'il retire (le cœur, sa chaîne, ce script, les
+documents de travail), cité en code dans un document Markdown, est suivi de « (non publié) », et un lien vers lui ne
+garde que son texte. Il refuse ensuite d'écrire la copie publique si un lien d'un document mène à un fichier absent, ou
+si un fichier publié nomme un dossier de travail du poste. Le code (sources, essais) est copié tel quel.

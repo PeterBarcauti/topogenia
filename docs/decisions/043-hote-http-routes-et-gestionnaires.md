@@ -8,7 +8,7 @@ Statut : acceptée (date 24/10/2026)
 ## Contexte
 
 P4-T04 expose les commandes et lectures de l'application (P4-T01 à P4-T03) selon la table des routes 1.x -> 2.0
-(`docs/couverture.md`, spec 3.6). Les tests d'architecture imposent déjà deux règles : toute déclaration de route vit
+(`docs/couverture.md` (non publié), spec 3.6). Les tests d'architecture imposent déjà deux règles : toute déclaration de route vit
 dans `Host/Endpoints/`, et ce dossier ne dépend ni du domaine, ni de la persistance, ni des formats d'échange
 (spec 3.2 : un point d'entrée ne contient aucune règle). Or les commandes prennent des requêtes du domaine
 (`AddLaneRequest`...) et rendent des résultats du domaine (`LaneResult`). Il fallait aussi fixer le JSON, la forme des
@@ -81,7 +81,7 @@ La règle des routes (`ExtraRulesTests.Http_entry_points_are_declared_only_in_th
 l'exemption de `Composition/HostPipeline` (préfixe sans extension) laissait passer une route posée dans ce fichier ou
 dans un fichier nommé d'après lui. Le pipeline passe la main aux routes par `MapApi`, méthode de l'espace de noms
 `Topogenia.Host.Endpoints` : un appel à une méthode de cet espace de noms ne déclare aucune route, où qu'il soit, les
-routes elles-mêmes étant contrôlées dans `Endpoints/` ; limite connue (round 4) : une méthode de cet espace de noms qui prendrait une adresse et un délégué pour les passer à `Map*` relaierait une route posée ailleurs ; aucune ne le fait (les méthodes d'`Endpoints/` ne prennent que le constructeur de routes), une règle qui l'interdit est au registre `a-peaufiner.md` (F-10). Un intergiciel ajouté par `Use` ou `UseMiddleware` n'est pas un
+routes elles-mêmes étant contrôlées dans `Endpoints/` ; limite connue (round 4) : une méthode de cet espace de noms qui prendrait une adresse et un délégué pour les passer à `Map*` relaierait une route posée ailleurs ; aucune ne le fait (les méthodes d'`Endpoints/` ne prennent que le constructeur de routes), une règle qui l'interdit est au registre `a-peaufiner.md` (non publié) (F-10). Un intergiciel ajouté par `Use` ou `UseMiddleware` n'est pas un
 point d'entrée, même quand il répond à une adresse (le lancement du mode Poste, `GET /launch`, spec 5.2) : c'est une
 étape du pipeline, ordonnée dans `Composition/HostPipeline`. Tests :
 `ExtraRulesTests.A_route_in_the_file_of_the_pipeline_or_in_a_file_named_after_it_is_misplaced`,

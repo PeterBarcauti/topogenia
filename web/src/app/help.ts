@@ -9,9 +9,14 @@ export const HELP_URL_FR = `${import.meta.env.BASE_URL}aide/index.html`;
 /** The address of the help in English, the one of every language of the interface but French. */
 export const HELP_URL_EN = `${import.meta.env.BASE_URL}aide/en/index.html`;
 
+/** A language of the interface served in French, the language of the manual and of the site: French itself (« fr », « fr-CA »); English serves any other. */
+export function servedInFrench(language: string): boolean {
+  return language === DEFAULT_LANGUAGE || language.startsWith(`${DEFAULT_LANGUAGE}-`);
+}
+
 /** The help to open for a language of the interface: French for French (« fr », « fr-CA »), English for any other. */
 export function helpUrl(language: string): string {
-  return language === DEFAULT_LANGUAGE || language.startsWith(`${DEFAULT_LANGUAGE}-`) ? HELP_URL_FR : HELP_URL_EN;
+  return servedInFrench(language) ? HELP_URL_FR : HELP_URL_EN;
 }
 
 /** Opens the help of a language of the interface in a new tab, without giving it the window of the application. */

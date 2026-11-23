@@ -1,5 +1,5 @@
 // SampleProjectRoutesTests.cs
-// The sample project of the first launch: imported from a package of the samples for the user of the desktop mode, by the chain of every import, written in the language of the interface; nothing in server mode (spec 6.1, 7.3).
+// The sample project of the first launch: imported from a package of the samples for the user of the desktop mode, by the chain of every import, written in the language of the interface, under the first free code once its own is taken (ADR 111); nothing in server mode (spec 6.1, 7.3).
 
 using Topogenia.Application.Audit;
 using Topogenia.Host.Api.Exchange;
@@ -47,7 +47,7 @@ public sealed class SampleProjectRoutesTests(ApiHosts hosts) : IClassFixture<Api
     }
 
     [Fact]
-    public async Task The_administrator_of_the_desktop_mode_creates_the_sample_project_once_as_its_only_facilitator_and_the_import_is_audited()
+    public async Task The_administrator_of_the_desktop_mode_creates_the_sample_project_as_its_only_facilitator_and_the_import_is_audited()
     {
         var host = await hosts.OfAsync(EngineKind.Sqlite);
         using var admin = host.As(Logins.Admin);
@@ -65,11 +65,66 @@ public sealed class SampleProjectRoutesTests(ApiHosts hosts) : IClassFixture<Api
         Assert.True((await admin.GetAsync($"/api/maps/{detail.GetProperty("root_map_id").GetGuid()}")).Ok().GetProperty("map").GetProperty("steps").GetArrayLength() > 0);
         var audit = Assert.Single((await admin.GetAsync($"/api/admin/audit?project_id={id}")).Ok().EnumerateArray());
         Assert.Equal(AuditKinds.ProjectImported, audit.GetProperty("kind").GetString());
+    }
 
-        Assert.Equal("CONGES", (await admin.PostAsync(Route)).Refused(409, "PROJET_CODE_EXISTANT").GetProperty("code").GetString());
-        (await admin.DeleteAsync($"/api/projects/{id}?confirmation=CONGES", detail.GetProperty("version").GetInt32())).Ok(204);
-        (await admin.PostAsync(Route)).Refused(409, "PROJET_CODE_CORBEILLE");
-        Assert.DoesNotContain((await admin.GetAsync("/api/projects")).Ok().EnumerateArray(), item => item.GetProperty("code").GetString() == "CONGES");
+    /// <summary>The code, the name and the labels of the steps of the root map of a sample created, read back from the host.</summary>
+    private static async Task<(string? Code, string? Name, IReadOnlyList<string?> Steps)> OpenedAsync(ApiClient admin, ApiResponse reply)
+    {
+        var created = reply.Ok(201);
+        var id = created.GetProperty("id").GetGuid();
+        Assert.Equal($"/api/projects/{id}", reply.Location!.OriginalString);
+        var detail = (await admin.GetAsync($"/api/projects/{id}")).Ok();
+        // The reply names the root map that the interface opens: the one of the project, readable at once.
+        var rootMap = created.GetProperty("root_map_id").GetGuid();
+        Assert.Equal(rootMap, detail.GetProperty("root_map_id").GetGuid());
+        var steps = (await admin.GetAsync($"/api/maps/{rootMap}")).Ok().GetProperty("map").GetProperty("steps").EnumerateArray()
+            .Select(step => step.GetProperty("label").GetString()).Order(StringComparer.Ordinal).ToList();
+        Assert.Equal(created.GetProperty("code").GetString(), detail.GetProperty("code").GetString());
+        return (detail.GetProperty("code").GetString(), detail.GetProperty("name").GetString(), steps);
+    }
+
+    /// <summary>
+    /// ADR 111 point 6 (3.4, lot 3): the sample stays offered once projects exist; its code taken, it takes the first free
+    /// code of the rule of the trash (CONGES, then CONGEA, CONGEB), and its map opens like the first. A base of its own:
+    /// the codes it finds are those it creates.
+    /// </summary>
+    [Fact]
+    public async Task A_second_sample_takes_the_next_free_code_and_opens_like_the_first()
+    {
+        await using var host = await ApiHost.StartAsync(EngineKind.Sqlite);
+        using var admin = host.As(Logins.Admin);
+        var first = await OpenedAsync(admin, await admin.PostAsync(Route));
+        var second = await OpenedAsync(admin, await admin.PostAsync(Route));
+        var third = await OpenedAsync(admin, await admin.PostAsync(Route));
+
+        Assert.Equal(("CONGES", "CONGEA", "CONGEB"), (first.Code, second.Code, third.Code));
+        Assert.NotEmpty(first.Steps);
+        foreach (var other in new[] { second, third })
+        {
+            Assert.Equal(first.Name, other.Name);
+            Assert.Equal(first.Steps, other.Steps);
+        }
+        Assert.Equal(["CONGEA", "CONGEB", "CONGES"],
+            (await admin.GetAsync("/api/projects")).Ok().EnumerateArray().Select(item => item.GetProperty("code").GetString()).Order(StringComparer.Ordinal));
+        Assert.Equal(3, (await admin.GetAsync($"/api/admin/audit?kind={AuditKinds.ProjectImported}")).Ok().GetArrayLength());
+    }
+
+    /// <summary>A project in the trash keeps its code (restorable 30 days): the sample takes the next free one, the trashed project is not brought back.</summary>
+    [Fact]
+    public async Task A_sample_whose_code_is_in_the_trash_takes_the_next_free_code()
+    {
+        await using var host = await ApiHost.StartAsync(EngineKind.Sqlite);
+        using var admin = host.As(Logins.Admin);
+        var created = (await admin.PostAsync(Route)).Ok(201);
+        var id = created.GetProperty("id").GetGuid();
+        var version = (await admin.GetAsync($"/api/projects/{id}")).Ok().GetProperty("version").GetInt32();
+        (await admin.DeleteAsync($"/api/projects/{id}?confirmation=CONGES", version)).Ok(204);
+
+        var again = await OpenedAsync(admin, await admin.PostAsync(Route));
+        Assert.Equal(("CONGEA", "Demande de congés"), (again.Code, again.Name));
+        Assert.NotEmpty(again.Steps);
+        Assert.Equal(["CONGEA"], (await admin.GetAsync("/api/projects")).Ok().EnumerateArray().Select(item => item.GetProperty("code").GetString()));
+        (await admin.GetAsync($"/api/projects/{id}")).Refused(404, "INTROUVABLE");
     }
 
     [Fact]

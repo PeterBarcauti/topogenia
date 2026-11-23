@@ -1,5 +1,5 @@
 // HomeSample.test.tsx
-// The home page and the classification: the sample project offered in desktop mode while there is no project, the level of each project on its card (spec 6.1, 4.1).
+// The home page and the classification: the sample project offered in desktop mode (a card while there is no project, the menu of the starts always), which opens its map once created, the level of each project on its card (spec 6.1, 4.1).
 
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,7 +7,7 @@ import type { Schema } from '../../api/client.ts';
 import { App } from '../../app/App.tsx';
 import { i18next } from '../../shared/i18n/i18n.ts';
 import { toasts } from '../../shared/ui/toasts.ts';
-import { callsTo, fakeApi, type FakeReply } from '../../test/fakeApi.ts';
+import { callsTo, fakeApi, heldReply, type FakeReply } from '../../test/fakeApi.ts';
 import { fakeSource, profileOf } from '../../test/profiles.ts';
 import type { ProjectItem } from './focus.ts';
 
@@ -15,6 +15,8 @@ const CONGES: ProjectItem = {
   id: 'p-conges', code: 'CONGES', name: 'Demande de congés', source_language: 'fr', name_translations: {}, description: null, classification: 'confidential',
   root_map_id: 'm-conges', role: 'facilitator', step_count: 23, map_count: 3,
 };
+
+const created = (code: string, rootMapId: string) => ({ id: `p-${code}`, code, root_map_id: rootMapId, trash_code: null, created_user_ids: [] });
 
 const DESKTOP: Partial<Schema<'ProfileView'>> = { is_admin: true, desktop: true };
 
@@ -47,20 +49,54 @@ describe('the sample project of the first launch (S-6.1-10)', () => {
     expect(card).toHaveTextContent('Un projet fictif, déjà décrit, pour découvrir une carte complète');
     expect(screen.getByTestId('home-empty')).toHaveTextContent('Aucun projet pour l’instant. Créer le premier.');
     await userEvent.click(screen.getByRole('button', { name: 'Nouveau projet' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Carte vide…' }));
     expect(window.location.pathname).toBe('/projects/new');
   });
 
-  it('« Créer le projet d’exemple » asks the host, says it, then lists the project, put forward by the main button', async () => {
-    const sent = start([{ json: [] }, { json: [CONGES] }], DESKTOP, { json: { id: 'p-conges', code: 'CONGES', root_map_id: 'm-conges', trash_code: null, created_user_ids: [] }, status: 201 });
+  it('the sample created opens its map and says its code', async () => {
+    const sent = start({ json: [] }, DESKTOP, { json: created('CONGES', 'm-conges'), status: 201 });
     await userEvent.click(await screen.findByRole('button', { name: 'Créer le projet d’exemple' }));
-    expect(await screen.findByTestId('project-CONGES')).toHaveTextContent('Demande de congés');
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/maps/m-conges');
+    });
     const [call] = callsTo(sent, 'POST', '/api/desktop/sample-project');
     expect([call?.body, call?.headers.get('X-Requested-With')]).toEqual([undefined, 'XMLHttpRequest']);
     expect(toasts.getState().toasts.map((toast) => [toast.kind, toast.text])).toEqual([['success', 'Projet d’exemple CONGES créé.']]);
-    expect(screen.queryByTestId('home-sample')).not.toBeInTheDocument();
+  });
+
+  it('a sample created from the menu while projects exist takes the code the host gives', async () => {
+    const sent = start({ json: [CONGES] }, DESKTOP, { json: created('CONGEA', 'm-conges-a'), status: 201 });
+    await userEvent.click(await screen.findByRole('button', { name: 'Nouveau projet' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Projet d’exemple' }));
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Décrire un processus' })).toBeEnabled();
+      expect(window.location.pathname).toBe('/maps/m-conges-a');
     });
+    expect(callsTo(sent, 'POST', '/api/desktop/sample-project')).toHaveLength(1);
+    expect(toasts.getState().toasts.map((toast) => toast.text)).toEqual(['Projet d’exemple CONGEA créé.']);
+  });
+
+  it('a creation of the sample under way cannot be started again from the menu or the card', async () => {
+    const held = heldReply();
+    const sent = start({ json: [] }, DESKTOP, held.reply);
+    await userEvent.click(await screen.findByRole('button', { name: 'Nouveau projet' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Projet d’exemple' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Nouveau projet' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Projet d’exemple' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Décrire un processus' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Projet d’exemple' }));
+    expect(callsTo(sent, 'POST', '/api/desktop/sample-project')).toHaveLength(1);
+    held.give({ json: created('CONGES', 'm-conges'), status: 201 });
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/maps/m-conges');
+    });
+  });
+
+  it('a refusal of the host while projects exist is said on the page, which stays', async () => {
+    start({ json: [CONGES] }, DESKTOP, { refused: 409, code: 'PROJET_CODE_CORBEILLE', message: 'Le code CONGES est dans la corbeille.' });
+    await userEvent.click(await screen.findByRole('button', { name: 'Nouveau projet' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Projet d’exemple' }));
+    expect(await screen.findByTestId('home-sample-error')).toHaveTextContent('Le code CONGES est dans la corbeille.');
+    expect(window.location.pathname).toBe('/');
   });
 
   it('a refusal of the host is said under the card, which stays to try again', async () => {
@@ -70,12 +106,14 @@ describe('the sample project of the first launch (S-6.1-10)', () => {
     expect(screen.getByRole('button', { name: 'Créer le projet d’exemple' })).toBeEnabled();
   });
 
-  it('never in server mode, never once a project is there, never to a user who is not an administrator', async () => {
-    for (const [projects, profile] of [[[], { is_admin: true }], [[CONGES], DESKTOP], [[], { desktop: true }]] as const) {
+  it('the card while the list is empty, the menu always in desktop mode; neither in server mode, nor for a user who is not an administrator', async () => {
+    for (const [projects, profile, menu] of [[[], { is_admin: true }, false], [[CONGES], DESKTOP, true], [[], { desktop: true }, false]] as const) {
       const sent = start({ json: projects }, profile);
       await screen.findByTestId(projects.length === 0 ? 'home-empty' : 'project-CONGES');
       expect(screen.queryByTestId('home-sample')).not.toBeInTheDocument();
       expect(callsTo(sent, 'POST', '/api/desktop/sample-project')).toEqual([]);
+      if (profile.is_admin === true) await userEvent.click(screen.getByRole('button', { name: 'Nouveau projet' }));
+      expect(screen.queryByRole('menuitem', { name: 'Projet d’exemple' }) !== null).toBe(menu);
       act(() => {
         document.body.innerHTML = '';
       });

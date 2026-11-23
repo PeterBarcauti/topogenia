@@ -18,9 +18,9 @@ public sealed class OperationKindsTests
     /// <summary>
     /// The operations the 1.x did not have: the reversal of a flow (2.0, AR-155), a proposal of the assistant applied to
     /// a map (3.0, ADR 079), the route chosen for a flow (3.1, ADR 091), the drawing given back to several flows at once (3.1),
-    /// rows inserted into a lane and an empty row taken out of it (3.1, ADR 096).
+    /// rows inserted into a lane and an empty row taken out of it (3.1, ADR 096), a file inserted as a detailed step (3.3, ADR 108).
     /// </summary>
-    private static readonly string[] New = ["inverser_lien", "proposition_ia", "tracer_lien", "retracer_liens", "inserer_rangees", "retirer_rangee"];
+    private static readonly string[] New = ["inverser_lien", "proposition_ia", "tracer_lien", "retracer_liens", "inserer_rangees", "retirer_rangee", "inserer_fichier"];
 
     /// <summary>The constants of the kinds, read by the test: the application keeps no list of them.</summary>
     private static string[] Constants() =>

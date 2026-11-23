@@ -4,6 +4,7 @@
 import { useId, useState, type SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ownName } from '../../shared/i18n/languageNames.ts';
+import { useUnsavedForm } from '../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../shared/ui/Button.tsx';
 import { Dialog } from '../../shared/ui/Dialog.tsx';
 import { Field } from '../../shared/ui/Field.tsx';
@@ -52,6 +53,8 @@ export function ManualTranslationsDialog({ named, languages, preferred, onSave, 
   const [saving, setSaving] = useState(false);
   const changes = changedTranslations(named.translations, fields);
   const changed = Object.keys(changes).length > 0;
+  // A translation typed and not saved is a form not validated, for « Quit » (R12).
+  useUnsavedForm(changed);
   // The button that submits is disabled without a change and while saving: the browser then submits nothing, Enter included.
   const submit = async (event: SyntheticEvent) => {
     event.preventDefault();

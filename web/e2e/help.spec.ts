@@ -1,5 +1,5 @@
 // help.spec.ts
-// Journeys of the help: the button « Aide » of the header opens it in a new tab, served by the host under its policy (no inline script nor style); its summary leads to a chapter and marks it, its search finds a section without its accents and goes to it, a capture is enlarged and drawn; F1 opens it too. An interface in English opens the help in English, whose link leads to the same section in French.
+// Journeys of the help: the menu « Aide » of the header opens it in a new tab (its entry « Aide en ligne »), served by the host under its policy (no inline script nor style); its summary leads to a chapter and marks it, its search finds a section without its accents and goes to it, a capture is enlarged and drawn; F1 opens it too. An interface in English opens the help in English, whose link leads to the same section in French.
 
 import { chooseInterfaceLanguage, expect, test } from './support/journey.ts';
 
@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-test('the help: opened from the header in a new tab under the policy of the host, its summary, its search, a capture enlarged; F1 opens it too', async ({ page, context }) => {
+test('the help: opened from the Help menu of the header in a new tab under the policy of the host, its summary, its search, a capture enlarged; F1 opens it too', async ({ page, context }) => {
   await context.addInitScript(() => {
     window.violations = [];
     document.addEventListener('securitypolicyviolation', (event) => window.violations.push(`${event.violatedDirective} ${event.blockedURI}`));
@@ -18,6 +18,7 @@ test('the help: opened from the header in a new tab under the policy of the host
   await expect(page.getByTestId('header-help')).toHaveText('Aide');
   const opened = context.waitForEvent('page');
   await page.getByTestId('header-help').click();
+  await page.getByTestId('help-menu-online').click();
   const help = await opened;
   await help.waitForLoadState();
   // The title names the product and its version: « Aide de <produit> 3.1.0 ».
@@ -28,7 +29,7 @@ test('the help: opened from the header in a new tab under the policy of the host
   // The summary leads to a chapter and marks it as the one read.
   await help.locator('#sidebar .toc-chapter > a', { hasText: 'Raccourcis clavier' }).click();
   await expect(help.locator('.toc-chapter.is-current')).toContainText('Raccourcis clavier');
-  const shortcut = help.locator('.chapter', { has: help.getByRole('heading', { level: 2, name: 'Raccourcis clavier' }) }).getByRole('row', { name: "Ouvrir l'aide" });
+  const shortcut = help.locator('.chapter', { has: help.getByRole('heading', { level: 2, name: 'Raccourcis clavier' }) }).getByRole('row', { name: 'Aide en ligne' });
   await expect(shortcut).toBeVisible();
   await expect(shortcut.locator('kbd')).toHaveText('F1');
 
@@ -54,7 +55,7 @@ test('the help: opened from the header in a new tab under the policy of the host
   expect(await page.evaluate(() => window.violations)).toEqual([]);
 });
 
-test('the help in English: opened from an interface in English, its search, its link to the same section in French; F1 opens it too', async ({ page, context }) => {
+test('the help in English: opened from the Help menu of an interface in English, its search, its link to the same section in French; F1 opens it too', async ({ page, context }) => {
   await context.addInitScript(() => {
     window.violations = [];
     document.addEventListener('securitypolicyviolation', (event) => window.violations.push(`${event.violatedDirective} ${event.blockedURI}`));
@@ -64,6 +65,7 @@ test('the help in English: opened from an interface in English, its search, its 
   await expect(page.getByTestId('header-help')).toHaveText('Help');
   const opened = context.waitForEvent('page');
   await page.getByTestId('header-help').click();
+  await page.getByTestId('help-menu-online').click();
   const help = await opened;
   await help.waitForLoadState();
   await expect(help).toHaveURL(/\/aide\/en\/index\.html$/);

@@ -10,6 +10,7 @@ import { notify } from '../../../shared/ui/toasts.ts';
 import type { CopiedTurn, FailureTurn, ProgressTurn, ReplyTurn, RequestTurn } from './assistantStore.ts';
 import { FilePills } from './Attachments.tsx';
 import { Findings, Proposal, Questions, Report, TextWithCodes } from './ReplyParts.tsx';
+import { CommentsReply } from './CommentsReply.tsx';
 import { SummariesReply } from './SummariesReply.tsx';
 import { copyText } from '../../../shared/ui/clipboard.ts';
 import type { ThreadContext } from './threadContext.ts';
@@ -109,6 +110,7 @@ export function ReplyCard({ turn, context }: { turn: ReplyTurn; context: ThreadC
       {reply.form === 'proposal' && <Proposal reply={reply} context={context} translation={turn.translation} turnId={turn.id} />}
       {reply.form === 'report' && <Report reply={reply} context={context} />}
       {reply.form === 'summaries' && <SummariesReply reply={reply} context={context} turnId={turn.id} />}
+      {reply.form === 'comments' && <CommentsReply reply={reply} context={context} turnId={turn.id} />}
       <CostLine turn={turn} />
     </article>
   );

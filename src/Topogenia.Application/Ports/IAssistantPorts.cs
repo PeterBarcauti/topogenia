@@ -169,6 +169,9 @@ public sealed record AssistantPrompt(
     /// <summary>The comments of presentation of the flows whose translation is asked, listed after those of the steps, to the practice `translate` only (ADR 099, lot J10).</summary>
     public IReadOnlyList<AssistantFlowCommentTarget> FlowComments { get; init; } = [];
 
+    /// <summary>The steps and the flows of the map open and of its detailed maps whose comment the practice `comments` writes, with their comment of today (F-130).</summary>
+    public IReadOnlyList<AssistantDraftTarget> CommentDrafts { get; init; } = [];
+
     /// <summary>
     /// The indicators of the project now and its photos compared with now (F-109), given to the practices that read and
     /// analyse (a question, an analysis, the report, a free request); null for the others.

@@ -65,6 +65,9 @@ public sealed record AssistantContext(
     /// <summary>The live flows of the map open and of the levels below it, in reading order, for a translation only; empty otherwise.</summary>
     public IReadOnlyList<FlowEnds> TreeFlows { get; init; } = [];
 
+    /// <summary>The steps and the flows of the map open and of its detailed maps with their comment today, for the practice `comments` only (F-130); empty otherwise.</summary>
+    public IReadOnlyList<AssistantDraftTarget> CommentTargets { get; init; } = [];
+
     /// <summary>A proposal changes the structure: the facilitator of the project, the administrator acting as one (spec 3.0 section 3.3, revision 4).</summary>
     public bool CanPropose => Role == MemberRole.Facilitator;
 }
@@ -82,10 +85,14 @@ public sealed class AssistantContextQuery(Guid mapId, IPmapFormat format, IPacka
     /// <summary>The map open given with every level below it and without its sheets: what a translation returns translated (ADR 083).</summary>
     public bool WholeTree { get; init; }
 
+    /// <summary>The steps and the flows of the map open and of its detailed maps read with their comments, which the practice `comments` writes (F-130).</summary>
+    public bool Drafts { get; init; }
+
     private IReadOnlyList<Step> treeSteps = [];
     private IReadOnlyList<PresentationComment> treeComments = [];
     private IReadOnlyList<FlowEnds> treeFlows = [];
     private IReadOnlyList<FlowPresentationComment> treeFlowComments = [];
+    private IReadOnlyList<AssistantDraftTarget> commentTargets = [];
 
     public override WorkspaceContent Content => withTexts ? WorkspaceContent.All : WorkspaceContent.None;
 
@@ -94,7 +101,9 @@ public sealed class AssistantContextQuery(Guid mapId, IPmapFormat format, IPacka
     {
         ArgumentNullException.ThrowIfNull(workspace);
         ArgumentNullException.ThrowIfNull(beside);
-        (treeSteps, treeComments, treeFlows, treeFlowComments) = ([], [], [], []);
+        (treeSteps, treeComments, treeFlows, treeFlowComments, commentTargets) = ([], [], [], [], []);
+        if (Drafts && withTexts)
+            commentTargets = await DraftTargetsAsync(workspace, beside, cancellationToken);
         if (!WholeTree || !withTexts)
             return;
         treeSteps = PresentationCommentRules.TreeSteps(workspace, mapId);
@@ -128,7 +137,8 @@ public sealed class AssistantContextQuery(Guid mapId, IPmapFormat format, IPacka
             else
             {
                 schemaFormat = AssistantSchemaFormat.Pmap;
-                schema = format.Write(format.Outline(workspace, viewerOf).Document, ProductIdentity.Name, stamp);
+                // The schema of the assistant carries the structure and the sheets, not what a whole copy adds (1.5, lot 3).
+                schema = format.Write(format.Outline(workspace, viewerOf, null).Document, ProductIdentity.Name, stamp);
             }
             var outline = WholeTree ? format.OutlineTree(workspace, map.Id) : format.OutlineMap(workspace, map.Id, viewerOf);
             openMap = format.Write(outline.Document, ProductIdentity.Name, stamp);
@@ -145,7 +155,21 @@ public sealed class AssistantContextQuery(Guid mapId, IPmapFormat format, IPacka
             TreeComments = treeComments,
             TreeFlows = treeFlows,
             TreeFlowComments = treeFlowComments,
+            CommentTargets = commentTargets,
         };
+    }
+
+    /// <summary>
+    /// The steps and the flows of the map open and of every detailed map below it, map by map, each in reading order, each
+    /// with the lines of its comment and the name of its map.
+    /// </summary>
+    private async Task<IReadOnlyList<AssistantDraftTarget>> DraftTargetsAsync(ProjectWorkspace workspace, BesidePorts beside, CancellationToken cancellationToken)
+    {
+        var steps = PresentationCommentRules.TreeSteps(workspace, mapId);
+        var flows = FlowPresentationCommentRules.TreeFlows(workspace, mapId);
+        var lines = steps.Count == 0 ? [] : await beside.Comments.OfStepsAsync([.. steps.Select(step => step.Id)], cancellationToken);
+        var flowLines = flows.Count == 0 ? [] : await beside.FlowComments.OfFlowsAsync([.. flows.Select(flow => flow.Id)], cancellationToken);
+        return AssistantCommentDraftTargets.Of(steps, lines, flows, flowLines, map => workspace.LiveMap(map).Name);
     }
 
     /// <summary>The entries of the package, each under a line that names it, in the order of the archive.</summary>

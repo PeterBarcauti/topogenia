@@ -91,6 +91,7 @@ describe('the projects (B-1.3-05 to B-1.3-14)', () => {
     expect(screen.getByTestId('import-package')).toBeInTheDocument();
     await userEvent.click(screen.getByTestId('import-package-cancel'));
     await userEvent.click(screen.getByRole('button', { name: 'Nouveau projet' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Carte vide…' }));
     expect(window.location.pathname).toBe('/projects/new');
   });
 
@@ -151,5 +152,78 @@ describe('the layout (B-1.3-04, B-1.3-28)', () => {
   it('projects on two thirds, participants on one third; one column below 900 px', () => {
     expect(css).toMatch(/\.home-cols \{[^}]*grid-template-columns: 2fr 1fr;/);
     expect(css).toMatch(/@media \(max-width: 899px\) \{[^@]*\.home-cols \{ grid-template-columns: 1fr; \}/);
+  });
+});
+
+describe('the filter of the projects (3.4, lot 2)', () => {
+  const TEAM = new Set(['P02', 'P05', 'P09']);
+  const many = Array.from({ length: 12 }, (_unused, index) => {
+    const code = `P${String(index + 1).padStart(2, '0')}`;
+    return item(code, `p-${code.toLowerCase()}`, { name: TEAM.has(code) ? `Équipe ${code}` : `Atelier ${code}`, name_translations: {} });
+  });
+  const OLD: Schema<'TrashItem'> = { id: 't-old', code: 'OLDA', name: 'Équipe ancienne', deleted_at: '2026-10-20T10:00:00Z', deleted_by: null, purge_at: '2026-11-19T10:00:00Z', step_count: 4 };
+  const field = () => screen.getByRole('searchbox', { name: 'Filtrer les projets' });
+  const listed = () => screen.getAllByTestId(/^project-P\d+$/).map((card) => card.getAttribute('data-testid'));
+
+  it('the field filters the list and the count reads 3 of 12', async () => {
+    start({ 'GET /api/projects': { json: many }, 'GET /api/projects/p-p01/participants': { json: [] } });
+    await screen.findByTestId('project-P01');
+    expect(field()).toHaveAttribute('placeholder', 'Code ou nom');
+    expect(document.querySelector('.home-col-head .count')).toHaveTextContent('12');
+    await userEvent.type(field(), 'equipe');
+    expect(listed()).toEqual(['project-P02', 'project-P05', 'project-P09']);
+    expect(document.querySelector('.home-col-head .count')).toHaveTextContent('3 sur 12');
+    await userEvent.clear(field());
+    await userEvent.type(field(), 'p1');
+    expect(listed()).toEqual(['project-P10', 'project-P11', 'project-P12']);
+  });
+
+  it('nothing found says so, Escape empties the field and the whole list comes back', async () => {
+    start({ 'GET /api/projects': { json: many }, 'GET /api/projects/p-p01/participants': { json: [] } });
+    await screen.findByTestId('project-P01');
+    await userEvent.type(field(), 'zzz');
+    expect(screen.getByText('Aucun projet ne correspond.')).toBeInTheDocument();
+    expect(screen.queryByTestId('project-P01')).not.toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    expect(field()).toHaveValue('');
+    expect(screen.queryByText('Aucun projet ne correspond.')).not.toBeInTheDocument();
+    expect(listed()).toHaveLength(12);
+    expect(document.querySelector('.home-col-head .count')).toHaveTextContent('12');
+  });
+
+  it('the count and the message of an empty filter are announced to a screen reader', async () => {
+    start({ 'GET /api/projects': { json: many }, 'GET /api/projects/p-p01/participants': { json: [] } });
+    await screen.findByTestId('project-P01');
+    await userEvent.type(field(), 'equipe');
+    const count = screen.getByText('3 sur 12');
+    expect(count).toHaveAttribute('role', 'status');
+    await userEvent.clear(field());
+    await userEvent.type(field(), 'zzz');
+    expect(screen.getByText('Aucun projet ne correspond.')).toHaveAttribute('role', 'status');
+    expect(screen.getByText('0 sur 12')).toHaveAttribute('role', 'status');
+  });
+
+  it('the field is there only when there are projects', async () => {
+    start({ 'GET /api/projects': { json: [] } });
+    await screen.findByTestId('home-empty');
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+  });
+
+  it('the project put forward and the trash do not change', async () => {
+    const sent = start({
+      'GET /api/projects': { json: many }, 'GET /api/projects/p-p09/participants': { json: [participant('Camille Bernard', false)] },
+      'GET /api/trash': { json: { retention_days: 30, projects: [OLD] } },
+    }, { last_project_id: 'p-p09' });
+    await screen.findByTestId('project-P01');
+    await userEvent.type(field(), 'atelier');
+    expect(listed()).toHaveLength(9);
+    // The project put forward is outside the filter: the main button and the participants keep it.
+    expect(screen.queryByTestId('project-P09')).not.toBeInTheDocument();
+    expect(await screen.findByTestId('participants')).toHaveTextContent('Équipe P09');
+    expect(callsTo(sent, 'GET', '/api/projects/p-p09/participants')).toHaveLength(1);
+    // The trash is outside the filter too: « Équipe ancienne » does not hold « atelier » and stays.
+    expect(screen.getByTestId('trash-OLDA')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Décrire un processus' }));
+    expect(window.location.pathname).toBe('/maps/p-p09-map');
   });
 });

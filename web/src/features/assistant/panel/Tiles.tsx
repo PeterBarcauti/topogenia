@@ -1,18 +1,20 @@
 // Tiles.tsx
-// The empty panel of the assistant: a greeting and the four tiles, one per practice, with examples fitted to the map (spec 3.0 section 3.4).
+// The empty panel of the assistant: a greeting and the tiles, one per practice, with examples fitted to the map (spec 3.0 section 3.4; the comments of presentation, F-130).
 
-import { FilePlus2, MessageCircleQuestion, PenLine, ScanSearch, Sparkles } from 'lucide-react';
+import { FilePlus2, MessageCircleQuestion, MessageSquareQuote, PenLine, ScanSearch, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '../../../shared/ui/Icon.tsx';
 import type { Intent } from './assistantStore.ts';
 import type { ThreadContext } from './threadContext.ts';
 
-/** The practices of the tiles, in their order; the first two change the map, for the facilitator only. */
+/** The practices of the tiles, in their order; the first two and the last change the project, for the facilitator only. */
 const TILES: readonly { readonly intent: Exclude<Intent, 'free'>; readonly icon: typeof Sparkles; readonly proposes: boolean }[] = [
   { intent: 'create', icon: FilePlus2, proposes: true },
   { intent: 'modify', icon: PenLine, proposes: true },
   { intent: 'analyze', icon: ScanSearch, proposes: false },
   { intent: 'ask', icon: MessageCircleQuestion, proposes: false },
+  // What a presentation says of the steps and the flows (F-130): written in the comments, for the facilitator, on a map with steps.
+  { intent: 'comments', icon: MessageSquareQuote, proposes: true },
 ];
 
 /** An empty map offers to create first; the home page offers only to create. A tile fills the field with its example and sets the practice. */
@@ -32,7 +34,8 @@ export function Tiles({ context }: { context: ThreadContext }) {
       </div>
       <div className={`assistant-tiles${tiles.length === 1 ? ' is-single' : ''}`}>
         {tiles.map((tile) => {
-          const allowed = !tile.proposes || canPropose;
+          // The comments are written for the steps of the map: an empty map has none.
+          const allowed = (!tile.proposes || canPropose) && !(tile.intent === 'comments' && empty);
           const example = t(`assistant.panel.tiles.${tile.intent}.${empty ? 'example_empty' : 'example'}`);
           return (
             <button key={tile.intent} type="button" className={`assistant-tile is-${tile.intent}`} data-testid={`assistant-tile-${tile.intent}`} disabled={!allowed}

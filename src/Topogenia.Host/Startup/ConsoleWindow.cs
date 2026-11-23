@@ -1,5 +1,5 @@
 // ConsoleWindow.cs
-// The console of the process on Windows in desktop mode: released when it was made for this process alone, opened for a question only, and the boxes of Windows that tell the person instead (F-69, ADR 090).
+// The console of the process on Windows in desktop mode: released when it was made for this process alone, opened for a question only, and the boxes of Windows that tell or ask the person instead (F-69, ADR 090, ADR 115).
 
 using System.Runtime.InteropServices;
 using System.Text;
@@ -17,6 +17,9 @@ public interface IStartupWindow
 
     /// <summary>Opens a console, writes the sentences, reads the answer of the person, closes the console; null when nothing is read.</summary>
     string? Ask(IReadOnlyList<string> lines);
+
+    /// <summary>Asks a question in a box of Windows, Yes or No, No by default, and waits for the answer: true for Yes only.</summary>
+    bool Confirm(IReadOnlyList<string> lines);
 }
 
 /// <summary>
@@ -34,6 +37,10 @@ public sealed class ConsoleWindow : IStartupWindow
     private const int CharacterDevice = 0x0002;
     private const uint Utf8 = 65001;
     private const uint BoxOk = 0x0;
+    private const uint BoxYesNo = 0x4;
+    private const uint BoxWarning = 0x30;
+    private const uint BoxSecondDefault = 0x100;
+    private const int AnswerYes = 6;
     private const uint BoxError = 0x10;
     private const uint BoxInformation = 0x40;
     private const uint BoxForeground = 0x10000;
@@ -41,6 +48,15 @@ public sealed class ConsoleWindow : IStartupWindow
 
     /// <summary>The title of the boxes and of the console opened for a question.</summary>
     public static string Title => Application.ProductIdentity.Name;
+
+    /// <summary>
+    /// The box of <see cref="Confirm"/> (ADR 115): Yes and No, No the button by default (Enter does not quit), a warning,
+    /// in the foreground and above the other windows.
+    /// </summary>
+    public static uint ConfirmStyle => BoxYesNo | BoxWarning | BoxSecondDefault | BoxForeground | BoxTopmost;
+
+    /// <summary>The answer of a box is Yes; a box that could not be shown (0) is not.</summary>
+    public static bool IsYes(int answer) => answer == AnswerYes;
 
     /// <summary>
     /// True when the process now runs without a console a person sees: none was given to it, or the one made for it alone
@@ -76,6 +92,12 @@ public sealed class ConsoleWindow : IStartupWindow
             return;
         _ = NativeMethods.MessageBoxW(IntPtr.Zero, string.Join(Environment.NewLine + Environment.NewLine, lines), Title,
             BoxOk | (problem ? BoxError : BoxInformation) | BoxForeground | BoxTopmost);
+    }
+
+    public bool Confirm(IReadOnlyList<string> lines)
+    {
+        ArgumentNullException.ThrowIfNull(lines);
+        return IsYes(NativeMethods.MessageBoxW(IntPtr.Zero, string.Join(Environment.NewLine + Environment.NewLine, lines), Title, ConfirmStyle));
     }
 
     public string? Ask(IReadOnlyList<string> lines)

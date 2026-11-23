@@ -76,7 +76,7 @@ Retour d'expérience du porteur du projet sur les diagrammes : les défauts habi
 ## Écarté
 
 - **Visio `.vsdx`, BPMN et GraphML** : écartés par le porteur du projet le 05/11/2026 (« je ne sais même pas si je le
-  traiterai »).
+  traiterai »). L'export BPMN est repris en 3.3 à sa demande (ADR 106) ; Visio et GraphML restent écartés.
 - **Le paquet `mermaid` dans le code livré** : il est lourd, et la syntaxe des exports est écrite par le code. Il reste
   une dépendance de test (point F-90).
 - **Une capture `html-to-image` pour le SVG** : son `foreignObject` ne se lit ni dans Word ni dans PowerPoint.

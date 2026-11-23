@@ -4,9 +4,9 @@
     "net10.0": {
       "Topogenia.Core": {
         "type": "Direct",
-        "requested": "[3.2.0, )",
-        "resolved": "3.2.0",
-        "contentHash": "lDcxfSghP6H74kzMmNv2uLLQ0o1HGcxyybTzzd+m7rjQgovAN9tLbnvUsbmMGcjk8gSEjiJ60wrTwmNlo/JiJw=="
+        "requested": "[3.4.1, )",
+        "resolved": "3.4.1",
+        "contentHash": "27HDOuqbeM4jmFJdfvWvyAJR140fgMZcnN0GONF0ONAAwh781TZNb1vBkK+3xA0TrYSzBCr+SagOMjYZ5Jz97w=="
       }
     }
   }

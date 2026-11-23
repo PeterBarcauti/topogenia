@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../../api/client.ts';
 import { messageOf } from '../../../shared/i18n/errorMessage.ts';
+import { useUnsavedForm } from '../../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../../shared/ui/Button.tsx';
 import { Dialog } from '../../../shared/ui/Dialog.tsx';
 import { Field } from '../../../shared/ui/Field.tsx';
@@ -57,6 +58,8 @@ export function ProjectPropertiesDialog({ projectId, code, onClose, onDetail }: 
     workday: workday ?? String(detail.workday_hours), fte: fte ?? String(detail.fte_hours_per_month),
   };
   const editable = detail?.role === 'facilitator';
+  // A change not saved is a form not validated, for « Quit » (R12); saved or closed, it is none.
+  useUnsavedForm(editable && choice !== null && changed(detail, choice));
 
   const save = async () => {
     if (detail === null || choice === null) return;

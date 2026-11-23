@@ -79,6 +79,7 @@ public sealed class FrameworkRulesTests
     [
         "src/Topogenia.Application/Assistant/AssistantContext.cs", "src/Topogenia.Application/Documents/DocumentCommands.cs",
         "src/Topogenia.Application/Maps/MapViewBuilder.cs", "src/Topogenia.Application/OperationLog/ChangeSetJson.cs",
+        "src/Topogenia.Application/Search/ProjectSearchWalk.cs",
         "src/Topogenia.Host/Api/Documents/DocumentApi.cs", "src/Topogenia.Host/Api/Documents/DocumentFolderApi.cs", "src/Topogenia.Host/Endpoints/SheetEndpoints.cs",
         "src/Topogenia.Interchange/Packages/ContentEntries.cs", "src/Topogenia.Interchange/Packages/PackageBuild.Content.cs",
         "src/Topogenia.Interchange/Packages/PackageImporter.cs", "src/Topogenia.Interchange/Pmap/PmapBuild.Sheets.cs", "src/Topogenia.Interchange/Pmap/PmapCarry.cs",

@@ -31,7 +31,7 @@ describe('the folders of web/src (B-8.2-01, spec 3.5)', () => {
     expect(top).toEqual(['api', 'app', 'features', 'shared', 'styles', 'test']);
     expect(readdirSync(join(src, 'features')).sort()).toEqual(['assistant', 'home', 'map', 'project', 'sheet', 'translations']);
     const map = readdirSync(join(src, 'features/map')).filter((name) => statSync(join(src, 'features/map', name)).isDirectory()).sort();
-    expect(map).toEqual(['canvas', 'chrome', 'edges', 'export', 'model', 'nodes', 'panels', 'presenter', 'state']);
+    expect(map).toEqual(['bpmn', 'canvas', 'chrome', 'edges', 'export', 'model', 'nodes', 'panels', 'plan', 'presenter', 'search', 'state']);
     expect(['main.tsx', 'api/generated/schema.ts', 'shared/ui/Dialog.tsx', 'styles/tokens.css'].every((file) => existsSync(join(src, file)))).toBe(true);
   });
 });

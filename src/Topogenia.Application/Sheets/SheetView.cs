@@ -1,6 +1,7 @@
 // SheetView.cs
 // The sheet of a step as its reader may see it, with its documents, rights, responsible and suggestions (annex A 2.10, 2.11).
 
+using Topogenia.Application.Documents;
 using Topogenia.Domain.Documents;
 using Topogenia.Domain.Model;
 using Topogenia.Domain.Sheets;
@@ -15,7 +16,8 @@ public sealed record SheetVersionView(int Number, DateTime ValidatedAt, Guid Val
 /// <summary>
 /// The sheet of a step (1.x `FicheVue`, `GET /api/etapes/{id}/fiche`): state and completeness as the reader sees them
 /// (`SheetVisibility`), the content (the draft, or the latest validated version), the inputs and outputs of the step
-/// (`DocumentFlows`, visible to every member) with the pain points of their uses, the latest version, the clarification
+/// (`DocumentFlows`, visible to every member) with the pain points of their uses, the pain points raised on the step that no
+/// live use carries (R10: a package may bring some; their status is chosen here), the latest version, the clarification
 /// request, the responsible, the rights (`SheetRights`), the suggestions (only for the one who may fill, A-2.10-42) and,
 /// for the one who sees the draft, the last change and the version to send back in `If-Match`.
 /// </summary>
@@ -33,6 +35,7 @@ public sealed record SheetView(
     IReadOnlyList<ProposedInput> Inputs,
     IReadOnlyList<StepOutput> Outputs,
     IReadOnlyList<PainPoint> PainPoints,
+    IReadOnlyList<PainPoint> StepPainPoints,
     DateTime? UpdatedAt,
     Guid? UpdatedBy,
     int? Version);
@@ -57,7 +60,7 @@ public static class SheetProjection
         var validated = visible.Version is { } version ? new SheetVersionView(version.VersionNumber, version.ValidatedAt, version.ValidatedBy) : null;
         return new SheetView(stepId, visible.Status, summary.Completeness, visible.Content, visible.IsDraft, validated,
             visible.ClarificationRequest, SheetRights.ResponsibleOf(workspace, step), SheetRights.PermissionsOf(viewer), suggestions,
-            inputs, outputs, PainPointsOf(workspace, inputs, outputs),
+            inputs, outputs, PainPointsOf(workspace, inputs, outputs), StepPainPointsOf(workspace, stepId),
             draft is null ? validated?.ValidatedAt : draft.UpdatedAt ?? draft.CreatedAt,
             draft is null ? validated?.ValidatedBy : draft.UpdatedBy ?? draft.CreatedBy,
             draft?.Version);
@@ -68,4 +71,15 @@ public static class SheetProjection
         inputs.Select(input => input.Use).OfType<DocumentUse>().Concat(outputs.SelectMany(output => output.UsedBy))
             .Select(use => use.PainPointId).OfType<Guid>().Distinct()
             .Select(id => PainPointRules.Find(workspace, id)).OfType<PainPoint>().ToList();
+
+    /// <summary>
+    /// The pain points raised on the step that no live use carries, in the order of their codes: the use of a live step on
+    /// a live map is the one the plan reads (`ActionPlanLines.LiveStep`), the one the rule of the core reads (R10).
+    /// </summary>
+    private static List<PainPoint> StepPainPointsOf(ProjectWorkspace workspace, Guid stepId)
+    {
+        var carried = workspace.All<DocumentUse>().Where(use => use.PainPointId is not null && ActionPlanLines.LiveStep(workspace, use.StepId) is not null)
+            .Select(use => use.PainPointId!.Value).ToHashSet();
+        return [.. workspace.All<PainPoint>().Where(point => point.StepId == stepId && !carried.Contains(point.Id)).OrderBy(point => point.Code, StringComparer.Ordinal)];
+    }
 }

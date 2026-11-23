@@ -1,5 +1,5 @@
 // PmapFormat.cs
-// Fixed names and limits of the .pmap format 1.3, which reads the formats 1.1 and 1.2 too (annex A 2.17, ADR 054, ADR 085, ADR 091).
+// Fixed names and limits of the .pmap format 1.5, which reads the formats 1.1 to 1.4 too (annex A 2.17, ADR 054, ADR 085, ADR 091, ADR 094, ADR 105).
 
 using Topogenia.Domain.Projects;
 using Topogenia.Domain.Structure;
@@ -17,11 +17,19 @@ public static class PmapFormat
     public static string Name { get; } = nameof(Topogenia).ToLowerInvariant();
 
     /// <summary>
-    /// The current version (1.4: the summary of a map, ADR 094, and the properties of the Makigami, ADR 095: value class of a
-    /// step, medium of a document, bounds of the duration of a sheet, action plan of a pain point), written when a map
-    /// carries a summary or an element one of these properties.
+    /// The current version (1.5, ADR 105: what a whole copy carries beside the structure, the comments of presentation of
+    /// the steps and the flows, the glossary of the project, the code and the status of a pain point), written when the
+    /// document carries one of them.
     /// </summary>
-    public const string Version = "1.4";
+    public const string Version = "1.5";
+
+    /// <summary>
+    /// The version written when the document carries none of the additions of the 1.5 but a map carries a summary or an
+    /// element a property of the Makigami (1.4: the summary of a map, ADR 094, and the properties of the Makigami, ADR 095:
+    /// value class of a step, medium of a document, bounds of the duration of a sheet, action plan of a pain point): its
+    /// content is then the one of the 1.4, which the version 3.2 of the application reads.
+    /// </summary>
+    public const string VersionWithoutExtras = "1.4";
 
     /// <summary>
     /// The version written when no map carries a summary nor any element a property of the Makigami, but a flow carries a
@@ -40,9 +48,20 @@ public static class PmapFormat
     public const string PreviousVersion = "1.1";
 
     /// <summary>The versions read.</summary>
-    public static IReadOnlyList<string> Versions { get; } = [PreviousVersion, VersionWithoutRoutes, VersionWithoutSummaries, Version];
+    public static IReadOnlyList<string> Versions { get; } = [PreviousVersion, VersionWithoutRoutes, VersionWithoutSummaries, VersionWithoutExtras, Version];
 
     public const string Extension = ".pmap";
+
+    /// <summary>The <c>format</c> of a template collection (ADR 114): the one of a file followed by <c>-collection</c>.</summary>
+    public static string CollectionName { get; } = Name + "-collection";
+
+    /// <summary>The version of the envelope of a collection, apart from the version of each of its processes.</summary>
+    public const string CollectionVersion = "1.0";
+
+    public const string CollectionExtension = ".pmaps";
+
+    /// <summary>The most processes a collection holds: the list stays readable and the answer of its preview bounded.</summary>
+    public const int ProcessesMax = 50;
 
     public const int StepsMax = 5000;
     public const int LanesMax = 200;
@@ -57,6 +76,10 @@ public static class PmapFormat
     public const int LaneNameMax = StructureEdits.LaneNameMax;
     public const int StepLabelMax = StructureEdits.StepLabelMax;
     public const int FlowLabelMax = StructureEdits.FlowLabelMax;
+    public const int GlossaryMax = ProjectCreation.TranslationGlossaryMax;
+
+    /// <summary>The longest code of a pain point read (1.5): informative, `PRJ-I001` for the application, which numbers its own.</summary>
+    public const int PainPointCodeMax = 32;
 
     /// <summary>The deepest JSON read (A-4-24).</summary>
     public const int JsonDepthMax = 256;

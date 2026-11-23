@@ -1,5 +1,5 @@
 // textSize.ts
-// The size of the texts the routing must keep clear: the label box of a flow and the label written under a gateway (B-3.4-35, AR-57).
+// The size of the texts the routing must keep clear: the label box of a flow and the label written under a gateway (B-3.4-35, AR-57); a text held in a width on a few lines, cut by an ellipsis (R8).
 
 import { EDGE_LABEL, GATEWAY_LABEL } from './geometry/constants.ts';
 import type { Size } from './geometry/routing/model.ts';
@@ -76,6 +76,35 @@ export function wrapLines(text: string, width: number, measure: TextMeasure, fon
   }
   if (line !== '') lines.push(line);
   return lines;
+}
+
+/** A text cut until it holds in the width with an ellipsis after it; the ellipsis alone at worst. */
+function shortened(text: string, width: number, measure: TextMeasure, font: TextFont): string {
+  let kept = text;
+  while (kept !== '' && measure(`${kept}…`, font) > width) kept = kept.slice(0, -1);
+  return `${kept.trimEnd()}…`;
+}
+
+/**
+ * A text held in a width on so many lines at most (R8): wrapped word by word, a word wider than the width cut by an
+ * ellipsis rather than broken, the last line shown ending with an ellipsis when some text is left out. No line is wider
+ * than the width, as measured.
+ */
+export function clampLines(text: string, width: number, most: number, measure: TextMeasure, font: TextFont): string[] {
+  const lines: string[] = [];
+  let line = '';
+  for (const word of text.trim().split(/\s+/).filter((piece) => piece !== '')) {
+    const candidate = line === '' ? word : `${line} ${word}`;
+    if (line === '' || measure(candidate, font) <= width) line = candidate;
+    else {
+      lines.push(line);
+      line = word;
+    }
+  }
+  if (line !== '') lines.push(line);
+  const held = lines.map((each) => (measure(each, font) <= width ? each : shortened(each, width, measure, font)));
+  if (held.length <= most) return held;
+  return [...held.slice(0, most - 1), shortened(lines[most - 1] ?? '', width, measure, font)];
 }
 
 const EDGE_FONT: TextFont = { size: EDGE_LABEL.fontSize, weight: EDGE_LABEL.fontWeight };

@@ -84,7 +84,7 @@ describe('the PNG (B-2.14-12, B-2.14-29, B-2.14-30, S-4.1-08)', () => {
     await act(() => exportMap(editor, 'png'));
     expect(seen).toEqual([{ exporting: true, caption: 'Classification : Confidentiel', view: canvas.querySelector('.react-flow__viewport') }]);
     expect(downloads.files).toEqual([{ name: `VIS_Visites_${day()}.png`, content: PNG }]);
-    expect(notes).toEqual([['Export en cours…', undefined], ['Export terminé : le fichier est dans le dossier Téléchargements.', 'success']]);
+    expect(notes).toEqual([['Export en cours…', undefined, 'export'], ['Export terminé : le fichier est dans le dossier Téléchargements.', 'success', 'export']]);
     expect(callsTo(sent, 'GET', `/api/projects/${PROJECT_ID}`)).toHaveLength(1);
     expect([editor.store.getState().exporting, canvas.classList.contains('is-exporting'), canvas.querySelector('[data-testid="export-caption"]')]).toEqual([null, false, null]);
     const options = vi.mocked(toCanvas).mock.lastCall?.[1];
@@ -116,7 +116,7 @@ describe('the PDF (B-2.14-13 to B-2.14-18, S-4.1-08)', () => {
     // A map far wider than high fills the width of the page between its margins (396 mm), whatever its pixel ratio.
     const width = Number(/([\d.]+) 0 0 [\d.]+ [\d.]+ [\d.]+ cm/.exec(pdf)?.[1]);
     expect(width / (72 / 25.4)).toBeCloseTo(396, 3);
-    expect(notes.at(-1)).toEqual(['Export terminé : le fichier est dans le dossier Téléchargements.', 'success']);
+    expect(notes.at(-1)).toEqual(['Export terminé : le fichier est dans le dossier Téléchargements.', 'success', 'export']);
   });
 
   it('with the value stream layer on, adds the page of its summary, main path and check; off, the map alone (spec 3.0 section 15.4)', { timeout: 15_000 }, async () => {
@@ -229,13 +229,13 @@ describe('the Markdown (plan 3.1, L3)', () => {
 });
 
 describe('the failures and what an export leaves (B-2.14-30, B-2.6-45)', () => {
-  const FAILED = ['L’export a échoué. Réessayer dans un instant.', 'error'];
+  const FAILED = ['L’export a échoué. Réessayer dans un instant.', 'error', 'export'];
 
   it('a project that cannot be read: the failure is said, nothing is captured nor saved, the canvas is itself again', async () => {
     fakeApi({ [`GET /api/projects/${PROJECT_ID}`]: { refused: 403, code: 'ACCES_REFUSE' } });
     const { editor, canvas, notes } = await showEditor(sampleMap());
     await act(() => exportMap(editor, 'pdf'));
-    expect([notes, seen, downloads.files]).toEqual([[['Export en cours…', undefined], FAILED], [], []]);
+    expect([notes, seen, downloads.files]).toEqual([[['Export en cours…', undefined, 'export'], FAILED], [], []]);
     expect([editor.store.getState().exporting, canvas.classList.contains('is-exporting')]).toEqual([null, false]);
   });
 
@@ -267,7 +267,7 @@ describe('the failures and what an export leaves (B-2.14-30, B-2.6-45)', () => {
     await vi.waitFor(() => {
       expect(callsTo(sent, 'GET', `/api/projects/${PROJECT_ID}`)).toHaveLength(1);
     });
-    expect([notes, editor.store.getState().exporting]).toEqual([[['Export en cours…', undefined]], { format: 'pdf', caption: null }]);
+    expect([notes, editor.store.getState().exporting]).toEqual([[['Export en cours…', undefined, 'export']], { format: 'pdf', caption: null }]);
   });
 
   it('an image needs the canvas shown: without it the failure is said; the workbook needs none', { timeout: 15_000 }, async () => {
@@ -329,7 +329,7 @@ describe('the poster for a wall (Makigami M9)', () => {
     const drawn = drawing();
     const { editor, notes } = await exporting('internal');
     await act(() => exportMap(editor, 'wall', { wall: { paper: 'a4', across: 2, analysis: false } }));
-    expect(notes.at(-1)).toEqual(['Export terminé : le fichier est dans le dossier Téléchargements.', 'success']);
+    expect(notes.at(-1)).toEqual(['Export terminé : le fichier est dans le dossier Téléchargements.', 'success', 'export']);
     expect(downloads.files.map((file) => [file.name, file.content.type])).toEqual([[`VIS_Visites-affiche_${day()}.pdf`, 'application/pdf']]);
     const map = editor.store.getState().map ?? sampleMap();
     const plan = wallPlan(wallSize(editor, map), 'a4', 2);
@@ -349,6 +349,6 @@ describe('the poster for a wall (Makigami M9)', () => {
     vi.stubGlobal('Image', class { src = ''; decode = () => Promise.reject(new Error('broken')); });
     const { editor, notes } = await exporting('internal');
     await act(() => exportMap(editor, 'wall', { wall: { paper: 'a3', across: 1, analysis: true } }));
-    expect([notes.at(-1), downloads.files]).toEqual([['L’export a échoué. Réessayer dans un instant.', 'error'], []]);
+    expect([notes.at(-1), downloads.files]).toEqual([['L’export a échoué. Réessayer dans un instant.', 'error', 'export'], []]);
   });
 });

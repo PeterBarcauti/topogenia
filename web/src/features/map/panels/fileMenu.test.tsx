@@ -10,6 +10,7 @@ import { captureDownloads } from '../../../test/downloads.ts';
 import { memoryStorage, renderMapScreen, sourceOf } from '../../../test/editor.tsx';
 import { callsTo, fakeApi } from '../../../test/fakeApi.ts';
 import { MAP_ID, PROJECT_ID, sampleMap } from '../../../test/maps.ts';
+import { chooseFileEntry } from '../../../test/fileMenu.ts';
 import { pmapOfSvg } from '../../project/files/svgCopy.ts';
 import { FORMAT } from '../../project/files/tableImport.ts';
 import { closeProjectProperties, projectProperties } from '../../project/properties/projectProperties.ts';
@@ -47,7 +48,7 @@ async function fileMenu(map: Schema<'MapView'> = subMap()) {
     });
   };
   open();
-  return { notes, open, choose: (id: string) => userEvent.click(screen.getByTestId(`menu-file-file.${id}`)) };
+  return { notes, open, choose: (id: string) => chooseFileEntry(`file.${id}`) };
 }
 
 describe('the dialogs of the File menu (B-2.4-53, B-2.4-55, ADR 058)', () => {
@@ -141,7 +142,50 @@ describe('« Télécharger une copie (.pmap) » (B-2.4-54)', () => {
   });
 });
 
+describe('« Enregistrer la carte ouverte (.pmap) » (3.3, lot 4, F-208)', () => {
+  it('saves the map shown with its detailed maps, read as a copy, under the name of the map, then says what it holds', async () => {
+    const downloads = captureDownloads();
+    try {
+      const sent = fakeApi({ [`GET /api/maps/${MAP_ID}/pmap`]: { text: '{"format":"pmap"}' } });
+      const { choose, notes } = await fileMenu();
+      await choose('map_pmap');
+      await vi.waitFor(() => {
+        expect(notes).toEqual([['Carte enregistrée avec ses cartes détaillées, ses fiches et ses commentaires : le fichier .pmap est dans le dossier Téléchargements.', 'success']]);
+      });
+      expect(callsTo(sent, 'GET', `/api/maps/${MAP_ID}/pmap`).map((call) => call.query.get('purpose'))).toEqual(['copy']);
+      expect(downloads.files.map((file) => file.name)).toEqual([expect.stringMatching(/^VIS_Traiter-la-commande_\d{4}-\d{2}-\d{2}\.pmap$/) as unknown]);
+      expect(await downloads.files[0]?.content.text()).toBe('{"format":"pmap"}');
+    } finally {
+      downloads.restore();
+    }
+  });
+
+  it('a failure is said, and nothing is saved', async () => {
+    const downloads = captureDownloads();
+    try {
+      fakeApi({ [`GET /api/maps/${MAP_ID}/pmap`]: { refused: 404, code: 'INTROUVABLE', message: 'Carte introuvable.' } });
+      const { choose, notes } = await fileMenu();
+      await choose('map_pmap');
+      await vi.waitFor(() => {
+        expect(notes).toEqual([['Carte introuvable.', 'error']]);
+      });
+      expect(downloads.files).toEqual([]);
+    } finally {
+      downloads.restore();
+    }
+  });
+});
+
 describe('the exports of the map (B-2.4-56 to B-2.4-58, B-2.14-01)', () => {
+  it('the group « Exporter la carte » shows short labels, each entry named by its whole label, the print for a wall set apart', async () => {
+    await fileMenu();
+    await userEvent.click(screen.getByTestId('menu-file-cascade-export'));
+    const entries = within(screen.getByRole('menu', { name: 'Exporter la carte' })).getAllByRole('menuitem');
+    expect(entries.map((entry) => entry.textContent)).toEqual(['PDF (A3 paysage)', 'Image PNG', 'Image SVG…', 'Excel', 'Markdown (Mermaid)', 'BPMN 2.0 (.bpmn)…', 'Imprimer en grand…']);
+    expect(entries.map((entry) => entry.getAttribute('aria-label'))).toEqual(['Exporter en PDF (A3 paysage)', 'Exporter en image PNG', 'Exporter en image SVG…', 'Exporter en Excel', 'Exporter en Markdown (Mermaid)', 'Exporter en BPMN 2.0 (.bpmn)…', null]);
+    expect(entries.map((entry) => entry.classList.contains('menu-item--group'))).toEqual([false, false, false, false, false, false, true]);
+  });
+
   it('« Exporter en PDF (A3 paysage) », « Exporter en image PNG », « Exporter en Excel » and « Exporter en Markdown (Mermaid) » each save their file at once', { timeout: 20_000 }, async () => {
     const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
     vi.mocked(toCanvas).mockResolvedValue({ toBlob: (done: (blob: Blob) => void) => { done(new Blob(['png'], { type: 'image/png' })); }, toDataURL: () => pixel } as unknown as HTMLCanvasElement);
@@ -153,7 +197,6 @@ describe('the exports of the map (B-2.4-56 to B-2.4-58, B-2.14-01)', () => {
         [`GET /api/maps/${MAP_ID}/action-plan`]: { json: { lines: [] } },
       });
       const { choose, open, notes } = await fileMenu();
-      expect(screen.getAllByRole('menuitem').map((item) => item.textContent).filter((text) => text.startsWith('Exporter en'))).toEqual(['Exporter en PDF (A3 paysage)', 'Exporter en image PNG', 'Exporter en image SVG…', 'Exporter en Excel', 'Exporter en Markdown (Mermaid)']);
       for (const format of ['pdf', 'png', 'xlsx', 'md']) {
         await choose(format);
         // The PDF and the workbook take seconds in jsdom under load (exceljs, jsPDF): the wait of the other exports (5 s).

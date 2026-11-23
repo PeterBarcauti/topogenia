@@ -2,6 +2,7 @@
 // The HTTP entry points of the steps, flows (their reversal too, AR-155), layout, command bar, RACI, detail, insertion, translations of steps and flows (lot A), comment of presentation of a step and of a flow (ADR 099).
 
 using Microsoft.AspNetCore.Mvc;
+using Topogenia.Host.Api.Exchange;
 using Topogenia.Host.Api.Flows;
 using Topogenia.Host.Api.Layout;
 using Topogenia.Host.Api.Presentation;
@@ -44,6 +45,10 @@ public static class StepEndpoints
         steps.MapPost("/insert", async (Guid id, InsertStepBody body, StepApi api, CancellationToken token) => TypedResults.Ok(await api.InsertAsync(id, body, token)));
         steps.MapPost("/detail", async (Guid id, [FromHeader(Name = "If-Match")] string? ifMatch, StepApi api, CancellationToken token) =>
             TypedResults.Ok(await api.DetailAsync(id, ifMatch, token)));
+        // The detail replaced by a .pmap file, the newer version of the process it was copied from (3.3, F-208), If-Match the structure version of its preview.
+        steps.MapPost("/replace-pmap", async (Guid id, HttpRequest request, [FromHeader(Name = "If-Match")] string? ifMatch, PmapInsertionApi api,
+            CancellationToken token) => TypedResults.Ok(await api.ReplaceAsync(id, request, ifMatch, token)))
+            .WithMetadata(new RequestSizeLimitAttribute(PmapApi.OpeningLimit)).Accepts<ReplaceDetailBody>("application/json");
         steps.MapPut("/raci", async (Guid id, SetRaciBody body, [FromHeader(Name = "If-Match")] string? ifMatch, RaciApi api, CancellationToken token) =>
             TypedResults.Ok(await api.SetAsync(id, body, ifMatch, token)));
         steps.MapPut("/translations", async (Guid id, StepTranslationsBody body, [FromHeader(Name = "If-Match")] string? ifMatch, StepApi api, CancellationToken token) =>

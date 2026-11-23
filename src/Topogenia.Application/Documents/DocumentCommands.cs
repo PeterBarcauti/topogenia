@@ -1,5 +1,5 @@
 // DocumentCommands.cs
-// The documents of a step and their uses: add, update, delete, tick, untick, and the "Other" window (annex A 1, A 2.11, 2.12).
+// The documents of a step and their uses: add, update, delete, tick, untick, the status of a pain point received, and the "Other" window (annex A 1, A 2.11, 2.12, ADR 116).
 
 using Topogenia.Application.Authorization;
 using Topogenia.Application.Commands;
@@ -108,6 +108,30 @@ public sealed class StopUsingDocumentCommand(Guid stepId, Guid documentId) : Ste
         {
             Versions = version is { } read ? [VersionCheck.OfErasure<DocumentUse>(DocumentUse.KeyOf(documentId, stepId), read)] : [],
         };
+}
+
+/// <summary>
+/// `PUT /api/steps/{id}/pain-points/{painPointId}/status` with If-Match on the pain point (3.4, ADR 116, Rempl.): the status
+/// of a pain point chosen on the sheet of the step that receives the document, the step of the route. The code is one of
+/// the seven of the list (VALEUR_INVALIDE on `status`); the rule is the one of the core, `PainPointRules.ChangeStatus`, and
+/// the right the one of every document of the sheet. Like every write of a sheet, it is not undoable (no kind, no log
+/// entry) and the audit does not trace it: the history of the pain point, one record appended, is its trace.
+/// </summary>
+[RequiresSheetFill]
+public sealed class ChangePainPointStatusCommand(Guid stepId, Guid painPointId, string? status) : StepDocumentCommand<Guid>(stepId)
+{
+    /// <summary>The pain point whose status is chosen.</summary>
+    public Guid PainPointId => painPointId;
+
+    public override Guid Execute(ProjectWorkspace workspace, OperationContext context)
+    {
+        PainPointRules.ChangeStatus(workspace, context, Target.Id, painPointId, Codes.Parse<PainPointStatus>(status, PainPointRules.StatusField));
+        return painPointId;
+    }
+
+    /// <summary>The If-Match of the request on the pain point, never on the use that carries it.</summary>
+    public static ChangePainPointStatusCommand WithVersion(Guid stepId, Guid painPointId, string? status, int? version) =>
+        new(stepId, painPointId, status) { Versions = version is { } read ? [VersionCheck.Of<PainPoint>(PainPoint.KeyOf(painPointId), read)] : [] };
 }
 
 /// <summary>

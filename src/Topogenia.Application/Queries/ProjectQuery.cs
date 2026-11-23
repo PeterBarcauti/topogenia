@@ -40,6 +40,14 @@ public abstract class ProjectQuery<TResult>
     public virtual Guid? HistoryMap => null;
 
     /// <summary>
+    /// Checks what the request carries besides its target (VALEUR_INVALIDE), once the right is granted and before anything
+    /// is loaded: a request refused costs no reading of the project. Nothing by default.
+    /// </summary>
+    public virtual void CheckRequest()
+    {
+    }
+
+    /// <summary>
     /// Reads what the query needs of the records kept beside the closed core (the comments of presentation, ADR 099
     /// revised), once the workspace is loaded and before the projection; the query keeps what it read. Nothing by default.
     /// </summary>

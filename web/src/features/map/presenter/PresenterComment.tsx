@@ -4,6 +4,7 @@
 import { useEffect, useId, useRef, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
+import { useUnsavedForm } from '../../../shared/state/useUnsavedForm.ts';
 import { useShortcutLabel } from '../../../shared/ui/useShortcutLabel.ts';
 import type { MapEditor } from '../state/editor.ts';
 import { titleIn } from '../../../shared/i18n/languageNames.ts';
@@ -64,6 +65,8 @@ function CommentField({ editor, presentation, stepId, keyed }: { editor: MapEdit
   const origin = figure?.step.source_language ?? presentation.map.languages.origin;
   const original = presentation.language === origin ? undefined : lineIn(kept, origin);
   const { text, over } = fieldOf(kept, presentation.language, typed);
+  // A text typed and not sent is a form not validated, for « Quit » (R12); back as the line shown, sent or given up, it is none.
+  useUnsavedForm(typed !== null && text !== over.text);
   // Read again as the field opens: a line removed then written again by another has the version of the one read at the start, and another text (R1-02).
   usePresenterComments(editor, presentation.map.id);
   useEscapeHeld();

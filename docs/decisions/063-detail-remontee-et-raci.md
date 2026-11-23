@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-P6-T06 (`plan.md`, phase 6) porte l'interface de l'annexe B 2.9 et 2.11 : Détailler et les sous-cartes (Détailler, Ouvrir,
+P6-T06 (`plan.md` (non publié), phase 6) porte l'interface de l'annexe B 2.9 et 2.11 : Détailler et les sous-cartes (Détailler, Ouvrir,
 Supprimer le détail et le fil d'Ariane sont en place depuis P6-T04, ADR 061 et 062), la remontée du détail dans le flux
 (cadre, reliquat, rangement) et le RACI (calque, panneau, matrice), avec les lignes que T04 lui a laissées (B-2.1-32,
 B-2.4-16, B-3.2-17, B-6-26, B-6-30, B-7-21). Les routes de l'hôte sont faites depuis la phase 4 (`POST

@@ -28,6 +28,8 @@
   "REOUVERTE": "Andra start: webbläsaren öppnas med programmet.",
   "ICONE_OUVRIR": "Öppna {product}",
   "ICONE_QUITTER": "Avsluta {product}",
+  "ICONE_QUITTER_ATTENTE": "Något du skrivit i ett faktablad är inte sparat ännu. Avsluta ändå?",
+  "ICONE_QUITTER_NON_VALIDE": "Ett öppet formulär är inte sparat: det du skrivit i det går förlorat. Avsluta ändå?",
   "SAUVEGARDES_DOSSIER": "Säkerhetskopiorna finns i {folder}.",
   "RESTAURATION_PROPOSEE": "Tillgängliga säkerhetskopior, från den nyaste till den äldsta. Ändringar som gjorts efter den valda säkerhetskopian finns inte med; den nuvarande filen och dess journal sparas bredvid, utan att raderas:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

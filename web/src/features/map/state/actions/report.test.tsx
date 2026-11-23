@@ -45,6 +45,6 @@ describe('the report told by the AI (plan 3.1, L4)', () => {
     expect(text).toContain('> Rédigé avec l’IA (claude-opus-5-5) : à relire avant de le diffuser.');
     expect(text).toContain('Classification : Interne');
     expect(text).toContain('## Ce qui coince');
-    expect(notes.at(-1)).toEqual(['Export terminé : le fichier est dans le dossier Téléchargements.', 'success']);
+    expect(notes.at(-1)).toEqual(['Export terminé : le fichier est dans le dossier Téléchargements.', 'success', 'export']);
   });
 });

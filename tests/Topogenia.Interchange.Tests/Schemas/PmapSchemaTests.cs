@@ -74,6 +74,28 @@ public sealed class PmapSchemaTests
     }
 
     [Fact]
+    public void The_schema_takes_the_additions_of_a_whole_copy_and_refuses_their_common_faults()
+    {
+        static JsonObject Use(string status) => new()
+        {
+            ["document"] = "d1", ["pain_point"] = "Incomplet", ["pain_point_code"] = "ACH-I001", ["pain_point_status"] = status,
+        };
+        Assert.Empty(Errors(document =>
+        {
+            document["project"]!["glossary"] = "facture = invoice";
+            Item(document, "steps", 1)["comment"] = new JsonObject { ["text"] = "On saisit.", ["translations"] = new JsonObject { ["en"] = "It is entered." } };
+            Item(document, "flows", 0)["comment"] = new JsonObject { ["translations"] = new JsonObject { ["en"] = "Then." } };
+            Item(document, "steps", 2)["sheet"] = new JsonObject { ["uses"] = new JsonArray(Use("dropped")) };
+        }));
+        Assert.Equal(["/map/steps/1/comment:not"], Errors(document => Item(document, "steps", 1)["comment"] = new JsonObject()));
+        Assert.Equal(["/map/steps/1/comment/text:maxLength"], Errors(document => Item(document, "steps", 1)["comment"] = new JsonObject { ["text"] = new string('a', 501) }));
+        Assert.Equal(["/map/steps/2/sheet/uses/0/pain_point_status:enum"],
+            Errors(document => Item(document, "steps", 2)["sheet"] = new JsonObject { ["uses"] = new JsonArray(Use("lost")) }));
+        var statuses = JsonNode.Parse(File.ReadAllText(Path.Combine(RepositoryRoot.Path, "schemas", PublishedSchemas.PmapFile)))!["$defs"]!["use"]!["properties"]!["pain_point_status"]!["enum"]!;
+        Assert.Equal(Domain.Values.Codes.All<Domain.Values.PainPointStatus>(), statuses.AsArray().Select(code => code!.GetValue<string>()));
+    }
+
+    [Fact]
     public void The_schema_imposes_its_format_and_the_version_1_3_present_both()
     {
         Assert.Empty(Errors(document => Item(document, "flows", 0)["route"] = new JsonObject

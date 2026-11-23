@@ -9,7 +9,7 @@ Statut : acceptée (date 23/10/2026)
 
 La spec 11 exige des tests d'accessibilité axe-core sur les écrans principaux (NF08, WCAG 2.2
 AA). axe-core est sous licence MPL-2.0, hors de la liste permissive de la spec 0.2 (MIT,
-Apache-2.0, BSD, ISC, OFL). Question Q-04 de `docs/questions.md`, défaut appliqué.
+Apache-2.0, BSD, ISC, OFL). Question Q-04 de `docs/questions.md` (non publié), défaut appliqué.
 
 ## Décision
 

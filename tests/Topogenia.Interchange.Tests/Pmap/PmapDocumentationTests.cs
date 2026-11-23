@@ -121,7 +121,7 @@ public sealed partial class PmapDocumentationTests
             new DateTime(2026, 10, 25, 0, 0, 0, DateTimeKind.Utc)));
 
         Assert.All(texts, text => Assert.Empty(SchemaOf(text).Validate(JsonDocument.Parse(text).RootElement)));
-        Assert.Equal(["1.2", "1.4"], texts.Select(text => JsonNode.Parse(text)!["version"]!.GetValue<string>()).Distinct().Order(StringComparer.Ordinal));
+        Assert.Equal(["1.2", "1.5"], texts.Select(text => JsonNode.Parse(text)!["version"]!.GetValue<string>()).Distinct().Order(StringComparer.Ordinal));
         var unknown = Sample("minimal.pmap").Replace("\"label\": \"Saisir la demande\"", "\"label\": \"Saisir\", \"lable\": \"x\"", StringComparison.Ordinal);
         Assert.NotEmpty(schema.Validate(JsonDocument.Parse(unknown).RootElement));
         Assert.NotEmpty(schema.Validate(JsonDocument.Parse(Sample("minimal.pmap").Replace("\"1.2\"", "\"1.0\"", StringComparison.Ordinal)).RootElement));
@@ -134,10 +134,12 @@ public sealed partial class PmapDocumentationTests
     [Fact]
     public void The_description_of_the_version_of_each_schema_names_every_content_that_makes_it_written()
     {
-        var pmap = JsonNode.Parse(Text("schemas", "pmap-1.4.schema.json"))!["properties"]!["version"]!["description"]!.GetValue<string>();
+        var pmap = JsonNode.Parse(Text("schemas", PublishedSchemas.PmapFile))!["properties"]!["version"]!["description"]!.GetValue<string>();
         var package = JsonNode.Parse(Text("schemas", "topogenia-package-2.3.schema.json"))!["description"]!.GetValue<string>();
         string[] makigami = ["classe de valeur", "support", "bornes de la durée", "plan d'actions"];
-        Assert.All(makigami.Append("résumé"), content => Assert.Contains(content, pmap, StringComparison.Ordinal));
+        // The additions of a whole copy (1.5, `PmapWriter.CarriesExtras`) are named too.
+        string[] extras = ["commentaire de présentation", "glossaire", "code ou l'état d'un irritant"];
+        Assert.All(makigami.Append("résumé").Concat(extras), content => Assert.Contains(content, pmap, StringComparison.Ordinal));
         Assert.All(makigami.Append("résumé").Append("photos"), content => Assert.Contains(content, package, StringComparison.Ordinal));
     }
 }

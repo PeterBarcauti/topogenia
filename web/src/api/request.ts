@@ -17,6 +17,8 @@ export interface RequestParts {
   readonly body?: unknown;
   readonly version?: number;
   readonly signal?: AbortSignal;
+  /** Sent even once the page is left (`pagehide`, ADR 115). */
+  readonly keepalive?: boolean;
 }
 
 /** The header of the anti-CSRF protection that every write carries (AR-13; 1.x `X-Ariane: 1`). */
@@ -139,6 +141,7 @@ export async function send(method: Method, route: string, parts: RequestParts = 
     body: bodyOf(exchange, parts.body),
     credentials: 'same-origin',
     signal: parts.signal ?? null,
+    keepalive: parts.keepalive === true,
   };
   let response: Response;
   try {

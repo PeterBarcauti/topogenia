@@ -1,11 +1,12 @@
 // SnapshotsSection.tsx
-// The photos of the indicators and the target state in the panel « Analysis », on the main map (Makigami M6, M8, plan 3.1, P3e): a photo taken, compared with now, deleted; for a target state its reference compared with now, where its source stands, its reference read again by a facilitator.
+// The photos of the indicators and the target state in the panel « Analysis », on the main map (Makigami M6, M8, plan 3.1, P3e): a photo taken, compared with now, deleted; for a target state its reference compared with now, where its source stands, its reference read again by a facilitator; a label typed and not sent is followed for « Quit » (R11).
 
 import { Camera, GitCompareArrows, RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, type Schema } from '../../../api/client.ts';
 import { messageOf } from '../../../shared/i18n/errorMessage.ts';
+import { useUnsavedForm } from '../../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../../shared/ui/Button.tsx';
 import { Icon } from '../../../shared/ui/Icon.tsx';
 import { changeRowsOf, snapshotDate } from '../model/snapshots.ts';
@@ -49,6 +50,7 @@ function LabelForm({ initial, action, testId, onSend, onCancel }: {
   const { t } = useTranslation();
   const [label, setLabel] = useState(initial);
   const [sending, setSending] = useState(false);
+  useUnsavedForm(label !== initial);
   const send = async () => {
     setSending(true);
     // A refusal is said by the section; the form stays with what was typed.

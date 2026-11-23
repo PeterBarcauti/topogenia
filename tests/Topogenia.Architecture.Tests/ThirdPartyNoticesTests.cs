@@ -129,6 +129,32 @@ public sealed partial class ThirdPartyNoticesTests
         Assert.Empty(missing);
     }
 
+    /// <summary>
+    /// MIT, ISC and BSD ask for the notice and the text of the licence with every copy (pre-audit 68, P2-05): each component
+    /// shipped is named in the section of the texts, under the text that covers it, and the runtime of .NET the desktop
+    /// carries in its executable is named with the place of its texts.
+    /// </summary>
+    [Fact]
+    public void Every_component_shipped_has_the_text_of_its_licence_and_the_runtime_is_named()
+    {
+        var text = File.ReadAllText(Path.Combine(RepositoryFiles.Root, "THIRD-PARTY-NOTICES.md"));
+        var at = text.IndexOf("\n## Textes des licences\n", StringComparison.Ordinal);
+        Assert.True(at > 0, "THIRD-PARTY-NOTICES.md has no section of the texts of the licences");
+        var section = text[at..];
+        var covered = TextEntryPattern().Matches(section).Select(match => $"{match.Groups[1].Value} {match.Groups[2].Value.Trim()}").ToHashSet(StringComparer.Ordinal);
+        var missing = Rows().Where(row => row.Usage == "livré").Select(row => $"{row.Component} {row.Version.Trim()}").Where(row => !covered.Contains(row)).ToList();
+        Assert.Empty(missing);
+        Assert.Contains("Permission is hereby granted, free of charge", section, StringComparison.Ordinal);
+        Assert.Contains("Redistribution and use in source and binary forms", section, StringComparison.Ordinal);
+        Assert.Contains("Permission to use, copy, modify, and/or distribute this software", section, StringComparison.Ordinal);
+        Assert.Contains("TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION", section, StringComparison.Ordinal);
+        Assert.Contains("`Microsoft.NETCore.App`", text, StringComparison.Ordinal);
+        Assert.Contains("licenses/microsoft", text, StringComparison.Ordinal);
+    }
+
+    [GeneratedRegex(@"^- `([^`]+)` ([^:\n]+?)(?: :|$)", RegexOptions.Multiline)]
+    private static partial Regex TextEntryPattern();
+
     /// <summary>P7-T04: the checked list of docs/securite.md is the one of the rows S-5.x of the coverage (build/security-list.mjs --check).</summary>
     [Fact]
     public async Task The_security_list_is_the_one_of_the_coverage()

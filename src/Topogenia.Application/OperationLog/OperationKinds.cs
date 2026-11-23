@@ -49,4 +49,7 @@ public static class OperationKinds
 
     /// <summary>New in 3.1: an empty row taken out of a lane, what was under it gone up (lot G, ADR 096), one gesture undone by one undo.</summary>
     public const string RemoveRow = "retirer_rangee";
+
+    /// <summary>New in 3.3: a `.pmap` file copied as the detail of a step, new or replaced (F-208), one operation undone by one undo.</summary>
+    public const string InsertFile = "inserer_fichier";
 }

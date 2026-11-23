@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) is niet gestopt. Probeer het opnieuw of sluit het consolevenster.",
     "quit_unsaved": "Een invoer in de fiche is nog niet opgeslagen: $t(app.name) blijft open. Probeer het opnieuw zodra de fiche is opgeslagen.",
     "stopped": "$t(app.name) is gestopt. U kunt dit tabblad sluiten.",
-    "stopped_help": "Open het opnieuw om het weer te gebruiken."
+    "stopped_help": "Open het opnieuw om het weer te gebruiken.",
+    "help_menu": "Helpmenu",
+    "help_online": "Online help (in het Engels)",
+    "update_check": "Controleren op updates",
+    "update_check_help": "Opent de versiepagina van de website. Geïnstalleerd: {{version}} van {{date}}.",
+    "update_check_store_help": "Opent de pagina in de Microsoft Store, die de updates installeert.",
+    "quit_text_unsaved": "Een geopend formulier is niet opgeslagen: wat erin is ingevoerd, gaat verloren.",
+    "quit_anyway": "Toch afsluiten"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Spatie",
     "Enter": "Enter",
-    "ArrowUp": "Pijl-omhoog"
+    "ArrowUp": "Pijl-omhoog",
+    "ArrowLeft": "Pijl-links",
+    "ArrowRight": "Pijl-rechts",
+    "ArrowDown": "Pijl-omlaag",
+    "Backspace": "Backspace",
+    "Wheel": "Muiswiel"
   },
   "errors": {
     "RESEAU": "$t(app.name) reageert niet. Controleer of $t(app.name) nog actief is (of de netwerkverbinding, als het op een server draait).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Onverwacht antwoord van de server. Laad de pagina opnieuw.",
     "ACCES_REFUSE": "Onvoldoende rechten voor deze pagina.",
     "UNKNOWN": "Er is een onverwachte fout opgetreden.",
-    "RESUMES_A_JOUR": "Alle kaarten hebben een actuele samenvatting. Om er een opnieuw te schrijven, open de kaart en klik op ‘i’ naast de titel."
+    "RESUMES_A_JOUR": "Alle kaarten hebben een actuele samenvatting. Om er een opnieuw te schrijven, open de kaart en klik op ‘i’ naast de titel.",
+    "COLLECTION_TROP_DE_PROCESSUS": "De verzameling bevat te veel processen."
   },
   "home": {
     "eyebrow": "Geef uw processen een boost met AI: begin met ze te beschrijven.",
@@ -79,7 +92,24 @@
     "sample_title": "Voorbeeldproject",
     "sample_text": "Een fictief, al beschreven project om een volledige kaart te ontdekken: banen, beslissingen, subkaart, fiches, documenten en knelpunten. Het wordt verwijderd zoals elk ander project.",
     "sample_create": "Voorbeeldproject maken",
-    "sample_created": "Voorbeeldproject {{code}} gemaakt."
+    "sample_created": "Voorbeeldproject {{code}} gemaakt.",
+    "filter": "Projecten filteren",
+    "filter_placeholder": "Code of naam",
+    "filter_count": "{{shown}} van {{total}}",
+    "filter_none": "Geen project komt overeen.",
+    "update_line": "Deze versie is van {{date}}.",
+    "update_link": "Nagaan of er een nieuwere bestaat",
+    "update_close": "Herinnering sluiten",
+    "button_start_help": "Een startpunt kiezen.",
+    "start_menu": "Een project beginnen",
+    "start_sample": "Voorbeeldproject",
+    "start_gallery": "Sjablonengalerij",
+    "start_gallery_help": "Opent in de browser.",
+    "start_blank": "Lege kaart…",
+    "new_project_help": "Beginnen met een lege kaart, een voorbeeld of een sjabloon.",
+    "new_project_help_no_sample": "Beginnen met een lege kaart of een sjabloon.",
+    "new_project_help_no_gallery": "Beginnen met een lege kaart of een voorbeeld.",
+    "new_project_help_blank": "Beginnen met een lege kaart."
   },
   "roles": {
     "facilitator": "Facilitator",
@@ -112,7 +142,7 @@
     "properties": "Projecteigenschappen…",
     "properties_title": "Eigenschappen van project {{code}}",
     "sharing_group": "Deelgroep voor documenten",
-    "sharing_group_help": "Genoemd in de fiches bij een gedeelde input (bijv. Financieel team). Leeg: “de deelgroep van het project”.",
+    "sharing_group_help": "Naam van de groep mensen die de documenten van het project mag lezen. Staat bij het selectievakje “Gedeeld met de groep” van elk document in een fiche. Leeg: “de deelgroep van het project”.",
     "properties_read_only": "Alleen een facilitator van het project kan deze eigenschappen wijzigen.",
     "properties_saved": "Projecteigenschappen opgeslagen.",
     "language": "Taal van het proces",
@@ -121,12 +151,14 @@
     "workday_hours": "Werkdag (uren)",
     "workday_hours_help": "Van 1 tot 24 u, standaard 7: zet de doorlooptijden om in werkdagen.",
     "fte_hours": "Uren per fte per maand",
-    "fte_hours_help": "Van 1 tot 744 u, standaard 151,67: zet de werklast om in fulltime-equivalenten."
+    "fte_hours_help": "Van 1 tot 744 u, standaard 151,67: zet de werklast om in fulltime-equivalenten.",
+    "code_proposed": "Voorgesteld op basis van de naam.",
+    "more_options": "Meer opties"
   },
   "files": {
     "open": "Bestand openen…",
     "open_title": "Bestand openen",
-    "open_help": "Het bestand wordt een nieuw project: een .pmap-bestand (gedownloade kopie of het antwoord van een AI die een schets las), een Excel- of CSV-tabel, een Mermaid-diagram (.mmd, .md) of een SVG-afbeelding die met haar bewerkbare kopie is geëxporteerd.",
+    "open_help": "Het bestand wordt een nieuw project: een .pmap-bestand (gedownloade kopie of het antwoord van een AI die een schets las), een collectie van modellen (.pmaps), een Excel- of CSV-tabel, een Mermaid-diagram (.mmd, .md) of een SVG-afbeelding die met haar bewerkbare kopie is geëxporteerd.",
     "choose": "Bestand kiezen…",
     "or_paste": "Of plak hier de inhoud, bijvoorbeeld het antwoord van een AI:",
     "area": "Plak of sleep hier de inhoud van het .pmap-bestand",
@@ -192,7 +224,52 @@
     "target_name": "{{name}} (doeltoestand)",
     "target_label": "Label van de referentie",
     "target_label_default": "Huidige toestand",
-    "target_button": "Maken"
+    "target_button": "Maken",
+    "map_download": "Geopende kaart opslaan (.pmap)",
+    "map_downloaded": "Kaart opgeslagen met haar detailkaarten, fiches en opmerkingen: het .pmap-bestand staat in de map Downloads.",
+    "insert": "Bestand invoegen als gedetailleerde stap…",
+    "insert_here": "Bestand hier invoegen…",
+    "insert_title": "Bestand invoegen als gedetailleerde stap",
+    "insert_help": "Het bestand wordt een nieuwe gedetailleerde stap van deze kaart. Het is een kopie: het bestand later wijzigen verandert de kaart niet. Een .pmap-bestand, een Excel- of CSV-tabel, een Mermaid-diagram of een SVG-afbeelding met haar kopie.",
+    "replace_title": "Detail vervangen door een bestand",
+    "replace_help": "Het detail van ‘{{label}}’ gaat naar de prullenbak en het bestand neemt zijn plaats in. Ctrl+Z maakt alles ongedaan.",
+    "insert_counts": "Stappen: {{steps}} · Banen: {{lanes}} · Verbindingen: {{flows}} · Kaarten: {{maps}} · Fiches: {{sheets}}",
+    "insert_too_deep": "Dit bestand heeft {{depth}} kaartniveaus; onder deze kaart mogen het er hoogstens {{room}} zijn.",
+    "insert_too_large": "Dit bestand is groter dan {{max}} MB: het kan niet worden ingevoegd.",
+    "insert_package": "Dit is een uitwisselingspakket: het wordt als project geïmporteerd, niet ingevoegd.",
+    "insert_dropped": "Weggelaten vertalingen (talen die hier niet zijn ingesteld): {{languages}}",
+    "insert_label": "Naam van de stap",
+    "insert_lane": "Baan",
+    "insert_after": "Plaatsen na",
+    "insert_at_start": "Aan het begin van de kaart",
+    "insert_sheets": "Fiches overnemen",
+    "insert_sheets_help": "De fiches, hun documenten en hun knelpunten komen binnen als concept, om na te lezen en daarna te valideren.",
+    "insert_button": "Invoegen",
+    "replace_button": "Vervangen",
+    "inserted": "Bestand ingevoegd. Stappen: {{steps}} · Kaarten: {{maps}}",
+    "insert_on_flow": "Op de pijl {{from}} → {{to}}",
+    "insert_on_flow_here": "Bestand op deze pijl invoegen…",
+    "collection_title": "Collectie “{{name}}”",
+    "collection_help": "Voor elk aangevinkt proces wordt een project gemaakt. Er wordt niets geschreven vóór “Projecten maken”.",
+    "collection_all": "Alles aanvinken",
+    "collection_ticked": "Aangevinkt: {{count}} van {{total}}",
+    "collection_points": "Te controleren punten: {{count}}",
+    "collection_details": "Beschrijving en te controleren punten",
+    "collection_code_free": "{{code}} is al in gebruik.",
+    "collection_invalid": "Kan niet worden geopend:",
+    "collection_create": "Projecten maken",
+    "collection_creating": "Maken {{done}} van {{total}}…",
+    "collection_done": "Projecten gemaakt",
+    "collection_created": "{{code}} gemaakt.",
+    "collection_failed": "Niet gemaakt: {{reason}}",
+    "collection_retry": "Opnieuw proberen",
+    "collection_unnamed": "Proces {{rank}}",
+    "insert_collection": "Een collectie wordt geopend via “Bestand openen…”. Voeg een van de modellen apart in.",
+    "open_too_large": "Dit bestand is groter dan {{max}} MB: het kan niet worden geopend.",
+    "collection_none": "Geen project gemaakt",
+    "collection_code_twice": "{{code}} is ook aan een andere regel gegeven.",
+    "collection_fix": "Tekst corrigeren",
+    "remote_locations": "Netwerk- of webadressen in de fiches: {{count}}, te controleren voordat een document wordt geopend."
   },
   "package": {
     "export": "Project exporteren ({{extension}})…",
@@ -369,7 +446,13 @@
       "due": "Deadline",
       "status": "Status",
       "lost": "Verloren uren per maand"
-    }
+    },
+    "copy_image": "De kaart als afbeelding kopiëren",
+    "copying": "Afbeelding kopiëren…",
+    "copied": "Afbeelding gekopieerd: plak ze (Ctrl+V) in een e-mail of dia.",
+    "copy_failed": "De afbeelding kon niet worden gekopieerd.",
+    "copy_as_png": "Exporteren als PNG",
+    "project_pdf": "Project exporteren als PDF…"
   },
   "classification": {
     "internal": "Intern",
@@ -498,7 +581,8 @@
     "breadcrumb": "Kruimelpad",
     "file": "Bestand",
     "file_help": "Bestand openen, kopie downloaden, dupliceren, exporteren",
-    "members": "Leden"
+    "members": "Leden",
+    "fit": "Alles tonen"
   },
   "ribbon": {
     "name": "Lint van de kaart",
@@ -596,6 +680,27 @@
       "necessary": "Noodzakelijk zonder waarde",
       "waste": "Verspilling",
       "none": "Niet ingedeeld"
+    },
+    "replace_detail": "Detail vervangen door een bestand…",
+    "copy_selection_image": "De selectie als afbeelding kopiëren",
+    "file_cascade": {
+      "export": "Kaart exporteren",
+      "project": "Project",
+      "package": "Uitwisselingspakket",
+      "assistant": "AI-assistent"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 liggend)",
+      "png": "PNG-afbeelding",
+      "svg": "SVG-afbeelding…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Heel project als PDF…",
+      "import": "Pakket importeren…",
+      "replace": "Vervangen door een pakket…",
+      "report": "Verteld rapport (Markdown)",
+      "comments": "Presentatieopmerkingen…"
     }
   },
   "deletion": {
@@ -646,7 +751,8 @@
       "retracer_liens": "automatisch traject van de pijlen",
       "inserer_rangees": "rijen invoegen",
       "retirer_rangee": "rij verwijderen",
-      "proposition_ia": "AI-voorstel"
+      "proposition_ia": "AI-voorstel",
+      "inserer_fichier": "invoegen van een bestand"
     }
   },
   "command": {
@@ -769,9 +875,6 @@
     "duration_max": "Langste duur",
     "duration_bounds_order": "Kortste ≤ duur ≤ langste",
     "minutes": "minuten",
-    "duration_between": "{{min}} tot {{max}} minuten",
-    "duration_at_least": "minstens {{min}} minuten",
-    "duration_at_most": "hoogstens {{max}} minuten",
     "duration_value_one": "{{count}} minuut",
     "duration_value_other": "{{count}} minuten",
     "fold": "“{{section}}” samenvouwen",
@@ -832,6 +935,7 @@
     "clarification_withdrawn": "Vraag verwijderd.",
     "read_empty": "Nog geen gevalideerde fiche voor deze stap.",
     "read_validated": "Versie gevalideerd op {{date}} door {{name}}.",
+    "read_draft": "Concept in bewerking, nog niet gevalideerd.",
     "document": {
       "add_output": "Output toevoegen",
       "new_output": "Nieuwe output",
@@ -895,7 +999,8 @@
         "file": "Bestand",
         "software": "Software",
         "other": "Overig"
-      }
+      },
+      "edit_pain": "Bewerken in {{code}}"
     },
     "pain_point": {
       "title": "Knelpunt",
@@ -924,7 +1029,21 @@
         "implemented": "gerealiseerd",
         "adopted": "geborgd",
         "dropped": "stopgezet"
-      }
+      },
+      "status": "Status",
+      "status_of": "Status van knelpunt {{code}}",
+      "status_help": "Gerealiseerd, geborgd of stopgezet: het knelpunt verdwijnt van de kaart en de uren tellen niet meer mee.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "probleem gesignaleerd, actie te plannen",
+        "scored": "knelpunt beoordeeld, actie te bepalen",
+        "under_review": "actie in onderzoek, nog niet besloten",
+        "in_progress": "actie wordt uitgevoerd",
+        "implemented": "actie uitgevoerd, resultaat te controleren",
+        "adopted": "gecontroleerd, het is de nieuwe werkwijze",
+        "dropped": "besloten het niet aan te pakken"
+      },
+      "status_now": "Status van knelpunt {{code}}: {{status}}"
     },
     "lead_time": "Doorlooptijd",
     "lead_time_help": "Tijd tussen de aankomst van een dossier en het verlaten van de stap, inclusief wachttijd; telt niet mee voor de volledigheid.",
@@ -941,7 +1060,18 @@
       "minute": "minuten",
       "hour": "uren",
       "day": "werkdagen"
-    }
+    },
+    "duration_between_one": "{{min}} tot {{max}} minuut",
+    "duration_between_other": "{{min}} tot {{max}} minuten",
+    "duration_at_least_one": "minstens {{min}} minuut",
+    "duration_at_least_other": "minstens {{min}} minuten",
+    "duration_at_most_one": "hoogstens {{max}} minuut",
+    "duration_at_most_other": "hoogstens {{max}} minuten",
+    "step_pain_points": "Knelpunten van de stap",
+    "step_pain_points_help": "Knelpunten van de stap, zonder document. Beschrijving en plan zijn alleen te lezen.",
+    "pain_points_one": "{{count}} knelpunt",
+    "pain_points_other": "{{count}} knelpunten",
+    "step_pain_points_help_fill": "Knelpunten van de stap, zonder document. Hun status wijzigt u hier; beschrijving en plan zijn alleen te lezen."
   },
   "translations": {
     "title": "Project vertalen",
@@ -1188,6 +1318,12 @@
         },
         "summaries": {
           "title": "Samenvattingen"
+        },
+        "comments": {
+          "title": "Presentatieopmerkingen",
+          "text": "Wat de presentatie over de stappen en de overdrachten zegt.",
+          "example": "Schrijf de opmerkingen van de stappen en de overdrachten van deze kaart en haar detailkaarten.",
+          "example_empty": "Schrijf de opmerkingen van de stappen en de overdrachten van deze kaart en haar detailkaarten."
         }
       },
       "thread": "Gesprek met de assistent",
@@ -1245,7 +1381,8 @@
         "findings": "Analyse",
         "report": "Rapport",
         "summaries": "Samenvattingen",
-        "proposal": "Voorstel"
+        "proposal": "Voorstel",
+        "comments": "Presentatieopmerkingen"
       },
       "pasted": "Antwoord geplakt",
       "copy_reply": "Antwoord kopiëren",
@@ -1401,7 +1538,19 @@
     "resource": "Azure-resource",
     "resource_help": "De naam van de resource: contoso voor contoso.openai.azure.com.",
     "port": "Poort",
-    "port_help": "Leeg: de standaardpoort (Ollama 11434, LM Studio 1234)."
+    "port_help": "Leeg: de standaardpoort (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Schrijf de presentatieopmerkingen van de stappen en de overdrachten van deze kaart en haar detailkaarten die er nog geen hebben.",
+      "menu": "Presentatieopmerkingen schrijven (AI)…",
+      "intro": "Lees elke opmerking opnieuw: bewaar, verbeter of verwerp ze. Ze wordt tijdens de presentatie uitgesproken.",
+      "flow": "Overdracht {{labels}}",
+      "map": "Kaart: {{name}}",
+      "current": "Huidige opmerking: {{text}}",
+      "typed": "Vervangt een met de hand getypte opmerking: {{text}}",
+      "save": "Bewaarde opmerkingen opslaan ({{n}})",
+      "saved": "Opmerkingen opgeslagen: {{n}}",
+      "done": "Presentatieopmerkingen opgeslagen: {{n}}"
+    }
   },
   "interface_language": {
     "help": "De taal van de menu's en meldingen, alleen voor u. De taal waarin de kaarten worden getoond, kiest u boven in het venster wanneer een project geopend is."
@@ -1856,5 +2005,174 @@
       "closing_lost": "Tijdverlies: {{lost}} per maand.",
       "arrow": "naar"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Exporteren als BPMN 2.0 (.bpmn)…",
+    "export_title": "Exporteren als BPMN 2.0",
+    "export_help": "Het .bpmn-bestand opent in BPMN-modelleringstools (Camunda, Signavio, Bizagi…). Het bevat de volledige fiche van elke stap, zonder de locatie van de documenten.",
+    "export_button": "Exporteren",
+    "export_subprocesses": "Gedetailleerde subprocessen opnemen",
+    "export_subprocesses_help": "Elke gedetailleerde stap opent in de modelleringstool als subproces.",
+    "export_subprocesses_none": "De kaart heeft geen gedetailleerde stap.",
+    "export_details": "Documenten en knelpunten tekenen",
+    "export_details_help": "Niet aangevinkt blijven ze beschreven in de documentatie van het bestand.",
+    "toolbar": "BPMN 2.0-weergave",
+    "badge": "BPMN 2.0-diagram · alleen-lezen",
+    "details": "Details op het diagram",
+    "export": "Exporteren (.bpmn)…",
+    "close": "Terug naar de kaart",
+    "close_help": "Terug naar de kaart (Alt+B)",
+    "failed": "Het diagram kon niet worden gelezen.",
+    "loading": "Diagram wordt gelezen…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Startgebeurtenis",
+      "endEvent": "Eindgebeurtenis",
+      "intermediateCatchEvent": "Wachttijd",
+      "manualTask": "Handmatige taak",
+      "userTask": "Gebruikerstaak",
+      "serviceTask": "Geautomatiseerde taak",
+      "subProcess": "Subproces",
+      "exclusiveGateway": "Exclusieve gateway",
+      "parallelGateway": "Parallelle gateway",
+      "inclusiveGateway": "Inclusieve gateway"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "‘{{text}}’",
+      "map": "Kaart: {{name}}",
+      "classification": "Classificatie: {{value}}",
+      "language": "Taal: {{language}}",
+      "work_time": "Werkdag: {{workday}} uur; maandelijkse uren per voltijdse kracht: {{fte}} uur",
+      "description": "Beschrijving",
+      "wait": "wachttijd van {{hours}} u",
+      "from": "van {{code}}",
+      "volume": "Ingaand volume: {{quantity}} per {{period}}",
+      "periods": {
+        "day": "werkdag",
+        "week": "week",
+        "month": "maand",
+        "year": "jaar"
+      },
+      "lane_system": "Baan van software die zelfstandig werkt",
+      "headcount": "Bezetting: {{number}}"
+    },
+    "fit": "Alles tonen",
+    "fit_help": "Het hele diagram in het venster tonen"
+  },
+  "shortcuts": {
+    "title": "Sneltoetsen",
+    "sections": {
+      "move": "Navigeren",
+      "choose": "Kiezen",
+      "edit": "De kaart wijzigen",
+      "display": "Weergeven",
+      "present": "Presenteren",
+      "help": "Help"
+    },
+    "edit_note": "Alleen voor de facilitator van het project.",
+    "or": "of",
+    "move_selection": "De selectie verplaatsen",
+    "escape": "Een menu, paneel of fiche sluiten; «Verbinden» stoppen",
+    "space_held": "Handgereedschap zolang de toets ingedrukt blijft",
+    "enter": "De fiche van de gekozen stap openen",
+    "type": "De naam van de gekozen stap beginnen",
+    "menu_key": "Menu van het gekozen object",
+    "wheel": "Scrollen; met Shift horizontaal",
+    "zoom": "Zoomen",
+    "saved": "Herinneren dat alles is opgeslagen",
+    "alone_note": "Zonder één enkele gekozen stap (anders begint de toets zijn naam)",
+    "type_key": "een letter",
+    "search_keys": "In het zoeken: volgende; met Shift vorige; Esc sluit"
+  },
+  "search": {
+    "command_help": "Zoeken in het project",
+    "title": "Zoeken",
+    "field": "Te zoeken woord",
+    "placeholder": "Stap, document, hulpmiddel…",
+    "previous": "Vorige (Shift+Enter)",
+    "next": "Volgende (Enter)",
+    "position": "{{index}} van {{count}}",
+    "searching": "Zoeken…",
+    "none": "Geen resultaten.",
+    "too_many": "De eerste {{shown}} van {{total}} resultaten: verfijn de zoekopdracht.",
+    "short": "Minstens twee tekens, of Enter.",
+    "this_map": "Deze kaart",
+    "level": "Niveau {{level}}",
+    "origin": "Brontaal: {{language}}",
+    "kinds": {
+      "step": "Stap",
+      "lane": "Baan",
+      "document": "Document",
+      "tool": "Hulpmiddel",
+      "pain_point": "Knelpunt",
+      "action": "Actie"
+    },
+    "results_one": "{{count}} resultaat",
+    "results_other": "{{count}} resultaten"
+  },
+  "action_plan": {
+    "command": "Actieplan",
+    "title": "Actieplan",
+    "total": "{{hours}} u verloren per maand door open knelpunten",
+    "late_count": "Te laat: {{count}}",
+    "count": "Getoonde knelpunten: {{shown}} van {{total}}",
+    "sort": "Sorteren op",
+    "sorts": {
+      "project": "Volgorde van het project",
+      "lost": "Verloren uren",
+      "due": "Deadline"
+    },
+    "filters": "Filters",
+    "filter_open": "Open",
+    "filter_late": "Te laat",
+    "filter_no_action": "Zonder actie",
+    "late": "Te laat",
+    "no_action": "Geen actie besloten",
+    "map": "Kaart: {{name}}",
+    "lane": "Baan: {{name}}",
+    "go_to": "Ga naar {{code}}",
+    "edit": "Plan bewerken",
+    "edit_of": "Plan van {{code}} bewerken",
+    "loading": "Plan laden…",
+    "empty": "Geen knelpunten in dit project.",
+    "none": "Geen knelpunt komt overeen met de filters.",
+    "status_since": "{{status}} sinds {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Ongedaan maken",
+    "undo_of": "Ongedaan maken: {{code}} terugzetten naar “{{status}}”"
+  },
+  "project_pdf": {
+    "sheet_state": "Status van de fiche: {{state}}",
+    "continued": "{{title}} (vervolg)",
+    "file": "project",
+    "contents": "Inhoud",
+    "page": "Pagina {{page}} van {{total}}",
+    "scope_line": "Kaart “{{name}}” en de bijbehorende niveaus",
+    "empty_map": "Kaart zonder stappen.",
+    "depth_cut": "Kaarten voorbij {{max}} niveaus staan niet in dit document.",
+    "sheets_of": "Fiches · {{map}}",
+    "reading": "Kaarten lezen: {{count}}",
+    "reading_sheets": "Fiches lezen…",
+    "drawing": "Kaart {{index}} van {{total}}",
+    "writing": "Document schrijven: pagina {{page}}",
+    "too_many_maps": "Meer dan {{max}} kaarten: kies “{{scope}}”.",
+    "too_many_pages": "Meer dan {{max}} pagina's: schakel de fiches uit of exporteer een detailkaart en de bijbehorende niveaus.",
+    "cancelled": "Export geannuleerd.",
+    "title": "Project exporteren als PDF",
+    "help": "Alle kaarten in één bestand, niveau voor niveau, voor wie de toepassing niet heeft.",
+    "scope": "Bereik",
+    "scope_project": "Het hele project",
+    "scope_branch": "Deze kaart en de bijbehorende niveaus",
+    "with_sheets": "Met de fiches",
+    "with_raci": "Met de RACI-matrix",
+    "with_stream": "Met de waardestroom",
+    "with_plan": "Met het actieplan",
+    "sheets_help": "De fiches zijn die u ziet: stuur het document alleen naar wie ze mag lezen.",
+    "button": "PDF maken",
+    "progress": "Voortgang",
+    "too_many_maps_below": "Meer dan {{max}} kaarten: open een lager gelegen detailkaart en kies “{{scope}}”.",
+    "too_many_pages_top": "Meer dan {{max}} pagina's: schakel de fiches uit."
   }
 }

@@ -3,6 +3,10 @@
 
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
+using Topogenia.Host.Errors;
+using Topogenia.Host.Security;
 using Topogenia.Host.Tests.Infrastructure;
 using Topogenia.Persistence.Tests.Infrastructure;
 
@@ -64,8 +68,41 @@ public sealed class BodySizeLimitTests(ApiHosts hosts) : IClassFixture<ApiHosts>
         Assert.Equal(name, atTheLimit.Ok().GetProperty("display_name").GetString());
 
         var over = await ChangeProfileAsync(reader, ProfileOf("Trop long", OneMegabyte + 1), announced);
-        Assert.Equal(1, over.Refused(413, "REQUETE_TROP_GROSSE").GetProperty("max").GetInt32());
+        var details = over.Refused(413, "REQUETE_TROP_GROSSE");
+        Assert.Equal(1, details.GetProperty("max").GetInt32());
+        Assert.Equal("MB", details.GetProperty("unit").GetString());
         Assert.Equal(name, await DisplayNameAsync(reader));
+    }
+
+    private static readonly ErrorResponses Responses = new(ErrorMessages.Embedded());
+
+    /// <summary>The refusal 413 of a route whose limit is <paramref name="limit"/> bytes, as the API writes it in a language.</summary>
+    private static ErrorBody RefusalOf(long limit, string language)
+    {
+        var context = new DefaultHttpContext();
+        context.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(new RequestSizeLimitMetadata(limit)), "route"));
+        return Responses.BodyOf(BodySizeLimit.Refusal(context), language, DateTime.UtcNow, _ => null);
+    }
+
+    [Theory]
+    [InlineData(4 * 1024, 4, "KB", "La requête dépasse 4 Ko.", "The request exceeds 4 KB.")]
+    [InlineData(1024, 1, "KB", "La requête dépasse 1 Ko.", "The request exceeds 1 KB.")]
+    [InlineData(1536 * 1024, 1536, "KB", "La requête dépasse 1536 Ko.", "The request exceeds 1536 KB.")]
+    [InlineData(1024 * 1024, 1, "MB", "La requête dépasse 1 Mo.", "The request exceeds 1 MB.")]
+    [InlineData(10 * 1024 * 1024, 10, "MB", "La requête dépasse 10 Mo.", "The request exceeds 10 MB.")]
+    [InlineData(100L * 1024 * 1024, 100, "MB", "La requête dépasse 100 Mo.", "The request exceeds 100 MB.")]
+    public void The_limit_is_told_in_the_unit_that_fits_never_as_zero_megabytes(long limit, long max, string unit, string french, string english)
+    {
+        var body = RefusalOf(limit, "fr");
+        Assert.Equal(("REQUETE_TROP_GROSSE", max, unit, french), (body.Code, body.Details["max"], body.Details["unit"], body.Message));
+        Assert.Equal(english, RefusalOf(limit, "en").Message);
+    }
+
+    private sealed record RequestSizeLimitMetadata(long? MaxRequestBodySize) : IRequestSizeLimitMetadata
+    {
+        public RequestSizeLimitMetadata(long limit) : this((long?)limit)
+        {
+        }
     }
 
     /// <summary>A stream read once, forward only, whose length is unknown: the client cannot announce it.</summary>

@@ -48,7 +48,7 @@ l'adresse du premier.
 
 ## Conséquences
 
-- Vérifié sur l'exécutable décompressé (`docs/couverture-p7/verification-poste.md`) : prêt en 4,2 s au premier lancement,
+- Vérifié sur l'exécutable décompressé (`docs/couverture-p7/verification-poste.md` (non publié)) : prêt en 4,2 s au premier lancement,
   2,2 s ensuite ; second lancement en 1,4 s, code 0 ; écritures dans le seul dossier du produit, rien dans `%TEMP%`.
 - Tests : `Topogenia.Host.Tests.Desktop.DesktopReopenTests` (trois), deux tests de `HostCommandsTests` (le second
   lancement qui passe la main, le verrou tenu sans réponse refusé) ; `Topogenia.Architecture.Tests.PublicationRulesTests`

@@ -5,6 +5,7 @@ using Topogenia.Application;
 using Topogenia.Domain.Errors;
 using Topogenia.Host.Api.Documents;
 using Topogenia.Host.Errors;
+using Topogenia.Interchange.Pmap;
 
 namespace Topogenia.Host.Tests.Errors;
 
@@ -28,11 +29,13 @@ public sealed class ErrorMessagesTests
     /// The codes of the refusals (<see cref="ErrorCodes"/>), the codes of the faults of a `.pmap` file
     /// (<see cref="FileErrorCodes"/>, the details of FICHIER_INVALIDE), the refusals of the assistant
     /// (<see cref="Application.Assistant.AssistantErrors"/>, 3.0) and those of the folder of a document
-    /// (<see cref="DocumentFolderErrors"/>, ADR 104): each has its message (A-3-72).
+    /// (<see cref="DocumentFolderErrors"/>, ADR 104) and the fault of a template collection that a `.pmap` does not have
+    /// (<see cref="CollectionErrors"/>, ADR 114): each has its message (A-3-72).
     /// </summary>
     private static IEnumerable<string> Coded =>
         Constants(typeof(ErrorCodes)).Concat(Constants(typeof(FileErrorCodes))).Concat(Constants(typeof(Application.Assistant.AssistantErrors)))
-            .Concat(Constants(typeof(DocumentFolderErrors))).Concat(TimeWords.Keys);
+            .Concat(Constants(typeof(DocumentFolderErrors))).Concat(Constants(typeof(CollectionErrors))).Concat(TimeWords.Keys)
+            .Append(SizeWords.RequestTooLargeKilobytes);
 
     private static IEnumerable<string> Constants(Type codes) => codes.GetFields()
         .Where(field => field.IsLiteral && field.FieldType == typeof(string))

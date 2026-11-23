@@ -42,7 +42,7 @@ visible de la DSI, jamais de se cacher d'elle.
      décompression en mémoire sont ce que les heuristiques lisent comme un exécutable empaqueté. Le ZIP, lui, reste
      compressé ;
    - l'obscurcissement du cœur renomme sans poser l'attribut contre le désassemblage (`SuppressIldasm=false`,
-     `build/core/obfuscar.xml`) : cet attribut n'arrête que `ildasm` et compte comme un indice de maliciel ; les
+     `build/core/obfuscar.xml` (non publié)) : cet attribut n'arrête que `ildasm` et compte comme un indice de maliciel ; les
      chaînes restent en clair (`HideStrings=false`, déjà). Le paquet du cœur est à refaire (ADR 074).
 5. **Les empreintes de chaque fichier** : à côté de chaque ZIP, `<nom>.files.sha256` donne le SHA-256 de chaque
    fichier du ZIP (au format de `sha256sum`), pour la liste blanche d'un antivirus ou d'un EDR, l'exécutable d'abord.
@@ -53,7 +53,7 @@ visible de la DSI, jamais de se cacher d'elle.
 
 ## Options écartées
 
-- Garder un `package.ps1` réduit aux appels d'outils (`Travail/package-ps1-reduit.txt`) : il garde le lancement de
+- Garder un `package.ps1` réduit aux appels d'outils (essayé hors du dépôt) : il garde le lancement de
   PowerShell avec `-ExecutionPolicy Bypass`, et l'heuristique a déjà réagi à ce nom de fichier.
 - Écrire le ZIP en JavaScript (zlib) : de la compression dans un script du dépôt, ce que la recette demande d'éviter,
   alors que le SDK le fait avec du code signé.
@@ -67,8 +67,18 @@ visible de la DSI, jamais de se cacher d'elle.
   empreintes des fichiers écrites) ; les deux règles du script de paquet relisent `build/package.mjs`. L'extension
   `.proj` entre dans les règles des en-têtes, du format et du nom du produit.
 - L'exécutable du mode Poste grossit (assemblages non compressés) ; le ZIP change peu. Taille et temps du premier
-  lancement à mesurer au prochain paquet (`docs/couverture-p7/verification-poste.md`).
+  lancement à mesurer au prochain paquet (`docs/couverture-p7/verification-poste.md` (non publié)).
 - Le paquet du cœur est à refaire avant le prochain ZIP (`build/package.mjs` refuse un paquet plus ancien que
-  `build/core/`) ; les empreintes de la recette finale sont à réécrire.
+  `build/core/` (non publié)) ; les empreintes de la recette finale sont à réécrire.
 - L'intégration continue garde des étapes `pwsh` : elles tournent sur les machines hébergées par GitHub, jamais sur un
   poste de l'entreprise.
+
+## Révision (23/11/2026, pré-audit de la copie 68) : dates des entrées
+
+Le ZIP (tâche du SDK) et le paquet MSIX (`makeappx`) datent leurs entrées de l'heure locale des fichiers, et le SBOM de
+l'heure universelle de la construction : ensemble, ils disaient le fuseau du poste. `build/archive-dates.mjs` donne à
+chaque entrée, dans ses en-têtes local et central et dans leurs champs de temps, le jour de la version (`releaseDate` de
+`web/package.json`) à minuit UTC, sans toucher à rien d'autre ; le SBOM porte la même date. `build/package.mjs` l'appelle
+après l'écriture de l'archive et avant sa relecture (et avant la signature d'essai du paquet MSIX) ; la relecture par
+le SDK ou par `makeappx` vérifie le contenu, la carte des blocs du MSIX ne couvrant que les données. Le paquet du cœur,
+fait par sa propre chaîne, garde ses dates.

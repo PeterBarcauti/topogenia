@@ -1,5 +1,5 @@
 <!-- 099-commentaire-de-presentation.md -->
-<!-- The comment of presentation of a step (3.2): typed during the presentation without opening the sheet, said instead of the sentences of its step in the language shown, one line per language (its original and its translations), kept beside the steps outside the closed core, translated by the assistant and by the workbook, carried by the package 2.4, not by the .pmap; and the same comment on a flow, said along the flow, by the same rules, translated by the same three ways (revision of 13/11/2026) -->
+<!-- The comment of presentation of a step (3.2): typed during the presentation without opening the sheet, said instead of the sentences of its step in the language shown, one line per language (its original and its translations), kept beside the steps outside the closed core, translated by the assistant and by the workbook, carried by the package 2.4, and by the .pmap 1.5 since ADR 105; and the same comment on a flow, said along the flow, by the same rules, translated by the same three ways (revision of 13/11/2026) -->
 
 # 099 - Le commentaire de présentation d'une étape
 
@@ -99,14 +99,15 @@ Le projet se présente dans plusieurs langues : un commentaire dit dans une seul
    12/11/2026 : le champ relit les commentaires de la carte à son ouverture ; tant que rien n'est tapé, il montre le
    texte à jour et enverra sa version ; un texte déjà tapé reste, avec la version de la ligne que le champ a montrée.
    Après un conflit, les commentaires sont relus, et un second Entrée enregistre par-dessus, en connaissance de
-   cause. **Limite connue** (F-131 de `docs/a-peaufiner.md`) : une ligne supprimée puis récrite repart de la
+   cause. **Limite connue** (F-131 de `docs/a-peaufiner.md` (non publié)) : une ligne supprimée puis récrite repart de la
    version 1 ; si l'on tape avant que la relecture d'ouverture soit arrivée, et qu'un autre animateur a entre-temps
    supprimé puis récrit ce commentaire, la ligne a le même numéro de version et un autre texte : l'hôte ne voit pas
    de conflit, et le texte de l'autre est remplacé sans message.
 6. **La vie de l'étape** : le commentaire suit son étape d'une carte à l'autre (sa clé commence par l'étape) ; il reste
    quand l'étape va à la corbeille, pour sa restauration ; la purge supprime toutes ses lignes avant l'étape.
 7. **Pas dans le `.pmap`** (choix du porteur du projet) : une copie `.pmap`, et « Dupliquer » qui passe par elle, n'ont
-   pas les commentaires.
+   pas les commentaires. **Révisé le 16/11/2026 par l'ADR 105**, décision du porteur du projet : le `.pmap` 1.5 porte les
+   commentaires dans une copie entière (copie d'un projet, copie d'une carte, duplication).
 8. **Traduit par l'assistant** (« Traduire en … », ADR 083) : l'invite donne au modèle, à côté de la carte, les
    commentaires de l'arbre de la carte qui ont un original et aucune ligne dans la langue demandée (300 au plus par
    échange) ; la réponse les rend dans un champ à part, `comments` (`{ step, text }`), validé par le schéma de réponse
@@ -178,7 +179,7 @@ serveur (points 12 à 17), puis la traduction du commentaire d'une flèche par l
     commentaire), **le regroupement en sous-carte** et **la remontée d'un détail**, dont les flèches recréées sont
     d'autres flèches. Le commentaire de la flèche d'origine n'est pas reporté sur celles qui la remplacent, alors que
     le cœur y reporte son libellé, sa part et les traductions du libellé : limite connue, tracée F-174 dans
-    `docs/a-peaufiner.md`. La création d'une flèche annulée (Ctrl+Z) alors qu'elle porte un commentaire n'est pas
+    `docs/a-peaufiner.md` (non publié). La création d'une flèche annulée (Ctrl+Z) alors qu'elle porte un commentaire n'est pas
     refusée : le commentaire attend avec la flèche, et la rétablir le lui rend. Ces comportements sont fixés par
     `FlowCommentRoutesTests` (création annulée puis rétablie, inversion entre deux étapes de langues d'origine
     différentes, insertion d'une étape).
@@ -188,8 +189,8 @@ serveur (points 12 à 17), puis la traduction du commentaire d'une flèche par l
     l'importateur, en version 1 ; celle d'une langue non configurée laissée ; deux lignes d'une flèche dans une même
     langue refusent le paquet ; la ligne de la langue d'origine de l'étape source est l'original, toujours une
     saisie. Elles sont écrites après les flèches, dans la même unité de travail. Un état cible reprend les commentaires
-    des flèches de sa source ; un remplacement par un paquet les écrit sur le nouveau projet. Ni le `.pmap` ni
-    « Dupliquer » ne les portent (point 7).
+    des flèches de sa source ; un remplacement par un paquet les écrit sur le nouveau projet. Le `.pmap` 1.5 et
+    « Dupliquer » les portent depuis la 3.3 (point 7 révisé, ADR 105).
 18. **Fait dans le lot J10**, plus rien ne reste : la saisie et la lecture dans la présentation (ADR 097) et la
     traduction (points 19 à 21) ; la limite notée ici dans la première rédaction de cette révision est **levée**. Le changement de langue
     d'origine (ADR 100, point 6) compte désormais les commentaires des flèches parmi les textes manquants (point 21) :
@@ -278,4 +279,4 @@ l'assistant** (deux implémentations qui divergent à la première retouche).
 - **Un type d'objet de plus dans les traductions du cœur** : le cœur modifié pour une donnée qu'il ne connaît pas.
 - **Deux requêtes pour « Appliquer » ou pour l'import** (la carte, puis les commentaires) : un échec de la seconde
   laisserait une traduction à moitié écrite.
-- **Le commentaire dans le `.pmap`** : écarté par le porteur du projet.
+- **Le commentaire dans le `.pmap`** : écarté par le porteur du projet ; repris le 16/11/2026 (ADR 105).

@@ -157,7 +157,10 @@ public sealed class PublicationRulesTests
     /// is archived with the holder. The chain refuses a pack without them and gives them to the build of the domain, whose
     /// assembly carries them; build/core/licence.mjs makes the mark by an HMAC of its secret, checks it in the obfuscated
     /// assembly, archives the package, both assemblies, the map of names and the sources, keeps the key, the secret and the
-    /// archive outside the repository, and starts its tools directly.
+    /// archive outside the repository, and starts its tools directly. The version of the package is the one of
+    /// Directory.Packages.props, given to the pack, which may differ from the version of the product (3.4.1, R10). The file
+    /// of the assembly declares that version, and every entry of the package is dated the release day before its SHA-256
+    /// is written; the tool refuses a package that misses either (pre-audit 68, P3-09 and P2-04).
     /// </summary>
     [Fact]
     public void Each_package_of_the_core_carries_its_licence_and_its_mark_and_is_archived_outside_the_repository()
@@ -168,12 +171,16 @@ public sealed class PublicationRulesTests
         Assert.Contains("'$(CoreLicence)' == '' Or '$(CoreMark)' == ''", chain, StringComparison.Ordinal);
         Assert.Contains("-p:CoreLicence=$(CoreLicence)", chain, StringComparison.Ordinal);
         Assert.Contains("-p:CoreMark=$(CoreMark)", chain, StringComparison.Ordinal);
+        Assert.Contains("-p:FileVersion=$(PackageVersion).0", chain, StringComparison.Ordinal);
+        Assert.Contains("-p:InformationalVersion=$(PackageVersion)", chain, StringComparison.Ordinal);
+        Assert.True(chain.IndexOf("build/archive-dates.mjs", StringComparison.Ordinal) is var dated and > 0
+            && dated < chain.IndexOf("<GetFileHash", StringComparison.Ordinal), "The dates of the package are fixed before its SHA-256");
         var metadata = XDocument.Load(Path.Combine(RepositoryFiles.Root, "src", "Topogenia.Domain", "Topogenia.Domain.csproj")).Descendants("AssemblyMetadata")
             .Select(item => (item.Attribute("Include")?.Value, item.Attribute("Value")?.Value));
         Assert.Equal([("Licence", "$(CoreLicence)"), ("LicenceMark", "$(CoreMark)")], metadata);
         var tool = Build(Path.Combine("core", "licence.mjs"));
         foreach (var expected in new[] { "createHmac('sha256', secret)", "shell: false", "must be kept outside the repository", "'Mapping.txt'", "licences.json",
-            "does not carry its licence and its mark", "one number, one licensee", "NOT AUTHENTIC", "is never replaced" })
+            "does not carry its licence and its mark", "does not declare the version", "keeps dates of the machine of the build", "one number, one licensee", "NOT AUTHENTIC", "is never replaced", "`-p:PackageVersion=${version}`" })
             Assert.Contains(expected, tool, StringComparison.Ordinal);
         Assert.Contains("node build/core/licence.mjs pack", Build("package.mjs"), StringComparison.Ordinal);
     }
@@ -193,7 +200,9 @@ public sealed class PublicationRulesTests
         // the entry point of the signature.
         Assert.Contains("\"build\": \"tsc -b && vite build\"", File.ReadAllText(Path.Combine(RepositoryFiles.Root, "web", "package.json")), StringComparison.Ordinal);
         foreach (var step in new[] { "'typescript', 'bin', 'tsc'), '-b']", "'vite', 'bin', 'vite.js'), 'build']", "'third-party-notices.mjs'), '--check']",
-            "certificate: { type: 'string' }", "run('signtool'", "assemble(published, locks" })
+            "certificate: { type: 'string' }", "run('signtool'", "assemble(published, locks",
+            // Contre-visite 68, CV-P2-02: the endpoints of the static assets dated the release day, never the hour of the build.
+            "withLastModified(readFileSync(endpoints, 'utf8'), releaseDay())", "keep the hour of the build" })
             Assert.Contains(step, assembly, StringComparison.Ordinal);
         foreach (var entry in new[] { "'README.txt'", "'sbom.cdx.json'", "'licenses/LICENSE.txt'", "'licenses/NOTICE.txt'", "'licenses/THIRD-PARTY-NOTICES.md'",
             "'licenses/CORE-LICENSE.md'", "'licenses/Inter-OFL-1.1.md'", "'licenses/Lucide-ISC.txt'" })

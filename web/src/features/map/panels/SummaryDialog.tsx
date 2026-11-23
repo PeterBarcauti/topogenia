@@ -7,6 +7,7 @@ import { useStore } from 'zustand';
 import type { Schema } from '../../../api/client.ts';
 import { summaryText } from '../../../app/SummaryBadge.tsx';
 import { formatDate } from '../../../shared/i18n/formatDate.ts';
+import { useUnsavedForm } from '../../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../../shared/ui/Button.tsx';
 import { Dialog } from '../../../shared/ui/Dialog.tsx';
 import { askSummaries, SUMMARY_MAX, writeSummary } from '../state/actions/summaries.ts';
@@ -43,6 +44,8 @@ export function SummaryDialog({ map, onClose }: SummaryDialogProps) {
   // A map without summary opens on the field to write it, for who may write it; after an erasure as well.
   const draft = typed ?? (summary === null && canWrite ? '' : null);
   const [saving, setSaving] = useState(false);
+  // A sentence typed and not saved is a form not validated, for « Quit » (R12).
+  useUnsavedForm(draft !== null && draft !== (summary?.text ?? ''));
 
   const save = async (text: string) => {
     setSaving(true);

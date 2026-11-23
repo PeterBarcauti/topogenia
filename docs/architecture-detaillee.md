@@ -18,7 +18,7 @@ découpage.
 
 | Phase | Ce qu'elle produit | État |
 |---|---|---|
-| 0 Cadrage | La lecture de la spécification, la liste de tous les comportements à prouver (`couverture.md`), les questions | Fait |
+| 0 Cadrage | La lecture de la spécification, la liste de tous les comportements à prouver (`couverture.md` (non publié)), les questions | Fait |
 | 1 Squelette | La solution, les projets vides, les règles d'architecture, la charte graphique, la maquette | Fait |
 | 2 Domaine | Toutes les règles du métier, en mémoire, sans base | Fait |
 | 3 Persistance | L'écriture et la lecture dans SQLite et SQL Server, les migrations, les vues des rapports | Fait |
@@ -70,7 +70,7 @@ flowchart TB
 
 ## 3. Index des éléments
 
-### Domaine (`src/Topogenia.Domain`) : les règles du métier
+### Domaine (`src/Topogenia.Domain` (non publié)) : les règles du métier
 
 Il ne dépend de rien : ni base, ni réseau, ni horloge système. Il reçoit l'état d'un projet en mémoire et rend la
 liste des changements.
@@ -86,7 +86,7 @@ liste des changements.
 | E06b | Projets et membres | Création d'un projet, liste des membres, rôles (animateur, contributeur, lecteur) | `Projects/` | 2 (révisé en 4, AR-104) | Fait |
 
 Le domaine et ses tests forment le **cœur fermé** (licence propriétaire, ADR 048) ; il est livré en paquet obscurci
-et signé par la chaîne `build/core/` (ADR 074), et le dépôt public se construit avec ce seul paquet.
+et signé par la chaîne `build/core/` (non publié) (ADR 074), et le dépôt public se construit avec ce seul paquet.
 
 ### Application (`src/Topogenia.Application`) : le chef d'orchestre
 
@@ -125,7 +125,7 @@ et signé par la chaîne `build/core/` (ADR 074), et le dépôt public se constr
 | E21 | Échange | Paquets `.topogenia` (un projet complet, avec empreintes) et fichiers `.pmap` (versions 1.1 à 1.4 : structure et fiches, captés d'un récit) | `src/Topogenia.Interchange` | 5 | Fait |
 | E22 | Tests | Un projet de tests par couche, plus les règles d'architecture ; les tests de données tournent sur les deux moteurs | `tests/` | 1 à 7 | Fait |
 | E23 | Construction et intégration continue | Versions centralisées, avertissements traités comme erreurs, CI GitHub, notices tierces | `Directory.*.props`, `.github/`, `build/` | 1, 7 | Fait |
-| E24 | Paquets livrés | ZIP du mode Poste (exécutable autonome), paquet MSIX du Store (ADR 088), ZIP du mode Serveur (IIS), SBOM, empreintes, cœur fermé en paquet | `build/package.mjs`, `build/core/` | 7 | Fait |
+| E24 | Paquets livrés | ZIP du mode Poste (exécutable autonome), paquet MSIX du Store (ADR 088), ZIP du mode Serveur (IIS), SBOM, empreintes, cœur fermé en paquet | `build/package.mjs`, `build/core/` (non publié) | 7 | Fait |
 | E25 | Documentation | Décisions (ADR et AR), architecture, modèle de données, formats, guides d'exploitation ; chez le porteur du projet, les documents de suivi et de recette | `docs/` | 0 à 7 | Fait |
 | E26 | Assistant IA | Les connecteurs des modèles de l'IA et les consignes du produit, derrière les ports de l'application ; éteint par défaut | `src/Topogenia.Assistant` | 3.0 (ADR 077, 098) | Fait |
 
@@ -149,6 +149,6 @@ Ces interdits ne sont pas une convention : `tests/Topogenia.Architecture.Tests` 
 |---|---|
 | le détail technique d'une couche | `architecture.md` |
 | pourquoi un choix a été fait | `decisions/README.md` (ADR), `decisions/000-arbitrages-phase-0.md` (AR) |
-| ce qui reste à faire | `plan.md`, `etat.md` |
-| quel test prouve quel comportement | `couverture.md` |
-| ce qui a été volontairement remis à la fin | `a-peaufiner.md` |
+| ce qui reste à faire | `plan.md` (non publié), `etat.md` (non publié) |
+| quel test prouve quel comportement | `couverture.md` (non publié) |
+| ce qui a été volontairement remis à la fin | `a-peaufiner.md` (non publié) |

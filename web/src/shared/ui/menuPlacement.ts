@@ -1,5 +1,5 @@
 // menuPlacement.ts
-// Where a menu stands so that it stays in the window: 240 px wide, rows of 34 px for the reckoning, as the 1.x placed it (B-2.4-01).
+// Where a menu stands so that it stays in the window: 240 px wide, rows of 34 px for the reckoning, as the 1.x placed it (B-2.4-01); a menu of the header under its button, scrolling when it is higher than the room under it.
 
 /** The width of a menu and the height of a row, the values of `--menu-width` and `--menu-row-height` (spec 9.5). */
 export const MENU_WIDTH = 240;
@@ -27,4 +27,34 @@ export function menuPlacement(at: { readonly x: number; readonly y: number }, ro
     x: Math.max(0, Math.min(at.x, window.width - MENU_WIDTH)),
     y: Math.max(TOP_GAP, Math.min(at.y, window.height - rows * MENU_ROW_HEIGHT - BOTTOM_GAP)),
   };
+}
+
+/**
+ * The top left corner and the greatest height of a menu opened under a button of the header (the File menu, the account,
+ * the help): it stays under its button, moved left only to stay in the window, and scrolls in the room left under the
+ * button when it is higher (lot 1 of the 3.4); a context menu is placed by {@link menuPlacement}.
+ */
+export function menuUnder(at: { readonly x: number; readonly y: number }, window: { readonly width: number; readonly height: number }): { x: number; y: number; maxHeight: number } {
+  return {
+    x: Math.max(0, Math.min(at.x, window.width - MENU_WIDTH)),
+    y: at.y,
+    maxHeight: Math.max(MENU_ROW_HEIGHT, window.height - at.y - TOP_GAP),
+  };
+}
+
+/** The part of a submenu over its menu, so that the pointer does not cross a gap, and the room between its top and the top of its first entry (padding and border). */
+const SUBMENU_OVERLAP = 2;
+const SUBMENU_FIRST_ENTRY = 5;
+
+/**
+ * The top left corner and the greatest height of a submenu (ADR 117): to the right of its menu, a little over it, its first
+ * entry on its row; to the left when it would leave the window on the right; moved up so that its bottom stays in the
+ * window, and scrolling in the height of the window when it is higher.
+ */
+export function submenuPlacement(anchor: { readonly left: number; readonly right: number; readonly top: number }, size: { readonly width: number; readonly height: number },
+  window: { readonly width: number; readonly height: number }): { x: number; y: number; maxHeight: number } {
+  const right = anchor.right - SUBMENU_OVERLAP;
+  const x = right + size.width <= window.width ? right : Math.max(0, anchor.left - size.width + SUBMENU_OVERLAP);
+  const y = Math.max(TOP_GAP, Math.min(anchor.top - SUBMENU_FIRST_ENTRY, window.height - size.height - BOTTOM_GAP));
+  return { x, y, maxHeight: window.height - y - TOP_GAP };
 }

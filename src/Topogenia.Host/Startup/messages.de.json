@@ -28,6 +28,8 @@
   "REOUVERTE": "Zweiter Start: Der Browser öffnet die Anwendung.",
   "ICONE_OUVRIR": "{product} öffnen",
   "ICONE_QUITTER": "{product} beenden",
+  "ICONE_QUITTER_ATTENTE": "Eine Eingabe im Steckbrief ist noch nicht gespeichert. Trotzdem beenden?",
+  "ICONE_QUITTER_NON_VALIDE": "Ein geöffnetes Formular ist nicht gespeichert: seine Eingabe geht verloren. Trotzdem beenden?",
   "SAUVEGARDES_DOSSIER": "Die Sicherungen liegen in {folder}.",
   "RESTAURATION_PROPOSEE": "Verfügbare Sicherungen, von der neuesten zur ältesten. Änderungen nach der gewählten Sicherung sind darin nicht enthalten; die aktuelle Datei und ihr Journal werden daneben aufbewahrt und nicht gelöscht:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

@@ -1,12 +1,40 @@
 // PmapModel.cs
-// The .pmap document in memory (1.2, 1.1 read): project, maps, lanes, steps, flows, sheets, as read from a file or built from a project.
+// The .pmap document in memory (1.5, 1.1 to 1.4 read): project, maps, lanes, steps, flows, sheets, comments, as read from a file or built from a project.
 
 using Topogenia.Domain.Documents;
+using Topogenia.Domain.Values;
 
 namespace Topogenia.Interchange.Pmap;
 
 /// <summary>A `.pmap` document (ADR 054): the project, its root map and the points an author asks a person to check.</summary>
-public sealed record PmapDocument(PmapProject Project, PmapMap Map, IReadOnlyList<string> Uncertainties);
+public sealed record PmapDocument(PmapProject Project, PmapMap Map, IReadOnlyList<string> Uncertainties)
+{
+    /// <summary>
+    /// The languages whose translations a read for an insertion left out, not configured (3.3, F-208), in their order;
+    /// empty for any other read, which refuses them.
+    /// </summary>
+    public IReadOnlyList<string> DroppedLanguages { get; init; } = [];
+
+    /// <summary>The levels of its maps: 1 for a map without detail.</summary>
+    public int Depth => DepthOf(Map);
+
+    /// <summary>
+    /// The distinct addresses of its documents, at every level, that reach another machine when a person opens them: a web
+    /// address, or a network path (<c>\\server\share</c>). A file received from outside may carry them; the opening says
+    /// how many before a link is followed (pre-audit 68, P3-02). A drive path stays on the machine.
+    /// </summary>
+    public int RemoteLocations => LocationsOf(Map).Where(IsRemote).Distinct(StringComparer.Ordinal).Count();
+
+    /// <summary>Whether an address leaves the machine: a web address, or a network path.</summary>
+    public static bool IsRemote(string location) =>
+        DocumentLocation.TryParse(location, out var parsed) && (parsed.Type == LocationType.Url || parsed.Address.StartsWith(@"\\", StringComparison.Ordinal));
+
+    private static IEnumerable<string> LocationsOf(PmapMap map) => map.Steps.SelectMany(step =>
+        (step.Sheet is { } sheet ? sheet.Outputs.Concat(sheet.Inputs).Select(document => document.Location).OfType<string>() : [])
+        .Concat(step.SubMap is { } sub ? LocationsOf(sub) : []));
+
+    private static int DepthOf(PmapMap map) => 1 + map.Steps.Where(step => step.SubMap is not null).Select(step => DepthOf(step.SubMap!)).DefaultIfEmpty(0).Max();
+}
 
 /// <summary>The project of a file: a code (null when absent or malformed: the application asks for it), its name and language.</summary>
 public sealed record PmapProject(string? Code, string Name, string Language, string? Description, IReadOnlyDictionary<string, string> Translations)
@@ -16,7 +44,16 @@ public sealed record PmapProject(string? Code, string Name, string Language, str
 
     /// <summary>The hours of a full-time equivalent in a month (1.2); absent: the default.</summary>
     public decimal? FteHoursPerMonth { get; init; }
+
+    /// <summary>The glossary of the translations of the project (1.5, ADR 105): one term a line, written by a whole copy only.</summary>
+    public string? Glossary { get; init; }
 }
+
+/// <summary>
+/// The comment of presentation of a step or of a flow in a file (1.5, ADR 099 revised by ADR 105): its line in the language
+/// of origin of its step (of the source step for a flow), absent when it has none, and its other lines by language.
+/// </summary>
+public sealed record PmapComment(string? Text, IReadOnlyDictionary<string, string> Translations);
 
 /// <summary>A map: its lanes from top to bottom, its steps, its flows.</summary>
 public sealed record PmapMap(IReadOnlyList<PmapLane> Lanes, IReadOnlyList<PmapStep> Steps, IReadOnlyList<PmapFlow> Flows)
@@ -63,6 +100,9 @@ public sealed record PmapStep(
 
     /// <summary>The value of the step for the customer as a code (1.4, Makigami M1), null when not classified.</summary>
     public string? ValueClass { get; init; }
+
+    /// <summary>The comment of presentation of the step (1.5), null without one.</summary>
+    public PmapComment? Comment { get; init; }
 }
 
 /// <summary>A flow between two steps of the same map, by their identifiers, with its label and its translations (1.1).</summary>
@@ -73,6 +113,9 @@ public sealed record PmapFlow(string Source, string Target, string? Label, IRead
 
     /// <summary>The route chosen by the user (1.3, ADR 091), null for the drawing alone.</summary>
     public PmapRoute? Route { get; init; }
+
+    /// <summary>The comment of presentation of the flow (1.5), its original in the language of origin of its source step; null without one.</summary>
+    public PmapComment? Comment { get; init; }
 }
 
 /// <summary>The route of a flow chosen by the user (1.3, ADR 091): its sides by their codes (`top`...), and one passage.</summary>
@@ -146,6 +189,21 @@ public sealed record PmapUse(string Document, decimal? WaitHours, int? PercentCo
     /// <summary>The day the action is due.</summary>
     public DateOnly? DueDate { get; init; }
 
-    /// <summary>The use as the domain reads it, its action plan with it.</summary>
+    /// <summary>The readable code of the pain point in its project (1.5), informative: an opening numbers its pain points itself.</summary>
+    public string? PainPointCode { get; init; }
+
+    /// <summary>The status of the pain point as a code (1.5), null when the file does not say it.</summary>
+    public string? PainPointStatus { get; init; }
+
+    /// <summary>
+    /// The status the opening gives to the pain point (ADR 116 point 10): the one the file says, open or dealt with, the
+    /// status of its creation when the file says none (a proposal never keeps one). The domain raises the pain point
+    /// reported, then its rule of the status (`PainPointRules.ChangeStatus`) gives it this one.
+    /// </summary>
+    public Domain.Values.PainPointStatus Status => PainPointStatus is { } code
+        ? Codes.Parse<Domain.Values.PainPointStatus>(code, "pain_point_status")
+        : PainPointRules.ProducedStatus;
+
+    /// <summary>The use as the domain reads it, its pain point and its action plan with it, whatever the status of the pain point.</summary>
     public DocumentUseInput Input => new(WaitHours, PercentCompleteAccurate, PainPoint, LostHoursPerMonth) { Action = Action, Owner = Owner, DueDate = DueDate };
 }

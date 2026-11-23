@@ -9,6 +9,7 @@ import { COLUMN_WIDTH, FREE_BAND, LANE_HEADER_WIDTH, LEFT_MARGIN, STEP_HEIGHT, S
 import { pdfTexts } from '../src/test/pdf.ts';
 import type { Api } from './support/api.ts';
 import { expect, openMap, stepOf, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 // exceljs is a CommonJS module: loaded as such in this ES module.
 const Excel = createRequire(import.meta.url)('exceljs') as typeof ExcelType;
@@ -49,7 +50,7 @@ async function layOut(page: Page, api: Api, projectName = 'Clôture mensuelle'):
 async function exported(page: Page, entry: 'png' | 'pdf' | 'xlsx'): Promise<{ name: string; content: Buffer }> {
   const download = page.waitForEvent('download');
   await page.getByTestId('header-file').click();
-  await page.getByTestId(`menu-file-file.${entry}`).click();
+  await (await fileEntry(page, `file.${entry}`)).click();
   const file = await download;
   await expect(page.getByText('Export terminé : le fichier est dans le dossier Téléchargements.')).toBeVisible();
   return { name: file.suggestedFilename(), content: readFileSync(await file.path()) };

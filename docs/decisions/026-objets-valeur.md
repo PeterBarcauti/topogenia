@@ -18,7 +18,7 @@ imposeraient des convertisseurs dans les deux fournisseurs et dans les formats d
 
 ## Décision
 
-Chaque valeur saisie a un objet valeur dans `src/Topogenia.Domain/Values/`, un
+Chaque valeur saisie a un objet valeur dans `src/Topogenia.Domain/Values/` (non publié), un
 `readonly record struct` dont le constructeur est privé : on ne l'obtient que par `Parse`
 (refus par une `DomainException` et son code) ou, quand un appelant en a besoin, `TryParse`
 (vrai ou faux, sans refus), qui portent la règle. Une valeur obtenue est donc toujours valide.
@@ -54,7 +54,7 @@ l'enregistrement. Les anciennes fonctions disparaissent (`ReadableCodes`,
 
 ## Vérification
 
-`tests/Topogenia.Domain.Tests/Values/ValueObjectTests.cs` (une théorie par règle, valeurs
+`tests/Topogenia.Domain.Tests/Values/ValueObjectTests.cs` (non publié) (une théorie par règle, valeurs
 acceptées et refusées, conversion des six couleurs 1.x) ; les tests des opérations
 (`ProjectCodeRulesTests`, `UserRulesTests`, `DocumentRulesTests`, `CommandLineParserTests`,
 `SheetContentReaderTests`) passent par les objets valeur.

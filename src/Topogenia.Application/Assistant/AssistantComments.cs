@@ -95,6 +95,61 @@ public static class AssistantCommentTargets
 }
 
 /// <summary>
+/// The steps and the flows whose comment of presentation the practice `comments` writes (3.3, lot 3, F-130): those of the
+/// map open and of every detailed map below it (essay of the 18/11/2026: a request for « every step and detailed step »
+/// is the whole process), map by map in the order of the steps given, each map with its live steps in reading order then
+/// its live flows between two of them; each with the name of its map, the original of its comment today (its line in its
+/// language of origin), the source and the version of that line; <see cref="AssistantCommentTargets.CommentsMax"/> at most,
+/// the last maps left out entire.
+/// </summary>
+public static class AssistantCommentDraftTargets
+{
+    public static IReadOnlyList<AssistantDraftTarget> Of(IReadOnlyList<Step> steps, IReadOnlyList<PresentationComment> lines, IReadOnlyList<FlowEnds> flows,
+        IReadOnlyList<FlowPresentationComment> flowLines, Func<Guid, string> mapName)
+    {
+        ArgumentNullException.ThrowIfNull(steps);
+        ArgumentNullException.ThrowIfNull(lines);
+        ArgumentNullException.ThrowIfNull(flows);
+        ArgumentNullException.ThrowIfNull(flowLines);
+        ArgumentNullException.ThrowIfNull(mapName);
+        var byStep = lines.Select(line => line.AsLine()).ToLookup(line => line.SubjectId);
+        var byFlow = flowLines.Select(line => line.AsLine()).ToLookup(line => line.SubjectId);
+        var flowsOf = flows.ToLookup(flow => flow.Flow.MapId);
+        var maps = steps.GroupBy(step => step.MapId).Select(map =>
+        {
+            var name = mapName(map.Key);
+            return map.Select(step => Target(CommentSubject.Of(step), false, step.Code, step.Label, name, byStep))
+                .Concat(flowsOf[map.Key].Select(flow => Target(flow.Subject, true, flow.Code, flow.Context, name, byFlow))).ToList();
+        });
+        return Bounded(maps);
+    }
+
+    /// <summary>
+    /// The maps taken whole, in order, while they fit in <see cref="AssistantCommentTargets.CommentsMax"/>: the bound cuts
+    /// the last maps entire, never the flows of a map listed (ADR 107, point 7; audit of the copy 65, NEW-P3-01). The first
+    /// map, the one open, is always listed, its first entries only when it alone passes the bound (its steps before its flows).
+    /// </summary>
+    private static List<AssistantDraftTarget> Bounded(IEnumerable<List<AssistantDraftTarget>> maps)
+    {
+        var listed = new List<AssistantDraftTarget>();
+        foreach (var map in maps)
+        {
+            if (listed.Count > 0 && listed.Count + map.Count > AssistantCommentTargets.CommentsMax)
+                break;
+            listed.AddRange(map.Take(AssistantCommentTargets.CommentsMax - listed.Count));
+        }
+        return listed;
+    }
+
+    private static AssistantDraftTarget Target(CommentSubject subject, bool flow, string reference, string context, string map, ILookup<Guid, CommentLine> lines)
+    {
+        var original = CommentLineRules.Original(subject, lines[subject.Id]);
+        return new AssistantDraftTarget(subject.Id, flow, reference, context.ReplaceLineEndings(" "), map.ReplaceLineEndings(" "), subject.SourceLanguage,
+            original?.Text, original is null ? null : Domain.Values.Codes.Of(original.Source), original?.Version ?? 0);
+    }
+}
+
+/// <summary>
 /// The texts of the field `comments` of a reply (ADR 099 revised): each entry `{ step, text }` read, bounded and matched
 /// to a comment asked by the code of its step, each step once, or, for the comment of a flow (lot J10), by the codes of
 /// its two steps, `A &gt; B`, each flow once; a text too long is cut at a word with an ellipsis, so that the person
@@ -143,6 +198,23 @@ public static class AssistantCommentsReader
         ArgumentNullException.ThrowIfNull(targets);
         return [.. Matched(texts, targets.ToLookup(target => target.Reference, StringComparer.Ordinal), target => target.FlowId, FlowReference)
             .Select(match => new AssistantFlowCommentView(match.Target.FlowId, match.Target.Source, match.Target.Target, match.Target.Original, match.Text))];
+    }
+
+    /// <summary>
+    /// The views of the comments written by the practice `comments` (F-130), matched to the steps and the flows listed (the
+    /// map open and its detailed maps), in the order of the list, so that the review reads the maps one after the other
+    /// whatever order the reply wrote them in: a step by its code, a flow by the codes of its two steps as for a
+    /// translation; a reference unknown or seen already is left aside.
+    /// </summary>
+    public static IReadOnlyList<AssistantCommentDraftView> DraftViews(IReadOnlyList<AssistantCommentText> texts, IReadOnlyList<AssistantDraftTarget> targets)
+    {
+        ArgumentNullException.ThrowIfNull(texts);
+        ArgumentNullException.ThrowIfNull(targets);
+        var rank = targets.Select((target, index) => (target.SubjectId, index)).ToDictionary(pair => pair.SubjectId, pair => pair.index);
+        return [.. Matched(texts, targets.ToLookup(target => target.Reference, StringComparer.Ordinal), target => target.SubjectId, FlowReference)
+            .OrderBy(match => rank[match.Target.SubjectId])
+            .Select(match => new AssistantCommentDraftView(match.Target.Flow ? null : match.Target.SubjectId, match.Target.Flow ? match.Target.SubjectId : null,
+                match.Target.Reference, match.Target.Context, match.Target.Map, match.Text, match.Target.Current, match.Target.CurrentSource, match.Target.Version))];
     }
 
     /// <summary>The texts of a reply matched to what was asked by its reference, each one once, its text bounded.</summary>
@@ -199,7 +271,9 @@ public static class AssistantCommentsReader
             return null;
         if (kept.Length <= PresentationCommentRules.TextMax)
             return kept;
-        var cut = kept[..(PresentationCommentRules.TextMax - 1)];
+        // Never between the two halves of a character outside the basic plane (an emoji): the stores would keep a broken one (audit of the copy 64, P2-06).
+        var end = PresentationCommentRules.TextMax - 1;
+        var cut = kept[..(char.IsHighSurrogate(kept[end - 1]) ? end - 1 : end)];
         var space = cut.LastIndexOfAny([' ', '\n']);
         return (space > PresentationCommentRules.TextMax / 2 ? cut[..space] : cut).TrimEnd() + "…";
     }

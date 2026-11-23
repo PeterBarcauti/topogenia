@@ -4,6 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, openMap, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 /** A fictitious key: the connectors of the starter answer without calling anyone. */
 const KEY = 'sk-ant-fictive-report-0000';
@@ -20,7 +21,7 @@ test('the report is asked from the File menu, shown in the panel and saved as a 
   await openMap(page, project.mapId, 'RAP-E001');
 
   await page.getByRole('button', { name: 'Fichier', exact: true }).click();
-  await page.getByRole('menu', { name: 'Menu Fichier' }).getByRole('menuitem', { name: 'Rapport raconté par l’IA (Markdown)' }).click();
+  await (await fileEntry(page, 'file.report')).click();
   // The chip of the request names the practice, never its key.
   await expect(page.getByTestId('assistant-panel').locator('.intent-chip').last()).toHaveText('Rapport');
   const report = page.getByTestId('assistant-report');

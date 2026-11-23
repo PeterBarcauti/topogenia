@@ -10,7 +10,7 @@ namespace Topogenia.Host.Security;
 /// <summary>
 /// Applies the limit of the body of the route (its <see cref="IRequestSizeLimitMetadata"/>, else <see cref="Default"/>)
 /// before anything reads the request (spec 5.4, weakness 1.x 5.6-7): a request that announces a longer body is refused
-/// at once, 413 REQUETE_TROP_GROSSE with the limit in MB, without reading it; a body without announced length (chunked)
+/// at once, 413 REQUETE_TROP_GROSSE with the limit in MB (in KB under 1 MB or when it is not a whole number of MB), without reading it; a body without announced length (chunked)
 /// is read through a stream that refuses the same way as soon as it passes the limit, so that the reader of the route
 /// never gets more. The limit of the server is set a little above, as a last guard. The 1.x relied on the limit of
 /// Kestrel or IIS (about 30 MB) and checked the size of an import after reading it.
@@ -19,6 +19,8 @@ public sealed class BodySizeLimit(RequestDelegate next)
 {
     /// <summary>The limit of an entry point that names none: 1 MB (spec 5.4).</summary>
     public const long Default = 1024 * 1024;
+
+    private const long Kilobyte = 1024;
 
     private const long Megabyte = 1024 * 1024;
 
@@ -42,9 +44,18 @@ public sealed class BodySizeLimit(RequestDelegate next)
         return context.GetEndpoint()?.Metadata.GetMetadata<IRequestSizeLimitMetadata>()?.MaxRequestBodySize ?? Default;
     }
 
-    /// <summary>REQUETE_TROP_GROSSE with the limit of the route in MB.</summary>
-    public static DomainException Refusal(HttpContext context) =>
-        new(ErrorCodes.RequestTooLarge, RefusalKind.TooLarge, new Dictionary<string, object?> { ["max"] = LimitOf(context) / Megabyte });
+    /// <summary>
+    /// REQUETE_TROP_GROSSE with the limit of the route as `max` in the unit named by `unit`: `MB` for a whole number of
+    /// MB, else `KB` (rounded up), so that a limit is never told as « 0 MB ».
+    /// </summary>
+    public static DomainException Refusal(HttpContext context) => Refusal(LimitOf(context));
+
+    /// <summary>REQUETE_TROP_GROSSE for a limit in bytes, told in MB when whole, else in KB.</summary>
+    public static DomainException Refusal(long limit)
+    {
+        var (max, unit) = limit % Megabyte == 0 ? (limit / Megabyte, "MB") : ((limit + Kilobyte - 1) / Kilobyte, "KB");
+        return new(ErrorCodes.RequestTooLarge, RefusalKind.TooLarge, new Dictionary<string, object?> { ["max"] = max, ["unit"] = unit });
+    }
 
     /// <summary>The body read up to the limit: one byte more and the refusal is thrown instead of the data.</summary>
     private sealed class LimitedBody(Stream inner, long limit, Func<Exception> refusal) : Stream

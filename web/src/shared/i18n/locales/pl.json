@@ -26,7 +26,14 @@
     "quit_failed": "Aplikacja $t(app.name) nie została zatrzymana. Spróbuj ponownie lub zamknij okno konsoli.",
     "quit_unsaved": "Część danych w karcie nie jest jeszcze zapisana: aplikacja $t(app.name) pozostaje otwarta. Spróbuj ponownie po zapisaniu karty.",
     "stopped": "Aplikacja $t(app.name) została zatrzymana. Tę kartę przeglądarki można zamknąć.",
-    "stopped_help": "Aby znów z niej skorzystać, otwórz ją ponownie."
+    "stopped_help": "Aby znów z niej skorzystać, otwórz ją ponownie.",
+    "help_menu": "Menu Pomoc",
+    "help_online": "Pomoc online (po angielsku)",
+    "update_check": "Sprawdź dostępność aktualizacji",
+    "update_check_help": "Otwiera stronę wersji w witrynie. Zainstalowana: {{version}} z {{date}}.",
+    "update_check_store_help": "Otwiera stronę w Microsoft Store, który instaluje aktualizacje.",
+    "quit_text_unsaved": "Otwarty formularz nie jest zapisany: wpisane w nim dane zostaną utracone.",
+    "quit_anyway": "Zamknij mimo to"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Spacja",
     "Enter": "Enter",
-    "ArrowUp": "Strzałka w górę"
+    "ArrowUp": "Strzałka w górę",
+    "ArrowLeft": "Strzałka w lewo",
+    "ArrowRight": "Strzałka w prawo",
+    "ArrowDown": "Strzałka w dół",
+    "Backspace": "Backspace",
+    "Wheel": "Kółko myszy"
   },
   "errors": {
     "RESEAU": "Aplikacja $t(app.name) nie odpowiada. Sprawdź, czy $t(app.name) nadal działa (lub połączenie sieciowe, jeśli działa na serwerze).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Nieoczekiwana odpowiedź serwera. Odśwież stronę.",
     "ACCES_REFUSE": "Brak uprawnień do tej strony.",
     "UNKNOWN": "Wystąpił nieoczekiwany błąd.",
-    "RESUMES_A_JOUR": "Wszystkie mapy mają aktualne podsumowanie. Aby napisać je ponownie, otwórz mapę i kliknij „i” obok jej tytułu."
+    "RESUMES_A_JOUR": "Wszystkie mapy mają aktualne podsumowanie. Aby napisać je ponownie, otwórz mapę i kliknij „i” obok jej tytułu.",
+    "COLLECTION_TROP_DE_PROCESSUS": "Kolekcja zawiera zbyt wiele procesów."
   },
   "home": {
     "eyebrow": "Aby usprawnić swoje procesy dzięki AI, zacznij od ich opisania.",
@@ -83,7 +96,24 @@
     "sample_title": "Projekt przykładowy",
     "sample_text": "Fikcyjny, już opisany projekt, dzięki któremu poznasz kompletną mapę: tory, decyzje, mapę podrzędną, karty, dokumenty i utrudnienia. Usuwa się go jak każdy projekt.",
     "sample_create": "Utwórz projekt przykładowy",
-    "sample_created": "Utworzono projekt przykładowy {{code}}."
+    "sample_created": "Utworzono projekt przykładowy {{code}}.",
+    "filter": "Filtruj projekty",
+    "filter_placeholder": "Kod lub nazwa",
+    "filter_count": "{{shown}} z {{total}}",
+    "filter_none": "Żaden projekt nie pasuje.",
+    "update_line": "Ta wersja pochodzi z {{date}}.",
+    "update_link": "Sprawdź, czy jest nowsza",
+    "update_close": "Zamknij przypomnienie",
+    "button_start_help": "Wybierz punkt wyjścia.",
+    "start_menu": "Rozpocznij projekt",
+    "start_sample": "Projekt przykładowy",
+    "start_gallery": "Galeria szablonów",
+    "start_gallery_help": "Otwiera się w przeglądarce.",
+    "start_blank": "Pusta mapa…",
+    "new_project_help": "Zacznij od pustej mapy, przykładu lub szablonu.",
+    "new_project_help_no_sample": "Zacznij od pustej mapy lub szablonu.",
+    "new_project_help_no_gallery": "Zacznij od pustej mapy lub przykładu.",
+    "new_project_help_blank": "Zacznij od pustej mapy."
   },
   "roles": {
     "facilitator": "Moderator",
@@ -116,7 +146,7 @@
     "properties": "Właściwości projektu…",
     "properties_title": "Właściwości projektu {{code}}",
     "sharing_group": "Grupa udostępniania dokumentów",
-    "sharing_group_help": "Podawana w kartach przy wejściu udostępnionym (np. Zespół finansów). Puste: „grupa udostępniania projektu”.",
+    "sharing_group_help": "Nazwa grupy osób, które mogą czytać dokumenty projektu. Pojawia się przy polu „Udostępniono grupie” każdego dokumentu w karcie. Puste: „grupa udostępniania projektu”.",
     "properties_read_only": "Te właściwości może zmieniać tylko moderator projektu.",
     "properties_saved": "Właściwości projektu zapisane.",
     "language": "Język procesu",
@@ -125,12 +155,14 @@
     "workday_hours": "Dzień pracy (godziny)",
     "workday_hours_help": "Od 1 do 24 h, domyślnie 7: przelicza czasy przejścia na dni robocze.",
     "fte_hours": "Godziny na etat miesięcznie",
-    "fte_hours_help": "Od 1 do 744 h, domyślnie 151,67: przelicza obciążenie na pełne etaty."
+    "fte_hours_help": "Od 1 do 744 h, domyślnie 151,67: przelicza obciążenie na pełne etaty.",
+    "code_proposed": "Zaproponowano na podstawie nazwy.",
+    "more_options": "Więcej opcji"
   },
   "files": {
     "open": "Otwórz plik…",
     "open_title": "Otwórz plik",
-    "open_help": "Plik staje się nowym projektem: plik .pmap (pobrana kopia lub odpowiedź AI, która odczytała szkic), tabela Excel lub CSV, diagram Mermaid (.mmd, .md) albo obraz SVG wyeksportowany z edytowalną kopią.",
+    "open_help": "Plik staje się nowym projektem: plik .pmap (pobrana kopia lub odpowiedź AI, która odczytała szkic), kolekcja modeli (.pmaps), tabela Excel lub CSV, diagram Mermaid (.mmd, .md) albo obraz SVG wyeksportowany z edytowalną kopią.",
     "choose": "Wybierz plik…",
     "or_paste": "Lub wklej tutaj jego zawartość, na przykład odpowiedź AI:",
     "area": "Wklej lub upuść tutaj zawartość pliku .pmap",
@@ -196,7 +228,52 @@
     "target_name": "{{name}} (stan docelowy)",
     "target_label": "Etykieta punktu odniesienia",
     "target_label_default": "Stan obecny",
-    "target_button": "Utwórz"
+    "target_button": "Utwórz",
+    "map_download": "Zapisz otwartą mapę (.pmap)",
+    "map_downloaded": "Mapa zapisana z mapami szczegółowymi, kartami i komentarzami: plik .pmap jest w folderze Pobrane.",
+    "insert": "Wstaw plik jako krok szczegółowy…",
+    "insert_here": "Wstaw plik tutaj…",
+    "insert_title": "Wstaw plik jako krok szczegółowy",
+    "insert_help": "Plik staje się nowym krokiem szczegółowym tej mapy. To kopia: późniejsza zmiana pliku nie zmienia mapy. Plik .pmap, tabela Excel lub CSV, diagram Mermaid albo obraz SVG z jego kopią.",
+    "replace_title": "Zastąp uszczegółowienie plikiem",
+    "replace_help": "Uszczegółowienie kroku „{{label}}” trafia do kosza, a plik zajmuje jego miejsce. Ctrl+Z cofa całość.",
+    "insert_counts": "Kroki: {{steps}} · Tory: {{lanes}} · Połączenia: {{flows}} · Mapy: {{maps}} · Karty: {{sheets}}",
+    "insert_too_deep": "Ten plik ma {{depth}} poziomów map; pod tą mapą może mieć najwyżej {{room}}.",
+    "insert_too_large": "Ten plik przekracza {{max}} MB: nie można go wstawić.",
+    "insert_package": "To jest pakiet wymiany: importuje się go jako projekt, nie wstawia.",
+    "insert_dropped": "Pominięte tłumaczenia (języki nieskonfigurowane tutaj): {{languages}}",
+    "insert_label": "Nazwa kroku",
+    "insert_lane": "Tor",
+    "insert_after": "Umieść po",
+    "insert_at_start": "Na początku mapy",
+    "insert_sheets": "Przejmij karty",
+    "insert_sheets_help": "Karty, ich dokumenty i problemy trafiają jako wersje robocze, do przejrzenia i zatwierdzenia.",
+    "insert_button": "Wstaw",
+    "replace_button": "Zastąp",
+    "inserted": "Plik wstawiony. Kroki: {{steps}} · Mapy: {{maps}}",
+    "insert_on_flow": "Na strzałce {{from}} → {{to}}",
+    "insert_on_flow_here": "Wstaw plik na tej strzałce…",
+    "collection_title": "Kolekcja „{{name}}”",
+    "collection_help": "Dla każdego zaznaczonego procesu powstaje projekt. Nic nie jest zapisywane przed „Utwórz projekty”.",
+    "collection_all": "Zaznacz wszystko",
+    "collection_ticked": "Zaznaczono: {{count}} z {{total}}",
+    "collection_points": "Punkty do sprawdzenia: {{count}}",
+    "collection_details": "Opis i punkty do sprawdzenia",
+    "collection_code_free": "{{code}} jest już zajęty.",
+    "collection_invalid": "Nie można otworzyć:",
+    "collection_create": "Utwórz projekty",
+    "collection_creating": "Tworzenie {{done}} z {{total}}…",
+    "collection_done": "Projekty utworzone",
+    "collection_created": "Utworzono {{code}}.",
+    "collection_failed": "Nie utworzono: {{reason}}",
+    "collection_retry": "Spróbuj ponownie",
+    "collection_unnamed": "Proces {{rank}}",
+    "insert_collection": "Kolekcję otwiera się przez „Otwórz plik…”. Wstaw jeden z jej modeli osobno.",
+    "open_too_large": "Ten plik przekracza {{max}} MB: nie można go otworzyć.",
+    "collection_none": "Nie utworzono żadnego projektu",
+    "collection_code_twice": "{{code}} jest przypisany także innemu wierszowi.",
+    "collection_fix": "Popraw tekst",
+    "remote_locations": "Adresy sieciowe lub internetowe w kartach: {{count}}, do sprawdzenia przed otwarciem dokumentu."
   },
   "package": {
     "export": "Eksportuj projekt ({{extension}})…",
@@ -377,7 +454,13 @@
       "due": "Termin",
       "status": "Stan",
       "lost": "Utracone godziny miesięcznie"
-    }
+    },
+    "copy_image": "Kopiuj mapę jako obraz",
+    "copying": "Kopiowanie obrazu…",
+    "copied": "Obraz skopiowany: wklej go (Ctrl+V) do wiadomości e-mail lub slajdu.",
+    "copy_failed": "Nie udało się skopiować obrazu.",
+    "copy_as_png": "Eksportuj jako PNG",
+    "project_pdf": "Eksportuj projekt do PDF…"
   },
   "classification": {
     "internal": "Wewnętrzny",
@@ -516,7 +599,8 @@
     "breadcrumb": "Ścieżka nawigacji",
     "file": "Plik",
     "file_help": "Otwórz plik, pobierz kopię, duplikuj, eksportuj",
-    "members": "Członkowie"
+    "members": "Członkowie",
+    "fit": "Pokaż wszystko"
   },
   "ribbon": {
     "name": "Wstążka mapy",
@@ -616,6 +700,27 @@
       "necessary": "Niezbędne bez wartości",
       "waste": "Marnotrawstwo",
       "none": "Niesklasyfikowany"
+    },
+    "replace_detail": "Zastąp uszczegółowienie plikiem…",
+    "copy_selection_image": "Kopiuj zaznaczenie jako obraz",
+    "file_cascade": {
+      "export": "Eksportuj mapę",
+      "project": "Projekt",
+      "package": "Pakiet wymiany",
+      "assistant": "Asystent AI"
+    },
+    "file_short": {
+      "pdf": "PDF (A3, poziomo)",
+      "png": "Obraz PNG",
+      "svg": "Obraz SVG…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Cały projekt do PDF…",
+      "import": "Importuj pakiet…",
+      "replace": "Zastąp pakietem…",
+      "report": "Raport opowiedziany (Markdown)",
+      "comments": "Komentarze do prezentacji…"
     }
   },
   "deletion": {
@@ -668,7 +773,8 @@
       "retracer_liens": "automatyczna trasa strzałek",
       "inserer_rangees": "wstawienie wierszy",
       "retirer_rangee": "usunięcie wiersza",
-      "proposition_ia": "propozycja AI"
+      "proposition_ia": "propozycja AI",
+      "inserer_fichier": "wstawienie pliku"
     }
   },
   "command": {
@@ -793,9 +899,6 @@
     "duration_max": "Najdłuższy czas",
     "duration_bounds_order": "Najkrótszy ≤ czas ≤ najdłuższy",
     "minutes": "minut",
-    "duration_between": "od {{min}} do {{max}} min",
-    "duration_at_least": "co najmniej {{min}} min",
-    "duration_at_most": "najwyżej {{max}} min",
     "duration_value_one": "{{count}} min",
     "duration_value_few": "{{count}} min",
     "duration_value_many": "{{count}} min",
@@ -862,6 +965,7 @@
     "clarification_withdrawn": "Pytanie usunięte.",
     "read_empty": "Ten krok nie ma jeszcze zatwierdzonej karty.",
     "read_validated": "Wersja zatwierdzona {{date}} przez {{name}}.",
+    "read_draft": "Wersja robocza w toku, jeszcze niezatwierdzona.",
     "document": {
       "add_output": "Dodaj wyjście",
       "new_output": "Nowe wyjście",
@@ -925,7 +1029,8 @@
         "file": "Plik",
         "software": "Oprogramowanie",
         "other": "Inny"
-      }
+      },
+      "edit_pain": "Edytuj w {{code}}"
     },
     "pain_point": {
       "title": "Utrudnienie",
@@ -954,7 +1059,21 @@
         "implemented": "wdrożone",
         "adopted": "przyjęte",
         "dropped": "porzucone"
-      }
+      },
+      "status": "Status",
+      "status_of": "Status problemu {{code}}",
+      "status_help": "Wdrożone, przyjęte lub porzucone: problem znika z mapy, a jego godziny przestają się liczyć.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problem zidentyfikowany, działanie do zaplanowania",
+        "scored": "problem oceniony, działanie do wyboru",
+        "under_review": "działanie w analizie, jeszcze nie zdecydowane",
+        "in_progress": "działanie w trakcie realizacji",
+        "implemented": "działanie wykonane, wynik do sprawdzenia",
+        "adopted": "sprawdzone, to nowy sposób pracy",
+        "dropped": "postanowiono go nie podejmować"
+      },
+      "status_now": "Status problemu {{code}}: {{status}}"
     },
     "lead_time": "Czas przejścia",
     "lead_time_help": "Czas od nadejścia sprawy do jej wyjścia z kroku, łącznie z oczekiwaniem; nie wlicza się do kompletności.",
@@ -977,7 +1096,26 @@
       "minute": "minuty",
       "hour": "godziny",
       "day": "dni robocze"
-    }
+    },
+    "duration_between_one": "od {{min}} do {{max}} min",
+    "duration_between_few": "od {{min}} do {{max}} min",
+    "duration_between_many": "od {{min}} do {{max}} min",
+    "duration_between_other": "od {{min}} do {{max}} min",
+    "duration_at_least_one": "co najmniej {{min}} min",
+    "duration_at_least_few": "co najmniej {{min}} min",
+    "duration_at_least_many": "co najmniej {{min}} min",
+    "duration_at_least_other": "co najmniej {{min}} min",
+    "duration_at_most_one": "najwyżej {{max}} min",
+    "duration_at_most_few": "najwyżej {{max}} min",
+    "duration_at_most_many": "najwyżej {{max}} min",
+    "duration_at_most_other": "najwyżej {{max}} min",
+    "step_pain_points": "Utrudnienia kroku",
+    "step_pain_points_help": "Utrudnienia przypisane do kroku, bez dokumentu. Opis i plan są tylko do odczytu.",
+    "pain_points_one": "{{count}} utrudnienie",
+    "pain_points_few": "{{count}} utrudnienia",
+    "pain_points_many": "{{count}} utrudnień",
+    "pain_points_other": "{{count}} utrudnienia",
+    "step_pain_points_help_fill": "Utrudnienia przypisane do kroku, bez dokumentu. Ich status zmienia się tutaj; opis i plan są tylko do odczytu."
   },
   "translations": {
     "title": "Tłumaczenie projektu",
@@ -1240,6 +1378,12 @@
         },
         "summaries": {
           "title": "Podsumowania"
+        },
+        "comments": {
+          "title": "Komentarze do prezentacji",
+          "text": "Co prezentacja mówi o krokach i przekazaniach.",
+          "example": "Napisz komentarze do kroków i przekazań tej mapy i jej map szczegółowych.",
+          "example_empty": "Napisz komentarze do kroków i przekazań tej mapy i jej map szczegółowych."
         }
       },
       "thread": "Rozmowa z asystentem",
@@ -1317,7 +1461,8 @@
         "findings": "Analiza",
         "report": "Raport",
         "summaries": "Podsumowania",
-        "proposal": "Propozycja"
+        "proposal": "Propozycja",
+        "comments": "Komentarze do prezentacji"
       },
       "pasted": "Wklejona odpowiedź",
       "copy_reply": "Kopiuj odpowiedź",
@@ -1483,7 +1628,19 @@
     "resource": "Zasób Azure",
     "resource_help": "Nazwa zasobu: contoso dla contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Puste: port domyślny (Ollama 11434, LM Studio 1234)."
+    "port_help": "Puste: port domyślny (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Napisz komentarze do prezentacji dla kroków i przekazań tej mapy i jej map szczegółowych, które ich nie mają.",
+      "menu": "Napisz komentarze do prezentacji (AI)…",
+      "intro": "Przeczytaj każdy komentarz: zachowaj go, popraw albo odrzuć. Zostanie wypowiedziany podczas prezentacji.",
+      "flow": "Przekazanie {{labels}}",
+      "map": "Mapa: {{name}}",
+      "current": "Obecny komentarz: {{text}}",
+      "typed": "Zastępuje komentarz wpisany ręcznie: {{text}}",
+      "save": "Zapisz zachowane komentarze ({{n}})",
+      "saved": "Zapisane komentarze: {{n}}",
+      "done": "Zapisane komentarze do prezentacji: {{n}}"
+    }
   },
   "interface_language": {
     "help": "Język menu i komunikatów, ustawiany osobno dla każdej osoby. Język, w którym wyświetlane są mapy, wybiera się u góry okna, gdy projekt jest otwarty."
@@ -1962,5 +2119,176 @@
       "closing_lost": "Stracony czas: {{lost}} na miesiąc.",
       "arrow": "do"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Eksportuj do BPMN 2.0 (.bpmn)…",
+    "export_title": "Eksportuj do BPMN 2.0",
+    "export_help": "Plik .bpmn otwiera się w narzędziach do modelowania BPMN (Camunda, Signavio, Bizagi…). Zawiera całą kartę każdego kroku, bez lokalizacji dokumentów.",
+    "export_button": "Eksportuj",
+    "export_subprocesses": "Dołącz szczegółowe podprocesy",
+    "export_subprocesses_help": "Każdy szczegółowy krok otwiera się w narzędziu jako podproces.",
+    "export_subprocesses_none": "Mapa nie ma szczegółowego kroku.",
+    "export_details": "Rysuj dokumenty i punkty bólu",
+    "export_details_help": "Po odznaczeniu pozostają opisane w dokumentacji pliku.",
+    "toolbar": "Widok BPMN 2.0",
+    "badge": "Diagram BPMN 2.0 · tylko do odczytu",
+    "details": "Szczegóły na diagramie",
+    "export": "Eksportuj (.bpmn)…",
+    "close": "Wróć do mapy",
+    "close_help": "Wróć do mapy (Alt+B)",
+    "failed": "Nie udało się odczytać diagramu.",
+    "loading": "Odczytywanie diagramu…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Zdarzenie początkowe",
+      "endEvent": "Zdarzenie końcowe",
+      "intermediateCatchEvent": "Oczekiwanie",
+      "manualTask": "Zadanie ręczne",
+      "userTask": "Zadanie użytkownika",
+      "serviceTask": "Zadanie zautomatyzowane",
+      "subProcess": "Podproces",
+      "exclusiveGateway": "Bramka wykluczająca",
+      "parallelGateway": "Bramka równoległa",
+      "inclusiveGateway": "Bramka inkluzywna"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "„{{text}}”",
+      "map": "Mapa: {{name}}",
+      "classification": "Klasyfikacja: {{value}}",
+      "language": "Język: {{language}}",
+      "work_time": "Dzień pracy: {{workday}} h; godziny etatu na miesiąc: {{fte}} h",
+      "description": "Opis",
+      "wait": "oczekiwanie {{hours}} h",
+      "from": "z {{code}}",
+      "volume": "Wolumen wejściowy: {{quantity}} na {{period}}",
+      "periods": {
+        "day": "dzień roboczy",
+        "week": "tydzień",
+        "month": "miesiąc",
+        "year": "rok"
+      },
+      "lane_system": "Tor oprogramowania działającego samodzielnie",
+      "headcount": "Obsada: {{number}}"
+    },
+    "fit": "Pokaż wszystko",
+    "fit_help": "Pokaż cały diagram w oknie"
+  },
+  "shortcuts": {
+    "title": "Skróty klawiszowe",
+    "sections": {
+      "move": "Poruszanie się",
+      "choose": "Wybieranie",
+      "edit": "Zmiana mapy",
+      "display": "Wyświetlanie",
+      "present": "Prezentowanie",
+      "help": "Pomoc"
+    },
+    "edit_note": "Tylko dla moderatora projektu.",
+    "or": "lub",
+    "move_selection": "Przesuń zaznaczenie",
+    "escape": "Zamknij menu, panel lub kartę; zatrzymaj „Połącz”",
+    "space_held": "Narzędzie Rączka, dopóki klawisz jest wciśnięty",
+    "enter": "Otwórz kartę wybranego kroku",
+    "type": "Zacznij wpisywać nazwę wybranego kroku",
+    "menu_key": "Menu wybranego obiektu",
+    "wheel": "Przewijaj; z Shift w poziomie",
+    "zoom": "Powiększ",
+    "saved": "Przypomnij, że wszystko jest zapisane",
+    "alone_note": "Bez pojedynczo wybranego kroku (inaczej klawisz zaczyna jego nazwę)",
+    "type_key": "litera",
+    "search_keys": "W wyszukiwaniu: następny; z Shift poprzedni; Esc zamyka"
+  },
+  "search": {
+    "command_help": "Szukaj w projekcie",
+    "title": "Szukaj",
+    "field": "Szukane słowo",
+    "placeholder": "Krok, dokument, narzędzie…",
+    "previous": "Poprzedni (Shift+Enter)",
+    "next": "Następny (Enter)",
+    "position": "{{index}} z {{count}}",
+    "searching": "Wyszukiwanie…",
+    "none": "Brak wyników.",
+    "too_many": "Pierwsze {{shown}} z {{total}} wyników: zawęź wyszukiwanie.",
+    "short": "Co najmniej dwa znaki lub Enter.",
+    "this_map": "Ta mapa",
+    "level": "Poziom {{level}}",
+    "origin": "Język oryginału: {{language}}",
+    "kinds": {
+      "step": "Krok",
+      "lane": "Tor",
+      "document": "Dokument",
+      "tool": "Narzędzie",
+      "pain_point": "Utrudnienie",
+      "action": "Działanie"
+    },
+    "results_one": "{{count}} wynik",
+    "results_few": "{{count}} wyniki",
+    "results_many": "{{count}} wyników",
+    "results_other": "{{count}} wyniku"
+  },
+  "action_plan": {
+    "command": "Plan działań",
+    "title": "Plan działań",
+    "total": "{{hours}} h straty miesięcznie na otwartych utrudnieniach",
+    "late_count": "Po terminie: {{count}}",
+    "count": "Pokazane utrudnienia: {{shown}} z {{total}}",
+    "sort": "Sortuj według",
+    "sorts": {
+      "project": "Kolejność w projekcie",
+      "lost": "Utracone godziny",
+      "due": "Termin"
+    },
+    "filters": "Filtry",
+    "filter_open": "Otwarte",
+    "filter_late": "Po terminie",
+    "filter_no_action": "Bez działania",
+    "late": "Po terminie",
+    "no_action": "Nie ustalono działania",
+    "map": "Mapa: {{name}}",
+    "lane": "Tor: {{name}}",
+    "go_to": "Przejdź do {{code}}",
+    "edit": "Edytuj plan",
+    "edit_of": "Edytuj plan dla {{code}}",
+    "loading": "Ładowanie planu…",
+    "empty": "Brak utrudnień w tym projekcie.",
+    "none": "Żadne utrudnienie nie spełnia filtrów.",
+    "status_since": "{{status}} od {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Cofnij",
+    "undo_of": "Cofnij: przywróć {{code}} do statusu „{{status}}”"
+  },
+  "project_pdf": {
+    "sheet_state": "Stan karty: {{state}}",
+    "continued": "{{title}} (ciąg dalszy)",
+    "file": "projekt",
+    "contents": "Spis treści",
+    "page": "Strona {{page}} z {{total}}",
+    "scope_line": "Mapa „{{name}}” i jej poziomy",
+    "empty_map": "Mapa bez kroków.",
+    "depth_cut": "Mapy poniżej {{max}} poziomów nie są w tym dokumencie.",
+    "sheets_of": "Karty · {{map}}",
+    "reading": "Odczyt map: {{count}}",
+    "reading_sheets": "Odczyt kart…",
+    "drawing": "Mapa {{index}} z {{total}}",
+    "writing": "Zapis dokumentu: strona {{page}}",
+    "too_many_maps": "Więcej niż {{max}} map: wybierz „{{scope}}”.",
+    "too_many_pages": "Więcej niż {{max}} stron: odznacz karty albo wyeksportuj mapę szczegółową i jej poziomy.",
+    "cancelled": "Eksport anulowany.",
+    "title": "Eksportuj projekt do PDF",
+    "help": "Wszystkie mapy w jednym pliku, poziom po poziomie, dla osób bez aplikacji.",
+    "scope": "Zakres",
+    "scope_project": "Cały projekt",
+    "scope_branch": "Ta mapa i jej poziomy",
+    "with_sheets": "Z kartami",
+    "with_raci": "Z macierzą RACI",
+    "with_stream": "Ze strumieniem wartości",
+    "with_plan": "Z planem działań",
+    "sheets_help": "Karty są takie, jakie widzisz: wyślij dokument tylko osobom, które mogą je czytać.",
+    "button": "Utwórz PDF",
+    "progress": "Postęp",
+    "too_many_maps_below": "Więcej niż {{max}} map: otwórz mapę szczegółową niższego poziomu, a następnie wybierz „{{scope}}”.",
+    "too_many_pages_top": "Więcej niż {{max}} stron: odznacz karty."
   }
 }

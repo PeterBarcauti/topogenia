@@ -11,7 +11,7 @@ namespace Topogenia.Application.Assistant;
 /// The practice chosen by a tile of the panel (spec 3.0 section 3.4), or none when the person writes directly: the model
 /// then chooses the form of its reply among those the scope and the right admit.
 /// </summary>
-public enum AssistantIntent { Free, Create, Modify, Analyze, Ask, Translate, Report, Summaries }
+public enum AssistantIntent { Free, Create, Modify, Analyze, Ask, Translate, Report, Summaries, Comments }
 
 /// <summary>What the exchange acts on: the map open, the whole project from its root map, or a project yet to create (from the home page).</summary>
 public enum AssistantScope { Map, Project, NewProject }
@@ -19,9 +19,10 @@ public enum AssistantScope { Map, Project, NewProject }
 /// <summary>
 /// The forms of a reply (spec 3.0 section 3.4): an answer, questions, findings, a proposal; and the report of the practice
 /// `report`, the story of a map told for the export in Markdown (plan 3.1, L4); the summaries of the practice `summaries`,
-/// one sentence per map, reviewed before they are kept (plan 3.1, lot R).
+/// one sentence per map, reviewed before they are kept (plan 3.1, lot R); the comments of presentation of the practice
+/// `comments`, written for the steps and the flows of the map open and of its detailed maps, reviewed before they are kept (3.3, lot 3, F-130).
 /// </summary>
-public enum AssistantForm { Answer, Questions, Findings, Proposal, Report, Summaries }
+public enum AssistantForm { Answer, Questions, Findings, Proposal, Report, Summaries, Comments }
 
 /// <summary>
 /// The format of the schema of the project given to the model: the entries of the package without the people for who may
@@ -119,7 +120,29 @@ public sealed record AssistantReplyView(
 
     /// <summary>The translations of the comments of presentation of the flows asked with a translation (ADR 099, lot J10); null for any other reply.</summary>
     public IReadOnlyList<AssistantFlowCommentView>? FlowComments { get; init; }
+
+    /// <summary>The comments of presentation written for the steps and the flows of the map open and of its detailed maps (practice `comments`, F-130); null for any other reply.</summary>
+    public IReadOnlyList<AssistantCommentDraftView>? CommentDrafts { get; init; }
 }
+
+/// <summary>
+/// A step or a flow of the map open or of one of its detailed maps whose comment of presentation the practice `comments`
+/// may write (3.3, lot 3, F-130): its identifier, whether it is a flow, its reference for the model (the code of the step,
+/// `A &gt; B` for a flow), the words that place it (the label of the step, the labels of the two steps of a flow), the
+/// name of its map, the language of origin its comment is written in, and its original today with its source and version
+/// (0 without one).
+/// </summary>
+public sealed record AssistantDraftTarget(Guid SubjectId, bool Flow, string Reference, string Context, string Map, string Language, string? Current,
+    string? CurrentSource, int Version);
+
+/// <summary>
+/// A comment written by the model for a step or a flow of the map open or of one of its detailed maps, as the panel shows
+/// it for review: the step or the flow, its reference, the words that place it and the name of its map, the text
+/// proposed, the original of today with its source (`manual`: typed by a person, which the save replaces only when the
+/// person asks it) and its version, which the save sends back.
+/// </summary>
+public sealed record AssistantCommentDraftView(Guid? StepId, Guid? FlowId, string Reference, string Context, string Map, string Text, string? Current,
+    string? CurrentSource, int Version);
 
 /// <summary>
 /// A map whose summary may be asked (plan 3.1, lot R): its reference for the model (the code of the project for the root

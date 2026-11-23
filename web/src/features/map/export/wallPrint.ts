@@ -107,7 +107,7 @@ export function rowName(index: number): string {
 export const boundedAcross = (across: number): number => Math.min(ACROSS_MAX, Math.max(ACROSS_MIN, Math.round(Number.isFinite(across) ? across : ACROSS_MIN)));
 
 /** Pixels of the print for a length in millimetres. */
-const pixelsOf = (millimetres: number): number => Math.max(1, Math.round((millimetres / 25.4) * WALL_DPI));
+export const pixelsOf = (millimetres: number): number => Math.max(1, Math.round((millimetres / 25.4) * WALL_DPI));
 
 /** The cut marks of an area: at each corner, a line along each side, in the margin, a gap away from the corner. */
 function cutMarks(area: Box): Segment[] {

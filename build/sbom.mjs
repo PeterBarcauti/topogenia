@@ -4,6 +4,7 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { releaseDay } from './archive-dates.mjs';
 import { components, nugetLicence, root } from './components.mjs';
 
 const [mode, depsFile, runtimeConfig, out] = process.argv.slice(2);
@@ -22,7 +23,7 @@ function licences(text) {
 const product = /Name = "([^"]+)"/.exec(readFileSync(join(root, 'src', 'Topogenia.Application', 'ProductIdentity.cs'), 'utf8'))[1];
 const version = /<Version>([^<]+)<\/Version>/.exec(readFileSync(join(root, 'Directory.Build.props'), 'utf8'))[1];
 const deps = JSON.parse(readFileSync(depsFile, 'utf8'));
-const { npm, carried } = components();
+const { nuget, npm, carried } = components();
 
 // .NET: what the publication carries, by its deps.json (packages, and the runtime packs of the desktop mode).
 const dotnet = Object.entries(deps.libraries)
@@ -42,19 +43,30 @@ const provided = runtimeConfig === '-' || !existsSync(runtimeConfig) ? [] : (JSO
     properties: [{ name: 'provided-by', value: 'Hosting Bundle .NET 10, installed on the server' }],
   }));
 
-// The interface: the npm packages served, each with the packages carried inside its bundled files.
-const inside = new Map();
-for (const item of carried) inside.set(item.host, [...(inside.get(item.host) ?? []), item]);
+// A package the notices say shipped that the deps.json does not name: its assembly is carried by a shared framework of
+// .NET (System.Security.Cryptography.Pkcs in ASP.NET Core), the runtime pack of the desktop or the Hosting Bundle of the
+// server, which supersedes the package; named, at its version, so that a scanner reads it (pre-audit 68, P2-06).
+const inDeps = new Set(dotnet.map((component) => component.name));
+const superseded = nuget.filter((item) => item.usage === 'livré' && !inDeps.has(item.id)).map((item) => ({
+  type: 'library', 'bom-ref': `pkg:nuget/${item.id}@${item.version}`, name: item.id, version: item.version,
+  purl: `pkg:nuget/${item.id}@${item.version}`, licenses: licences(item.licence),
+  properties: [{ name: 'delivered-by', value: 'a shared framework of .NET (runtime pack of the desktop, Hosting Bundle of the server)' }],
+}));
+
+// The interface: the npm packages served, then the packages carried inside their bundled files, at the top as well, at
+// the version their embedded package.json gives when the bundle carries one (elliptic), without a version otherwise.
 const interfaceComponents = npm.filter((item) => item.usage === 'livré').map((item) => ({
   type: 'library', 'bom-ref': `pkg:npm/${item.id}@${item.version}`, name: item.id, version: item.version,
   purl: `pkg:npm/${item.id}@${item.version}`, licenses: licences(item.licence),
-  ...(inside.has(item.id) && item.path === `node_modules/${item.id}` ? {
-    components: inside.get(item.id).map((part) => ({
-      type: 'library', 'bom-ref': `pkg:npm/${part.id}#in-${item.id}`, name: part.id, purl: `pkg:npm/${part.id}`, licenses: licences(part.licence),
-      properties: [{ name: 'carried', value: part.version }],
-    })),
-  } : {}),
 }));
+// A package served and carried as well (core-js, pako) is named twice: the copy in the bundle may be of another version.
+const carriedComponents = carried.map((item) => {
+  const at = item.carriedVersion ? `@${item.carriedVersion}` : '';
+  return {
+    type: 'library', 'bom-ref': `pkg:npm/${item.id}${at}#in-${item.host}`, name: item.id, ...(item.carriedVersion ? { version: item.carriedVersion } : {}),
+    purl: `pkg:npm/${item.id}${at}`, licenses: licences(item.licence), properties: [{ name: 'carried', value: item.version }],
+  };
+});
 
 /** What the package of each mode is (ADR 088: the desktop mode also as an MSIX package for the Microsoft Store). */
 const DESCRIPTIONS = {
@@ -66,14 +78,23 @@ const DESCRIPTIONS = {
 const bom = {
   bomFormat: 'CycloneDX', specVersion: '1.5', serialNumber: `urn:uuid:${randomUUID()}`, version: 1,
   metadata: {
-    timestamp: new Date().toISOString(),
+    // The release day at midnight UTC, the date of every entry of the package: never the hour of the build (pre-audit 68, P2-04).
+    timestamp: releaseDay().toISOString().replace('.000Z', 'Z'),
     component: {
       type: 'application', 'bom-ref': `${product}@${version}`, name: product, version,
       description: DESCRIPTIONS[mode],
       licenses: [{ license: { id: 'Apache-2.0' } }, { license: { name: 'Proprietary licence of the core (licenses/CORE-LICENSE.md)' } }],
     },
   },
-  components: [...dotnet, ...provided, ...interfaceComponents],
+  components: [...dotnet, ...superseded, ...provided, ...interfaceComponents, ...carriedComponents],
 };
+// Every component THIRD-PARTY-NOTICES.md says shipped is a component of the SBOM, at the top, the one a scanner of
+// vulnerabilities reads (pre-audit 68, P2-06): a package of the notices left out fails the SBOM.
+const named = new Set(bom.components.map((component) => component.name));
+const left = [...nuget, ...npm, ...carried].filter((item) => item.usage === 'livré' && !named.has(item.id)).map((item) => `${item.id} ${item.version}`);
+if (left.length > 0) {
+  console.error(`The SBOM leaves out ${left.length} components shipped: ${left.join(', ')}`);
+  process.exit(1);
+}
 writeFileSync(out, `${JSON.stringify(bom, null, 2)}\n`);
-console.log(`${out}: ${dotnet.length} .NET, ${provided.length} provided, ${interfaceComponents.length} npm (${carried.length} carried inside)`);
+console.log(`${out}: ${dotnet.length + superseded.length} .NET, ${provided.length} provided, ${interfaceComponents.length} npm and ${carriedComponents.length} carried inside them`);

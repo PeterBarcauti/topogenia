@@ -52,4 +52,18 @@ describe('the view of the editor', () => {
     rerender();
     expect(result.current.view).toBe(first);
   });
+
+  it('fit shows the whole map, bounded as any view', () => {
+    const { result } = renderHook(() => useBoundedViewport(large, screen));
+    act(() => {
+      result.current.change({ x: -1200, y: -300, zoom: 1.5 });
+    });
+    act(() => {
+      result.current.fit();
+    });
+    const { view } = result.current;
+    expect(view.zoom).toBeCloseTo((1000 - INITIAL_VIEW.x - 40) / 3000, 10);
+    expect([view.x, view.y]).toEqual([INITIAL_VIEW.x, 16]);
+    expect(view.y + large.height * view.zoom).toBeLessThanOrEqual(600 - 24);
+  });
 });

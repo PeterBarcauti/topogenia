@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "topogenia-collection-1.0.schema.json",
+  "title": "Collection de modèles .pmaps, version 1.0",
+  "description": "Plusieurs processus dans un seul fichier (ADR 114) : une enveloppe dont chaque élément de processes est un document .pmap complet, tel quel. Ce schéma décrit l'enveloppe seule ; chaque élément suit le schéma pmap-<version>.schema.json de la version qu'il déclare (1.1 à 1.5). L'enveloppe ne porte ni langue ni code : chaque .pmap porte les siens. À l'ouverture, une faute de l'enveloppe refuse le fichier entier, une faute d'un élément ne refuse que lui. Format et règles : docs/format-collection.md. S'ouvre dans Topogenia 3.4 et suivantes.",
+  "type": "object",
+  "required": ["format", "version", "name", "processes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "topogenia-collection", "description": "Toujours \"topogenia-collection\" ; un .pmap porte \"topogenia\"." },
+    "version": { "const": "1.0", "description": "Version 1.0 de l'enveloppe, indépendante de la version de chaque .pmap qu'elle contient." },
+    "name": {
+      "type": "string",
+      "pattern": "\\S",
+      "maxLength": 200,
+      "not": { "pattern": "<[a-zA-Z!/?]" },
+      "description": "Nom de la collection, montré en tête de la liste à l'ouverture ; il ne nomme aucun projet."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 4000,
+      "not": { "pattern": "<[a-zA-Z!/?]" },
+      "description": "Ce que contient la collection (informatif) ; aucun HTML, comme tout texte saisi."
+    },
+    "processes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "description": "Un document .pmap complet, de version 1.1 à 1.5, comme valeur JSON (ni texte échappé ni format parallèle) : il suit le schéma pmap-<version>.schema.json de la version qu'il déclare et les règles de docs/format-pmap.md. Un projet est créé par élément coché, sous son propre code, son nom et sa langue."
+      },
+      "description": "Les processus de la collection, dans l'ordre de la liste montrée à l'ouverture : 1 au moins, 50 au plus."
+    }
+  }
+}

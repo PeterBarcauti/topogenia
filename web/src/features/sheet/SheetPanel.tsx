@@ -63,8 +63,8 @@ export function SheetPanel(props: SheetPanelProps) {
       ) : (
         <SheetContext.Provider value={value}>
           <SheetHead step={props.step} view={value.view} save={value.save} onClose={props.onClose} />
-          {value.view.is_draft ? <SheetBody mode={mode} onMode={setMode} /> : <ReadView />}
-          {value.view.is_draft && <SheetFoot />}
+          {value.view.is_draft && props.readOnly !== true ? <SheetBody mode={mode} onMode={setMode} /> : <ReadView />}
+          {value.view.is_draft && props.readOnly !== true && <SheetFoot />}
         </SheetContext.Provider>
       )}
     </aside>

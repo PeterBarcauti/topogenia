@@ -222,7 +222,7 @@ Constats fidélité MAJ-1 et m4, données M1 et m3 du round 3.
   trop long, jamais coupé) ; les codes lisibles (`ReadableCode`, 18 caractères au plus pour une largeur de 20), les noms
   de cartes repris d'un libellé (150 pour une largeur de 200) ou d'un nom de projet (200 pour 200), les couloirs et
   traductions copiés gardent un texte déjà contrôlé ; aucun autre endroit ne coupe ni ne compose un texte stocké.
-- Phase 5 (P5-T05, `docs/plan.md`) : `app_user.display_name` et `app_user.email` de la 1.x, les seules colonnes texte
+- Phase 5 (P5-T05, `docs/plan.md` (non publié)) : `app_user.display_name` et `app_user.email` de la 1.x, les seules colonnes texte
   de la 1.x qui peuvent finir par une espace (lecture du code 1.x : tout autre texte est rogné par `Textes.Obligatoire`
   ou `Facultatif`, par le lecteur `.pmap`, ou vient d'une liste fermée ou d'un code généré), sont rognés comme le fait
   `UserRules.NewUser` ; chaque ligne rognée est une anomalie du rapport de migration (S-7.6-11). Un NUL dans ces deux
@@ -275,7 +275,7 @@ Constats fidélité MAJ-1 et m4, données M1 et m3 du round 3.
 
 ### Vérification
 
-`tests/Topogenia.Domain.Tests/Projects/UserRulesTests.cs` : nom de 127 caractères, une espace, puis la suite ; e-mail de
+`tests/Topogenia.Domain.Tests/Projects/UserRulesTests.cs` (non publié) : nom de 127 caractères, une espace, puis la suite ; e-mail de
 255 caractères, espaces, puis la suite ; coupe au milieu d'une paire de substitution.
 `tests/Topogenia.Persistence.Tests/Collation/SearchParityTests.cs` (deux moteurs) : utilisateur créé par
 `UserRules.NewUser` avec ce nom et cet e-mail, écrit et relu à l'identique ; `StartsWith` et `EndsWith` sensibles à la

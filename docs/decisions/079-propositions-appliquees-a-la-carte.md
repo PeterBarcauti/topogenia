@@ -50,5 +50,5 @@ Le calcul de l'aperçu et l'application restent dans le cœur fermé (ADR 048).
 - Le paquet du cœur fermé est refait (le domaine a changé) avant le paquet de l'application.
 - « Proposer la correction » d'un constat d'analyse (animateur) envoie au modèle une demande de modification qui nomme
   le constat et ses objets : la proposition qui revient suit le même aperçu et la même application.
-- Restent pour plus tard (`docs/a-peaufiner.md`, F-53) : les fiches des étapes nouvelles en brouillon et les cartes
+- Restent pour plus tard (`docs/a-peaufiner.md` (non publié), F-53) : les fiches des étapes nouvelles en brouillon et les cartes
   détaillées proposées (le plan porte sur la carte ouverte).

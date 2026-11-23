@@ -1,28 +1,31 @@
 <!-- format-pmap.md -->
-<!-- Le format .pmap 1.4 : structure, règles de cohérence, fiches d'étape, flux de valeur, placement, ouverture, copie, duplication (ADR 054, ADR 085) -->
+<!-- Le format .pmap 1.5 : structure, règles de cohérence, fiches d'étape, flux de valeur, placement, commentaires de présentation, ouverture, copie, duplication (ADR 054, ADR 085, ADR 105) -->
 
-# Format de fichier `.pmap`, version 1.4
+# Format de fichier `.pmap`, version 1.5
 
 Un fichier `.pmap` décrit une carte de processus en couloirs : les acteurs (couloirs), les étapes, les flèches qui les
 relient, les rôles RACI, le détail des étapes (sous-cartes), en version 1.1 les traductions des étapes et des flèches et
 une fiche facultative par étape, en version 1.2 les saisies du flux de valeur (ADR 085) : volume entrant d'un début,
 part des sorties d'un branchement, délai d'une fiche, effectif d'un couloir, temps de travail du projet ; en version 1.3
 le tracé choisi d'une flèche (ADR 091) ; en version 1.4 le résumé d'une carte (ADR 094) et les propriétés du Makigami
-(ADR 095). La version courante est la 1.4 ; les versions 1.1 à 1.4 sont lues. C'est le format léger de l'application,
-lisible et écrivable par une personne ou une IA (D11) ; le paquet `.topogenia` (`docs/format-topogenia.md`) porte, lui,
-tout le projet.
+(ADR 095) ; en version 1.5 ce que porte une copie entière (ADR 105) : les commentaires de présentation des étapes et des
+flèches, le glossaire du projet, le code et l'état d'un irritant. La version courante est la 1.5 ; les versions 1.1 à
+1.5 sont lues. C'est le format léger de l'application, lisible et écrivable par une personne ou une IA (D11) ; le paquet
+`.topogenia` (`docs/format-topogenia.md`) porte, lui, tout le projet.
 
 - **Fichier > Télécharger une copie** produit le `.pmap` d'un projet (tout membre) ;
 - **Fichier > Ouvrir un fichier .pmap** crée un projet à partir d'un fichier (administrateur) ;
-- **Dupliquer le projet** passe par le même modèle, en mémoire, sans les fiches (administrateur).
+- **Dupliquer le projet** passe par le même modèle, en mémoire, sans les fiches, avec les commentaires de présentation
+  et le glossaire (administrateur).
 
 | Élément | Valeur |
 |---|---|
 | Extension | `.pmap` |
 | Contenu | JSON (RFC 8259), UTF-8 |
-| Schéma | `schemas/pmap-1.4.schema.json` (sous-ensemble de JSON Schema 2020-12, ADR 051) ; `schemas/pmap-1.3.schema.json`, `schemas/pmap-1.2.schema.json` et `schemas/pmap-1.1.schema.json` restent publiés |
+| Schéma | `schemas/pmap-1.5.schema.json` (sous-ensemble de JSON Schema 2020-12, ADR 051) ; `schemas/pmap-1.4.schema.json`, `schemas/pmap-1.3.schema.json`, `schemas/pmap-1.2.schema.json` et `schemas/pmap-1.1.schema.json` restent publiés |
 | Marqueur | `"format": "topogenia"` |
-| Version | `"version": "1.4"`, écrite quand une carte porte un résumé ou qu'un élément porte une propriété du Makigami (classe de valeur, support, bornes de la durée, plan d'actions), `"1.3"` quand une flèche porte un tracé choisi, `"1.2"` sinon ; `"1.3"`, `"1.2"` et `"1.1"` toujours lues, sans les propriétés des versions suivantes (AR-93 : aucun fichier 1.0 n'a été publié) |
+| Plusieurs processus | La collection de modèles `.pmaps` (`docs/format-collection.md`, ADR 114) : une enveloppe dont chaque élément est un `.pmap` complet, tel quel ; 3.4 et suivantes |
+| Version | `"version": "1.5"`, écrite quand le fichier porte un commentaire de présentation, un glossaire, le code ou l'état d'un irritant (section 11), `"1.4"` quand une carte porte un résumé ou qu'un élément porte une propriété du Makigami (classe de valeur, support, bornes de la durée, plan d'actions), `"1.3"` quand une flèche porte un tracé choisi, `"1.2"` sinon ; `"1.4"`, `"1.3"`, `"1.2"` et `"1.1"` toujours lues, sans les propriétés des versions suivantes (AR-93 : aucun fichier 1.0 n'a été publié) |
 
 Le schéma décrit la forme ; ce document ajoute les règles qu'un schéma ne sait pas dire (section 4). Un exemple minimal
 et un exemple complet sont dans `samples/minimal.pmap` et `samples/cloture-mensuelle.pmap` ; les consignes pour une IA
@@ -60,7 +63,7 @@ refusée avec la liste des propriétés possibles : une faute de frappe (`lable`
 | Propriété | Obligatoire | Règle |
 |---|---|---|
 | `format` | oui | `"topogenia"` |
-| `version` | oui | `"1.4"`, `"1.3"`, `"1.2"` ou `"1.1"` : une propriété d'une version plus récente que celle du fichier y est inconnue (en 1.1, la fréquence `per_case` est refusée) |
+| `version` | oui | `"1.5"`, `"1.4"`, `"1.3"`, `"1.2"` ou `"1.1"` : une propriété d'une version plus récente que celle du fichier y est inconnue (en 1.1, la fréquence `per_case` est refusée) |
 | `generated_by`, `generated_at` | non | Informatifs ; la copie écrit le nom du produit et la date UTC |
 | `project` | oui | Section 2.2 |
 | `map` | oui | Carte racine, section 2.3 |
@@ -78,6 +81,7 @@ refusée avec la liste des propriétés possibles : une faute de frappe (`lable`
 | `translations` | non | Nom du projet dans les autres langues configurées |
 | `workday_hours` | non (1.2) | Journée de travail, de 1 à 24 heures ; 7 sans valeur |
 | `fte_hours_per_month` | non (1.2) | Heures d'un équivalent temps plein par mois, de 1 à 744 ; 151,67 sans valeur |
+| `glossary` | non (1.5) | Glossaire du projet, un terme par ligne, 4 000 caractères (section 11) |
 
 ### 2.3 Carte, couloir, étape, flèche
 
@@ -85,8 +89,8 @@ refusée avec la liste des propriétés possibles : une faute de frappe (`lable`
 |---|---|
 | Carte | `lanes` (1 à 200, de haut en bas, obligatoire), `steps`, `flows`, `summary` (1.4 : `{ "text", "translations" }`, une phrase de 200 caractères au plus sur une ligne, qui dit ce que montre la carte ; écrit seulement quand il la décrit telle qu'elle est, ADR 094) |
 | Couloir | `id`, `name` (150), `type` (`person` par défaut, `department`, `system`), `color` (`#RRGGBB`, minuscules acceptées et mises en majuscules ; absente : teinte du rang), `translations`, `headcount` (1.2 : effectif, entier de 0 à 100 000, jamais sur `system`) |
-| Étape | `id`, `lane` (un couloir de sa carte), `label` (150), `type` (`task` par défaut, `decision`, `parallel`, `inclusive`, `wait`, `start`, `end`), `column` (0 à 10 000), `row` (0 à 50), `automation` (`manual` par défaut, `in_progress`, `automated`), `raci`, `sub_map`, `translations` (1.1), `sheet` (1.1), `volume` (1.2 : `{ "quantity", "period" }`, quantité de 0 à 1 000 000 par `day`, `week`, `month` ou `year`, seulement sur `start`), `value_class` (1.4, Makigami : `value_added`, `necessary`, `waste`, seulement sur une étape avec contenu : `task`, `decision`, `wait`) |
-| Flèche | `source`, `target` (deux étapes de la même carte), `label` (60), `translations` (1.1), `share` (1.2 : part des dossiers en %, de 0 à 100, seulement sur une sortie de `decision` ou `inclusive`), `route` (1.3 : tracé choisi dans l'application, section 4, règle 9) |
+| Étape | `id`, `lane` (un couloir de sa carte), `label` (150), `type` (`task` par défaut, `decision`, `parallel`, `inclusive`, `wait`, `start`, `end`), `column` (0 à 10 000), `row` (0 à 50), `automation` (`manual` par défaut, `in_progress`, `automated`), `raci`, `sub_map`, `translations` (1.1), `sheet` (1.1), `volume` (1.2 : `{ "quantity", "period" }`, quantité de 0 à 1 000 000 par `day`, `week`, `month` ou `year`, seulement sur `start`), `value_class` (1.4, Makigami : `value_added`, `necessary`, `waste`, seulement sur une étape avec contenu : `task`, `decision`, `wait`), `comment` (1.5 : commentaire de présentation, section 11) |
+| Flèche | `source`, `target` (deux étapes de la même carte), `label` (60), `translations` (1.1), `share` (1.2 : part des dossiers en %, de 0 à 100, seulement sur une sortie de `decision` ou `inclusive`), `route` (1.3 : tracé choisi dans l'application, section 4, règle 9), `comment` (1.5 : commentaire de présentation, section 11) |
 
 ## 3. Identifiants
 
@@ -114,7 +118,9 @@ tenue ; rien n'est créé tant que le fichier n'est pas entièrement correct.
 7. Textes : les règles de toute saisie de l'application (un seul contrôle pour l'API et les formats, A-2.18-08) : espaces
    retirés, pas de balise HTML, pas de caractère de contrôle autre que la tabulation et les fins de ligne, longueur bornée.
 8. Limites : 5 000 étapes par fichier, 200 couloirs par carte, 12 niveaux de sous-cartes, JSON de 256 niveaux au plus,
-   8 millions de caractères ; le corps de la demande d'ouverture est limité à 10 Mo avant d'être lu.
+   8 millions de caractères ; le corps de la demande d'ouverture est limité à 10 Mo avant d'être lu. Une clé écrite deux fois
+   dans un même objet est refusée (`PMAP_JSON`, avec la ligne et la colonne de la seconde) : le lecteur garderait la
+   dernière, quand la relecture du texte voit la première (3.4).
 9. Tracé choisi (1.3, ADR 091) : `route` porte au plus `from` et `to`, le côté de départ et le côté d'arrivée (`top`,
    `bottom`, `left`, `right`), et `via`, un passage, un seul parmi : une allée `{ "aisle": n }` (l'allée à droite de la
    colonne n, de -1, avant la colonne 0, à 10 000) ; le milieu d'une colonne `{ "column": n }` (de 0 à 10 000) ; une
@@ -141,7 +147,9 @@ messages de l'application (A-3-72) ; la réponse `FICHIER_INVALIDE` porte `count
 
 - Le **R** est toujours le couloir de l'étape (`lane`). `raci` donne le rôle des **autres** couloirs de la même carte :
   `{ "dir": "A", "com": "C" }`.
-- Les lettres sont celles du paramètre `raci_letters` (A, C, I par défaut ; S en RASCI) ; un seul A par étape.
+- Les lettres sont A, S, C et I, quel que soit le paramètre `raci_letters` (A, C, I par défaut ; S en RASCI), qui dit
+  seulement ce qu'une personne saisit : une copie d'un projet qui porte un S se rouvre donc telle quelle dans une
+  installation en RACI, comme un paquet (décision du porteur du projet du 16/11/2026) ; un seul A par étape.
 - `"R"` pour le couloir de l'étape est admis et sans effet ; `"R"` pour un autre couloir est refusé ; une autre lettre
   sur le couloir de l'étape aussi.
 - Une copie n'écrit que le RACI visible : un rôle masqué (couloir de l'étape après un déplacement, couloir d'une autre
@@ -171,7 +179,7 @@ une version validée (le circuit de validation reste celui de l'application).
 | `free_text` | 20 000 caractères |
 | `outputs` | Documents que l'étape produit : `{ "id", "name", "location", "share_confirmed", "medium" }` ; `id` n'est demandé qu'à une sortie qu'une autre étape utilise ; `medium` (1.4, Makigami) : `paper`, `email`, `spreadsheet`, `file`, `software`, `other` |
 | `inputs` | Documents reçus de l'extérieur de la carte : les mêmes propriétés, plus `wait_hours` (0 à 100 000) |
-| `uses` | Sorties d'**autres** étapes de la **même** carte que l'étape utilise : `{ "document", "wait_hours", "percent_complete_accurate", "pain_point", "lost_hours_per_month" }` ; `document` est l'`id` de la sortie ; une sortie est utilisée une fois au plus par une étape ; l'irritant (`pain_point`, 2 000 caractères, temps perdu de 0 à 99 999,9 heures par mois) naît sur l'étape productrice ; en 1.4 (Makigami M7), son plan d'actions : `action` (500 caractères), `owner` (qui la porte, 150 caractères, texte libre), `due_date` (échéance, `aaaa-mm-jj`), seulement avec un `pain_point` |
+| `uses` | Sorties d'**autres** étapes de la **même** carte que l'étape utilise : `{ "document", "wait_hours", "percent_complete_accurate", "pain_point", "lost_hours_per_month" }` ; `document` est l'`id` de la sortie ; une sortie est utilisée une fois au plus par une étape ; l'irritant (`pain_point`, 2 000 caractères, temps perdu de 0 à 99 999,9 heures par mois) naît sur l'étape productrice ; en 1.4 (Makigami M7), son plan d'actions : `action` (500 caractères), `owner` (qui la porte, 150 caractères, texte libre), `due_date` (échéance, `aaaa-mm-jj`), seulement avec un `pain_point` ; en 1.5, son code `pain_point_code` et son état `pain_point_status` (section 11) |
 
 Les liens (`location`) sont des adresses web `http(s)://` ou des chemins de fichier (`\\serveur\dossier`, `X:\dossier`).
 Une copie n'écrit les fiches que sur option (`with_sheets=true`, désactivée par défaut) et chaque fiche telle que le
@@ -183,9 +191,13 @@ Documents et usages, visibles de tous les membres, suivent. La duplication ne co
 | Route | Droit | Effet |
 |---|---|---|
 | `GET /api/projects/{id}/pmap?with_sheets=` | Lecteur | La copie en texte, nommée `CODE_Nom-court_aaaa-mm-jj.pmap` (A-1.2-16) ; événement d'audit `project.exported` |
-| `GET /api/maps/{id}/pmap` | Lecteur | La copie d'une carte et de ses cartes détaillées, avec les tracés et les fiches telles que l'utilisateur les voit : celle qu'une image SVG porte sur option (3.1, ADR 092) ; événement `project.exported` avec la portée `map` |
+| `GET /api/maps/{id}/pmap?purpose=` | Lecteur | La copie d'une carte et de ses cartes détaillées, avec les tracés et les fiches telles que l'utilisateur les voit : celle qu'une image SVG porte sur option (3.1, ADR 092) ; événement `project.exported` avec la portée `map`. `purpose` (ADR 106) : `copy` (par défaut) ou `bpmn`, la même copie, un fichier à garder, son événement disant son format ; `view`, ce que lit la vue BPMN 2.0, sans événement : la carte seule, sans ses niveaux, sans l'emplacement des documents ni ce qu'ajoute une copie entière, et sans nom de fichier (audit de la copie 64) ; `pdf`, ce que lit « Exporter le projet en PDF… » (ADR 113) : la carte et ses niveaux jusqu'à 12, les fiches telles que l'utilisateur les voit, le code et l'état de chaque irritant, sans l'emplacement des documents, ni commentaire, ni glossaire, sans nom de fichier, son événement disant le format `pdf` |
+| `POST /api/maps/{id}/insert-pmap/preview` | Animateur | Corps `{ "content" }`, lu après le droit : ce que le fichier tient, ses niveaux et la place que la carte laisse, le libellé proposé, les langues écartées ; rien d'écrit (ADR 108) |
+| `POST /api/maps/{id}/insert-pmap` | Animateur, If-Match | Corps `{ "content", "label", "lane_id", "column", "row", "anchor_step_id", "position", "flow_id", "with_sheets" }`, lu après le droit : le fichier copié sous une nouvelle étape détaillée, tout ou rien, un Ctrl+Z ; événement `map.file_inserted` (ADR 108) |
+| `POST /api/steps/{id}/replace-pmap` | Animateur, If-Match | Corps `{ "content", "with_sheets" }`, lu après le droit : le détail de l'étape remplacé par le fichier, l'ancien à la corbeille ; événement `map.file_inserted` (ADR 108) |
+| `POST /api/projects/import-collection/preview` | Administrateur | Corps `{ "content" }`, une collection `.pmaps`, lu après le droit : par processus, son nom, sa langue, le code proposé libre, ses nombres, ses points à vérifier, ses fautes et son texte, que l'interface envoie ensuite à `import-pmap` une fois par processus coché ; rien d'écrit (ADR 114, `format-collection.md`) |
 | `POST /api/projects/import-pmap` | Administrateur | Corps `{ "content", "code", "name" }` : le code et le nom saisis l'emportent sur ceux du fichier, un nom changé perd les traductions du nom ; l'ouvreur est le seul animateur ; réponse 201 avec les nombres de cartes, couloirs, étapes, flèches et fiches et les incertitudes ; événement `project.imported` |
-| `POST /api/projects/{id}/duplicate` | Administrateur (la source lue) | Corps `{ "code", "name" }` : le modèle `.pmap` de la source, sans les fiches, ouvert comme un fichier ; traductions des étapes et des flèches gardées ; événement `project.duplicated` |
+| `POST /api/projects/{id}/duplicate` | Administrateur (la source lue) | Corps `{ "code", "name" }` : le modèle `.pmap` de la source, sans les fiches, ouvert comme un fichier ; traductions des étapes et des flèches, commentaires de présentation et glossaire gardés (1.5) ; événement `project.duplicated` |
 
 Pour faciliter le copier-coller depuis une conversation avec une IA, l'ouverture accepte aussi un contenu entouré d'un
 bloc de code Markdown, la marque d'ordre des octets, les virgules en fin de liste et les commentaires `//`.
@@ -195,6 +207,7 @@ Depuis la 3.1 (ADR 092), le dialogue d'ouverture fait aussi un `.pmap` à partir
 côté dans `uncertainties`. Il lit aussi la copie qu'une image SVG de Topogenia porte dans `<metadata id="topogenia">`,
 en base64 du texte UTF-8 du `.pmap` : seule cette métadonnée est lue (par `DOMParser`, en `image/svg+xml`), jamais le
 SVG inséré dans la page. Le texte obtenu suit la même route d'ouverture.
+
 ## 10. Versions
 
 - `1.1` (25/10/2026) : traductions des étapes et des flèches, fiche d'étape, refus d'un RACI sur un début, une fin ou un
@@ -210,5 +223,36 @@ SVG inséré dans la page. Le texte obtenu suit la même route d'ouverture.
   (`action`, `owner`, `due_date`). La copie écrit la 1.4 quand une carte porte un résumé à jour ou qu'un élément porte
   l'une de ces propriétés, la 1.3 ou la 1.2 sinon. À l'ouverture d'un fichier, le résumé est gardé comme écrit à la
   main ; une proposition de l'IA n'en prend que les traductions.
+- `1.5` (16/11/2026, ADR 105) : ce que porte une copie entière (section 11), les commentaires de présentation des
+  étapes et des flèches, le glossaire du projet, le code et l'état d'un irritant. La copie écrit la 1.5 seulement quand
+  le fichier porte l'un d'eux, pour qu'une version 3.2 ouvre encore les autres.
 - Une version plus récente que celles-ci est refusée (`PMAP_VERSION`, avec les versions lues) : l'application doit être
   mise à jour pour l'ouvrir.
+
+## 11. Ce que porte une copie entière (1.5)
+
+Le `.pmap` est la seule description d'une carte hors de la base : la copie d'un projet, la copie d'une carte, la
+duplication, l'export BPMN 2.0 (ADR 106) et l'insertion d'un fichier comme étape détaillée (ADR 108) le lisent ou
+l'écrivent. La
+version 1.5 lui ajoute ce qui vivait à côté de la carte (ADR 105). Ces ajouts ne sont écrits que par une copie entière :
+copie d'un projet (`GET /api/projects/{id}/pmap`), copie d'une carte (`GET /api/maps/{id}/pmap`), modèle d'une
+duplication. Le contexte donné à l'assistant ne les porte pas.
+
+| Ajout | Où | Règle |
+|---|---|---|
+| Glossaire | `project.glossary` | Un terme par ligne, 4 000 caractères ; à l'ouverture, posé par la règle du réglage du projet |
+| Commentaire de présentation | `comment` d'une étape ou d'une flèche | `{ "text", "translations" }`, l'un des deux au moins. `text` est la ligne dans la langue d'origine de l'étape (de l'étape de départ pour une flèche), `translations` les autres lignes ; chaque ligne sous la règle de tout commentaire : 500 caractères, sans balise, fins de ligne en `\n` |
+| Code d'un irritant | `pain_point_code` d'un usage | Avec `pain_point` seulement, 32 caractères ; informatif : l'ouverture numérote ses irritants |
+| État d'un irritant | `pain_point_status` d'un usage | Avec `pain_point` seulement : `reported`, `scored`, `under_review`, `in_progress`, `implemented`, `adopted`, `dropped` |
+
+À l'ouverture d'un fichier :
+
+- les commentaires sont écrits à côté de la carte, dans la même opération que le projet ; toutes leurs lignes sont des
+  saisies de la personne qui ouvre le fichier, comme les traductions qu'il apporte ; une ligne de `translations` dans la
+  langue du fichier cède la place à `text` ; une langue que l'installation ne configure pas est refusée ;
+- chaque irritant garde l'état du fichier, ouvert ou traité (ADR 116) : il naît « signalé », l'état d'un irritant à sa
+  création, puis la règle de l'état lui donne celui du fichier ; un irritant traité (`implemented`, `adopted`, `dropped`)
+  n'est donc pas rouvert et le projet ouvert compte les mêmes heures perdues que sa source ; son historique commence à
+  l'ouverture (le paquet `.topogenia` garde l'historique entier) ; la duplication d'un projet ne copie aucune fiche
+  (AR-10), donc aucun irritant ;
+- une proposition de l'assistant connaît ces propriétés et n'en garde aucune.

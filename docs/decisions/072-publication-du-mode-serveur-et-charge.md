@@ -30,13 +30,13 @@ et ne peut pas l'être (prompt 4.4) ; il n'y a qu'un compte Windows ; aucun obje
    sur son projet, 10 tours des gestes courants ; un client seul, puis les 30 ensemble avec une seconde entre deux gestes
    (rythme bien au-delà de 30 personnes), puis en rafale. **Critère** : aucun échec, et chaque geste sous une seconde au
    95e centile avec la pause (la limite de la fluidité perçue d'une action) ; la rafale est donnée pour la marge.
-5. **Renvoyé à la recette d'installation** (`docs/recette/finale/`) : le comportement sous IIS (module, `web.config`,
+5. **Renvoyé à la recette d'installation** (`docs/recette/finale/` (non publié)) : le comportement sous IIS (module, `web.config`,
    authentification Windows d'IIS) et le démarrage sous un compte membre du seul rôle `topogenia_app` (AR-110 ajusté :
    créer ce compte de connexion sort des bases `Topogenia_*`) ; les droits du rôle restent prouvés par la persistance.
 
 ## Conséquences
 
-- Mesuré (`docs/couverture-p7/verification-serveur.md`) : avec la pause, 95e centile de 48 à 101 ms pour les gestes de la
+- Mesuré (`docs/couverture-p7/verification-serveur.md` (non publié)) : avec la pause, 95e centile de 48 à 101 ms pour les gestes de la
   carte et de la fiche, 542 ms pour la liste des projets de l'accueil ; en rafale, 1,4 s pour l'accueil, moins de 0,7 s
   pour le reste ; 2 334 requêtes par passage, aucun échec. La liste des projets est le geste qui s'alourdit (F-42).
 - 30 sessions d'un même compte, faute d'autres comptes : l'hôte ne garde par utilisateur que son profil, l'écart est

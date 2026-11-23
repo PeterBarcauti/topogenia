@@ -325,10 +325,13 @@ public sealed class DetectorSamplesTests
     [InlineData("src: url(//fonts.gstatic.com/s/inter.woff2)")]
     [InlineData("new WebSocket('wss://telemetry.example.com/x')")]
     [InlineData("fetch('https://localhost.example.com/x')")]
+    [InlineData("fetch('https://www.omg.org/about')")]
     public void External_addresses_are_detected(string sample) => Assert.True(SourceDetectors.ContainsExternalUrl(sample));
 
     [Theory]
     [InlineData("<svg xmlns=\"http://www.w3.org/2000/svg\">")]
+    // The namespaces of BPMN 2.0.2 (ADR 106): names of the OMG that no reader fetches, as those of the W3C.
+    [InlineData("'xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"'")]
     [InlineData("const api = 'http://127.0.0.1:5080';")]
     [InlineData("const api = 'http://localhost:5080/api';")]
     [InlineData("// a comment line")]

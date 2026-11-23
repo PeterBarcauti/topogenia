@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
 import { runCommand } from '../../../shared/commands/commands.ts';
 import type { Point } from '../model/geometry/grid.ts';
+import { planStore } from '../plan/planStore.ts';
 import { clipboard } from './clipboard.ts';
 import { contextOf } from './commands/context.ts';
 import { MAP_COMMANDS } from './commands/mapCommands.ts';
@@ -38,13 +39,14 @@ export function useMapLanguage(): string {
 
 /**
  * The context the commands read, drawn again when what they read changes: the state of the editor, the clipboard and
- * the preferences; null while the map is not read.
+ * the preferences, the action plan open or not; null while the map is not read.
  */
 export function useCommandContext() {
   const editor = useEditor();
   useStore(editor.store);
   useStore(clipboard);
   useStore(editor.preferences);
+  useStore(planStore, (state) => state.open);
   return contextOf(editor);
 }
 

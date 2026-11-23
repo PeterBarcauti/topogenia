@@ -28,6 +28,8 @@
   "REOUVERTE": "Segundo inicio: el navegador se abre en la aplicación.",
   "ICONE_OUVRIR": "Abrir {product}",
   "ICONE_QUITTER": "Salir de {product}",
+  "ICONE_QUITTER_ATTENTE": "Hay datos de la ficha que aún no se han guardado. ¿Salir de todos modos?",
+  "ICONE_QUITTER_NON_VALIDE": "Un formulario abierto no está guardado: lo que se ha escrito en él se perderá. ¿Salir de todos modos?",
   "SAUVEGARDES_DOSSIER": "Las copias de seguridad están en {folder}.",
   "RESTAURATION_PROPOSEE": "Copias de seguridad disponibles, de la más reciente a la más antigua. Los cambios hechos después de la copia elegida no están en ella; el archivo actual y su registro se conservarán al lado, sin borrarse:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

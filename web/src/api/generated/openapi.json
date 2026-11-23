@@ -134,6 +134,35 @@
         }
       }
     },
+    "/api/projects/code-proposal": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeProposalBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposedProjectCode"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects/{id}": {
       "get": {
         "tags": [
@@ -474,6 +503,46 @@
         }
       }
     },
+    "/api/projects/{id}/search": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectSearchView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects/import/preview": {
       "post": {
         "tags": [
@@ -724,6 +793,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PmapOpened"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/import-collection/preview": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewCollectionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionPreview"
                 }
               }
             }
@@ -1202,6 +1300,44 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Maps"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentDraftsBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDraftsResult"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/maps/{id}/flow-presentation-comments": {
@@ -1398,6 +1534,13 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "purpose",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1407,6 +1550,93 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/maps/{id}/insert-pmap/preview": {
+      "post": {
+        "tags": [
+          "Maps"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertPmapPreviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PmapInsertionPreview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/maps/{id}/insert-pmap": {
+      "post": {
+        "tags": [
+          "Maps"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertPmapBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructureReply"
                 }
               }
             }
@@ -2318,6 +2548,53 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructureReply"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/steps/{id}/replace-pmap": {
+      "post": {
+        "tags": [
+          "Steps"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceDetailBody"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -3632,6 +3909,62 @@
         }
       }
     },
+    "/api/steps/{id}/pain-points/{painPointId}/status": {
+      "put": {
+        "tags": [
+          "Documents"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "painPointId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PainPointStatusBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SheetView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects/{id}/members": {
       "put": {
         "tags": [
@@ -3974,6 +4307,28 @@
         }
       }
     },
+    "/api/desktop/writes": {
+      "post": {
+        "tags": [
+          "System"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DesktopWritesBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/desktop/sample-project": {
       "post": {
         "tags": [
@@ -4250,7 +4605,15 @@
           "step_id",
           "step_code",
           "step",
-          "lane"
+          "lane",
+          "open",
+          "receiving_step_id",
+          "receiving_map_id",
+          "document_id",
+          "can_fill",
+          "status_step_id",
+          "version",
+          "status_changed_at"
         ],
         "type": "object",
         "properties": {
@@ -4319,13 +4682,59 @@
                 "$ref": "#/components/schemas/NamedText"
               }
             ]
+          },
+          "open": {
+            "type": "boolean"
+          },
+          "receiving_step_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "receiving_map_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "document_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "can_fill": {
+            "type": "boolean"
+          },
+          "status_step_id": {
+            "type": "string",
+            "description": "The step under which its status is chosen (`PUT /api/steps/{id}/pain-points/{painPointId}/status`): the receiving\r\nstep of the live use that carries it, else the step it is raised on (R10).",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "description": "The version of the pain point, the If-Match of a change of its status (never the version of the use).",
+            "format": "int32"
+          },
+          "status_changed_at": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The instant of the last change of its status, in universal time; null for a pain point without history (a package may bring none).",
+            "format": "date-time"
           }
         },
-        "description": "A line of the action plan: the pain point, its plan and status, the step it is raised on, the lane of the step, the map."
+        "description": "A line of the action plan: the pain point, its plan and status, the step it is raised on, the lane of the step, the\r\nmap; whether it is open (neither implemented, nor adopted, nor dropped, as the map shows it); the step that receives\r\nthe document and the document, from the use that carries the pain point (null when none, a package written by hand);\r\nwhether the person may fill the sheet where its status is chosen, the receiving step (its plan too, ADR 112) or, when\r\nno live use carries it, its own step (R10); the version of the pain point, sent back to choose its status, and the\r\ninstant of the last record of its history (ADR 116)."
       },
       "ActionPlanView": {
         "required": [
-          "lines"
+          "lines",
+          "open_lost_hours_per_month"
         ],
         "type": "object",
         "properties": {
@@ -4334,9 +4743,13 @@
             "items": {
               "$ref": "#/components/schemas/ActionPlanLine"
             }
+          },
+          "open_lost_hours_per_month": {
+            "type": "number",
+            "format": "double"
           }
         },
-        "description": "The action plan of a map (`ActionPlan`), in its order."
+        "description": "The action plan of a map (`ActionPlan`), in its order, and the hours lost per month of its open lines, added exactly."
       },
       "AddLaneBody": {
         "required": [
@@ -4628,6 +5041,65 @@
           }
         },
         "description": "A chapter of the story: its title, its short title for the boxes of fixed size, the codes of its steps, its text."
+      },
+      "AssistantCommentDraftView": {
+        "required": [
+          "step_id",
+          "flow_id",
+          "reference",
+          "context",
+          "map",
+          "text",
+          "current",
+          "current_source",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "step_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "flow_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "map": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "current": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "current_source": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "A comment written by the model for a step or a flow of the map open or of one of its detailed maps, as the panel shows\r\nit for review: the step or the flow, its reference, the words that place it and the name of its map, the text\r\nproposed, the original of today with its source (`manual`: typed by a person, which the save replaces only when the\r\nperson asks it) and its version, which the save sends back."
       },
       "AssistantCommentView": {
         "required": [
@@ -5392,6 +5864,16 @@
               "$ref": "#/components/schemas/AssistantFlowCommentView"
             },
             "description": "The translations of the comments of presentation of the flows asked with a translation (ADR 099, lot J10); null for any other reply."
+          },
+          "comment_drafts": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/AssistantCommentDraftView"
+            },
+            "description": "The comments of presentation written for the steps and the flows of the map open and of its detailed maps (practice `comments`, F-130); null for any other reply."
           }
         },
         "description": "A reply as the panel shows it, of one of the four forms: the message of the model (the answer, or the words that open\r\nits questions, findings or proposal), its questions, findings or proposal, the objects of the project it names; the\r\nJSON it wrote, that the page gives back with the next turns; its cost for the administrator; its time."
@@ -6024,6 +6506,21 @@
         },
         "description": "`PUT /api/projects/{id}/classification` (spec 4.1, route named by the host): the code of the level, required (spec 5.4:\r\nan absent field is an error, never the default of the creation)."
       },
+      "CodeProposalBody": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "`POST /api/projects/code-proposal` (3.4, lot 3, ADR 111 point 7): the name of the new project, in the body and never in\r\nthe address."
+      },
       "CodeState": {
         "enum": [
           "free",
@@ -6032,6 +6529,134 @@
         ],
         "type": "string",
         "description": "Whether the code a package would take is free, the code of a live project, or of a project in the trash."
+      },
+      "CollectionFault": {
+        "required": [
+          "path",
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "description": "A fault of a process of a collection, as the opening of a file reports it (FICHIER_INVALIDE, A-1.2-19): its place in\r\nthe `.pmap` of the process and its code; the host writes the message in the language of the person from its values."
+      },
+      "CollectionPreview": {
+        "required": [
+          "name",
+          "description",
+          "processes"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "processes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CollectionProcessPreview"
+            }
+          }
+        },
+        "description": "A collection previewed: its name, its description and its processes in the order of the file."
+      },
+      "CollectionProcessPreview": {
+        "required": [
+          "index",
+          "name",
+          "language",
+          "file_code",
+          "proposed_code",
+          "description",
+          "counts",
+          "uncertainties",
+          "remote_locations",
+          "faults",
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "file_code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "proposed_code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "counts": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PmapCounts"
+              }
+            ]
+          },
+          "uncertainties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remote_locations": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "faults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CollectionFault"
+            }
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "description": "A process of a collection previewed: its rank, its name (as the file writes it for a process in fault, when it is a readable text of 1 to 200 characters, never interpreted), the language of its texts, the code of its file, the free\r\ncode proposed, its description, what it holds, its points to check and how many addresses of its documents reach\r\nanother machine (web, network path: pre-audit 68, P3-02); its faults instead, without code proposed\r\nnor counts, when its `.pmap` is refused; and its text as the host read it, which the interface sends as it is to the\r\nopening of a file (`POST /api/projects/import-pmap`), never reading the collection again."
       },
       "CommandBarBody": {
         "required": [
@@ -6047,6 +6672,89 @@
           }
         },
         "description": "`POST /api/maps/{id}/command` (1.x `CommandeDemande`: `texte`)."
+      },
+      "CommentDraftBody": {
+        "required": [
+          "step_id",
+          "flow_id",
+          "text",
+          "version",
+          "replace"
+        ],
+        "type": "object",
+        "properties": {
+          "step_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "flow_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "replace": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        },
+        "description": "One comment of `POST /api/maps/{id}/presentation-comments` (F-130): its step or its flow, the text kept from the review,\r\nthe version of the original read (0 when there was none), and whether the person accepted to replace an original typed\r\nby hand (false when absent)."
+      },
+      "CommentDraftsBody": {
+        "required": [
+          "comments"
+        ],
+        "type": "object",
+        "properties": {
+          "comments": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/IReadOnlyListOfCommentDraftBody"
+              }
+            ]
+          }
+        },
+        "description": "`POST /api/maps/{id}/presentation-comments` (3.3, lot 3, F-130): the comments written by the assistant and kept after review."
+      },
+      "CommentDraftsResult": {
+        "required": [
+          "written",
+          "kept"
+        ],
+        "type": "object",
+        "properties": {
+          "written": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kept": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "What the writing did: the comments written, and those typed by a person that stayed because their replacement was not accepted."
       },
       "CommentText": {
         "required": [
@@ -6319,6 +7027,34 @@
           }
         },
         "description": "`POST /api/maps/{id}/deletion` (1.x `SuppressionDemande`: `etapes`, `liens`, `recoudre`, `sous_cartes=supprimer`):\r\nthe steps and flows deleted in one batch, `stitch`, and `sub_maps` = `delete` for the filled sub-maps."
+      },
+      "DesktopWritesBody": {
+        "required": [
+          "tab",
+          "waiting"
+        ],
+        "type": "object",
+        "properties": {
+          "tab": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "waiting": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "unsaved": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        },
+        "description": "`POST /api/desktop/writes` (ADR 115): a tab of the desktop mode says whether it still has writes to send to the host\r\nand, `unsaved` (R11, absent read false), whether it holds a form changed and not validated, which never leaves by itself."
       },
       "Document": {
         "required": [
@@ -6708,6 +7444,7 @@
               "CHAMP_OBLIGATOIRE",
               "CHEMIN_NON_PRIS_EN_CHARGE",
               "CHEMIN_TROP_LONG",
+              "COLLECTION_TROP_DE_PROCESSUS",
               "COMMANDE_ERREURS",
               "COMMANDE_SYNTAXE",
               "COMMANDE_VIDE",
@@ -6828,6 +7565,7 @@
               "REMONTEE_TERMINEE",
               "REQUETE_INVALIDE",
               "REQUETE_TROP_GROSSE",
+              "REQUETE_TROP_GROSSE_KO",
               "RESUMES_A_JOUR",
               "TEMPS_HEURES_FEW",
               "TEMPS_HEURES_MANY",
@@ -7887,6 +8625,101 @@
         },
         "description": "An indicator compared: its code, its value in the reference and now, its gain, null when one side is unknown; whether the gain is an improvement."
       },
+      "InsertPmapBody": {
+        "required": [
+          "content",
+          "lane_id",
+          "column",
+          "row",
+          "label",
+          "with_sheets"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lane_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "column": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "row": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "label": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "with_sheets": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "flow_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "anchor_step_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "position": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "`POST /api/maps/{id}/insert-pmap`: the text of the file, the lane of the new step, its label (the one proposed when\r\nempty), the sheets taken or not; its place, a column and a row, or a step of the map it goes `before` or `after` in the\r\nflow (`anchor_step_id`, `position`, after by default), or a flow of the map it goes on, cut in two (`flow_id`, which\r\nprevails), the column not read then."
+      },
+      "InsertPmapPreviewBody": {
+        "required": [
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "step_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        },
+        "description": "`POST /api/maps/{id}/insert-pmap/preview`: the text of the file, and the step whose detail it would replace, if any."
+      },
       "InsertRowsBody": {
         "required": [
           "row",
@@ -7943,6 +8776,12 @@
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/AuditEntry"
+        }
+      },
+      "IReadOnlyListOfCommentDraftBody": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CommentDraftBody"
         }
       },
       "IReadOnlyListOfMapSummaryBody": {
@@ -9212,7 +10051,25 @@
           "adopted",
           "dropped"
         ],
-        "type": "string"
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "PainPointStatusBody": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "`PUT /api/steps/{id}/pain-points/{painPointId}/status` (3.4, ADR 116): the code of the status chosen, one of the seven of\r\nthe list, carried as text and checked by the command (VALEUR_INVALIDE on `status`)."
       },
       "PasteBody": {
         "required": [
@@ -9396,6 +10253,125 @@
         },
         "description": "A step of the main path with its lead time and its work by case, null when unknown."
       },
+      "PmapCounts": {
+        "required": [
+          "maps",
+          "lanes",
+          "steps",
+          "flows",
+          "sheets"
+        ],
+        "type": "object",
+        "properties": {
+          "maps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lanes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "steps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "flows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sheets": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "The maps, lanes, steps, flows and sheets of a document."
+      },
+      "PmapInsertionPreview": {
+        "required": [
+          "project_code",
+          "project_name",
+          "language",
+          "maps",
+          "lanes",
+          "steps",
+          "flows",
+          "sheets",
+          "depth",
+          "room",
+          "uncertainties",
+          "remote_locations",
+          "dropped_languages",
+          "label",
+          "structure_version"
+        ],
+        "type": "object",
+        "properties": {
+          "project_code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "project_name": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "maps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lanes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "steps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "flows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sheets": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "room": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uncertainties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remote_locations": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dropped_languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "label": {
+            "type": "string"
+          },
+          "structure_version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "What an insertion shows before anything is written: the project of the file, its language, what it holds, its levels and\r\nhow many the map leaves room for, the points its author asks to check, how many addresses of its documents reach\r\nanother machine (pre-audit 68, P3-02), the languages of its translations left out (not\r\nconfigured), the label proposed for the new step, and the structure version of the project read."
+      },
       "PmapOpened": {
         "required": [
           "id",
@@ -9406,7 +10382,8 @@
           "steps",
           "flows",
           "sheets",
-          "uncertainties"
+          "uncertainties",
+          "remote_locations"
         ],
         "type": "object",
         "properties": {
@@ -9446,9 +10423,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "remote_locations": {
+            "type": "integer",
+            "format": "int32"
           }
         },
-        "description": "A project opened from a file or duplicated (reply 201): what the 1.x returned, the sheets written as drafts besides;\r\nwhether a duplication left sub-maps out beyond the walks of the domain, said by the header of the route, not the body."
+        "description": "A project opened from a file or duplicated (reply 201): what the 1.x returned, the sheets written as drafts besides,\r\nand how many addresses of its documents reach another machine (web, network path: pre-audit 68, P3-02), said before a\r\nlink is followed; whether a duplication left sub-maps out beyond the walks of the domain, said by the header of the route, not the body."
       },
       "PresentationCommentBody": {
         "required": [
@@ -9579,6 +10560,21 @@
         },
         "description": "The voice of a language as a presentation reads it: its language, its name, whether it is one of the computer, its version for the If-Match of its change."
       },
+      "PreviewCollectionBody": {
+        "required": [
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "`POST /api/projects/import-collection/preview`: the text of the collection (ADR 114)."
+      },
       "ProcedureLineBody": {
         "required": [
           "text",
@@ -9637,6 +10633,22 @@
           }
         },
         "description": "A cleaned micro-task of the procedure."
+      },
+      "ProductLinks": {
+        "required": [
+          "site",
+          "store_page"
+        ],
+        "type": "object",
+        "properties": {
+          "site": {
+            "type": "string"
+          },
+          "store_page": {
+            "type": "string"
+          }
+        },
+        "description": "The site of the product and its page of the Store (ADR 111 point 2), opened by the browser on a click, never called by\r\nthe application; the interface builds the pages of the site (versions, gallery) on the base it receives."
       },
       "ProfileView": {
         "required": [
@@ -9712,6 +10724,21 @@
           "desktop": {
             "type": "boolean",
             "description": "The host runs in desktop mode (spec 5.2, 6.1): one user, administrator of his data file; the interface offers the\r\ncommand « Quit » and, while he has no project, the sample project. Set by the host, which alone knows its mode."
+          },
+          "store": {
+            "type": "boolean",
+            "description": "The desktop mode runs from the package of the Microsoft Store (ADR 088, ADR 111 point 4): « Check for updates » opens\r\nthe page of the Store, and no reminder is shown, the Store updating by itself. False in server mode. Set by the host."
+          },
+          "links": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The addresses the interface opens in the browser (ADR 111 points 2 and 3), or null when the operation hides every link\r\nto the site (the switch `SiteLinks`): then neither « Check for updates », nor the reminder, nor the gallery. Set by\r\nthe host, which alone reads the switch.",
+                "$ref": "#/components/schemas/ProductLinks"
+              }
+            ]
           }
         },
         "description": "The profile (1.x `ProfilVue`): the language of the profile and the effective one (AR-51), the administrator flag, the\r\nfirst visit, the last project opened (AR-49), the version (AR-07), the roles in the live projects, and the languages of\r\nthe configuration in their order, from which the interface builds its language switch (AR-29, NF12, ADR 057)."
@@ -9918,6 +10945,26 @@
           }
         },
         "description": "The role of a user in one live project, as the profile shows it (`GET /api/me`, 1.x `RoleProjet`)."
+      },
+      "ProjectSearchView": {
+        "required": [
+          "total",
+          "maps"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchMapView"
+            }
+          }
+        },
+        "description": "The reply of a search: the number of results, and the first int ProjectSearchQuery.HitsMax of them by map."
       },
       "ProposalBody": {
         "required": [
@@ -10213,6 +11260,21 @@
         },
         "description": "An input of the sheet. Producer null: external input. Near: produced by a step linked by an incoming flow (offered\r\nunticked); otherwise added through \"Other\". Use: the tick of the step, if any."
       },
+      "ProposedProjectCode": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "The reply of a proposal: the code, or null when the name gives none."
+      },
       "RaciRole": {
         "enum": [
           "A",
@@ -10437,6 +11499,28 @@
         },
         "description": "`POST /api/dissolutions/{id}/remove` (1.x: the same `AffectationDemande`, of which only `genre` and `objet_id` are read)."
       },
+      "ReplaceDetailBody": {
+        "required": [
+          "content",
+          "with_sheets"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "with_sheets": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        },
+        "description": "`POST /api/steps/{id}/replace-pmap`: the text of the file and the sheets taken or not."
+      },
       "ResponsibleOrigin": {
         "enum": [
           "step",
@@ -10480,6 +11564,159 @@
           }
         },
         "description": "`PUT /api/steps/{id}/sheet` (1.x `FicheDemande`: `champs`, `deroule`, `texte_libre`): the complete draft."
+      },
+      "SearchBody": {
+        "required": [
+          "text",
+          "language",
+          "map_id"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "map_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        },
+        "description": "`POST /api/projects/{id}/search` (3.4, lot 2, ADR 110): the word, in the body and never in the address; the language\r\nshown (absent: the language of origin alone); the map open, put first (unknown: ignored)."
+      },
+      "SearchHitView": {
+        "required": [
+          "kind",
+          "step_id",
+          "lane_id",
+          "text",
+          "language",
+          "start",
+          "length",
+          "marks"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/SearchKind"
+          },
+          "step_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "lane_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "length": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "marks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TextMatch"
+            }
+          },
+          "step_code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "step": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NamedText"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PainPointStatus"
+              }
+            ]
+          }
+        },
+        "description": "A result: its kind, its step or its lane, the text the words were found in, the language of that text (null for a code),\r\nthe marks of the words in it (UTF-16 units; retouch R9b: by place, never overlapping nor touching, one at least) and\r\nthe first of them as `start` and `length`, the place a result carried before. A document, a\r\ntool, a pain point and an action carry the code and the name of their step; a pain point and an action, the status of\r\nthe pain point."
+      },
+      "SearchKind": {
+        "enum": [
+          "step",
+          "lane",
+          "document",
+          "tool",
+          "pain_point",
+          "action"
+        ],
+        "type": "string",
+        "description": "What a result is: a step (name or code), a lane, a document, a tool of a sheet, a pain point (code or description), an action."
+      },
+      "SearchMapView": {
+        "required": [
+          "map_id",
+          "depth",
+          "name",
+          "hits"
+        ],
+        "type": "object",
+        "properties": {
+          "map_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "$ref": "#/components/schemas/NamedText"
+          },
+          "hits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchHitView"
+            }
+          }
+        },
+        "description": "The results of one map, with its level (1 for the root map) and its name."
       },
       "SetRaciBody": {
         "required": [
@@ -10828,6 +12065,7 @@
           "inputs",
           "outputs",
           "pain_points",
+          "step_pain_points",
           "updated_at",
           "updated_by",
           "version"
@@ -10901,6 +12139,12 @@
               "$ref": "#/components/schemas/PainPoint"
             }
           },
+          "step_pain_points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PainPoint"
+            }
+          },
           "updated_at": {
             "type": [
               "null",
@@ -10923,7 +12167,7 @@
             "format": "int32"
           }
         },
-        "description": "The sheet of a step (1.x `FicheVue`, `GET /api/etapes/{id}/fiche`): state and completeness as the reader sees them\r\n(`SheetVisibility`), the content (the draft, or the latest validated version), the inputs and outputs of the step\r\n(`DocumentFlows`, visible to every member) with the pain points of their uses, the latest version, the clarification\r\nrequest, the responsible, the rights (`SheetRights`), the suggestions (only for the one who may fill, A-2.10-42) and,\r\nfor the one who sees the draft, the last change and the version to send back in `If-Match`."
+        "description": "The sheet of a step (1.x `FicheVue`, `GET /api/etapes/{id}/fiche`): state and completeness as the reader sees them\r\n(`SheetVisibility`), the content (the draft, or the latest validated version), the inputs and outputs of the step\r\n(`DocumentFlows`, visible to every member) with the pain points of their uses, the pain points raised on the step that no\r\nlive use carries (R10: a package may bring some; their status is chosen here), the latest version, the clarification\r\nrequest, the responsible, the rights (`SheetRights`), the suggestions (only for the one who may fill, A-2.10-42) and,\r\nfor the one who sees the draft, the last change and the version to send back in `If-Match`."
       },
       "SnapshotBody": {
         "required": [
@@ -12048,6 +13292,24 @@
           }
         },
         "description": "`POST /api/projects/{id}/target`: the code and the name of the target state, the label of its reference photo."
+      },
+      "TextMatch": {
+        "required": [
+          "start",
+          "length"
+        ],
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "length": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "The place of a word found in a text of origin, in UTF-16 units (those of JavaScript)."
       },
       "TransferBody": {
         "required": [

@@ -8,6 +8,7 @@ import { i18next } from '../../../shared/i18n/i18n.ts';
 import { memoryStorage, renderMapScreen, sourceOf } from '../../../test/editor.tsx';
 import { fakeApi } from '../../../test/fakeApi.ts';
 import { laneOf, MAP_ID, PROJECT_ID, sampleMap, stepOf } from '../../../test/maps.ts';
+import { chooseFileEntry } from '../../../test/fileMenu.ts';
 import { defaultAcross, wallPlan, type Paper } from '../export/wallPrint.ts';
 import { exportMap, wallSize } from '../state/actions/exports.ts';
 import { createMapEditor, type MapEditor } from '../state/editor.ts';
@@ -29,7 +30,7 @@ async function wallDialog(map: Schema<'MapView'> = sampleMap(), analysis = false
   act(() => {
     editor.floating.getState().open({ kind: 'menu', target: { kind: 'file' }, at: { x: 10, y: 40 } });
   });
-  await userEvent.click(screen.getByTestId('menu-file-file.wall'));
+  await chooseFileEntry('file.wall');
   return { editor, dialog: screen.getByRole('dialog', { name: 'Imprimer en grand' }) };
 }
 

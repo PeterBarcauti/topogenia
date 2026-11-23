@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-P6-T10 (`plan.md`, phase 6) porte la spécification 11 pour l'interface : les 176 tests unitaires 1.x (S-11-02), les
+P6-T10 (`plan.md` (non publié), phase 6) porte la spécification 11 pour l'interface : les 176 tests unitaires 1.x (S-11-02), les
 tests des commandes, menus et raccourcis (S-11-03), les 49 parcours de bout en bout 1.x (annexe B 8.3, 69 lignes) et
 les nouveaux (jeton de lancement, paquet `.topogenia`, annulation après rechargement, exports sous la CSP), axe-core sur
 les écrans principaux (S-11-09), le banc lui-même (B-0-06 à B-0-08), et les 145 lignes que P6-T01 à P6-T09 avaient
@@ -73,8 +73,8 @@ navigateur qu'il ouvre (spec 5.2, ADR 044), le mode Serveur refuse le HTTP (ADR 
 8. **Écart relevé, traité à part** : AR-52 (police Inter intégrée au PDF) n'était pas appliqué, le PDF écrivait en
    Latin-1 (ADR 066 § 10). Corrigé en P6-T09b (révision de l'ADR 066).
 9. **Portage des unitaires** : le relevé des 176 tests 1.x a trouvé 143 tests portés, 28 partiels, 2 manquants,
-   3 sans objet ; les 30 lignes ont reçu leurs tests (vitest et xUnit). Tableau : `docs/couverture-p6/portage-interface.md`
-   (173 portés, dont 11 côté hôte, 3 sans objet par décision écrite) ; parcours : `docs/couverture-p6/portage-parcours.md`
+   3 sans objet ; les 30 lignes ont reçu leurs tests (vitest et xUnit). Tableau : `docs/couverture-p6/portage-interface.md` (non publié)
+   (173 portés, dont 11 côté hôte, 3 sans objet par décision écrite) ; parcours : `docs/couverture-p6/portage-parcours.md` (non publié)
    (49 parcours 1.x portés, 21 nouveaux, 70 en tout).
 
 ## Conséquences
@@ -93,5 +93,5 @@ navigateur qu'il ouvre (spec 5.2, ADR 044), le mode Serveur refuse le HTTP (ADR 
   suite. `web/e2e/host.spec.ts` (B-0-06 à B-0-08), `launch.spec.ts` (S-11-05), `package.spec.ts` (S-11-06),
   `undo-after-reload.spec.ts` (S-11-07, B-2.6-02, B-2.6-03), `accessibility.spec.ts` (S-11-09), `exports.spec.ts`
   (B-8.3-11 à 13 et le contenu du PNG, sous la CSP de l'hôte, politique prouvée en vigueur).
-- `docs/couverture.md` : 223 lignes écrites par `Travail/outils-p6-t10/coverage_t10.py`.
+- `docs/couverture.md` (non publié) : 223 lignes écrites par un outil de travail (non publié).
 - Suite web vitest, `tsc -b`, ESLint ; suite complète ; Architecture.

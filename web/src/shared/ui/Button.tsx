@@ -1,7 +1,7 @@
 // Button.tsx
 // The buttons of the interface: plain, secondary, primary, danger, and the large one of the home banner (spec 9.5, mockup).
 
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, Ref } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Icon } from './Icon.tsx';
 
@@ -14,6 +14,8 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   readonly variant?: ButtonVariant;
   readonly large?: boolean;
   readonly type?: 'button' | 'submit';
+  /** The button itself, for a dialog that gives it the focus once the one pressed is gone. */
+  readonly ref?: Ref<HTMLButtonElement>;
 }
 
 export function Button({ testId, icon, variant = 'plain', large = false, type = 'button', className, children, ...rest }: ButtonProps) {

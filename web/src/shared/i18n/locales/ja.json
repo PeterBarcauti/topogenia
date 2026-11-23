@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) を終了できませんでした。もう一度お試しいただくか、コンソールウィンドウを閉じてください。",
     "quit_unsaved": "シートの入力内容がまだ保存されていないため、$t(app.name) は開いたままです。シートの保存後にもう一度お試しください。",
     "stopped": "$t(app.name) は終了しました。このタブは閉じてかまいません。",
-    "stopped_help": "再び使うときは、もう一度起動してください。"
+    "stopped_help": "再び使うときは、もう一度起動してください。",
+    "help_menu": "ヘルプメニュー",
+    "help_online": "オンラインヘルプ（英語）",
+    "update_check": "更新プログラムを確認",
+    "update_check_help": "Web サイトのバージョンページを開きます。インストール済み: {{date}} 版 {{version}}。",
+    "update_check_store_help": "更新プログラムをインストールする Microsoft Store のページを開きます。",
+    "quit_text_unsaved": "開いているフォームが保存されていません。入力した内容は失われます。",
+    "quit_anyway": "それでも終了"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Space",
     "Enter": "Enter",
-    "ArrowUp": "上矢印"
+    "ArrowUp": "上矢印",
+    "ArrowLeft": "左矢印",
+    "ArrowRight": "右矢印",
+    "ArrowDown": "下矢印",
+    "Backspace": "Backspace",
+    "Wheel": "ホイール"
   },
   "errors": {
     "RESEAU": "$t(app.name) が応答しません。$t(app.name) が起動したままか（サーバー上の場合はネットワーク接続）を確認してください。",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "サーバーから予期しない応答がありました。ページを再読み込みしてください。",
     "ACCES_REFUSE": "このページを表示する権限がありません。",
     "UNKNOWN": "予期しないエラーが発生しました。",
-    "RESUMES_A_JOUR": "すべてのマップに最新の要約があります。書き直すには、マップを開いてタイトル横の「i」をクリックしてください。"
+    "RESUMES_A_JOUR": "すべてのマップに最新の要約があります。書き直すには、マップを開いてタイトル横の「i」をクリックしてください。",
+    "COLLECTION_TROP_DE_PROCESSUS": "コレクションのプロセスが多すぎます。"
   },
   "home": {
     "eyebrow": "AI でプロセスを強化する第一歩は、プロセスを記述することです。",
@@ -79,7 +92,24 @@
     "sample_title": "サンプルプロジェクト",
     "sample_text": "記入済みの架空のプロジェクトで、レーン、判断、詳細マップ、シート、文書、困りごとがそろった完全なマップを確認できます。ほかのプロジェクトと同じように削除できます。",
     "sample_create": "サンプルプロジェクトを作成",
-    "sample_created": "サンプルプロジェクト {{code}} を作成しました。"
+    "sample_created": "サンプルプロジェクト {{code}} を作成しました。",
+    "filter": "プロジェクトを絞り込む",
+    "filter_placeholder": "コードまたは名前",
+    "filter_count": "{{total}} 件中 {{shown}} 件",
+    "filter_none": "該当するプロジェクトはありません。",
+    "update_line": "このバージョンは {{date}} 版です。",
+    "update_link": "新しいバージョンがあるか確認",
+    "update_close": "リマインダーを閉じる",
+    "button_start_help": "開始方法を選びます。",
+    "start_menu": "プロジェクトを始める",
+    "start_sample": "サンプルプロジェクト",
+    "start_gallery": "テンプレートギャラリー",
+    "start_gallery_help": "ブラウザーで開きます。",
+    "start_blank": "空のマップ…",
+    "new_project_help": "空のマップ、サンプル、テンプレートから始めます。",
+    "new_project_help_no_sample": "空のマップまたはテンプレートから始めます。",
+    "new_project_help_no_gallery": "空のマップまたはサンプルから始めます。",
+    "new_project_help_blank": "空のマップから始めます。"
   },
   "roles": {
     "facilitator": "ファシリテーター",
@@ -112,7 +142,7 @@
     "properties": "プロジェクトのプロパティ…",
     "properties_title": "プロジェクト {{code}} のプロパティ",
     "sharing_group": "文書の共有グループ",
-    "sharing_group_help": "共有されたインプットについて、シートに表示される名前です（例：経理チーム）。空欄の場合は「プロジェクトの共有グループ」と表示されます。",
+    "sharing_group_help": "プロジェクトの文書を読めるメンバーのグループ名です。シート内の各文書の「グループと共有」チェックボックスに表示されます。空欄の場合は「プロジェクトの共有グループ」と表示されます。",
     "properties_read_only": "これらのプロパティを変更できるのは、プロジェクトのファシリテーターだけです。",
     "properties_saved": "プロジェクトのプロパティを保存しました。",
     "language": "プロセスの言語",
@@ -121,12 +151,14 @@
     "workday_hours": "1 日の就業時間（時間）",
     "workday_hours_help": "1～24 時間（既定値 7）。リードタイムを営業日に換算します。",
     "fte_hours": "1 FTE あたりの月間時間",
-    "fte_hours_help": "1～744 時間（既定値 151.67）。工数を FTE（フルタイム換算人数）に換算します。"
+    "fte_hours_help": "1～744 時間（既定値 151.67）。工数を FTE（フルタイム換算人数）に換算します。",
+    "code_proposed": "名前から提案されました。",
+    "more_options": "その他のオプション"
   },
   "files": {
     "open": "ファイルを開く…",
     "open_title": "ファイルを開く",
-    "open_help": "ファイルは新しいプロジェクトになります。.pmap ファイル（ダウンロードしたコピー、またはスケッチを読んだ AI の回答）、Excel または CSV の表、Mermaid 図（.mmd、.md）、編集可能なコピー付きでエクスポートした SVG 画像を開けます。",
+    "open_help": "ファイルは新しいプロジェクトになります。.pmap ファイル（ダウンロードしたコピー、またはスケッチを読んだ AI の回答）、テンプレートのコレクション（.pmaps）、Excel または CSV の表、Mermaid 図（.mmd、.md）、編集可能なコピー付きでエクスポートした SVG 画像を開けます。",
     "choose": "ファイルを選択…",
     "or_paste": "または、内容をここに貼り付けます（AI の回答など）：",
     "area": ".pmap ファイルの内容をここに貼り付けるか、ドロップしてください",
@@ -192,7 +224,52 @@
     "target_name": "{{name}}（目標状態）",
     "target_label": "基準のラベル",
     "target_label_default": "現状",
-    "target_button": "作成"
+    "target_button": "作成",
+    "map_download": "開いているマップを保存 (.pmap)",
+    "map_downloaded": "詳細マップ、シート、コメントとともにマップを保存しました。.pmap ファイルはダウンロード フォルダーにあります。",
+    "insert": "ファイルを詳細ステップとして挿入…",
+    "insert_here": "ここにファイルを挿入…",
+    "insert_title": "ファイルを詳細ステップとして挿入",
+    "insert_help": "ファイルはこのマップの新しい詳細ステップになります。これはコピーです。後でファイルを変更してもマップは変わりません。.pmap ファイル、Excel または CSV の表、Mermaid 図、コピー付きの SVG 画像を使えます。",
+    "replace_title": "詳細をファイルで置き換え",
+    "replace_help": "「{{label}}」の詳細はごみ箱に移り、ファイルがその代わりになります。Ctrl+Z ですべて元に戻せます。",
+    "insert_counts": "ステップ：{{steps}} · レーン：{{lanes}} · 矢印：{{flows}} · マップ：{{maps}} · シート：{{sheets}}",
+    "insert_too_deep": "このファイルのマップは {{depth}} 階層です。このマップの下では最大 {{room}} 階層までです。",
+    "insert_too_large": "このファイルは {{max}} MB を超えているため、挿入できません。",
+    "insert_package": "これは交換用パッケージです。プロジェクトとしてインポートしてください。挿入はできません。",
+    "insert_dropped": "除外した翻訳（ここで設定されていない言語）：{{languages}}",
+    "insert_label": "ステップ名",
+    "insert_lane": "レーン",
+    "insert_after": "配置する位置（後ろ）",
+    "insert_at_start": "マップの先頭",
+    "insert_sheets": "シートも取り込む",
+    "insert_sheets_help": "シート、その文書と課題は下書きとして届きます。確認してから承認してください。",
+    "insert_button": "挿入",
+    "replace_button": "置き換え",
+    "inserted": "ファイルを挿入しました。ステップ：{{steps}} · マップ：{{maps}}",
+    "insert_on_flow": "矢印の上 {{from}} → {{to}}",
+    "insert_on_flow_here": "この矢印の上にファイルを挿入…",
+    "collection_title": "コレクション「{{name}}」",
+    "collection_help": "チェックした各プロセスにつき、プロジェクトが 1 つ作成されます。「プロジェクトを作成」を押すまで何も書き込まれません。",
+    "collection_all": "すべてチェック",
+    "collection_ticked": "チェック済み：{{total}} 件中 {{count}} 件",
+    "collection_points": "確認事項：{{count}} 件",
+    "collection_details": "説明と確認事項",
+    "collection_code_free": "{{code}} は既に使われています。",
+    "collection_invalid": "開けません：",
+    "collection_create": "プロジェクトを作成",
+    "collection_creating": "作成中 {{done}} / {{total}}…",
+    "collection_done": "プロジェクトを作成しました",
+    "collection_created": "{{code}} を作成しました。",
+    "collection_failed": "作成できませんでした：{{reason}}",
+    "collection_retry": "再試行",
+    "collection_unnamed": "プロセス {{rank}}",
+    "insert_collection": "コレクションは「ファイルを開く…」で開きます。そのテンプレートを 1 つだけ挿入します。",
+    "open_too_large": "このファイルは {{max}} MB を超えているため、開けません。",
+    "collection_none": "プロジェクトは作成されませんでした",
+    "collection_code_twice": "{{code}} は別の行にも指定されています。",
+    "collection_fix": "テキストを修正",
+    "remote_locations": "シート内のネットワークまたは Web のアドレス：{{count}} 件。文書を開く前に確認してください。"
   },
   "package": {
     "export": "プロジェクトをエクスポート（{{extension}}）…",
@@ -367,7 +444,13 @@
       "due": "期限",
       "status": "状態",
       "lost": "月あたりの損失時間"
-    }
+    },
+    "copy_image": "マップを画像としてコピー",
+    "copying": "画像をコピーしています…",
+    "copied": "画像をコピーしました：メールやスライドに貼り付け（Ctrl+V）できます。",
+    "copy_failed": "画像をコピーできませんでした。",
+    "copy_as_png": "PNG でエクスポート",
+    "project_pdf": "プロジェクトを PDF でエクスポート…"
   },
   "classification": {
     "internal": "社内限り",
@@ -496,7 +579,8 @@
     "breadcrumb": "パンくずリスト",
     "file": "ファイル",
     "file_help": "ファイルを開く、コピーをダウンロード、複製、エクスポート",
-    "members": "メンバー"
+    "members": "メンバー",
+    "fit": "全体を表示"
   },
   "ribbon": {
     "name": "マップのリボン",
@@ -594,6 +678,27 @@
       "necessary": "必要だが価値なし",
       "waste": "ムダ",
       "none": "未分類"
+    },
+    "replace_detail": "詳細をファイルで置き換え…",
+    "copy_selection_image": "選択範囲を画像としてコピー",
+    "file_cascade": {
+      "export": "マップをエクスポート",
+      "project": "プロジェクト",
+      "package": "交換パッケージ",
+      "assistant": "AI アシスタント"
+    },
+    "file_short": {
+      "pdf": "PDF（A3 横）",
+      "png": "PNG 画像",
+      "svg": "SVG 画像…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "プロジェクト全体を PDF で…",
+      "import": "パッケージをインポート…",
+      "replace": "パッケージで置き換え…",
+      "report": "語りのレポート（Markdown）",
+      "comments": "発表用コメント…"
     }
   },
   "deletion": {
@@ -644,7 +749,8 @@
       "retracer_liens": "矢印の自動ルート",
       "inserer_rangees": "行の挿入",
       "retirer_rangee": "行の削除",
-      "proposition_ia": "AI の提案"
+      "proposition_ia": "AI の提案",
+      "inserer_fichier": "ファイルの挿入"
     }
   },
   "command": {
@@ -767,9 +873,6 @@
     "duration_max": "最長の所要時間",
     "duration_bounds_order": "最短 ≤ 所要時間 ≤ 最長",
     "minutes": "分",
-    "duration_between": "{{min}}～{{max}} 分",
-    "duration_at_least": "最短 {{min}} 分",
-    "duration_at_most": "最長 {{max}} 分",
     "duration_value_one": "{{count}} 分",
     "duration_value_other": "{{count}} 分",
     "fold": "「{{section}}」を折りたたむ",
@@ -830,6 +933,7 @@
     "clarification_withdrawn": "質問を取り下げました。",
     "read_empty": "このステップの確定済みシートはまだありません。",
     "read_validated": "{{date}} に {{name}} が確定した版です。",
+    "read_draft": "作成中の下書きです。まだ確定していません。",
     "document": {
       "add_output": "アウトプットを追加",
       "new_output": "新しいアウトプット",
@@ -893,7 +997,8 @@
         "file": "ファイル",
         "software": "ソフトウェア",
         "other": "その他"
-      }
+      },
+      "edit_pain": "{{code}} で編集"
     },
     "pain_point": {
       "title": "困りごと",
@@ -922,7 +1027,21 @@
         "implemented": "実施済み",
         "adopted": "定着",
         "dropped": "見送り"
-      }
+      },
+      "status": "状態",
+      "status_of": "課題 {{code}} の状態",
+      "status_help": "実施済み・定着・見送りの課題は、マップから外れ、その時間は集計されなくなります。",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "問題を把握、対策を計画する",
+        "scored": "課題を評価、対策を決める",
+        "under_review": "対策を検討中、未決定",
+        "in_progress": "対策を実行中",
+        "implemented": "対策を実施、結果を確認する",
+        "adopted": "確認済み、新しいやり方として定着",
+        "dropped": "対応しないと決定"
+      },
+      "status_now": "課題 {{code}} の状態：{{status}}"
     },
     "lead_time": "リードタイム",
     "lead_time_help": "案件が届いてからステップを出るまでの経過時間で、待ち時間を含みます。記入率には含まれません。",
@@ -939,7 +1058,15 @@
       "minute": "分",
       "hour": "時間",
       "day": "営業日"
-    }
+    },
+    "duration_between_other": "{{min}}～{{max}} 分",
+    "duration_at_least_other": "最短 {{min}} 分",
+    "duration_at_most_other": "最長 {{max}} 分",
+    "step_pain_points": "ステップの困りごと",
+    "step_pain_points_help": "文書のない、このステップの困りごとです。説明と計画は閲覧のみです。",
+    "pain_points_one": "困りごと {{count}} 件",
+    "pain_points_other": "困りごと {{count}} 件",
+    "step_pain_points_help_fill": "文書のない、このステップの困りごとです。状態はここで変更できます。説明と計画は閲覧のみです。"
   },
   "translations": {
     "title": "プロジェクトの翻訳",
@@ -1185,6 +1312,12 @@
         },
         "summaries": {
           "title": "要約"
+        },
+        "comments": {
+          "title": "発表用コメント",
+          "text": "発表がステップと引き継ぎについて話す内容。",
+          "example": "このマップとその詳細マップのステップと引き継ぎのコメントを書いて。",
+          "example_empty": "このマップとその詳細マップのステップと引き継ぎのコメントを書いて。"
         }
       },
       "thread": "アシスタントとのやり取り",
@@ -1242,7 +1375,8 @@
         "findings": "分析",
         "report": "レポート",
         "summaries": "要約",
-        "proposal": "提案"
+        "proposal": "提案",
+        "comments": "発表用コメント"
       },
       "pasted": "貼り付けた回答",
       "copy_reply": "回答をコピー",
@@ -1398,7 +1532,19 @@
     "resource": "Azure リソース",
     "resource_help": "リソースの名前（contoso.openai.azure.com なら contoso）。",
     "port": "ポート",
-    "port_help": "空欄: 既定のポート（Ollama 11434、LM Studio 1234）。"
+    "port_help": "空欄: 既定のポート（Ollama 11434、LM Studio 1234）。",
+    "comments": {
+      "request": "このマップとその詳細マップでコメントのないステップと引き継ぎについて、発表用コメントを書いて。",
+      "menu": "発表用コメントを書く（AI）…",
+      "intro": "各コメントを読み直して、残す・直す・外すを選んでください。発表中に読み上げられます。",
+      "flow": "引き継ぎ {{labels}}",
+      "map": "マップ: {{name}}",
+      "current": "現在のコメント：{{text}}",
+      "typed": "手入力のコメントを置き換えます：{{text}}",
+      "save": "残したコメントを保存（{{n}}）",
+      "saved": "保存したコメント：{{n}}",
+      "done": "保存した発表用コメント：{{n}}"
+    }
   },
   "interface_language": {
     "help": "メニューとメッセージの言語です。この設定はご自身にだけ適用されます。マップを表示する言語は、プロジェクトを開いているときにウィンドウ上部で選択します。"
@@ -1842,5 +1988,174 @@
       "closing_lost": "損失時間：月 {{lost}}。",
       "arrow": "から"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "BPMN 2.0 でエクスポート (.bpmn)…",
+    "export_title": "BPMN 2.0 でエクスポート",
+    "export_help": ".bpmn ファイルは BPMN モデリングツール（Camunda、Signavio、Bizagi など）で開けます。各ステップのシート全体を含み、文書の保存場所は含みません。",
+    "export_button": "エクスポート",
+    "export_subprocesses": "詳細なサブプロセスを含める",
+    "export_subprocesses_help": "詳細化された各ステップは、ツールでサブプロセスとして開きます。",
+    "export_subprocesses_none": "このマップには詳細化されたステップがありません。",
+    "export_details": "文書と問題点を描く",
+    "export_details_help": "チェックを外しても、ファイルのドキュメントには記載されます。",
+    "toolbar": "BPMN 2.0 ビュー",
+    "badge": "BPMN 2.0 図 · 読み取り専用",
+    "details": "図に詳細を表示",
+    "export": "エクスポート (.bpmn)…",
+    "close": "マップに戻る",
+    "close_help": "マップに戻る (Alt+B)",
+    "failed": "図を読み込めませんでした。",
+    "loading": "図を読み込んでいます…",
+    "node_label": "{{kind}}：{{name}}",
+    "kinds": {
+      "startEvent": "開始イベント",
+      "endEvent": "終了イベント",
+      "intermediateCatchEvent": "待機",
+      "manualTask": "手作業タスク",
+      "userTask": "ユーザータスク",
+      "serviceTask": "自動化タスク",
+      "subProcess": "サブプロセス",
+      "exclusiveGateway": "排他ゲートウェイ",
+      "parallelGateway": "並列ゲートウェイ",
+      "inclusiveGateway": "包含ゲートウェイ"
+    },
+    "doc": {
+      "field": "{{label}}：{{value}}",
+      "quote": "「{{text}}」",
+      "map": "マップ：{{name}}",
+      "classification": "機密区分：{{value}}",
+      "language": "言語：{{language}}",
+      "work_time": "1 日の労働時間：{{workday}} 時間、1 FTE の月間時間：{{fte}} 時間",
+      "description": "説明",
+      "wait": "{{hours}} 時間の待ち",
+      "from": "{{code}} から",
+      "volume": "流入量：{{period}}あたり {{quantity}}",
+      "periods": {
+        "day": "営業日",
+        "week": "週",
+        "month": "月",
+        "year": "年"
+      },
+      "lane_system": "単独で動作するソフトウェアのレーン",
+      "headcount": "人員：{{number}}"
+    },
+    "fit": "全体を表示",
+    "fit_help": "図全体をウィンドウに表示"
+  },
+  "shortcuts": {
+    "title": "キーボードショートカット",
+    "sections": {
+      "move": "移動",
+      "choose": "選択",
+      "edit": "マップの編集",
+      "display": "表示",
+      "present": "発表",
+      "help": "ヘルプ"
+    },
+    "edit_note": "プロジェクトのファシリテーター専用です。",
+    "or": "または",
+    "move_selection": "選択を移動",
+    "escape": "メニュー、パネル、シートを閉じる。「接続」を終了",
+    "space_held": "押している間は手のひらツール",
+    "enter": "選択したステップのシートを開く",
+    "type": "選択したステップの名前を入力し始める",
+    "menu_key": "選択したオブジェクトのメニュー",
+    "wheel": "スクロール。Shift を押すと横方向",
+    "zoom": "ズーム",
+    "saved": "すべて保存済みであることを知らせる",
+    "alone_note": "ステップを1つだけ選択していないとき（選択していると、キーがその名前の入力になります）",
+    "type_key": "文字キー",
+    "search_keys": "検索中：次へ、Shift で前へ、Esc で閉じる"
+  },
+  "search": {
+    "command_help": "プロジェクト内を検索",
+    "title": "検索",
+    "field": "検索する語",
+    "placeholder": "ステップ、文書、ツール…",
+    "previous": "前へ（Shift+Enter）",
+    "next": "次へ（Enter）",
+    "position": "{{count}} 件中 {{index}} 件目",
+    "searching": "検索中…",
+    "none": "結果はありません。",
+    "too_many": "{{total}} 件中、先頭の {{shown}} 件を表示しています。検索を絞り込んでください。",
+    "short": "2 文字以上、または Enter。",
+    "this_map": "このマップ",
+    "level": "階層 {{level}}",
+    "origin": "元の言語：{{language}}",
+    "kinds": {
+      "step": "ステップ",
+      "lane": "レーン",
+      "document": "文書",
+      "tool": "ツール",
+      "pain_point": "困りごと",
+      "action": "対策"
+    },
+    "results_one": "{{count}} 件の結果",
+    "results_other": "{{count}} 件の結果"
+  },
+  "action_plan": {
+    "command": "対策計画",
+    "title": "対策計画",
+    "total": "未解決の困りごとで月 {{hours}} 時間の損失",
+    "late_count": "期限超過：{{count}}",
+    "count": "表示中の困りごと：{{total}} 件中 {{shown}} 件",
+    "sort": "並べ替え",
+    "sorts": {
+      "project": "プロジェクトの順",
+      "lost": "損失時間",
+      "due": "期限"
+    },
+    "filters": "フィルター",
+    "filter_open": "未解決",
+    "filter_late": "期限超過",
+    "filter_no_action": "対策なし",
+    "late": "期限超過",
+    "no_action": "対策は未決定",
+    "map": "マップ：{{name}}",
+    "lane": "レーン：{{name}}",
+    "go_to": "{{code}} へ移動",
+    "edit": "計画を編集",
+    "edit_of": "{{code}} の計画を編集",
+    "loading": "計画を読み込み中…",
+    "empty": "このプロジェクトに困りごとはありません。",
+    "none": "フィルターに一致する困りごとはありません。",
+    "status_since": "{{date}} から{{status}}",
+    "status_changed": "{{code}}：{{status}}。",
+    "undo": "元に戻す",
+    "undo_of": "元に戻す：{{code}} を「{{status}}」に戻す"
+  },
+  "project_pdf": {
+    "sheet_state": "シートの状態：{{state}}",
+    "continued": "{{title}}（続き）",
+    "file": "プロジェクト",
+    "contents": "目次",
+    "page": "{{total}} ページ中 {{page}} ページ",
+    "scope_line": "マップ「{{name}}」とその階層",
+    "empty_map": "ステップのないマップ。",
+    "depth_cut": "{{max}} 階層を超えるマップはこの文書に含まれません。",
+    "sheets_of": "シート・{{map}}",
+    "reading": "マップを読み込み中：{{count}}",
+    "reading_sheets": "シートを読み込み中…",
+    "drawing": "マップ {{index}} / {{total}}",
+    "writing": "文書を書き込み中：{{page}} ページ",
+    "too_many_maps": "マップが {{max}} 件を超えています。「{{scope}}」を選択してください。",
+    "too_many_pages": "{{max}} ページを超えています。シートのチェックを外すか、詳細マップとその階層をエクスポートしてください。",
+    "cancelled": "エクスポートをキャンセルしました。",
+    "title": "プロジェクトを PDF でエクスポート",
+    "help": "すべてのマップを 1 つのファイルに階層順にまとめます。アプリを使わない人向けです。",
+    "scope": "範囲",
+    "scope_project": "プロジェクト全体",
+    "scope_branch": "このマップとその階層",
+    "with_sheets": "シートを含める",
+    "with_raci": "RACI マトリクスを含める",
+    "with_stream": "バリューストリームを含める",
+    "with_plan": "対策計画を含める",
+    "sheets_help": "シートはご自身に見えているものです。読む権限のある人にだけ文書を送ってください。",
+    "button": "PDF を作成",
+    "progress": "進行状況",
+    "too_many_maps_below": "マップが {{max}} 件を超えています。下の階層の詳細マップを開き、「{{scope}}」を選択してください。",
+    "too_many_pages_top": "{{max}} ページを超えています。シートのチェックを外してください。"
   }
 }

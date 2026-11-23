@@ -126,8 +126,10 @@ test('quality: %C&A and pain point on the document received, seen by the step th
   await expect(producer.getByText(/utilisé par BRA-E002 \(0 % utilisable tel quel\)/)).toBeVisible();
   await expect(producer.getByText(/BRA-I001 · signalé : Requête non mise à jour/)).toBeVisible();
 
-  // A pain point is noted where it is suffered: the outputs lead to the sheet of the step that receives (F-118).
-  await producer.getByRole('button', { name: 'Signaler un irritant dans BRA-E002' }).click();
+  // A pain point is noted where it is suffered: the outputs lead to the sheet of the step that receives (F-118); once
+  // noted, the way is « Modifier dans CODE », under the pain point (R10).
+  await expect(producer.getByRole('button', { name: 'Signaler un irritant dans BRA-E002' })).toHaveCount(0);
+  await producer.getByRole('button', { name: 'Modifier dans BRA-E002' }).click();
   const receiver = page.getByRole('complementary', { name: 'Fiche de l’étape BRA-E002' });
   await expect(receiver.getByRole('textbox', { name: 'Irritant sur « Extraction SIG »' })).toBeFocused();
 });

@@ -29,5 +29,5 @@ SDK .NET 10 propose Microsoft.Testing.Platform comme exécuteur de tests.
 ## Vérification
 
 - `global.json` et `Directory.Packages.props` relus par la porte de contrôle Architecture.
-- Comptes de tests par fournisseur consignés dans `docs/journal.md` à chaque porte ; porte de
+- Comptes de tests par fournisseur consignés dans `docs/journal.md` (non publié) à chaque porte ; porte de
   contrôle Intégrité des tests (aucun cas ignoré sur une base).

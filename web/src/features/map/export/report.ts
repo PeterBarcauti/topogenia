@@ -1,5 +1,5 @@
 // report.ts
-// The report « l'histoire du processus » of a map as a Markdown document (plan 3.1, L4, modèle Travail/rapport-mermaid-modele.html): the texts written with the model, the diagrams, the figures and the tables written by the code from the map; what the team noted and what the model spotted kept apart.
+// The report « l'histoire du processus » of a map as a Markdown document (plan 3.1, L4, after a model page of the holder, not published): the texts written with the model, the diagrams, the figures and the tables written by the code from the map; what the team noted and what the model spotted kept apart.
 
 import type { Schema } from '../../../api/client.ts';
 import type { Translate } from '../../../shared/i18n/i18n.ts';
@@ -146,7 +146,7 @@ function annexes(parts: Parts): string {
   return section(t('report.annexes'), ...[steps, raci].flatMap((sheet) => (sheet === undefined ? [] : [`### ${sheet.name}`, tableOf(sheet, language)])));
 }
 
-/** The report: its header, then its eleven sections in the order of the model (Travail/rapport-mermaid-modele.html). */
+/** The report: its header, then its eleven sections in the order of the model page. */
 export function reportMarkdown(map: MapView, language: string, t: Translate, facts: ReportFacts, report: Report, look: MermaidLook, valueStream = false): string {
   const parts: Parts = { map, language, t, report, look };
   const head = [`# ${inline(t('report.title', { title: facts.title }))}`, '', ...summaryLines(map, language), ...(facts.breadcrumb === '' ? [] : [`> ${inline(facts.breadcrumb)}`, '>']),

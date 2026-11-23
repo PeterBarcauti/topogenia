@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) did not stop. Try again, or close the console window.",
     "quit_unsaved": "Something typed in a sheet is not saved yet: $t(app.name) stays open. Try again once the sheet is saved.",
     "stopped": "$t(app.name) has stopped. This tab can be closed.",
-    "stopped_help": "To use it again, open it again."
+    "stopped_help": "To use it again, open it again.",
+    "help_menu": "Help menu",
+    "help_online": "Online help",
+    "update_check": "Check for updates",
+    "update_check_help": "Opens the versions page of the website. Installed: {{version}} of {{date}}.",
+    "update_check_store_help": "Opens the Microsoft Store page; the Store installs updates.",
+    "quit_text_unsaved": "An open form is not saved: what is typed in it will be lost.",
+    "quit_anyway": "Quit anyway"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Space",
     "Enter": "Enter",
-    "ArrowUp": "Up"
+    "ArrowUp": "Up",
+    "ArrowLeft": "Left",
+    "ArrowRight": "Right",
+    "ArrowDown": "Down",
+    "Backspace": "Backspace",
+    "Wheel": "Wheel"
   },
   "errors": {
     "RESEAU": "$t(app.name) is not responding. Check that $t(app.name) is still running (or your network connection if it is on a server).",
@@ -42,13 +54,24 @@
     "REPONSE_INVALIDE": "Unexpected answer from the server. Reload the page.",
     "ACCES_REFUSE": "You do not have permission for this page.",
     "UNKNOWN": "An unexpected error occurred.",
-    "RESUMES_A_JOUR": "Every map has an up-to-date summary. To rewrite one, open the map and click “i” next to its title."
+    "RESUMES_A_JOUR": "Every map has an up-to-date summary. To rewrite one, open the map and click “i” next to its title.",
+    "COLLECTION_TROP_DE_PROCESSUS": "The collection holds too many processes."
   },
   "home": {
     "eyebrow": "To boost your processes with AI, start by describing them.",
     "title": "Map your real processes to automate repetitive actions and work more efficiently.",
     "button": "Describe a process",
     "button_help": "Open the project’s map to complete it.",
+    "update_line": "This version dates from {{date}}.",
+    "update_link": "See whether a newer one exists",
+    "update_close": "Close the reminder",
+    "button_start_help": "Choose how to start.",
+    "start_menu": "Start a project",
+    "start_sample": "Sample project",
+    "start_gallery": "Template gallery",
+    "start_gallery_help": "Opens in the browser.",
+    "start_blank": "Blank map…",
+    "new_project_help": "Start from a blank map, a sample or a template.",
     "projects": "Projects",
     "no_project": "You are not part of any project yet. The project facilitator will send you an invitation.",
     "no_project_admin": "No project yet. Create the first one.",
@@ -79,7 +102,14 @@
     "sample_title": "Sample project",
     "sample_text": "A fictitious project, already described, to discover a complete map: lanes, decisions, sub-map, sheets, documents and pain points. It is deleted like any project.",
     "sample_create": "Create the sample project",
-    "sample_created": "Sample project {{code}} created."
+    "sample_created": "Sample project {{code}} created.",
+    "filter": "Filter the projects",
+    "filter_placeholder": "Code or name",
+    "filter_count": "{{shown}} of {{total}}",
+    "filter_none": "No project matches.",
+    "new_project_help_no_sample": "Start from a blank map or a template.",
+    "new_project_help_no_gallery": "Start from a blank map or a sample.",
+    "new_project_help_blank": "Start from a blank map."
   },
   "roles": {
     "facilitator": "Facilitator",
@@ -90,6 +120,8 @@
     "create_title": "Create a project",
     "code": "Short code",
     "code_help": "3 to 6 capital letters, unique and permanent (e.g. VIS).",
+    "code_proposed": "Suggested from the name.",
+    "more_options": "More options",
     "name_in": "Name in {{language}}",
     "names_help": "The name is translated into the other languages here or later, with the rest of the process.",
     "description": "Description",
@@ -112,7 +144,7 @@
     "properties": "Project properties…",
     "properties_title": "Properties of project {{code}}",
     "sharing_group": "Sharing group of the documents",
-    "sharing_group_help": "Named in the sheets for a shared input (e.g. Finance team). Empty: “the sharing group of the project”.",
+    "sharing_group_help": "Name of the group of people who can read the project's documents. Shown on the “Shared with the group” box of each document in a sheet. Empty: “the sharing group of the project”.",
     "properties_read_only": "Only a facilitator of the project changes these properties.",
     "properties_saved": "Project properties saved.",
     "language": "Language of the process",
@@ -123,10 +155,42 @@
     "fte_hours": "Hours per FTE and per month",
     "fte_hours_help": "From 1 to 744 h, 151.67 by default: turns the workload into full-time equivalents."
   },
+  "project_pdf": {
+    "sheet_state": "Sheet status: {{state}}",
+    "continued": "{{title}} (continued)",
+    "file": "project",
+    "contents": "Contents",
+    "page": "Page {{page}} of {{total}}",
+    "scope_line": "Map “{{name}}” and its levels",
+    "empty_map": "Map without steps.",
+    "depth_cut": "Maps beyond {{max}} levels are not in this document.",
+    "sheets_of": "Sheets · {{map}}",
+    "reading": "Reading the maps: {{count}}",
+    "reading_sheets": "Reading the sheets…",
+    "drawing": "Map {{index}} of {{total}}",
+    "writing": "Writing the document: page {{page}}",
+    "too_many_maps": "More than {{max}} maps: choose “{{scope}}”.",
+    "too_many_pages": "More than {{max}} pages: untick the sheets or export a detailed map and its levels.",
+    "cancelled": "Export cancelled.",
+    "title": "Export the project as PDF",
+    "help": "All the maps in one file, level by level, for readers without the application.",
+    "scope": "Scope",
+    "scope_project": "The whole project",
+    "scope_branch": "This map and its levels",
+    "with_sheets": "With the sheets",
+    "with_raci": "With the RACI matrix",
+    "with_stream": "With the value stream",
+    "with_plan": "With the action plan",
+    "sheets_help": "The sheets are those you can see: send the document only to people allowed to read them.",
+    "button": "Create the PDF",
+    "progress": "Progress",
+    "too_many_maps_below": "More than {{max}} maps: open a detailed map further down, then choose “{{scope}}”.",
+    "too_many_pages_top": "More than {{max}} pages: untick the sheets."
+  },
   "files": {
     "open": "Open a file…",
     "open_title": "Open a file",
-    "open_help": "The file becomes a new project: a .pmap file (a downloaded copy, or the reply of an AI that read a sketch), an Excel or CSV table, a Mermaid diagram (.mmd, .md) or an SVG image exported with its editable copy.",
+    "open_help": "The file becomes a new project: a .pmap file (a downloaded copy, or the reply of an AI that read a sketch), a template collection (.pmaps), an Excel or CSV table, a Mermaid diagram (.mmd, .md) or an SVG image exported with its editable copy.",
     "choose": "Choose a file…",
     "or_paste": "Or paste its content here, for example an AI’s answer:",
     "area": "Paste or drop the content of the .pmap file here",
@@ -137,6 +201,21 @@
     "created_summary": "Steps: {{steps}} · Lanes: {{lanes}} · Links: {{flows}} · Maps: {{maps}}",
     "uncertainties": "Points to check, flagged in the file:",
     "open_map": "Open the map",
+    "collection_title": "Collection “{{name}}”",
+    "collection_help": "One project is created for each process ticked. Nothing is written before “Create the projects”.",
+    "collection_all": "Select all",
+    "collection_ticked": "Ticked: {{count}} of {{total}}",
+    "collection_points": "Points to check: {{count}}",
+    "collection_details": "Description and points to check",
+    "collection_code_free": "{{code}} is already taken.",
+    "collection_invalid": "Cannot be opened:",
+    "collection_create": "Create the projects",
+    "collection_creating": "Creating {{done}} of {{total}}…",
+    "collection_done": "Projects created",
+    "collection_created": "{{code}} created.",
+    "collection_failed": "Not created: {{reason}}",
+    "collection_retry": "Try again",
+    "collection_unnamed": "Process {{rank}}",
     "duplicate": "Duplicate the project…",
     "duplicate_title": "Duplicate the project",
     "duplicate_help": "The copy includes all maps: lanes, steps, arrows and RACI. Sheets, documents and pain points stay in the original project. The person who duplicates it becomes its facilitator; members are not copied.",
@@ -192,7 +271,37 @@
     "target_name": "{{name}} (target state)",
     "target_label": "Label of the reference",
     "target_label_default": "Current state",
-    "target_button": "Create"
+    "target_button": "Create",
+    "map_download": "Save the open map (.pmap)",
+    "map_downloaded": "Map saved with its detailed maps, its sheets and its comments: the .pmap file is in the Downloads folder.",
+    "insert": "Insert a file as a detailed step…",
+    "insert_here": "Insert a file here…",
+    "insert_title": "Insert a file as a detailed step",
+    "insert_help": "The file becomes a new detailed step of this map. It is a copy: changing the file afterwards does not change the map. A .pmap file, an Excel or CSV table, a Mermaid diagram or an SVG image with its copy.",
+    "replace_title": "Replace the detail with a file",
+    "replace_help": "The detail of “{{label}}” goes to the recycle bin and the file takes its place. Ctrl+Z undoes it all.",
+    "insert_counts": "Steps: {{steps}} · Lanes: {{lanes}} · Links: {{flows}} · Maps: {{maps}} · Sheets: {{sheets}}",
+    "insert_too_deep": "This file has {{depth}} levels of maps; under this map, it may have {{room}} at most.",
+    "insert_too_large": "This file is over {{max}} MB: it cannot be inserted.",
+    "open_too_large": "This file is over {{max}} MB: it cannot be opened.",
+    "insert_package": "This is an exchange package: it is imported as a project, not inserted.",
+    "insert_collection": "A collection opens through “Open a file…”. Insert one of its templates on its own.",
+    "insert_dropped": "Translations left out (languages not configured here): {{languages}}",
+    "insert_label": "Label of the step",
+    "insert_lane": "Lane",
+    "insert_after": "Place after",
+    "insert_at_start": "At the start of the map",
+    "insert_sheets": "Take the sheets",
+    "insert_sheets_help": "The sheets, their documents and their pain points arrive as drafts, to review and then validate.",
+    "insert_button": "Insert",
+    "replace_button": "Replace",
+    "inserted": "File inserted. Steps: {{steps}} · Maps: {{maps}}",
+    "insert_on_flow": "On the flow {{from}} → {{to}}",
+    "insert_on_flow_here": "Insert a file on this flow…",
+    "collection_none": "No project created",
+    "collection_code_twice": "{{code}} is also given to another line.",
+    "collection_fix": "Correct the text",
+    "remote_locations": "Network or web addresses in the sheets: {{count}}, to check before opening a document."
   },
   "package": {
     "export": "Export the project ({{extension}})…",
@@ -230,6 +339,11 @@
   "export": {
     "pdf": "Export as PDF (A3 landscape)",
     "png": "Export as PNG image",
+    "copy_image": "Copy the map as an image",
+    "copying": "Copying the image…",
+    "copied": "Image copied: paste it (Ctrl+V) into an email or a slide.",
+    "copy_failed": "The image could not be copied.",
+    "copy_as_png": "Export as PNG",
     "svg": "Export as SVG image…",
     "svg_title": "Export as SVG image",
     "svg_help": "A vector image, sharp at any size, to place in Word, PowerPoint or a web page.",
@@ -369,7 +483,8 @@
       "due": "Due date",
       "status": "Status",
       "lost": "Hours lost per month"
-    }
+    },
+    "project_pdf": "Export the project as PDF…"
   },
   "classification": {
     "internal": "Internal",
@@ -383,6 +498,7 @@
     "read_only": "Read only: click a step to read its description. Only the facilitator changes the structure.",
     "depth": "This map is at level {{level}}. Beyond {{max}} levels, it becomes hard to read.",
     "back_to_start": "Back to the start of the map",
+    "fit": "Show all",
     "controls": "Zoom",
     "zoom_in": "Zoom in",
     "zoom_out": "Zoom out",
@@ -553,6 +669,7 @@
     "delete_detail": "Delete the detail",
     "cut": "Cut",
     "copy": "Copy",
+    "copy_selection_image": "Copy the selection as an image",
     "duplicate": "Duplicate",
     "paste_before": "Paste before this step",
     "paste_after": "Paste after this step",
@@ -596,6 +713,26 @@
       "necessary": "Necessary, no value",
       "waste": "Waste",
       "none": "Not classified"
+    },
+    "replace_detail": "Replace the detail with a file…",
+    "file_cascade": {
+      "export": "Export the map",
+      "project": "Project",
+      "package": "Exchange package",
+      "assistant": "AI assistant"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 landscape)",
+      "png": "PNG image",
+      "svg": "SVG image…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Whole project as PDF…",
+      "import": "Import a package…",
+      "replace": "Replace with a package…",
+      "report": "Narrated report (Markdown)",
+      "comments": "Presentation comments…"
     }
   },
   "deletion": {
@@ -646,7 +783,8 @@
       "retracer_liens": "automatic route of the arrows",
       "inserer_rangees": "row insertion",
       "retirer_rangee": "row removal",
-      "proposition_ia": "proposal of the AI"
+      "proposition_ia": "proposal of the AI",
+      "inserer_fichier": "file insertion"
     }
   },
   "command": {
@@ -769,9 +907,12 @@
     "duration_max": "Longest duration",
     "duration_bounds_order": "Shortest ≤ duration ≤ longest",
     "minutes": "minutes",
-    "duration_between": "{{min}} to {{max}} minutes",
-    "duration_at_least": "at least {{min}} minutes",
-    "duration_at_most": "at most {{max}} minutes",
+    "duration_between_one": "{{min}} to {{max}} minute",
+    "duration_between_other": "{{min}} to {{max}} minutes",
+    "duration_at_least_one": "at least {{min}} minute",
+    "duration_at_least_other": "at least {{min}} minutes",
+    "duration_at_most_one": "at most {{max}} minute",
+    "duration_at_most_other": "at most {{max}} minutes",
     "duration_value_one": "{{count}} minute",
     "duration_value_other": "{{count}} minutes",
     "fold": "Fold “{{section}}”",
@@ -832,6 +973,7 @@
     "clarification_withdrawn": "Question removed.",
     "read_empty": "No validated sheet for this step yet.",
     "read_validated": "Version validated on {{date}} by {{name}}.",
+    "read_draft": "Draft in progress, not validated yet.",
     "document": {
       "add_output": "Add an output",
       "new_output": "New output",
@@ -895,7 +1037,8 @@
         "file": "File",
         "software": "Software",
         "other": "Other"
-      }
+      },
+      "edit_pain": "Edit in {{code}}"
     },
     "pain_point": {
       "title": "Pain point",
@@ -916,6 +1059,19 @@
       "plan_action": "Action: {{action}}",
       "plan_owner": "Owner: {{owner}}",
       "plan_due": "Due date: {{date}}",
+      "status": "Status",
+      "status_of": "Status of pain point {{code}}",
+      "status_help": "Implemented, adopted or dropped: the pain point leaves the map and its hours no longer count.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problem spotted, action to plan",
+        "scored": "pain point assessed, action to decide",
+        "under_review": "action being studied, not decided yet",
+        "in_progress": "action being carried out",
+        "implemented": "action done, result to check",
+        "adopted": "checked, it is the new way of working",
+        "dropped": "we decide not to deal with it"
+      },
       "statuses": {
         "reported": "reported",
         "scored": "scored",
@@ -924,7 +1080,8 @@
         "implemented": "implemented",
         "adopted": "adopted",
         "dropped": "dropped"
-      }
+      },
+      "status_now": "Status of pain point {{code}}: {{status}}"
     },
     "lead_time": "Lead time",
     "lead_time_help": "Time from the arrival of a case to its leaving the step, waits included; it does not count in the completeness.",
@@ -941,7 +1098,12 @@
       "minute": "minutes",
       "hour": "hours",
       "day": "working days"
-    }
+    },
+    "step_pain_points": "Pain points of the step",
+    "step_pain_points_help": "Pain points attached to the step, without a document. Their description and plan are read only.",
+    "pain_points_one": "{{count}} pain point",
+    "pain_points_other": "{{count}} pain points",
+    "step_pain_points_help_fill": "Pain points attached to the step, without a document. Their status is changed here; their description and plan are read only."
   },
   "translations": {
     "title": "Translate the project",
@@ -1188,6 +1350,12 @@
         },
         "summaries": {
           "title": "Summaries"
+        },
+        "comments": {
+          "title": "Presentation comments",
+          "text": "What the presentation says of the steps and the handoffs.",
+          "example": "Write the comments of the steps and the handoffs of this map and its detailed maps.",
+          "example_empty": "Write the comments of the steps and the handoffs of this map and its detailed maps."
         }
       },
       "thread": "Exchanges with the assistant",
@@ -1245,7 +1413,8 @@
         "findings": "Analysis",
         "report": "Report",
         "summaries": "Summaries",
-        "proposal": "Proposal"
+        "proposal": "Proposal",
+        "comments": "Presentation comments"
       },
       "pasted": "Reply pasted",
       "copy_reply": "Copy the reply",
@@ -1401,7 +1570,19 @@
     "resource": "Azure resource",
     "resource_help": "The name of the resource: contoso for contoso.openai.azure.com.",
     "port": "Port",
-    "port_help": "Empty: the default port (Ollama 11434, LM Studio 1234)."
+    "port_help": "Empty: the default port (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Write the presentation comments of the steps and the handoffs of this map and its detailed maps that have none.",
+      "menu": "Write the presentation comments (AI)…",
+      "intro": "Read each comment again: keep it, correct it or drop it. It will be said during the presentation.",
+      "flow": "Handoff {{labels}}",
+      "map": "Map: {{name}}",
+      "current": "Current comment: {{text}}",
+      "typed": "Replaces a comment typed by hand: {{text}}",
+      "save": "Save the comments kept ({{n}})",
+      "saved": "Comments saved: {{n}}",
+      "done": "Presentation comments saved: {{n}}"
+    }
   },
   "interface_language": {
     "help": "The language of the menus and messages, for you alone. The language the maps are shown in is chosen at the top of the window, when a project is open."
@@ -1856,5 +2037,142 @@
       "closing_lost": "Time lost: {{lost}} a month.",
       "arrow": "to"
     }
+  },
+  "bpmn": {
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "“{{text}}”",
+      "map": "Map: {{name}}",
+      "classification": "Classification: {{value}}",
+      "language": "Language: {{language}}",
+      "work_time": "Working day: {{workday}} h; hours of an FTE per month: {{fte}} h",
+      "description": "Description",
+      "wait": "wait of {{hours}} h",
+      "from": "from {{code}}",
+      "volume": "Incoming volume: {{quantity}} per {{period}}",
+      "periods": {
+        "day": "working day",
+        "week": "week",
+        "month": "month",
+        "year": "year"
+      },
+      "lane_system": "Lane of a software that acts alone",
+      "headcount": "Headcount: {{number}}"
+    },
+    "view": "BPMN 2.0",
+    "export_menu": "Export as BPMN 2.0 (.bpmn)…",
+    "export_title": "Export as BPMN 2.0",
+    "export_help": "The .bpmn file opens in BPMN modellers (Camunda, Signavio, Bizagi…). It carries the whole sheet of each step, without the location of the documents.",
+    "export_button": "Export",
+    "export_subprocesses": "Include the detailed sub-processes",
+    "export_subprocesses_help": "Each detailed step opens in the modeller as a sub-process.",
+    "export_subprocesses_none": "The map has no detailed step.",
+    "export_details": "Draw the documents and the pain points",
+    "export_details_help": "Unticked, they stay written in the documentation of the file.",
+    "toolbar": "BPMN 2.0 view",
+    "badge": "BPMN 2.0 diagram · read only",
+    "details": "Details on the diagram",
+    "export": "Export (.bpmn)…",
+    "close": "Back to the map",
+    "close_help": "Back to the map (Alt+B)",
+    "failed": "The diagram could not be read.",
+    "loading": "Reading the diagram…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Start event",
+      "endEvent": "End event",
+      "intermediateCatchEvent": "Wait",
+      "manualTask": "Manual task",
+      "userTask": "User task",
+      "serviceTask": "Service task",
+      "subProcess": "Sub-process",
+      "exclusiveGateway": "Exclusive gateway",
+      "parallelGateway": "Parallel gateway",
+      "inclusiveGateway": "Inclusive gateway"
+    },
+    "fit": "Show all",
+    "fit_help": "Fit the whole diagram in the window"
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "sections": {
+      "move": "Moving around",
+      "choose": "Selecting",
+      "edit": "Changing the map",
+      "display": "Display",
+      "present": "Presenting",
+      "help": "Help"
+    },
+    "edit_note": "For the facilitator of the project.",
+    "or": "or",
+    "move_selection": "Move the selection",
+    "escape": "Close a menu, a panel or a sheet; stop « Link »",
+    "space_held": "Hand tool while held",
+    "enter": "Open the sheet of the chosen step",
+    "type": "Start the name of the chosen step",
+    "menu_key": "Menu of the chosen object",
+    "wheel": "Scroll; with Shift, sideways",
+    "zoom": "Zoom",
+    "saved": "Remind that everything is saved",
+    "alone_note": "Without a single step chosen (otherwise the key starts its name)",
+    "type_key": "a letter",
+    "search_keys": "In the search: next; with Shift, previous; Esc closes"
+  },
+  "search": {
+    "command_help": "Search the project",
+    "title": "Search",
+    "field": "Word to find",
+    "placeholder": "Step, document, tool…",
+    "previous": "Previous (Shift+Enter)",
+    "next": "Next (Enter)",
+    "position": "{{index}} of {{count}}",
+    "searching": "Searching…",
+    "none": "No results.",
+    "too_many": "The first {{shown}} of {{total}} results: narrow the search.",
+    "short": "Two characters at least, or Enter.",
+    "this_map": "This map",
+    "level": "Level {{level}}",
+    "origin": "Language of origin: {{language}}",
+    "kinds": {
+      "step": "Step",
+      "lane": "Lane",
+      "document": "Document",
+      "tool": "Tool",
+      "pain_point": "Pain point",
+      "action": "Action"
+    },
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results"
+  },
+  "action_plan": {
+    "command": "Action plan",
+    "title": "Action plan",
+    "total": "{{hours}} h lost per month on open pain points",
+    "late_count": "Overdue: {{count}}",
+    "count": "Pain points shown: {{shown}} of {{total}}",
+    "sort": "Sort by",
+    "sorts": {
+      "project": "Project order",
+      "lost": "Hours lost",
+      "due": "Due date"
+    },
+    "filters": "Filters",
+    "filter_open": "Open",
+    "filter_late": "Overdue",
+    "filter_no_action": "No action",
+    "late": "Overdue",
+    "no_action": "No action decided",
+    "map": "Map: {{name}}",
+    "lane": "Lane: {{name}}",
+    "go_to": "Go to {{code}}",
+    "edit": "Edit the plan",
+    "edit_of": "Edit the plan of {{code}}",
+    "loading": "Loading the plan…",
+    "empty": "No pain points in this project.",
+    "none": "No pain point matches the filters.",
+    "status_since": "{{status}} since {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Undo",
+    "undo_of": "Undo: set {{code}} back to “{{status}}”"
   }
 }

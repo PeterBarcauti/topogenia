@@ -91,6 +91,34 @@ public sealed class CommonHeadersTests(ApiHosts hosts) : IClassFixture<ApiHosts>
         Assert.DoesNotContain("unsafe", SecurityHeaders.Policy, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// ADR 014 and ADR 111 point 1: the page reaches the application alone. `connect-src` (fetch, XHR, WebSocket,
+    /// EventSource, sendBeacon) is `'self'`, and so is `default-src`; neither host of the links that the profile gives (the
+    /// site, the page of the Store) is in the policy: they are opened by the browser in a tab of its own, never called by
+    /// the page, which sends no referrer and shares no window with them. Read from the replies, in both modes.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
+    public async Task The_page_reaches_the_application_only_connect_src_self(EngineKind kind)
+    {
+        var project = await ProjectAsync(kind);
+        using var reader = project.Reader;
+        using var anonymous = project.Host.As(null);
+        var links = (await reader.GetAsync("/api/me")).Ok().GetProperty("links");
+        var hosts = new[] { links.GetProperty("site").GetString()!, links.GetProperty("store_page").GetString()! }.Select(address => new Uri(address).Host).ToList();
+        Assert.Equal(2, hosts.Distinct(StringComparer.Ordinal).Count());
+        foreach (var response in new[] { await reader.GetAsync($"/api/maps/{project.RootMapId}"), await anonymous.GetAsync("/api/me"), await reader.GetAsync("/api/nowhere") })
+        {
+            var policy = response.Headers["Content-Security-Policy"];
+            var directives = policy.Split(';', StringSplitOptions.TrimEntries).ToDictionary(directive => directive.Split(' ')[0], directive => directive);
+            Assert.Equal("connect-src 'self'", directives["connect-src"]);
+            Assert.Equal("default-src 'self'", directives["default-src"]);
+            Assert.All(hosts, host => Assert.DoesNotContain(host, policy, StringComparison.OrdinalIgnoreCase));
+            Assert.DoesNotContain("*", policy, StringComparison.Ordinal);
+            Assert.Equal(("no-referrer", "same-origin"), (response.Headers["Referrer-Policy"], response.Headers["Cross-Origin-Opener-Policy"]));
+        }
+    }
+
     [Theory]
     [MemberData(nameof(Engines.All), MemberType = typeof(Engines))]
     public async Task A_body_longer_than_one_megabyte_is_refused_413_before_it_is_read_and_nothing_is_written(EngineKind kind)

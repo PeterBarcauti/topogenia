@@ -97,5 +97,10 @@ public sealed class AssistantCommentsTests
         Assert.Null(AssistantCommentsReader.Bounded(" \t \n "));
         // What the reader gives is always a text the rule of a comment takes as it is.
         Assert.Equal(cut, PresentationCommentRules.Text(cut));
+        // Cut where no space is, never between the two halves of an emoji (audit of the copy 64, P2-06).
+        var emojis = string.Concat(Enumerable.Repeat("\U0001F600", PresentationCommentRules.TextMax));
+        var cutEmojis = AssistantCommentsReader.Bounded(emojis)!;
+        Assert.False(char.IsHighSurrogate(cutEmojis[^2]), "a half of a character before the ellipsis");
+        Assert.Equal(cutEmojis, PresentationCommentRules.Text(cutEmojis));
     }
 }

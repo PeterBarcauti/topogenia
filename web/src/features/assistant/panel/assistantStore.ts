@@ -8,7 +8,7 @@ import { sendStream } from '../../../api/request.ts';
 import { messageOf } from '../../../shared/i18n/errorMessage.ts';
 import type { FileBounds, FileLabel, JoinedFile } from './attachments.ts';
 
-export type Intent = 'free' | 'create' | 'modify' | 'analyze' | 'ask' | 'translate' | 'report' | 'summaries';
+export type Intent = 'free' | 'create' | 'modify' | 'analyze' | 'ask' | 'translate' | 'report' | 'summaries' | 'comments';
 
 /**
  * A translation of the whole process by the assistant (ADR 083): the language asked, and the root map it is asked on,
@@ -165,6 +165,9 @@ export interface AssistantState {
    */
   readonly summariesSaved: Readonly<Record<number, number>>;
   readonly keepSummaries: (turnId: number, count: number) => void;
+  /** How many comments of presentation of each turn were saved (F-130), kept with the thread as the summaries saved. */
+  readonly commentsSaved: Readonly<Record<number, number>>;
+  readonly keepComments: (turnId: number, count: number) => void;
 }
 
 /** A proposal applied on the map, or put aside. */
@@ -318,9 +321,10 @@ export function createAssistantStore(target: AssistantTarget): StoreApi<Assistan
     const kit: Kit = { get: getState, set: setState, target, next: () => number++, calls };
     return {
       open: false, status: null, statusError: null, turns: [], history: [], running: false, draft: '', intent: null, selectionDropped: false, mode: 'model',
-      files: [], bounds: null, outcomes: {}, summariesSaved: {},
+      files: [], bounds: null, outcomes: {}, summariesSaved: {}, commentsSaved: {},
       settle: (turnId, outcome) => { setState({ outcomes: { ...getState().outcomes, [turnId]: outcome } }); },
       keepSummaries: (turnId, count) => { setState({ summariesSaved: { ...getState().summariesSaved, [turnId]: count } }); },
+    keepComments: (turnId, count) => { setState({ commentsSaved: { ...getState().commentsSaved, [turnId]: count } }); },
       setMode: (mode) => { setState({ mode }); },
       setBounds: (bounds) => { setState({ bounds }); },
       addFiles: (added) => { setState({ files: [...getState().files, ...added.map((file) => ({ ...file, id: number++ }))] }); },
@@ -355,7 +359,7 @@ export function createAssistantStore(target: AssistantTarget): StoreApi<Assistan
       stop: () => { calls.running?.abort(); },
       restart() {
         calls.running?.abort();
-        setState({ turns: [], history: [], draft: '', intent: null, selectionDropped: false, files: [], outcomes: {}, summariesSaved: {} });
+        setState({ turns: [], history: [], draft: '', intent: null, selectionDropped: false, files: [], outcomes: {}, summariesSaved: {}, commentsSaved: {} });
       },
       paste: (turnId, pasted) => readPasted(kit, turnId, pasted),
     };

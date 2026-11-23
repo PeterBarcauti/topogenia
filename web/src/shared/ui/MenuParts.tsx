@@ -1,5 +1,5 @@
 // MenuParts.tsx
-// The parts of a context menu as the validated mock-up draws them: an entry with its icon, its radio and its shortcut, a named group of choices, a grid of swatches with its caption (spec 9.5, ARIA 1.2).
+// The parts of a context menu as the validated mock-up draws them: an entry with its icon, its radio and its shortcut (or its name and its help on two lines), a named group of choices, a grid of swatches with its caption (spec 9.5, ARIA 1.2).
 
 import { useId, type CSSProperties } from 'react';
 import { Check } from 'lucide-react';
@@ -48,19 +48,31 @@ function Trail({ item, look }: { item: CommandItem; look: Look }) {
 /** The shortcut for assistive technologies, in the names of ARIA (`Control+X`). */
 const keyShortcut = (chord: string | undefined) => (chord === undefined ? undefined : chord.replace(/\bCtrl\b/g, 'Control'));
 
+/** The label shown: the text, or the two lines of an entry that has them, its name then its help. */
+function Label({ item, shown }: { item: CommandItem; shown: string }) {
+  if (item.lines === undefined) return <span className="menu-label">{shown}</span>;
+  return (
+    <span className="menu-label">
+      <span className="menu-name">{item.lines[0]}</span>
+      <span className="menu-help">{item.lines[1]}</span>
+    </span>
+  );
+}
+
 export function MenuEntry({ item, testId, onChoose, look = 'plain', text }: EntryProps) {
   const { t } = useTranslation();
   const label = t(item.label, item.labelValues);
   const shown = text === undefined ? label : t(text);
-  const className = ['menu-item', item.danger === true && 'menu-item--danger', item.separatorBefore === true && look === 'plain' && 'menu-item--group'].filter(Boolean).join(' ');
+  const className = ['menu-item', item.danger === true && 'menu-item--danger', item.separatorBefore === true && look === 'plain' && 'menu-item--group',
+    item.lines !== undefined && 'menu-item--lines'].filter(Boolean).join(' ');
   return (
     <button type="button" role={item.checked === undefined ? 'menuitem' : 'menuitemradio'} aria-checked={item.checked} className={className} tabIndex={-1}
-      aria-disabled={item.disabled} aria-keyshortcuts={keyShortcut(item.shortcut)} aria-label={shown === label ? undefined : label} data-testid={`${testId}-${item.id}`}
-      onClick={() => {
+      aria-disabled={item.disabled} aria-keyshortcuts={keyShortcut(item.shortcut)} aria-label={shown === label && item.lines === undefined ? undefined : label}
+      data-testid={`${testId}-${item.id}`} title={item.title === undefined ? undefined : t(item.title, item.labelValues)} onClick={() => {
         onChoose(item);
       }}>
       <Lead item={item} look={look} />
-      <span className="menu-label">{shown}</span>
+      <Label item={item} shown={shown} />
       <Trail item={item} look={look} />
     </button>
   );

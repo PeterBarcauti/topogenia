@@ -87,6 +87,6 @@ montrer qu'il travaille, et un échange long ne doit pas être coupé en route.
 - L'aperçu et l'application d'une proposition sur une carte qui a du contenu viennent au lot 3 (calcul dans le cœur
   fermé) ; au lot 2, une proposition se crée en nouveau projet ou se télécharge.
 - Bedrock sans flux, le repli côté serveur (`fallbacks`) non activé et le plafond du contenu envoyé fixé dans le code
-  (2 400 000 caractères) sont inscrits dans `docs/a-peaufiner.md`.
+  (2 400 000 caractères) sont inscrits dans `docs/a-peaufiner.md` (non publié).
 - Un proxy d'entreprise qui met les réponses en tampon retarde l'affichage de la progression, sans couper l'échange
   (guides d'exploitation).

@@ -1,5 +1,5 @@
 // DocumentApi.cs
-// The routes of the documents of a step and of their uses turned into their requests: add, update, delete, tick, untick, "Other" (annex A 1, A 2.11).
+// The routes of the documents of a step and of their uses turned into their requests: add, update, delete, tick, untick, the status of a pain point received, "Other" (annex A 1, A 2.11, ADR 116).
 
 using System.Collections.ObjectModel;
 using Topogenia.Application.Commands;
@@ -35,6 +35,12 @@ public sealed record DocumentUseBody(decimal? WaitHours, int? PercentCompleteAcc
     /// <summary>The day the action is due (`yyyy-MM-dd`).</summary>
     public DateOnly? DueDate { get; init; }
 }
+
+/// <summary>
+/// `PUT /api/steps/{id}/pain-points/{painPointId}/status` (3.4, ADR 116): the code of the status chosen, one of the seven of
+/// the list, carried as text and checked by the command (VALEUR_INVALIDE on `status`).
+/// </summary>
+public sealed record PainPointStatusBody(string? Status);
 
 /// <summary>The "Other" window: the outputs of the other steps of the map, grouped by step (1.x `DisponiblesVue[]`).</summary>
 public sealed class AvailableDocuments(IList<AvailableOutputs> outputs) : ReadOnlyCollection<AvailableOutputs>(outputs);
@@ -91,6 +97,14 @@ public sealed class DocumentApi
     public async Task<SheetView> StopUsingAsync(Guid stepId, Guid documentId, string? ifMatch, CancellationToken cancellationToken)
     {
         await commands.RunAsync(StopUsingDocumentCommand.WithVersion(stepId, documentId, ApiInput.Version(ifMatch)), cancellationToken);
+        return await SheetAsync(stepId, cancellationToken);
+    }
+
+    public async Task<SheetView> ChangePainPointStatusAsync(Guid stepId, Guid painPointId, PainPointStatusBody body, string? ifMatch,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(body);
+        await commands.RunAsync(ChangePainPointStatusCommand.WithVersion(stepId, painPointId, body.Status, ApiInput.Version(ifMatch)), cancellationToken);
         return await SheetAsync(stepId, cancellationToken);
     }
 

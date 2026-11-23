@@ -14,8 +14,8 @@ import { downloadPmapCopy } from './pmapCopy.ts';
 
 const PMAP = JSON.stringify({ format: 'pmap', version: '1.1', project: { code: 'VIS', name: 'Visites' }, maps: [] });
 
-const opened = (uncertainties: string[]) => ({
-  json: { id: 'p-new', code: 'VIS', root_map_id: 'm-new', maps: 2, lanes: 3, steps: 9, flows: 8, sheets: 0, uncertainties }, status: 201,
+const opened = (uncertainties: string[], remote_locations = 0) => ({
+  json: { id: 'p-new', code: 'VIS', root_map_id: 'm-new', maps: 2, lanes: 3, steps: 9, flows: 8, sheets: 0, uncertainties, remote_locations }, status: 201,
 });
 
 const openDialog = () => {
@@ -51,7 +51,7 @@ describe('open a .pmap (B-1.6-01 to B-1.6-12)', () => {
       expect(field('Code court')).toHaveValue('VIS');
     });
     expect(screen.getByText('visites.pmap')).toBeInTheDocument();
-    expect(screen.getByTestId('open-pmap-file')).toHaveAttribute('accept', '.pmap,application/json,.xlsx,.csv,.mmd,.md,.svg');
+    expect(screen.getByTestId('open-pmap-file')).toHaveAttribute('accept', '.pmap,.pmaps,application/json,.xlsx,.csv,.mmd,.md,.svg');
   });
 
   it('a file dropped on the area fills it too', async () => {
@@ -191,6 +191,19 @@ describe('the answer of the host (B-1.6-13 to B-1.6-17)', () => {
     expect(window.location.pathname).toBe('/');
     await userEvent.click(within(created).getByRole('button', { name: 'Ouvrir la carte' }));
     expect(window.location.pathname).toBe('/maps/m-new');
+  });
+});
+
+describe('the addresses of a file opened (pre-audit 68, P3-02)', () => {
+  it('a file whose documents reach another machine says how many before the map opens, even without a point to check', async () => {
+    fakeApi({ 'POST /api/projects/import-pmap': opened([], 2) });
+    openDialog();
+    fireEvent.change(field('Ou coller son contenu ici, par exemple la réponse d’une IA :'), { target: { value: PMAP } });
+    await userEvent.click(screen.getByRole('button', { name: 'Ouvrir' }));
+    const created = await screen.findByRole('dialog', { name: 'Projet créé' });
+    expect(within(created).getByTestId('pmap-created-remote')).toHaveTextContent('Adresses réseau ou web dans les fiches : 2, à vérifier avant d’ouvrir un document.');
+    expect([within(created).queryByText('Points à vérifier, signalés dans le fichier :'), within(created).queryAllByRole('listitem')]).toEqual([null, []]);
+    expect(window.location.pathname).toBe('/');
   });
 });
 

@@ -95,6 +95,13 @@ describe('the pictograms, the gauge, the warning (annex B 2.10, spec 9.4)', () =
       .toEqual(['var(--warning-graphic)', 'var(--success)', 'var(--danger)']);
   });
 
+  it('on a gateway, the gauge is a stroke of 3 px along the lower contour, in the colour of the state, under the pictograms (R14)', () => {
+    expect([rule('.step-gauge--contour polyline', 'fill'), rule('.step-gauge--contour polyline', 'stroke-width'), rule('.step-gauge--contour polyline', 'transition')])
+      .toEqual(['none', '3', 'stroke-dasharray var(--duration-base)']);
+    expect([rule('.gauge--draft', 'stroke'), rule('.gauge--validated', 'stroke'), rule('.gauge--needs_review', 'stroke')]).toEqual(['var(--warning-graphic)', 'var(--success)', 'var(--danger)']);
+    expect(rule('.step--gateway .step-pictos', 'z-index')).toBe('1');
+  });
+
   it('the warning in the top left corner, in the warning colour', () => {
     expect([rule('.step-warning', 'left'), rule('.step-warning', 'top'), rule('.step-warning', 'background')]).toEqual(['-10px', '-9px', 'var(--warning-graphic)']);
   });

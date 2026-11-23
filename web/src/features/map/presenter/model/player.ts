@@ -12,8 +12,11 @@ export interface PlayerState {
   readonly speed: number;
 }
 
-/** The speeds offered, the normal one in the middle. */
-export const SPEEDS: readonly number[] = [0.5, 0.75, 1, 1.5, 2];
+/**
+ * The speeds offered, the normal one in the middle, in fine steps around it as the players of podcasts do: a voice of the
+ * system is hard to follow at 0.5 and past 1.25 (essai of the project owner, 19/11/2026).
+ */
+export const SPEEDS: readonly number[] = [0.75, 0.9, 1, 1.1, 1.25];
 
 /** A presentation opens paused on the whole map: the presenter starts it when the room is ready. */
 export const PLAYER_START: PlayerState = { scene: 0, elapsed: 0, playing: false, speed: 1 };

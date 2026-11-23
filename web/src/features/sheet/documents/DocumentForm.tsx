@@ -1,8 +1,9 @@
 // DocumentForm.tsx
-// The form of a document the step declares, an output or an input from outside: its name, its link, its wait for an input, its medium (Makigami M3), its sharing with the group of the project (annex B 4, plan 3.1).
+// The form of a document the step declares, an output or an input from outside: its name, its link, its wait for an input, its medium (Makigami M3), its sharing with the group of the project (annex B 4, plan 3.1); followed while changed and not validated (R11).
 
-import { useId, type KeyboardEvent } from 'react';
+import { useId, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUnsavedForm } from '../../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../../shared/ui/Button.tsx';
 import { MEDIA, type DocumentEntry, type Direction, type Medium } from '../model/documents.ts';
 import { useSheet } from '../SheetContext.tsx';
@@ -19,11 +20,15 @@ export interface DocumentFormProps {
 /**
  * Name of 200 characters, link of 1000, wait before receipt in hours from 0 to 100 000 by 0.5 for an input, the box of
  * the sharing named by the setting of the project (B-4-66 to B-4-69, B-4-78); Escape cancels it before closing the panel.
+ * Changed from the entry it opened on, and not validated, it counts as a typing not saved for « Quit » (R11, ADR 115):
+ * the list gives each document its own form (`key`), so that the entry it opened on is the one of its document.
  */
 export function DocumentForm({ direction, entry, busy, onChange, onCancel, onSave }: DocumentFormProps) {
   const { t } = useTranslation();
   const { props } = useSheet();
   const id = useId();
+  const [opened] = useState(entry);
+  useUnsavedForm(JSON.stringify(entry) !== JSON.stringify(opened));
   const set = (part: Partial<DocumentEntry>) => { onChange({ ...entry, ...part }); };
   const group = props.project?.sharingGroupLabel ?? null;
   const title = entry.id !== null ? t('sheet.document.edit_title', { name: entry.name }) : t(direction === 'input' ? 'sheet.document.new_external' : 'sheet.document.new_output');

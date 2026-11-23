@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
 import type { Api } from './support/api.ts';
 import { expect, openMap, stepOf, test } from './support/journey.ts';
+import { fileEntry } from './support/file-menu.ts';
 
 interface Laid { projectId: string; mapId: string; ids: string[] }
 
@@ -31,7 +32,7 @@ async function layOut(api: Api): Promise<Laid> {
 /** File > Export the project, people left out (the default): the file the browser receives. */
 async function exportPackage(page: Page): Promise<{ name: string; path: string }> {
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.export').click();
+  await (await fileEntry(page, 'file.export')).click();
   await expect(page.getByTestId('export-package-without-people')).toBeChecked();
   const download = page.waitForEvent('download');
   await page.getByTestId('export-package-confirm').click();
@@ -108,7 +109,7 @@ test('the File menu of the map imports a package too; a package chosen in the di
 
   // « Importer un paquet… » of the File menu: a new project, as from the home page.
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.import').click();
+  await (await fileEntry(page, 'file.import')).click();
   await page.getByTestId('import-package-file').setInputFiles(path);
   await page.getByTestId('import-package-check').click();
   await page.getByTestId('import-package-code').fill('pkgc');
@@ -130,7 +131,7 @@ test('a package takes the place of a project, which goes to the trash under a de
 
   await page.reload();
   await page.getByTestId('header-file').click();
-  await page.getByTestId('menu-file-file.replace').click();
+  await (await fileEntry(page, 'file.replace')).click();
   await page.getByTestId('import-package-file').setInputFiles(path);
   await page.getByTestId('import-package-check').click();
   await expect(page.getByText('Le projet actuel part à la corbeille sous le code PKGA.')).toBeVisible();

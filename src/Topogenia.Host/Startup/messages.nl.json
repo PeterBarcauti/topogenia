@@ -28,6 +28,8 @@
   "REOUVERTE": "Tweede keer gestart: de browser opent de applicatie.",
   "ICONE_OUVRIR": "{product} openen",
   "ICONE_QUITTER": "{product} afsluiten",
+  "ICONE_QUITTER_ATTENTE": "Een invoer in de fiche is nog niet opgeslagen. Toch afsluiten?",
+  "ICONE_QUITTER_NON_VALIDE": "Een geopend formulier is niet opgeslagen: wat erin is ingevoerd, gaat verloren. Toch afsluiten?",
   "SAUVEGARDES_DOSSIER": "De back-ups staan in {folder}.",
   "RESTAURATION_PROPOSEE": "Beschikbare back-ups, van de nieuwste naar de oudste. Wijzigingen die na de gekozen back-up zijn gedaan, staan er niet in; het huidige bestand en zijn journaalbestand worden ernaast bewaard, zonder te worden gewist:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

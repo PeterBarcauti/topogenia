@@ -81,8 +81,9 @@
   border-left: 4px solid var(--ink); background: linear-gradient(90deg, var(--surface) 70%, transparent);
   transition: opacity var(--duration-caption);
 }
-.presenter-lane span { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.presenter-lane span { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: var(--lines, 3); -webkit-box-orient: vertical; overflow: hidden; }
 .presenter-lane.is-active span { font-size: 17px; }
+.presenter-lane.is-masked span { display: none; }
 .presenter-lane.is-dim { opacity: .45; }
 
 /* the small map « you are here » at the bottom right, beside the caption, the room out of view veiled */

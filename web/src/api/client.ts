@@ -52,7 +52,7 @@ export type CallOptions<R extends Route, M extends Method> = PathPart<Parameters
   & QueryPart<ParametersOf<Operation<R, M>>>
   & VersionPart<ParametersOf<Operation<R, M>>>
   & BodyPart<Operation<R, M>>
-  & { readonly signal?: AbortSignal };
+  & { readonly signal?: AbortSignal; readonly keepalive?: boolean };
 
 type Success<O> = O extends { responses: infer R } ? R[Extract<keyof R, 200 | 201 | 202 | 204>] : never;
 

@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from 'react';
 import { INITIAL_VIEW } from '../model/geometry/constants.ts';
-import { boundView, type Extent, type View } from '../model/geometry/viewport.ts';
+import { boundView, fitView, type Extent, type View } from '../model/geometry/viewport.ts';
 
 export interface BoundedViewport {
   /** The view shown: the one kept, bounded to the map and the screen of now (B-2.2-09). */
@@ -12,6 +12,8 @@ export interface BoundedViewport {
   readonly change: (next: View) => void;
   /** Back to the start of the map at zoom 1: the first column right of the headers, the first lane at the top (B-2.1-43). */
   readonly backToStart: () => void;
+  /** The whole map in the window: the largest zoom that holds it, at most 1, from its start (Show all). */
+  readonly fit: () => void;
 }
 
 /** The view opens at the start of the map at each opening of the editor, whatever was shown before (B-7-09). */
@@ -32,6 +34,9 @@ export function useBoundedViewport(map: Extent, screen: Extent): BoundedViewport
     change: take,
     backToStart: () => {
       take(INITIAL_VIEW);
+    },
+    fit: () => {
+      take(fitView(map, screen));
     },
   };
 }

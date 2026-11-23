@@ -9,7 +9,7 @@ namespace Topogenia.Architecture.Tests;
 public sealed partial class FileFormatRulesTests
 {
     private static readonly string[] Folders =
-        ["src", "tests", "web/src", "web/e2e", "web/scripts", "build", "docs", "samples", ".github"];
+        ["src", "tests", "web/src", "web/e2e", "web/scripts", "build", "docs", "samples", "schemas", ".github"];
 
     private static readonly string[] HeaderExtensions =
     [
@@ -17,7 +17,7 @@ public sealed partial class FileFormatRulesTests
         ".editorconfig", ".gitignore", ".gitattributes",
     ];
 
-    private static readonly string[] TextExtensions = [.. HeaderExtensions, ".json", ".pmap", ".svg", ".txt", ".xml", ".config", ".sln"];
+    private static readonly string[] TextExtensions = [.. HeaderExtensions, ".json", ".pmap", ".pmaps", ".svg", ".txt", ".xml", ".config", ".sln"];
 
     private static IEnumerable<string> Files(string[] extensions) =>
         RepositoryFiles.Enumerate(Folders, extensions)

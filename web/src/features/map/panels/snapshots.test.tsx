@@ -4,6 +4,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { Schema } from '../../../api/client.ts';
 import { i18next } from '../../../shared/i18n/i18n.ts';
+import { formsUnsaved } from '../../../shared/state/pendingWrites.ts';
 import { callsTo, fakeApi } from '../../../test/fakeApi.ts';
 import { PROJECT_ID, sampleMap } from '../../../test/maps.ts';
 import { french as t } from '../../../test/translations.ts';
@@ -121,6 +122,27 @@ describe('the photos of the project (M8)', () => {
     fireEvent.click(screen.getByTestId('snapshot-take-form-send'));
     expect(await screen.findByTestId('snapshots-error')).toHaveTextContent('Le libellé est obligatoire.');
     expect(screen.getByTestId('snapshot-take-form')).toBeInTheDocument();
+  });
+});
+
+describe('the label of a photo not sent (R11)', () => {
+  it('a label typed and not sent counts as a form not validated, until it is sent or given up (R11, ADR 115)', async () => {
+    fakeApi({
+      [`GET ${url}`]: { json: viewOf() },
+      [`POST ${url}`]: { json: viewOf({ photos: [photo('p1', 'Avant l’atelier'), photo('p2', 'Après')] }) },
+    });
+    render(<SnapshotsSection map={sampleMap()} writing={writing} />);
+    fireEvent.click(await screen.findByTestId('snapshot-take'));
+    expect(formsUnsaved()).toBe(false);
+    fireEvent.change(screen.getByTestId('snapshot-take-form-label'), { target: { value: 'Après' } });
+    expect(formsUnsaved()).toBe(true);
+    fireEvent.click(screen.getByTestId('snapshot-take-form-cancel'));
+    expect(formsUnsaved()).toBe(false);
+    fireEvent.click(screen.getByTestId('snapshot-take'));
+    fireEvent.change(screen.getByTestId('snapshot-take-form-label'), { target: { value: 'Après' } });
+    fireEvent.click(screen.getByTestId('snapshot-take-form-send'));
+    expect(await screen.findByTestId('snapshot-p2')).toBeInTheDocument();
+    expect(formsUnsaved()).toBe(false);
   });
 });
 

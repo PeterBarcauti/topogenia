@@ -163,8 +163,8 @@ describe('the names of the operations (B-2.6-15)', () => {
     const kinds = [...source.matchAll(/public const string \w+ = "([a-z_]+)";/g)].map((match) => match[1]);
     // The 21 kinds of the 1.x, the reversal of a flow, new in 2.0 (AR-155), the proposal of the assistant, new in 3.0 (ADR 079),
     // the route chosen for a flow, new in 3.1 (ADR 091), the drawing given back to several flows at once (plan 3.1, L2 C), rows
-    // inserted into a lane and an empty row taken out (3.1, ADR 096).
-    expect(kinds).toHaveLength(27);
+    // inserted into a lane and an empty row taken out (3.1, ADR 096), a file inserted as a detailed step (3.3, ADR 108).
+    expect(kinds).toHaveLength(28);
     expect(Object.keys(fr.history.actions).sort()).toEqual([...kinds].sort());
     expect(Object.keys(en.history.actions).sort()).toEqual([...kinds].sort());
   });

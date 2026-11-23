@@ -28,6 +28,6 @@ migration 1.x doivent pouvoir conserver ou réécrire des identifiants sans dép
 
 ## Vérification
 
-- Tests unitaires des entités dans `tests/Topogenia.Domain.Tests/` (P2-T04).
+- Tests unitaires des entités dans `tests/Topogenia.Domain.Tests/` (non publié) (P2-T04).
 - Configurations EF relues par la porte de contrôle Données et portabilité : aucune
   génération de clé par la base (`ValueGeneratedNever`).

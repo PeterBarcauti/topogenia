@@ -1,11 +1,12 @@
 // ReadView.tsx
-// The sheet for who may not fill it: its latest validated version, in the sections of the form, folded when it opens (essai J10): the key facts, only the fields filled; the documents used; the procedure numbered; the documents produced; the tools as pills, always in sight; the free text (annex B 4).
+// The sheet for who may not fill it: its latest validated version, in the sections of the form, folded when it opens (essai J10): the key facts, only the fields filled; the documents used; the procedure numbered; the documents produced; the pain points of the step without a document (R10); the tools as pills, always in sight; the free text (annex B 4).
 
 import { useTranslation } from 'react-i18next';
 import type { Schema } from '../../../api/client.ts';
 import { formatDate } from '../../../shared/i18n/formatDate.ts';
 import { InputList } from '../documents/InputList.tsx';
 import { OutputList } from '../documents/OutputList.tsx';
+import { hasStepPainPoints, StepPainPoints } from '../documents/StepPainPoints.tsx';
 import { FoldAll, FoldSection } from '../FoldSection.tsx';
 import { inputGroups } from '../model/documents.ts';
 import { citedTools } from '../model/draft.ts';
@@ -71,11 +72,18 @@ function ReadDocuments({ section }: { section: 'inputs' | 'outputs' }) {
   );
 }
 
-/** « Version validée le… par… », or « Aucune fiche validée… » (B-4-60). */
+/**
+ * « Version validée le… par… », or « Aucune fiche validée… » (B-4-60). The sheet read only of a member who sees its draft
+ * (the view in BPMN 2.0, ADR 106) shows that draft, said as a draft, never as the version validated before it, nor as no
+ * sheet at all (audit of the copy 64, P1-03).
+ */
 export function ReadView() {
   const { t, i18n } = useTranslation();
   const { view, nameOf } = useSheet();
-  const validated = view.validated;
+  // A sheet never filled is no draft to show: it says it has no validated sheet yet.
+  const draft = view.is_draft && view.status !== 'empty';
+  const validated = draft ? null : view.validated;
+  const shown = draft || validated !== null;
   const content = view.content;
   const freeText = content.free_text ?? '';
   const tools = citedTools(content.tools ?? '');
@@ -86,13 +94,15 @@ export function ReadView() {
   // lists when the step uses or produces one; the tools and the free text do not fold here.
   const documents = usedInputs(view) > 0 || view.outputs.length > 0;
   const drawn: Partial<Record<SheetSection, boolean>> = {
-    facts: validated !== null && known, inputs: documents, procedure: validated !== null && content.procedure.length > 0, outputs: documents,
+    facts: shown && known, inputs: documents, procedure: shown && content.procedure.length > 0, outputs: documents, pain_points: hasStepPainPoints(view),
   };
   const sections = SHEET_SECTIONS.filter((section) => drawn[section] === true);
   return (
     <div className="side-panel-body sheet-body sheet-read" data-testid="sheet-read">
       <Responsible />
-      {validated === null ? <p className="sheet-empty" data-testid="sheet-read-empty">{t('sheet.read_empty')}</p> : (
+      {draft && <p className="field-hint" data-testid="sheet-read-draft">{t('sheet.read_draft')}</p>}
+      {!shown && <p className="sheet-empty" data-testid="sheet-read-empty">{t('sheet.read_empty')}</p>}
+      {validated !== null && (
         <p className="field-hint" data-testid="sheet-read-validated">
           {t('sheet.read_validated', { date: formatDate(validated.validated_at, i18n.language), name: nameOf(validated.validated_by) })}
         </p>
@@ -110,13 +120,14 @@ export function ReadView() {
         </FoldSection>
       )}
       {documents && <ReadDocuments section="outputs" />}
-      {validated !== null && tools.length > 0 && (
+      <StepPainPoints />
+      {shown && tools.length > 0 && (
         <div className="sheet-read-tools" data-testid="sheet-read-tools">
           <strong>{t('sheet.tools')}</strong>
           <ToolPills tools={tools} />
         </div>
       )}
-      {validated !== null && freeText !== '' && (
+      {shown && freeText !== '' && (
         <div className="sheet-read-free" data-testid="sheet-read-free">
           <strong>{t('sheet.mode_free')}</strong>
           <p>{freeText}</p>

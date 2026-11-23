@@ -79,6 +79,10 @@ export interface CanvasHandle {
   readonly reveal: (stepIds: readonly string[]) => void;
   /** Given by the canvas when it shows, taken back when it leaves. */
   readonly showReveal: (reveal: ((stepIds: readonly string[]) => void) | null) => void;
+  /** Shows the whole of the canvas shown in the window (Show all); nothing while no canvas is shown. */
+  readonly fit: () => void;
+  /** Given by the canvas when it shows, taken back when it leaves. */
+  readonly showFit: (fit: (() => void) | null) => void;
   /** The sides each flow drawn leaves and reaches by, for the menu of a flow (audit 3.1.0 3.3, audit 3.1 V2 3.3); empty while no canvas is shown. */
   readonly drawn: () => DrawnSides;
   /** Given by the canvas at each drawing, taken back when it leaves. */
@@ -88,6 +92,7 @@ export interface CanvasHandle {
 function createCanvasHandle(): CanvasHandle {
   let shown: CaptureTarget | null = null;
   let revealer: ((stepIds: readonly string[]) => void) | null = null;
+  let fitter: (() => void) | null = null;
   let departures: DrawnSides = new Map();
   return {
     target: () => shown,
@@ -99,6 +104,12 @@ function createCanvasHandle(): CanvasHandle {
     },
     showReveal: (reveal) => {
       revealer = reveal;
+    },
+    fit: () => {
+      fitter?.();
+    },
+    showFit: (fit) => {
+      fitter = fit;
     },
     drawn: () => departures,
     showDrawn: (drawn) => {

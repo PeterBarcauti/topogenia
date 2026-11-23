@@ -85,15 +85,20 @@ describe('the moves of a presentation by its exits, its jumps and its speeds', (
     expect([state.from, state.player, state.run, state.screen]).toEqual(['s5', { ...player, scene: 1, elapsed: 0 }, run, 'map']);
   });
 
-  it('goes faster and slower through the speeds offered, never past the ends', () => {
+  it('goes faster and slower through the speeds offered, in fine steps around the normal one, never past the ends', () => {
     const store = createPresenterStore();
     store.getState().start(null);
-    store.getState().faster();
-    store.getState().faster();
-    store.getState().faster();
-    expect(store.getState().player.speed).toBe(2);
-    for (let index = 0; index < 6; index++) store.getState().slower();
-    expect(store.getState().player.speed).toBe(0.5);
+    const seen = [store.getState().player.speed];
+    for (let index = 0; index < 3; index++) {
+      store.getState().faster();
+      seen.push(store.getState().player.speed);
+    }
+    for (let index = 0; index < 6; index++) {
+      store.getState().slower();
+      seen.push(store.getState().player.speed);
+    }
+    // A voice of the system is hard to follow at 0.5 and past 1.25 (essai of the project owner, 19/11/2026).
+    expect(seen).toEqual([1, 1.1, 1.25, 1.25, 1.1, 1, 0.9, 0.75, 0.75, 0.75]);
   });
 });
 

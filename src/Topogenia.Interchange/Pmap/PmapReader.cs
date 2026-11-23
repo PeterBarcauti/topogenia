@@ -1,5 +1,5 @@
 // PmapReader.cs
-// Reading of a .pmap 1.1 file written by the application, a person or an AI: cleaning, every rule of annex A 2.17, faults by code.
+// Reading of a .pmap file (1.1 to 1.5) written by the application, a person or an AI: cleaning, every rule of annex A 2.17, faults by code.
 
 using System.Text.Json;
 using Topogenia.Domain.Errors;
@@ -8,12 +8,19 @@ using Topogenia.Interchange.Json;
 
 namespace Topogenia.Interchange.Pmap;
 
-/// <summary>What the reading needs of the installation: the configured languages and the RACI letters besides R.</summary>
 /// <summary>
 /// The settings of a read: the languages and the RACI letters configured; <see cref="Proposal"/> for the proposal of the
 /// assistant, whose routes are not read (ADR 091: the drawing of a proposal is the drawing of the application).
 /// </summary>
-public sealed record PmapReadSettings(LanguageSettings Languages, string RaciLetters, bool Proposal = false);
+public sealed record PmapReadSettings(LanguageSettings Languages, string RaciLetters, bool Proposal = false)
+{
+    /// <summary>
+    /// For a file inserted as a detailed step (3.3, F-208): a translation, or a line of a comment, in a language that is not
+    /// configured is left out and its language listed (<see cref="PmapDocument.DroppedLanguages"/>), instead of a fault; the
+    /// language of the file itself must still be configured.
+    /// </summary>
+    public bool DropUnknownLanguages { get; init; }
+}
 
 /// <summary>A read file: its document when it has no fault, and its faults (30 at most), in the order found.</summary>
 public sealed record PmapRead(PmapDocument? Document, IReadOnlyList<FileError> Errors);
@@ -59,6 +66,7 @@ internal sealed partial class PmapReading(PmapReadSettings settings)
     private static readonly string[] DocumentProperties = ["$schema", "format", "version", "generated_by", "generated_at", "project", "map", "uncertainties"];
     private static readonly string[] ProjectProperties = ["code", "name", "language", "description", "translations"];
     private static readonly string[] ProjectProperties12 = [.. ProjectProperties, "workday_hours", "fte_hours_per_month"];
+    private static readonly string[] ProjectProperties15 = [.. ProjectProperties12, GlossaryField];
 
     /// <summary>The file is of the version 1.2: the properties of the value stream are known (ADR 085).</summary>
     private bool valueStream;
@@ -71,60 +79,115 @@ internal sealed partial class PmapReading(PmapReadSettings settings)
 
     private readonly List<FileError> errors = [];
 
+    /// <summary>The languages of the translations left out by a read that drops them (<see cref="PmapReadSettings.DropUnknownLanguages"/>).</summary>
+    private readonly SortedSet<string> dropped = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// A translation in a language that is not configured: left out and its language kept by a read that drops them, a fault
+    /// at its place otherwise. True when the translation is to be read.
+    /// </summary>
+    private bool Configured(string language, string place)
+    {
+        if (settings.Languages.IsSupported(language))
+            return true;
+        if (settings.DropUnknownLanguages)
+            dropped.Add(language);
+        else
+            Fault(place, FileErrorCodes.UnknownLanguage, ("language", language), ("possible", string.Join(", ", settings.Languages.Languages)));
+        return false;
+    }
+
     /// <summary>The kind of each identifier of the file (lane, step or document): one namespace for the whole file.</summary>
     private readonly Dictionary<string, string> ids = new(StringComparer.Ordinal);
 
     private int stepCount;
 
-    public PmapRead Read(string text)
+    /// <summary>The options of the parser, for the reading again that finds a key written twice.</summary>
+    private static readonly JsonReaderOptions ReaderOptions = new()
+    {
+        AllowTrailingCommas = true,
+        CommentHandling = JsonCommentHandling.Skip,
+        MaxDepth = PmapFormat.JsonDepthMax,
+    };
+
+    /// <summary>
+    /// The JSON of a file, cleaned then parsed (trailing commas, comments, 256 levels, no key written twice in one object),
+    /// its root an object whose every text reads; null with its fault otherwise. The same for a `.pmap` and for the
+    /// envelope of a collection (ADR 114).
+    /// </summary>
+    private JsonDocument? Parse(string text)
     {
         var clean = PmapReader.Clean(text);
         if (clean.Length == 0)
-            return Refused("", FileErrorCodes.Empty);
+        {
+            Fault("", FileErrorCodes.Empty);
+            return null;
+        }
         JsonDocument json;
         try
         {
+            // A key written twice in one object is refused, as the package does (PackageReader): the parser would keep the
+            // last one, where a reader of the text sees the first, and a collection could show one text and open another.
             json = JsonDocument.Parse(clean, new JsonDocumentOptions
             {
                 AllowTrailingCommas = true,
+                AllowDuplicateProperties = false,
                 CommentHandling = JsonCommentHandling.Skip,
                 MaxDepth = PmapFormat.JsonDepthMax,
             });
         }
         catch (JsonException exception)
         {
-            return Refused("", FileErrorCodes.NotJson, ("line", (exception.LineNumber ?? 0) + 1), ("column", (exception.BytePositionInLine ?? 0) + 1));
+            // The check of the keys written twice follows the parsing and its fault has no line: the place is found again.
+            var twice = exception.LineNumber is null ? JsonDuplicateKeys.Place(clean, ReaderOptions) : null;
+            var (line, column) = twice ?? ((exception.LineNumber ?? 0) + 1, (exception.BytePositionInLine ?? 0) + 1);
+            Fault("", FileErrorCodes.NotJson, ("line", line), ("column", column));
+            return null;
         }
-        using (json)
+        catch (InvalidOperationException)
         {
-            var root = json.RootElement;
-            if (!JsonText.Reads(root))
-                return Refused("", FileErrorCodes.NotJson);
-            if (root.ValueKind != JsonValueKind.Object)
-                return Refused("", FileErrorCodes.NotObject);
-            Properties(root, "", DocumentProperties);
-            var format = Text(root, "format", "", required: true);
-            if (format is not null && format != PmapFormat.Name)
-                return Refused("format", FileErrorCodes.WrongFormat, ("expected", PmapFormat.Name));
-            var version = Text(root, "version", "", required: true);
-            if (version is not null && !PmapFormat.Versions.Contains(version, StringComparer.Ordinal))
-                return Refused("version", FileErrorCodes.WrongVersion, ("version", version), ("supported", string.Join(", ", PmapFormat.Versions)));
-            valueStream = version is PmapFormat.VersionWithoutRoutes or PmapFormat.VersionWithoutSummaries or PmapFormat.Version;
-            routes = version is PmapFormat.VersionWithoutSummaries or PmapFormat.Version;
-            summaries = version == PmapFormat.Version;
-            Text(root, "generated_by", "", required: false);
-            Text(root, "generated_at", "", required: false);
-            var project = Project(root);
-            PmapMap? map = null;
-            if (Object(root, "map", "", required: true) is { } element)
-                map = Map(element, "map", 1);
-            var uncertainties = Uncertainties(root);
-            if (stepCount > PmapFormat.StepsMax)
-                Fault("map", FileErrorCodes.TooManySteps, ("count", stepCount), ("max", PmapFormat.StepsMax));
-            if (errors.Count > 0 || project is null || map is null)
-                return new PmapRead(null, errors);
-            return new PmapRead(new PmapDocument(project, map, uncertainties), errors);
+            // Half of a surrogate pair in a name, met by the check of the keys written twice: a text that does not read.
+            Fault("", FileErrorCodes.NotJson);
+            return null;
         }
+        var root = json.RootElement;
+        var refusal = !JsonText.Reads(root) ? FileErrorCodes.NotJson : root.ValueKind != JsonValueKind.Object ? FileErrorCodes.NotObject : null;
+        if (refusal is null)
+            return json;
+        json.Dispose();
+        Fault("", refusal);
+        return null;
+    }
+
+    public PmapRead Read(string text)
+    {
+        using var json = Parse(text);
+        if (json is null)
+            return new PmapRead(null, errors);
+        var root = json.RootElement;
+        Properties(root, "", DocumentProperties);
+        var format = Text(root, "format", "", required: true);
+        if (format is not null && format != PmapFormat.Name)
+            return Refused("format", FileErrorCodes.WrongFormat, ("expected", PmapFormat.Name));
+        var version = Text(root, "version", "", required: true);
+        if (version is not null && !PmapFormat.Versions.Contains(version, StringComparer.Ordinal))
+            return Refused("version", FileErrorCodes.WrongVersion, ("version", version), ("supported", string.Join(", ", PmapFormat.Versions)));
+        valueStream = version is PmapFormat.VersionWithoutRoutes or PmapFormat.VersionWithoutSummaries or PmapFormat.VersionWithoutExtras or PmapFormat.Version;
+        routes = version is PmapFormat.VersionWithoutSummaries or PmapFormat.VersionWithoutExtras or PmapFormat.Version;
+        summaries = version is PmapFormat.VersionWithoutExtras or PmapFormat.Version;
+        extras = version == PmapFormat.Version;
+        Text(root, "generated_by", "", required: false);
+        Text(root, "generated_at", "", required: false);
+        var project = Project(root);
+        PmapMap? map = null;
+        if (Object(root, "map", "", required: true) is { } element)
+            map = Map(element, "map", 1);
+        var uncertainties = Uncertainties(root);
+        if (stepCount > PmapFormat.StepsMax)
+            Fault("map", FileErrorCodes.TooManySteps, ("count", stepCount), ("max", PmapFormat.StepsMax));
+        if (errors.Count > 0 || project is null || map is null)
+            return new PmapRead(null, errors);
+        return new PmapRead(new PmapDocument(project, map, uncertainties) { DroppedLanguages = [.. dropped] }, errors);
     }
 
     private PmapRead Refused(string path, string code, params (string Key, object? Value)[] values)
@@ -147,7 +210,7 @@ internal sealed partial class PmapReading(PmapReadSettings settings)
     {
         if (Object(root, "project", "", required: true) is not { } project)
             return null;
-        Properties(project, "project", valueStream ? ProjectProperties12 : ProjectProperties);
+        Properties(project, "project", extras ? ProjectProperties15 : valueStream ? ProjectProperties12 : ProjectProperties);
         // A code absent or malformed does not prevent the opening: the application asks for it (A-2.17-33).
         var code = Text(project, "code", "project", required: false);
         if (code is not null && !ProjectCode.TryParse(code, out _))
@@ -163,7 +226,11 @@ internal sealed partial class PmapReading(PmapReadSettings settings)
         var translations = Translations(project, "project", PmapFormat.ProjectNameMax);
         var workday = WorkNumber(project, WorkTime.WorkdayField, WorkTime.ParseWorkday);
         var fte = WorkNumber(project, WorkTime.FteField, WorkTime.ParseFte);
-        return name is null ? null : new PmapProject(code, name, language, description, translations) { WorkdayHours = workday, FteHoursPerMonth = fte };
+        var glossary = Glossary(project);
+        return name is null ? null : new PmapProject(code, name, language, description, translations)
+        {
+            WorkdayHours = workday, FteHoursPerMonth = fte, Glossary = glossary,
+        };
     }
 
     /// <summary>

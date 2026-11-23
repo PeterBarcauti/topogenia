@@ -25,10 +25,10 @@ namespace Topogenia.Host.Tests.Api;
 /// second fresh project, since a granted call may change or remove its target. Granted means the success of the route
 /// (2xx): a valid body, and the `If-Match` of the record read when the handler of the route reads it (found on the
 /// endpoints, <see cref="IfMatchRequirement.ReadsIfMatch"/>), so that no refusal of the server mode, no validation and no
-/// error passes for a granted right. The health, the command Quit, the sample project and the folder of a document, whose
-/// answer depends on the mode and not only on the role, are out of the table: `CommonRulesTests`, `ServerRunTests`,
-/// `DesktopServerTests`, `SampleProjectRoutesTests` and `DocumentFolderRoutesTests` (every role in desktop mode, not
-/// found in server mode) prove them.
+/// error passes for a granted right. The health, the command Quit, the writes declared by a page, the sample project and
+/// the folder of a document, whose answer depends on the mode and not only on the role, are out of the table:
+/// `CommonRulesTests`, `ServerRunTests`, `DesktopServerTests`, `DesktopWritesRoutesTests`, `SampleProjectRoutesTests` and
+/// `DocumentFolderRoutesTests` (every role in desktop mode, not found in server mode) prove them.
 /// </summary>
 public sealed partial class RightsMatrixTests(ApiHosts hosts) : IClassFixture<ApiHosts>
 {
@@ -67,7 +67,7 @@ public sealed partial class RightsMatrixTests(ApiHosts hosts) : IClassFixture<Ap
 
     /// <summary>The routes of the table and those left out on purpose are exactly the routes of the host.</summary>
     public static IReadOnlyList<string> Routes =>
-        [.. Table.Select(entry => entry.Name), "GET /api/health", "POST /api/desktop/quit", "POST /api/desktop/sample-project",
+        [.. Table.Select(entry => entry.Name), "GET /api/health", "POST /api/desktop/quit", "POST /api/desktop/writes", "POST /api/desktop/sample-project",
             "POST /api/steps/{id}/documents/{documentId}/folder"];
 
     [Fact]
@@ -239,6 +239,11 @@ public sealed partial class RightsMatrixTests(ApiHosts hosts) : IClassFixture<Ap
         var targets = new Targets(project, row, flow, otherLane, subMapLane, codes, frame, trashed, snapshot, targetState);
         if (entry.NeedsUse)
             (await facilitator.PutAsync(targets.UseUrl, new { wait_hours = 2 }, NoRecord)).Ok();
+        if (entry.NeedsPainPoint)
+        {
+            var sheet = (await facilitator.PutAsync(targets.UseUrl, new { wait_hours = 2, pain_point = "Saisie en double" }, NoRecord)).Ok();
+            targets = targets with { PainPoint = sheet.GetProperty("pain_points").EnumerateArray().Single().GetProperty("id").GetGuid() };
+        }
         await PrepareSheetAsync(targets, entry.Sheet);
         return targets;
     }

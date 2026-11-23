@@ -175,7 +175,7 @@ public sealed class PmapRouteTests
         var files = new PmapFiles();
         var open = files.Write(files.OutlineTree(workspace, workspace.All<ProcessMap>().Single(map => map.IsRoot).Id).Document, "Test", At);
         Assert.DoesNotContain("\"route\"", open, StringComparison.Ordinal);
-        Assert.Contains("\"route\"", files.Write(files.Outline(workspace, null).Document, "Test", At), StringComparison.Ordinal);
+        Assert.Contains("\"route\"", files.Write(files.Outline(workspace, null, null).Document, "Test", At), StringComparison.Ordinal);
     }
 
     [Fact]

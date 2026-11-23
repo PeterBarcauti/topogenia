@@ -67,6 +67,12 @@ public static class AuditKinds
     /// tokens and time; never the request, the map sent nor the reply.
     /// </summary>
     public const string AssistantExchanged = "assistant.exchanged";
+
+    /// <summary>
+    /// A `.pmap` file copied as the detail of a step (3.3, F-208), as the opening of a file is traced: the details give the
+    /// mode (`insert` or `replace`), the step, its new detailed map and what the file held, identifiers and counts only.
+    /// </summary>
+    public const string FileInserted = "map.file_inserted";
 }
 
 /// <summary>
@@ -127,10 +133,13 @@ public static class AuditTrail
         new(Guid.CreateVersion7(), now, userId, AuditKinds.ProjectExported, projectId,
             JsonSerializer.Serialize(new { format = "pmap", with_sheets = withSheets }));
 
-    /// <summary>The event of the .pmap copy of one map and of the maps below it, carried by an image (plan 3.1, L7): its details name the map.</summary>
-    public static AuditEvent OfMapPmapCopy(DateTime now, Guid userId, Guid projectId, Guid mapId) =>
+    /// <summary>
+    /// The event of the copy of one map and of the maps below it, as a .pmap carried by an image (plan 3.1, L7) or as the
+    /// source of a .bpmn (ADR 106): its details name the format and the map.
+    /// </summary>
+    public static AuditEvent OfMapPmapCopy(DateTime now, Guid userId, Guid projectId, Guid mapId, string format) =>
         new(Guid.CreateVersion7(), now, userId, AuditKinds.ProjectExported, projectId,
-            JsonSerializer.Serialize(new { format = "pmap", scope = "map", map = mapId, with_sheets = true }));
+            JsonSerializer.Serialize(new { format, scope = "map", map = mapId, with_sheets = true }));
 
     /// <summary>
     /// The event of an exchange of the assistant, written alone like the event of an export (it changes nothing); the project

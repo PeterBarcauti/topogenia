@@ -29,7 +29,7 @@ public sealed class AssistantInstructions : IAssistantInstructions
     public const string PackageVersion = "2.4";
 
     /// <summary>The version of the `.pmap` the map open and the schema of a map are written in (PmapFormat.Version).</summary>
-    public const string PmapVersion = "1.4";
+    public const string PmapVersion = "1.5";
 
     /// <summary>
     /// The files of the documentation of the formats, in the order they are given (spec 3.0 section 5); each schema is the
@@ -54,6 +54,7 @@ public sealed class AssistantInstructions : IAssistantInstructions
         AssistantIntent.Translate => Resource("Instructions.practice-translate.md"),
         AssistantIntent.Report => Resource("Instructions.practice-report.md"),
         AssistantIntent.Summaries => Resource("Instructions.practice-summaries.md"),
+        AssistantIntent.Comments => Resource("Instructions.practice-comments.md"),
         _ => null,
     };
 
@@ -107,13 +108,15 @@ public sealed class AssistantInstructions : IAssistantInstructions
             text.Append(practice).Append('\n');
         else
             text.Append("No tile was chosen: choose the form of your reply among the allowed forms.\n");
-        if (!prompt.Forms.Contains(AssistantForm.Proposal) && prompt.Intent is not (AssistantIntent.Report or AssistantIntent.Summaries))
+        if (!prompt.Forms.Contains(AssistantForm.Proposal) && prompt.Intent is not (AssistantIntent.Report or AssistantIntent.Summaries or AssistantIntent.Comments))
             text.Append("A proposal is not allowed in this exchange (the person may read the map, not change it): answer, ask or analyse.\n");
         text.Append("</exchange>\n\n");
         if (prompt.Intent == AssistantIntent.Report)
             text.Append(PainPointsOf(prompt.PainPoints)).Append("\n\n");
         if (prompt.Intent == AssistantIntent.Summaries)
             text.Append(MapsOf(prompt.SummaryMaps)).Append("\n\n");
+        if (prompt.Intent == AssistantIntent.Comments)
+            text.Append(DraftsOf(prompt.CommentDrafts)).Append("\n\n");
         if (prompt.Intent == AssistantIntent.Translate && prompt.Comments.Count + prompt.FlowComments.Count > 0)
             text.Append(CommentsOf(prompt.Comments, prompt.FlowComments)).Append("\n\n");
         if (prompt.Indicators is { } indicators)
@@ -153,6 +156,24 @@ public sealed class AssistantInstructions : IAssistantInstructions
         var list = JsonSerializer.Serialize(comments.Select(comment => new { step = comment.Reference, text = comment.Original })
             .Concat((flows ?? []).Select(comment => new { step = comment.Reference, text = comment.Original })), CommentsJson);
         return "<comments>\n" + list + "\n</comments>";
+    }
+
+    /// <summary>
+    /// The steps and the flows of the map open and of its detailed maps whose comment of presentation is asked (F-130), as a
+    /// JSON list, map by map: the reference the reply gives back (`step`: the code of the step, `SOURCE &gt; TARGET` for a
+    /// flow), whether it is a flow, the words that place it, the name of its map, the language its comment is written in,
+    /// and its comment today with who wrote it (`manual`: typed by a person) when it has one. Escaped as the comments of a
+    /// translation, so that no text closes the list.
+    /// </summary>
+    public static string DraftsOf(IReadOnlyList<AssistantDraftTarget> targets)
+    {
+        ArgumentNullException.ThrowIfNull(targets);
+        var list = JsonSerializer.Serialize(targets.Select(target => new
+        {
+            step = target.Reference, kind = target.Flow ? "flow" : "step", context = target.Context, map = target.Map, language = target.Language,
+            today = target.Current, written_by = target.CurrentSource,
+        }), CommentsJson);
+        return "<comments_to_write>\n" + list + "\n</comments_to_write>";
     }
 
     /// <summary>The JSON of the comments: every letter as it is, the characters of markup and the quotes as their escapes.</summary>

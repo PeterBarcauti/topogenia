@@ -42,6 +42,13 @@ export interface CommandItem {
   readonly swatch?: string;
   /** A thin line before the item: it opens another group of its menu (B-2.4-08). */
   readonly separatorBefore?: boolean;
+  /** The i18n key of the tooltip of the entry (where the online help opens, in which language). */
+  readonly title?: string;
+  /**
+   * Two lines shown instead of the label, already translated: a name, and its help under it (a status of a pain point,
+   * ADR 116); the whole label, which holds both, stays the name of the entry.
+   */
+  readonly lines?: readonly [name: string, help: string];
 }
 
 /** The command a chord runs, among a list (the first that declares it). */

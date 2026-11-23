@@ -112,9 +112,13 @@
 .pictos-on-hover .react-flow__node:hover .step-pictos { opacity: 1; }
 .step-gauge { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; overflow: hidden; border-radius: 0 0 calc(var(--radius-step) - 1px) calc(var(--radius-step) - 3px); }
 .step-gauge span { display: block; height: 100%; transition: width var(--duration-base); }
-.gauge--draft { background: var(--warning-graphic); }
-.gauge--validated { background: var(--success); }
-.gauge--needs_review { background: var(--danger); }
+.gauge--draft { background: var(--warning-graphic); stroke: var(--warning-graphic); }
+.gauge--validated { background: var(--success); stroke: var(--success); }
+.gauge--needs_review { background: var(--danger); stroke: var(--danger); }
+/* on a gateway, the gauge runs along the lower contour of the diamond, over its ink and under its pictograms (R14) */
+.step-gauge--contour { top: 0; height: auto; overflow: visible; border-radius: 0; pointer-events: none; }
+.step-gauge--contour svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.step-gauge--contour polyline { fill: none; stroke-width: 3; stroke-linecap: butt; stroke-linejoin: round; pointer-events: visibleStroke; transition: stroke-dasharray var(--duration-base); }
 .step-warning { position: absolute; left: -10px; top: -9px; width: 17px; height: 17px; border-radius: var(--radius-pill); background: var(--warning-graphic); color: var(--text);
   font-size: 11px; font-weight: 700; line-height: 17px; text-align: center; outline: 2px solid var(--surface); }
 /* a gateway writes its code above its box, where the corner of a card is: the warning goes on the middle of the upper left
@@ -198,7 +202,7 @@
 .step.is-under-left .raci-badges { right: calc(50% + var(--under-shift)); justify-content: flex-end; }
 /* annex B 2.10: the pictograms of a gateway are centred at the bottom */
 /* on a white ground: the narrow bottom of the diamond would leave the muted red of a pain point on the grey of an even lane */
-.step--gateway .step-pictos { right: auto; left: 50%; bottom: 8px; transform: translateX(-50%); padding: 1px 4px; background: var(--surface); border-radius: var(--radius-small); }
+.step--gateway .step-pictos { z-index: 1; right: auto; left: 50%; bottom: 8px; transform: translateX(-50%); padding: 1px 4px; background: var(--surface); border-radius: var(--radius-small); }
 .step--parallel .step-label, .step--inclusive .step-label { color: var(--text-muted); }
 
 /* handles (annex B 3.3): dots of 10 px bordered with white, shown on hover or when the step is chosen */
@@ -357,7 +361,8 @@
 .raci-matrix-legend { margin: 0; font-size: var(--font-size-small); color: var(--text-muted); }
 
 /* the image of an export (annex B 2.14): nothing moves, the selection is neutral, the frame is hidden (B-2.9-20), the margin of the lanes
-   is drawn (B-2.12-25), the line of the classification stands under the map of a PNG (S-4.1-08) */
+   is drawn (B-2.12-25), the line of the classification stands under the map of a PNG (S-4.1-08); the image of a selection leaves out
+   the rest of the map and the names of the lanes (ADR 109) */
 .map-canvas.is-exporting *, .map-canvas.is-exporting *::before, .map-canvas.is-exporting *::after { animation-name: none; transition-property: none; }
 .map-canvas.is-exporting .step.is-selected { outline: 0; box-shadow: var(--shadow-step); }
 .map-canvas.is-exporting .step--gateway.is-selected { box-shadow: none; }
@@ -365,6 +370,7 @@
 .map-canvas.is-exporting .react-flow__edge.selected .react-flow__edge-path { stroke: var(--edge); }
 .map-canvas.is-exporting .react-flow__nodesselection, .map-canvas.is-exporting .react-flow__selection, .map-canvas.is-exporting .react-flow__node-frame { display: none; }
 .map-canvas.is-exporting .lane-body-margin { visibility: visible; }
+.map-canvas.is-exporting .is-left-out, .map-canvas.is-exporting .is-name-left-out .lane-body-margin { visibility: hidden; }
 .export-caption { position: absolute; left: 0; top: 0; margin: 0; line-height: 24px; font-size: var(--font-size-small); font-weight: 600; color: var(--text); white-space: nowrap; }
 
 /* the value stream layer (spec 14.5, ADR 085): a cartouche of four cases under each step with content, under the flows; the computed values in the accent, a value of a draft underlined dotted; the entry and the exit of the events; the share of the exits; the block under the lanes */
@@ -499,3 +505,53 @@
 /* the paper of the poster for a wall (Makigami M9): its title as the label of a field, its two choices side by side, 24 px apart (WCAG 2.5.8) */
 .wall-paper { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 0; padding: 0; border: 0; }
 .wall-paper legend { width: 100%; margin-bottom: 6px; padding: 0; }
+.project-pdf-boxes { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.project-pdf-boxes .field-hint { margin: 2px 0 0 24px; }
+/* The panel « Rechercher » (ADR 110 point 5): the field with its count and its arrows on one line; the results of each map
+   under its name, each a button of the width of the panel, the word marked, the current one outlined in the accent. */
+.search-bar { display: flex; align-items: center; gap: 4px; }
+.search-field { flex: 1; min-width: 0; }
+.search-count { flex: none; min-width: 56px; text-align: right; font-size: var(--font-size-small); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.search-message { margin: 0; font-size: var(--font-size-small); color: var(--text-muted); }
+.search-message.is-error { color: var(--danger); }
+.search-group h3 { margin: 0 0 4px; font-size: var(--font-size-small); font-weight: 600; }
+.search-level { font-weight: 400; color: var(--text-muted); }
+.search-hits { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.search-hit { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 6px; border: 0; border-radius: var(--radius-ui); background: none; color: var(--text);
+  font: inherit; text-align: left; cursor: pointer; }
+.search-hit:hover { background: var(--hover); }
+.search-hit[aria-current='true'] { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.search-hit-head { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: var(--font-size-small); }
+.search-hit-kind { flex: none; display: inline-flex; color: var(--text-muted); }
+.search-hit-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.search-hit mark { padding: 0 1px; border-radius: 2px; background: var(--warning-soft); color: inherit; font-weight: 600; }
+.search-hit-language { flex: none; padding: 0 4px; border-radius: var(--radius-small); background: var(--hover); color: var(--text-muted); font-size: var(--font-size-code); }
+.search-hit-step { padding-left: 20px; font-size: var(--font-size-micro); color: var(--text-muted); }
+.search-hit-step code { font-family: var(--font-mono); font-size: var(--font-size-code); }
+/* The panel « Plan d'actions » (ADR 112 point 5): the total and the counts at its head, the sort and the three filters on
+   one line, then one line a pain point on three rows, a button of the width of the panel; the late mark in red. */
+.plan-panel .side-panel-body { gap: 12px; font-variant-numeric: tabular-nums; }
+.plan-head { display: flex; flex-direction: column; gap: 2px; }
+.plan-total { margin: 0; font-weight: 600; }
+.plan-count { margin: 0; font-size: var(--font-size-small); color: var(--text-muted); }
+.plan-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.plan-sort { display: flex; align-items: center; gap: 6px; font-size: var(--font-size-small); color: var(--text-muted); }
+.plan-filters { display: flex; flex-wrap: wrap; gap: 4px; }
+.plan-filter { padding: 2px 10px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); font: inherit;
+  font-size: var(--font-size-small); cursor: pointer; }
+.plan-filter:hover { border-color: var(--accent); background: var(--hover); }
+.plan-filter[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
+.plan-message { margin: 0; font-size: var(--font-size-small); color: var(--text-muted); }
+.plan-message.is-error { color: var(--danger); }
+.plan-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.plan-go { display: block; width: 100%; padding: 6px; border: 0; border-radius: var(--radius-ui); background: none; color: var(--text); font: inherit; text-align: left;
+  cursor: pointer; }
+.plan-go:hover { background: var(--hover); }
+.plan-line-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.plan-line-head { font-size: var(--font-size-small); overflow-wrap: anywhere; }
+.plan-line-place, .plan-line-plan { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: var(--font-size-micro); color: var(--text-muted); overflow-wrap: anywhere; }
+.plan-line-text code { font-family: var(--font-mono); font-size: var(--font-size-code); }
+.plan-late { margin-left: 6px; color: var(--danger); font-weight: 600; }
+.plan-edit { display: inline-flex; gap: 4px; align-items: center; margin: 0 6px 4px; min-height: 24px; }
+/* the status button of a line shows the status alone (review m8); the region of the message stays out of the flow while empty */
+.plan-status { margin: 0 6px 4px; } .plan-change { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; } .plan-change-live:empty { position: absolute; }

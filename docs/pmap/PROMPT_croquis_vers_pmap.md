@@ -1,5 +1,5 @@
 <!-- PROMPT_croquis_vers_pmap.md -->
-<!-- Consigne à donner à une IA avec la photo d'un croquis de processus pour obtenir un fichier .pmap 1.4 -->
+<!-- Consigne à donner à une IA avec la photo d'un croquis de processus pour obtenir un fichier .pmap 1.5 -->
 
 # Consigne : d'un croquis de processus à un fichier `.pmap`
 
@@ -12,7 +12,7 @@ dans un fichier `.pmap`).
 ## Ta mission
 
 Tu reçois la photo d'un croquis de processus, souvent dessiné à la main : des bandes horizontales (les couloirs, un par
-acteur), des boîtes (les étapes), des flèches et parfois des notes. Produis le fichier `.pmap` version 1.4 qui reproduit
+acteur), des boîtes (les étapes), des flèches et parfois des notes. Produis le fichier `.pmap` version 1.5 qui reproduit
 ce croquis, conforme au guide `PMAP_GUIDE_IA.md`.
 
 ## Comment lire le croquis
@@ -61,7 +61,7 @@ ce croquis, conforme au guide `PMAP_GUIDE_IA.md`.
 
 ## Contrôles avant de répondre
 
-Les cases de la section 8 du guide, en particulier : `format` = `"topogenia"`, `version` = `"1.4"` ; chaque `lane`,
+Les cases de la section 8 du guide, en particulier : `format` = `"topogenia"`, `version` = `"1.5"` ; chaque `lane`,
 `source`, `target` et clé de `raci` dans la même carte ; colonnes pour toutes les étapes ou pour aucune ; pas de
 `sub_map`, de `raci` ni de `sheet` sur `start`, `end`, `parallel`, `inclusive`.
 
@@ -78,7 +78,7 @@ Croquis : deux bandes « Demandeur » et « Acheteur ». Dans « Demandeur », u
 ```json
 {
   "format": "topogenia",
-  "version": "1.4",
+  "version": "1.5",
   "generated_by": "Une IA, depuis un croquis",
   "project": { "name": "Demande d'achat", "language": "fr" },
   "map": {
@@ -106,21 +106,21 @@ Croquis : deux bandes « Demandeur » et « Acheteur ». Dans « Demandeur », u
 
 ## Schéma du fichier
 
-Le fichier produit respecte ce schéma JSON, copie exacte de `schemas/pmap-1.4.schema.json`.
+Le fichier produit respecte ce schéma JSON, copie exacte de `schemas/pmap-1.5.schema.json`.
 
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "pmap-1.4.schema.json",
-  "title": "Fichier .pmap, version 1.4",
-  "description": "Carte de processus en couloirs : couloirs, étapes, flèches, rôles RACI, cartes détaillées, traductions et fiches d'étape facultatives, et en 1.2 les saisies du flux de valeur (volume entrant, parts, délai, effectif, temps de travail). Le schéma décrit la forme ; docs/format-pmap.md ajoute les règles de cohérence qu'un schéma ne sait pas dire ; en 1.3 le tracé choisi d'une flèche (côtés et passage, ADR 091), que l'IA n'écrit pas.",
+  "$id": "pmap-1.5.schema.json",
+  "title": "Fichier .pmap, version 1.5",
+  "description": "Carte de processus en couloirs : couloirs, étapes, flèches, rôles RACI, cartes détaillées, traductions et fiches d'étape facultatives, et en 1.2 les saisies du flux de valeur (volume entrant, parts, délai, effectif, temps de travail). Le schéma décrit la forme ; docs/format-pmap.md ajoute les règles de cohérence qu'un schéma ne sait pas dire ; en 1.3 le tracé choisi d'une flèche (côtés et passage, ADR 091), que l'IA n'écrit pas ; en 1.5 ce que porte une copie entière (ADR 105) : commentaires de présentation des étapes et des flèches, glossaire du projet, code et état d'un irritant.",
   "type": "object",
   "required": ["format", "version", "project", "map"],
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string" },
     "format": { "const": "topogenia", "description": "Toujours \"topogenia\"." },
-    "version": { "const": "1.4", "description": "Version 1.4 ; l'application lit aussi un fichier 1.3, sans le résumé des cartes ni les propriétés du Makigami, 1.2, sans le tracé choisi des flèches, et 1.1, sans les propriétés du flux de valeur. Elle écrit 1.4 quand une carte a un résumé ou qu'un élément porte une propriété du Makigami (classe de valeur d'une étape, support d'un document, bornes de la durée d'une fiche, plan d'actions d'un irritant), 1.3 sinon quand une flèche a un tracé choisi, 1.2 dans les autres cas." },
+    "version": { "const": "1.5", "description": "Version 1.5 ; l'application lit aussi un fichier 1.4, sans ce qu'ajoute une copie entière, 1.3, sans le résumé des cartes ni les propriétés du Makigami, 1.2, sans le tracé choisi des flèches, et 1.1, sans les propriétés du flux de valeur. Elle écrit 1.5 quand le fichier porte un commentaire de présentation, un glossaire, le code ou l'état d'un irritant, 1.4 sinon quand une carte a un résumé ou qu'un élément porte une propriété du Makigami (classe de valeur d'une étape, support d'un document, bornes de la durée d'une fiche, plan d'actions d'un irritant), 1.3 sinon quand une flèche a un tracé choisi, 1.2 dans les autres cas." },
     "generated_by": { "type": "string", "description": "Logiciel ou personne qui a produit le fichier (informatif)." },
     "generated_at": { "type": "string", "description": "Date de production, ISO 8601, par exemple 2026-10-25T15:30:00Z (informatif)." },
     "project": { "$ref": "#/$defs/project" },
@@ -156,7 +156,18 @@ Le fichier produit respecte ce schéma JSON, copie exacte de `schemas/pmap-1.4.s
         "description": { "type": "string", "maxLength": 4000 },
         "translations": { "$ref": "#/$defs/translations" },
         "workday_hours": { "type": "number", "minimum": 1, "maximum": 24, "description": "Journée de travail, en heures (7 par défaut)." },
-        "fte_hours_per_month": { "type": "number", "minimum": 1, "maximum": 744, "description": "Heures d'un équivalent temps plein par mois (151,67 par défaut)." }
+        "fte_hours_per_month": { "type": "number", "minimum": 1, "maximum": 744, "description": "Heures d'un équivalent temps plein par mois (151,67 par défaut)." },
+        "glossary": { "type": "string", "maxLength": 4000, "not": { "pattern": "<[a-zA-Z!/?]" }, "description": "Glossaire du projet (1.5) : un terme par ligne, repris par les traductions." }
+      }
+    },
+    "comment": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Commentaire de présentation d'une étape ou d'une flèche (1.5, ADR 105) : ce que dit la présentation à la place de ses propres phrases. text dans la langue du fichier, translations dans les autres langues configurées ; l'un des deux au moins.",
+      "allOf": [{ "not": { "allOf": [{ "not": { "required": ["text"] } }, { "not": { "required": ["translations"] } }] } }],
+      "properties": {
+        "text": { "allOf": [{ "$ref": "#/$defs/text" }, { "maxLength": 500 }] },
+        "translations": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 500 } }
       }
     },
     "map": {
@@ -213,6 +224,7 @@ Le fichier produit respecte ce schéma JSON, copie exacte de `schemas/pmap-1.4.s
         },
         "sub_map": { "$ref": "#/$defs/map", "description": "Carte détaillée de l'étape. Interdite sur start, end, parallel et inclusive." },
         "translations": { "$ref": "#/$defs/translations" },
+        "comment": { "$ref": "#/$defs/comment" },
         "sheet": { "$ref": "#/$defs/sheet" },
         "volume": {
           "type": "object",
@@ -266,7 +278,8 @@ Le fichier produit respecte ce schéma JSON, copie exacte de `schemas/pmap-1.4.s
             }
           }
         },
-        "translations": { "$ref": "#/$defs/translations" }
+        "translations": { "$ref": "#/$defs/translations" },
+        "comment": { "$ref": "#/$defs/comment", "description": "Commentaire dit pendant le passage d'une étape à la suivante ; son text est dans la langue de l'étape de départ." }
       }
     },
     "sheet": {
@@ -345,6 +358,8 @@ Le fichier produit respecte ce schéma JSON, copie exacte de `schemas/pmap-1.4.s
         "wait_hours": { "type": "number", "minimum": 0, "maximum": 100000 },
         "percent_complete_accurate": { "type": "integer", "minimum": 0, "maximum": 100 },
         "pain_point": { "type": "string", "maxLength": 2000 },
+        "pain_point_code": { "type": "string", "maxLength": 32, "description": "Code de l'irritant dans son projet (1.5), informatif : l'ouverture numérote les siens. Avec pain_point seulement." },
+        "pain_point_status": { "enum": ["reported", "scored", "under_review", "in_progress", "implemented", "adopted", "dropped"], "description": "État de l'irritant (1.5), avec pain_point seulement ; implemented, adopted et dropped ne sont pas rouverts à l'ouverture." },
         "lost_hours_per_month": { "type": "number", "minimum": 0, "maximum": 99999.9 },
         "action": { "type": "string", "maxLength": 500, "description": "Action décidée sur le point de douleur (1.4, Makigami M7), avec lui seulement." },
         "owner": { "type": "string", "maxLength": 150, "description": "Qui porte l'action, en texte libre." },

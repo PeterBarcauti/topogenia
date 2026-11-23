@@ -36,6 +36,9 @@ export function useElementStates(editor: MapEditor, map: MapView, showCodes: boo
   const showAnalysis = useStore(editor.preferences, (state) => state.showAnalysis);
   const content = useStore(clipboard, (state) => state.content);
   const exporting = useMapState(capturing);
+  // The steps of a selection being captured (ADR 109); the array of the store, the same while the capture runs.
+  const capturedSteps = useMapState((state) => (capturing(state) ? state.exporting?.steps : undefined));
+  const captured = useMemo(() => (capturedSteps === undefined ? null : new Set(capturedSteps)), [capturedSteps]);
   const marks = useMapState((state) => state.marks);
   const focus = useMapState((state) => state.analysisFocus);
   const stream = map.value_stream;
@@ -43,9 +46,9 @@ export function useElementStates(editor: MapEditor, map: MapView, showCodes: boo
   const analysis = useMemo(() => (showAnalysis ? analysisMarksOf(stream, steps) : null), [showAnalysis, stream, steps]);
   return useMemo(() => ({
     showCodes, canEdit: map.rights.structure, selection, cut: cutSteps(content, map.id), linkSource, editing,
-    quickAdd: map.rights.structure && !linking && !showRaci && !showStream && !showAnalysis, showRaci, showStream, exporting, marks, analysis,
+    quickAdd: map.rights.structure && !linking && !showRaci && !showStream && !showAnalysis, showRaci, showStream, exporting, captured, marks, analysis,
     focus: analysis === null || exporting ? null : focus,
-  }), [showCodes, map.rights.structure, map.id, selection, content, linkSource, editing, linking, showRaci, showStream, showAnalysis, exporting, marks, analysis, focus]);
+  }), [showCodes, map.rights.structure, map.id, selection, content, linkSource, editing, linking, showRaci, showStream, showAnalysis, exporting, captured, marks, analysis, focus]);
 }
 
 /** The identifiers given with the choices of React Flow applied: added when chosen, taken out when no more. */

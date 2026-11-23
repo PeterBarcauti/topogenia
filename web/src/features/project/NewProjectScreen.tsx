@@ -12,9 +12,10 @@ import { Button } from '../../shared/ui/Button.tsx';
 import { Field } from '../../shared/ui/Field.tsx';
 import type { Classification } from './classification.ts';
 import { ClassificationField } from './ClassificationField.tsx';
-import { PROJECT_CODE, typedCode } from './files/pmapText.ts';
+import { PROJECT_CODE } from './files/pmapText.ts';
 import { bodyOf, projectNames, type MemberLine } from './members.ts';
 import { MembersEditor } from './MembersEditor.tsx';
+import { useCodeProposal } from './useCodeProposal.ts';
 
 interface NameFieldsProps {
   readonly languages: readonly string[];
@@ -26,11 +27,22 @@ interface NameFieldsProps {
   readonly onAdd: (language: string) => void;
 }
 
-/** The language of the process, its name in it, then the translations of the name asked for (ADR 083: not one field per language). */
-function ProjectNameFields({ languages, language, names, added, onLanguage, onName, onAdd }: NameFieldsProps) {
+/** The name in the language of the process: the first thing asked, the code follows it. */
+function PrimaryName({ language, names, onName }: Pick<NameFieldsProps, 'language' | 'names' | 'onName'>) {
   const { t, i18n } = useTranslation();
-  const given = [language, ...added.filter((other) => other !== language)];
-  const addable = languages.filter((code) => !given.includes(code));
+  return (
+    <Field label={t('project.name_in', { language: nameIn(language, i18n.language) })} testId={`new-project-name-${language}`}>
+      {(control) => <input {...control} lang={language} value={names[language] ?? ''} maxLength={200} autoFocus
+        onChange={(event) => { onName(language, event.target.value); }} />}
+    </Field>
+  );
+}
+
+/** The language of the process, then the translations of the name asked for (ADR 083: not one field per language). */
+function NameOptions({ languages, language, names, added, onLanguage, onName, onAdd }: NameFieldsProps) {
+  const { t, i18n } = useTranslation();
+  const others = added.filter((other) => other !== language);
+  const addable = languages.filter((code) => code !== language && !others.includes(code));
   const label = (code: string) => `${ownName(code)} · ${nameIn(code, i18n.language)}`;
   return (
     <>
@@ -41,7 +53,7 @@ function ProjectNameFields({ languages, language, names, added, onLanguage, onNa
             </select>
           )}
         </Field>
-        {given.map((code) => (
+        {others.map((code) => (
           <Field key={code} label={t('project.name_in', { language: nameIn(code, i18n.language) })} testId={`new-project-name-${code}`}>
             {(control) => <input {...control} lang={code} value={names[code] ?? ''} maxLength={200}
               onChange={(event) => { onName(code, event.target.value); }} />}
@@ -64,7 +76,6 @@ function ProjectNameFields({ languages, language, names, added, onLanguage, onNa
 export function NewProjectScreen() {
   const { t, i18n } = useTranslation();
   const profile = useProfile((state) => state.profile);
-  const [code, setCode] = useState('');
   const [names, setNames] = useState<Record<string, string>>({});
   const [description, setDescription] = useState('');
   const [folder, setFolder] = useState('');
@@ -76,8 +87,12 @@ export function NewProjectScreen() {
   // The language of the process, the interface's by default (ADR 083); its name first, the translations asked for after it.
   const [language, setLanguage] = useState(i18n.language);
   const [added, setAdded] = useState<readonly string[]>([]);
+  const setName = (code: string, text: string) => { setNames((state) => ({ ...state, [code]: text })); };
   const given = [language, ...added.filter((other) => other !== language)];
   const named = (names[language] ?? '').trim() === '' ? undefined : projectNames(Object.fromEntries(given.map((code) => [code, names[code] ?? ''])), language, given);
+
+  const proposal = useCodeProposal(names[language] ?? '');
+  const code = proposal.code;
 
   if (profile?.is_admin !== true) return <div className="page-form"><p className="message-error" role="alert" data-testid="new-project-refused">{t('errors.ACCES_REFUSE')}</p></div>;
 
@@ -104,19 +119,23 @@ export function NewProjectScreen() {
     <div className="page-form" data-testid="new-project">
       <h1>{t('project.create_title')}</h1>
       <form onSubmit={(event) => void submit(event)} noValidate>
-        <Field label={t('project.code')} testId="new-project-code" hint={t('project.code_help')}>
-          {(control) => <input {...control} value={code} maxLength={6} required onChange={(event) => { setCode(typedCode(event.target.value)); }} />}
+        <PrimaryName language={language} names={names} onName={setName} />
+        <Field label={t('project.code')} testId="new-project-code" hint={proposal.proposed ? t('project.code_proposed') : t('project.code_help')}>
+          {(control) => <input {...control} value={code} maxLength={6} required onChange={(event) => { proposal.type(event.target.value); }} />}
         </Field>
-        <ProjectNameFields languages={languages} language={language} names={names} added={added} onLanguage={setLanguage}
-          onName={(code, text) => { setNames((state) => ({ ...state, [code]: text })); }} onAdd={(code) => { setAdded([...added, code]); }} />
-        <Field label={t('project.description')} testId="new-project-description">
-          {(control) => <textarea {...control} value={description} maxLength={4000} rows={3} onChange={(event) => { setDescription(event.target.value); }} />}
-        </Field>
-        <Field label={t('project.shared_folder')} testId="new-project-folder">
-          {(control) => <input {...control} value={folder} maxLength={400} onChange={(event) => { setFolder(event.target.value); }} />}
-        </Field>
-        <ClassificationField value={classification} testId="new-project-classification" onChange={setClassification} />
-        <MembersEditor lines={members} onChange={setMembers} />
+        <details className="project-options" data-testid="new-project-options">
+          <summary>{t('project.more_options')}</summary>
+          <NameOptions languages={languages} language={language} names={names} added={added} onLanguage={setLanguage}
+            onName={setName} onAdd={(code) => { setAdded([...added, code]); }} />
+          <Field label={t('project.description')} testId="new-project-description">
+            {(control) => <textarea {...control} value={description} maxLength={4000} rows={3} onChange={(event) => { setDescription(event.target.value); }} />}
+          </Field>
+          <Field label={t('project.shared_folder')} testId="new-project-folder">
+            {(control) => <input {...control} value={folder} maxLength={400} onChange={(event) => { setFolder(event.target.value); }} />}
+          </Field>
+          <ClassificationField value={classification} testId="new-project-classification" onChange={setClassification} />
+          <MembersEditor lines={members} onChange={setMembers} />
+        </details>
         {error !== null && <p className="message-error" role="alert">{error}</p>}
         <div className="form-actions">
           <Button testId="new-project-cancel" variant="secondary" onClick={() => { navigate(paths.home); }}>{t('project.cancel')}</Button>

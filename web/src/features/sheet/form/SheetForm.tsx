@@ -1,5 +1,5 @@
 // SheetForm.tsx
-// The form of the sheet in its five sections, each folded when the sheet opens with its summary in its head (essai J10, asked by the project owner; before, annex B 4, B-4-21): the key facts (actor, purpose, frequency, duration and its bounds, lead time, Makigami M5), the inputs, the procedure, the outputs, the tools as pills.
+// The form of the sheet in its sections, each folded when the sheet opens with its summary in its head (essai J10, asked by the project owner; before, annex B 4, B-4-21): the key facts (actor, purpose, frequency, duration and its bounds, lead time, Makigami M5), the inputs, the procedure, the outputs, the pain points of the step without a document (R10), the tools as pills.
 
 import { RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -7,11 +7,12 @@ import { Field } from '../../../shared/ui/Field.tsx';
 import { Icon } from '../../../shared/ui/Icon.tsx';
 import { InputList } from '../documents/InputList.tsx';
 import { OutputList } from '../documents/OutputList.tsx';
+import { hasStepPainPoints, StepPainPoints } from '../documents/StepPainPoints.tsx';
 import { FoldAll, FoldSection } from '../FoldSection.tsx';
 import { inputGroups } from '../model/documents.ts';
 import { boundOutOfOrder, citedTools, FREQUENCIES, LEAD_TIME_UNITS, numberOf, type FrequencyCode, type LeadTimeUnit, type SheetDraft } from '../model/draft.ts';
 import { factsText } from '../model/durationText.ts';
-import { useSheet } from '../SheetContext.tsx';
+import { SHEET_SECTIONS, useSheet } from '../SheetContext.tsx';
 import { ToolPills } from '../ToolPills.tsx';
 import { Procedure, TOOLS_LIST } from './Procedure.tsx';
 import { ToolsField } from './ToolsField.tsx';
@@ -122,9 +123,11 @@ export function SheetForm() {
   const operations = draft.procedure.filter((line) => line.text.trim() !== '').length;
   const facts = useFactsSummary(draft);
   const tools = citedTools(draft.tools);
+  // « Tout déplier » acts on the sections drawn: the pain points of the step only when it holds one.
+  const sections = SHEET_SECTIONS.filter((section) => section !== 'pain_points' || hasStepPainPoints(view));
   return (
     <div className="sheet-form" data-testid="sheet-form">
-      <FoldAll />
+      <FoldAll sections={sections} />
       <FoldSection section="facts" title={t('sheet.facts')} summary={facts ?? t('sheet.empty')}>
         <Field label={t('sheet.actor')} hint={t('sheet.actor_help')} testId="sheet-actor">
           {(control) => <input {...control} type="text" maxLength={4000} placeholder={props.step.laneName} value={draft.actor} onChange={(event) => { set({ actor: event.target.value }); }} />}
@@ -146,6 +149,7 @@ export function SheetForm() {
       <FoldSection section="outputs" title={t('sheet.outputs')} summary={count('documents', view.outputs.length)} hint={t('sheet.outputs_help')}>
         <OutputList />
       </FoldSection>
+      <StepPainPoints />
       <FoldSection section="tools" title={t('sheet.tools')} summary={tools.length === 0 ? t('sheet.empty') : <ToolPills tools={tools} />} hint={t('sheet.tools_help')}>
         <ToolsField value={draft.tools} suggestions={view.suggestions.tools} onChange={(value) => { set({ tools: value }); }} />
       </FoldSection>

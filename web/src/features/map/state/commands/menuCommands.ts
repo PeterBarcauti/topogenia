@@ -2,8 +2,8 @@
 // The commands offered only by the context menus: on a step, a selection, the background, a flow, a lane (annex B 2.4).
 
 import {
-  ArrowDown, ArrowLeft, ArrowLeftFromLine, ArrowLeftRight, ArrowRight, ArrowRightFromLine, ArrowUp, BetweenHorizontalEnd, BetweenHorizontalStart, ClipboardPaste, ExternalLink,
-  FoldVertical, Group, Hash, PanelRightOpen, Pencil, PencilLine, Route, RouteOff, SquareStack, SquareX, Trash2, Ungroup, UsersRound,
+  ArrowDown, ArrowLeft, ArrowLeftFromLine, ArrowLeftRight, ArrowRight, ArrowRightFromLine, ArrowUp, BetweenHorizontalEnd, BetweenHorizontalStart, ClipboardPaste, ExternalLink, FileInput,
+  FoldVertical, Group, Hash, Images, PanelRightOpen, Pencil, PencilLine, Route, RouteOff, SquareStack, SquareX, Trash2, Ungroup, UsersRound,
 } from 'lucide-react';
 import type { Schema } from '../../../../api/client.ts';
 import { paths } from '../../../../app/router.ts';
@@ -16,6 +16,7 @@ import { allowedSides } from '../../model/routeGestures.ts';
 import { roomOf, shrinking, type LaneEnd } from '../../model/laneRows.ts';
 import { hasContent, isMacro } from '../../model/stepFacts.ts';
 import { deleteLane, growLane, shrinkLane, updateLane } from '../actions/lanes.ts';
+import { copyMapImage } from '../actions/copyImage.ts';
 import { autoRoutes, reverseFlow, routeShown, setFlowRoute } from '../actions/flows.ts';
 import { paste } from '../actions/paste.ts';
 import { deleteChosen, deleteSelection } from '../actions/selection.ts';
@@ -23,6 +24,7 @@ import { raciPanelPoint } from '../actions/stepActivation.ts';
 import { deleteDetail, detailStep, insertStep, updateStep, type InsertPosition } from '../actions/steps.ts';
 import { cellAimed, flowsOf, isCut, stepOf, stepsOf, type MapContext } from './context.ts';
 import { groupable, groupChosen, ungroupable, ungroupChosen } from './editCommands.ts';
+import { mapShown } from './fileCommands.ts';
 
 type StepType = Schema<'StepType'>;
 
@@ -133,6 +135,12 @@ const STEP_COMMANDS: readonly Command<MapContext>[] = [
       if (isMacro(step)) context.editor.floating.getState().open({ kind: 'detail-delete', stepId: step.id });
       else void deleteDetail(context.editor, step.id);
     } },
+  // The detail replaced by a .pmap file, the newer version of the process it was copied from (F-208): a step that has a detail.
+  { id: 'step.replace-detail', label: 'menu.replace_detail', icon: FileInput, enabled: editing, visible: (context) => withSheet(context) && targetStep(context)?.sub_map_id != null,
+    run: (context) => {
+      const step = targetStep(context);
+      if (step !== undefined) context.editor.floating.getState().open({ kind: 'insert-pmap', stepId: step.id });
+    } },
   pasteBy('before'),
   pasteBy('after'),
   ...STEP_TYPES.map(changeType),
@@ -151,6 +159,10 @@ const STEP_COMMANDS: readonly Command<MapContext>[] = [
 ];
 
 const SELECTION_COMMANDS: readonly Command<MapContext>[] = [
+  // The image of the steps of the selection and of the flows between them, for every reader; the whole map from the background (ADR 109).
+  { id: 'selection.copy-image', label: 'menu.copy_selection_image', icon: Images, enabled: (context) => mapShown(context) && stepsOf(context).length > 0,
+    run: (context) => void copyMapImage(context.editor, stepsOf(context)) },
+  { id: 'pane.copy-image', label: 'export.copy_image', icon: Images, enabled: mapShown, run: (context) => void copyMapImage(context.editor) },
   { id: 'selection.group', label: 'menu.group_selection', icon: Group, shortcuts: ['Ctrl+G'], enabled: groupable, run: groupChosen },
   { id: 'selection.route.auto', label: 'menu.route_auto_selection', icon: RouteOff,
     enabled: (context) => editing(context) && routedOf(context).length > 0, run: (context) => void autoRoutes(context.editor, routedOf(context)) },
@@ -164,9 +176,21 @@ const SELECTION_COMMANDS: readonly Command<MapContext>[] = [
       const cell = context.target?.kind === 'pane' ? cellAimed(context, context.target.point) : null;
       if (cell !== null) void paste(context.editor, { cell });
     } },
+  // A .pmap file inserted as a detailed step at the cell clicked (F-208).
+  { id: 'pane.insert-pmap', label: 'files.insert_here', icon: FileInput,
+    enabled: (context) => context.canEdit && context.target?.kind === 'pane' && cellAimed(context, context.target.point) !== null,
+    run: (context) => {
+      const cell = context.target?.kind === 'pane' ? cellAimed(context, context.target.point) : null;
+      if (cell !== null) context.editor.floating.getState().open({ kind: 'insert-pmap', cell });
+    } },
   { id: 'flow.label', label: 'menu.flow_label', icon: Pencil, enabled: editing,
     run: (context) => {
       if (context.target?.kind === 'flow') context.editor.floating.getState().open({ kind: 'flow-label', flowId: context.target.flowId, at: context.target.at });
+    } },
+  // A .pmap file inserted as a detailed step on the flow clicked, that flow cut in two (F-208), as a shape dropped on a connector.
+  { id: 'flow.insert-pmap', label: 'files.insert_on_flow_here', icon: FileInput, enabled: editing,
+    run: (context) => {
+      if (context.target?.kind === 'flow') context.editor.floating.getState().open({ kind: 'insert-pmap', flowId: context.target.flowId });
     } },
   { id: 'flow.reverse', label: 'menu.reverse_flow', icon: ArrowLeftRight, enabled: editing,
     run: (context) => {

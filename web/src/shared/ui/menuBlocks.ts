@@ -1,5 +1,5 @@
 // menuBlocks.ts
-// The blocks of a menu: its items alone, or gathered in the named groups of choices it declares, and the rows they take for its placement (spec 9.5, ARIA 1.2).
+// The blocks of a menu: its items alone, or gathered in the named groups of choices or the submenus it declares, and the rows they take for its placement (spec 9.5, ARIA 1.2, ADR 117).
 
 import type { CommandItem } from '../commands/commands.ts';
 
@@ -22,19 +22,40 @@ export interface MenuGroup {
   readonly inks?: Readonly<Record<string, string>>;
 }
 
-/** A block of the menu: an item alone, or a group with the items of it that the menu shows. */
-export type MenuBlock = { readonly item: CommandItem } | { readonly group: MenuGroup; readonly items: readonly CommandItem[] };
+/**
+ * A run of items opened from one row marked by a chevron, in a menu of its own (a group of the File menu). The row stands
+ * where the first of its items stands, with its separator; a submenu none of whose items is shown has no row.
+ */
+export interface MenuSubmenu {
+  /** Its identifier: the test identifier of its row is `{menu}-cascade-{id}`. */
+  readonly id: string;
+  /** The i18n key of its name: the text of its row and the name of its menu. */
+  readonly name: string;
+  /** The items of the submenu by their identifiers; the menu keeps its own order. */
+  readonly ids: readonly string[];
+  /** The i18n keys of the shorter texts shown by item; the whole label stays the name of the item. */
+  readonly texts?: Readonly<Record<string, string>>;
+}
 
-/** The items gathered in their groups, where the first of each group stands; a group none of whose items is shown is left out. */
-export function blocksOf(items: readonly CommandItem[], groups: readonly MenuGroup[]): MenuBlock[] {
+/** A block of the menu: an item alone, a group with the items of it that the menu shows, or a submenu with its items. */
+export type MenuBlock =
+  | { readonly item: CommandItem }
+  | { readonly group: MenuGroup; readonly items: readonly CommandItem[] }
+  | { readonly submenu: MenuSubmenu; readonly items: readonly CommandItem[] };
+
+/** The items gathered in their groups and their submenus, where the first of each stands; one none of whose items is shown is left out. */
+export function blocksOf(items: readonly CommandItem[], groups: readonly MenuGroup[], submenus: readonly MenuSubmenu[] = []): MenuBlock[] {
   const blocks: MenuBlock[] = [];
-  const placed = new Set<MenuGroup>();
+  const placed = new Set<MenuGroup | MenuSubmenu>();
   for (const item of items) {
     const group = groups.find((candidate) => candidate.ids.includes(item.id));
-    if (group === undefined) blocks.push({ item });
-    else if (!placed.has(group)) {
-      placed.add(group);
-      blocks.push({ group, items: items.filter((other) => group.ids.includes(other.id)) });
+    const submenu = submenus.find((candidate) => candidate.ids.includes(item.id));
+    const gathering = group ?? submenu;
+    if (gathering === undefined) blocks.push({ item });
+    else if (!placed.has(gathering)) {
+      placed.add(gathering);
+      const gathered = items.filter((other) => gathering.ids.includes(other.id));
+      blocks.push(group === undefined ? { submenu: gathering as MenuSubmenu, items: gathered } : { group, items: gathered });
     }
   }
   return blocks;
@@ -46,7 +67,7 @@ export const SWATCHES_A_ROW = 4;
 /** The rows of 34 px a menu takes, for its placement before it is drawn: a title, a row of swatches and their caption count. */
 export function rowsOf(blocks: readonly MenuBlock[]): number {
   return blocks.reduce((rows, block) => {
-    if (!('group' in block)) return rows + 1;
+    if (!('group' in block)) return rows + 1;  // an item, or the row of a submenu
     const title = block.group.titled === true ? 1 : 0;
     return rows + title + (block.group.look === 'swatches' ? Math.ceil(block.items.length / SWATCHES_A_ROW) + 1 : block.items.length);
   }, 0);

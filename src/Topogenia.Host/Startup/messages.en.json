@@ -28,6 +28,8 @@
   "REOUVERTE": "A second start: the browser opens on the application.",
   "ICONE_OUVRIR": "Open {product}",
   "ICONE_QUITTER": "Quit {product}",
+  "ICONE_QUITTER_ATTENTE": "A sheet entry is not saved yet. Quit anyway?",
+  "ICONE_QUITTER_NON_VALIDE": "An open form is not saved: what is typed in it will be lost. Quit anyway?",
   "SAUVEGARDES_DOSSIER": "The backups are in {folder}.",
   "RESTAURATION_PROPOSEE": "Backups available, from the newest to the oldest. The changes made after the chosen backup are not in it; the current file and its journal will be kept next to it, not erased:",
   "RESTAURATION_CHOIX": "{number}. {date} {file}",

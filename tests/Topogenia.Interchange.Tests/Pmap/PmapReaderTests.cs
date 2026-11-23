@@ -97,10 +97,10 @@ public sealed class PmapReaderTests
         Assert.Equal(FileErrorCodes.NotObject, Assert.Single(Faults("[1, 2]")).Code);
         var format = Assert.Single(Faults("""{ "format": "ariane", "version": "1.0" }"""));
         Assert.Equal(("format", FileErrorCodes.WrongFormat, (object?)"topogenia"), (format.Path, format.Code, format.Values["expected"]));
-        foreach (var version in new[] { "1.0", "1.5", "2.0" })
+        foreach (var version in new[] { "1.0", "1.6", "2.0" })
         {
             var refused = Assert.Single(Faults(Doc($$"""{ "lanes": [{{TwoLanes}}] }""").Replace("\"1.1\"", $"\"{version}\"", StringComparison.Ordinal)));
-            Assert.Equal(("version", FileErrorCodes.WrongVersion, (object?)version, (object?)"1.1, 1.2, 1.3, 1.4"),
+            Assert.Equal(("version", FileErrorCodes.WrongVersion, (object?)version, (object?)"1.1, 1.2, 1.3, 1.4, 1.5"),
                 (refused.Path, refused.Code, refused.Values["version"], refused.Values["supported"]));
         }
     }
@@ -337,6 +337,18 @@ public sealed class PmapReaderTests
             var broken = Assert.Single(Faults(Doc($$"""{ "lanes": [{{TwoLanes}}] }""", project)));
             Assert.Equal((FileErrorCodes.NotJson, ""), (broken.Code, broken.Path));
         }
+    }
+
+    [Fact]
+    public void A_key_written_twice_in_one_object_is_not_json_that_is_read()
+    {
+        // The parser would keep the last one, where a reader of the text sees the first (pre-audit 68, P3-03).
+        var format = Assert.Single(Faults("{\n  \"format\": \"topogenia\",\n  \"format\": \"x\",\n  \"version\": \"1.1\"\n}"));
+        Assert.Equal((FileErrorCodes.NotJson, "", (object?)3L, (object?)3L), (format.Code, format.Path, format.Values["line"], format.Values["column"]));
+        var twice = Assert.Single(Faults(Doc($$"""{ "lanes": [{{TwoLanes}}], "steps": [{ "id": "e1", "lane": "c1", "label": "Saisir", "label": "Supprimer" }] }""")));
+        Assert.Equal((FileErrorCodes.NotJson, ""), (twice.Code, twice.Path));
+        // The same name in two objects, or twice in one text, is no fault.
+        Assert.Equal("Saisir", Read(Doc($$"""{ "lanes": [{{TwoLanes}}], "steps": [{ "id": "e1", "lane": "c1", "label": "Saisir" }, { "id": "e2", "lane": "c2", "label": "Saisir" }] }""")).Map.Steps[1].Label);
     }
 
     [Fact]

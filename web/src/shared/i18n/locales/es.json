@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) no se ha detenido. Vuelve a intentarlo o cierra la ventana de la consola.",
     "quit_unsaved": "Hay datos de la ficha que aún no se han guardado: $t(app.name) sigue abierto. Vuelve a intentarlo cuando la ficha esté guardada.",
     "stopped": "$t(app.name) se ha detenido. Puedes cerrar esta pestaña.",
-    "stopped_help": "Para volver a usarlo, ábrelo de nuevo."
+    "stopped_help": "Para volver a usarlo, ábrelo de nuevo.",
+    "help_menu": "Menú Ayuda",
+    "help_online": "Ayuda en línea (en inglés)",
+    "update_check": "Buscar actualizaciones",
+    "update_check_help": "Abre la página de versiones del sitio web. Instalada: {{version}} del {{date}}.",
+    "update_check_store_help": "Abre la ficha de Microsoft Store, que instala las actualizaciones.",
+    "quit_text_unsaved": "Un formulario abierto no está guardado: lo que se ha escrito en él se perderá.",
+    "quit_anyway": "Salir de todos modos"
   },
   "keys": {
     "Shift": "Mayús",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Espacio",
     "Enter": "Intro",
-    "ArrowUp": "Arriba"
+    "ArrowUp": "Arriba",
+    "ArrowLeft": "Izquierda",
+    "ArrowRight": "Derecha",
+    "ArrowDown": "Abajo",
+    "Backspace": "Retroceso",
+    "Wheel": "Rueda"
   },
   "errors": {
     "RESEAU": "$t(app.name) no responde. Comprueba que $t(app.name) sigue en ejecución (o la conexión de red, si está en un servidor).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Respuesta inesperada del servidor. Vuelve a cargar la página.",
     "ACCES_REFUSE": "No tienes permisos suficientes para esta página.",
     "UNKNOWN": "Se ha producido un error inesperado.",
-    "RESUMES_A_JOUR": "Todos los mapas tienen un resumen actualizado. Para rehacer uno, abre el mapa y haz clic en «i» junto a su título."
+    "RESUMES_A_JOUR": "Todos los mapas tienen un resumen actualizado. Para rehacer uno, abre el mapa y haz clic en «i» junto a su título.",
+    "COLLECTION_TROP_DE_PROCESSUS": "La colección tiene demasiados procesos."
   },
   "home": {
     "eyebrow": "Para impulsar tus procesos con la IA, empieza por describirlos.",
@@ -79,7 +92,24 @@
     "sample_title": "Proyecto de ejemplo",
     "sample_text": "Un proyecto ficticio, ya descrito, para descubrir un mapa completo: carriles, decisiones, submapa, fichas, documentos y puntos de dolor. Se elimina como cualquier otro proyecto.",
     "sample_create": "Crear el proyecto de ejemplo",
-    "sample_created": "Proyecto de ejemplo {{code}} creado."
+    "sample_created": "Proyecto de ejemplo {{code}} creado.",
+    "filter": "Filtrar los proyectos",
+    "filter_placeholder": "Código o nombre",
+    "filter_count": "{{shown}} de {{total}}",
+    "filter_none": "Ningún proyecto coincide.",
+    "update_line": "Esta versión es del {{date}}.",
+    "update_link": "Ver si existe una más reciente",
+    "update_close": "Cerrar el recordatorio",
+    "button_start_help": "Elegir un punto de partida.",
+    "start_menu": "Empezar un proyecto",
+    "start_sample": "Proyecto de ejemplo",
+    "start_gallery": "Galería de plantillas",
+    "start_gallery_help": "Se abre en el navegador.",
+    "start_blank": "Mapa vacío…",
+    "new_project_help": "Empezar con un mapa vacío, un ejemplo o una plantilla.",
+    "new_project_help_no_sample": "Empezar con un mapa vacío o una plantilla.",
+    "new_project_help_no_gallery": "Empezar con un mapa vacío o un ejemplo.",
+    "new_project_help_blank": "Empezar con un mapa vacío."
   },
   "roles": {
     "facilitator": "Facilitador",
@@ -112,7 +142,7 @@
     "properties": "Propiedades del proyecto…",
     "properties_title": "Propiedades del proyecto {{code}}",
     "sharing_group": "Grupo de uso compartido de los documentos",
-    "sharing_group_help": "Se nombra en las fichas para una entrada compartida (p. ej., Equipo de finanzas). Vacío: «el grupo de uso compartido del proyecto».",
+    "sharing_group_help": "Nombre del grupo de personas que puede leer los documentos del proyecto. Aparece en la casilla «Compartido con el grupo» de cada documento de una ficha. Vacío: «el grupo de uso compartido del proyecto».",
     "properties_read_only": "Solo un facilitador del proyecto puede modificar estas propiedades.",
     "properties_saved": "Propiedades del proyecto guardadas.",
     "language": "Idioma del proceso",
@@ -121,12 +151,14 @@
     "workday_hours": "Jornada laboral (horas)",
     "workday_hours_help": "De 1 a 24 h, 7 de forma predeterminada: convierte los plazos en días laborables.",
     "fte_hours": "Horas por ETC y mes",
-    "fte_hours_help": "De 1 a 744 h, 151,67 de forma predeterminada: convierte la carga en equivalentes a tiempo completo."
+    "fte_hours_help": "De 1 a 744 h, 151,67 de forma predeterminada: convierte la carga en equivalentes a tiempo completo.",
+    "code_proposed": "Propuesto a partir del nombre.",
+    "more_options": "Más opciones"
   },
   "files": {
     "open": "Abrir un archivo…",
     "open_title": "Abrir un archivo",
-    "open_help": "El archivo se convierte en un proyecto nuevo: un archivo .pmap (copia descargada o respuesta de una IA que leyó un boceto), una tabla Excel o CSV, un diagrama Mermaid (.mmd, .md) o una imagen SVG exportada con su copia editable.",
+    "open_help": "El archivo se convierte en un proyecto nuevo: un archivo .pmap (copia descargada o respuesta de una IA que leyó un boceto), una colección de modelos (.pmaps), una tabla Excel o CSV, un diagrama Mermaid (.mmd, .md) o una imagen SVG exportada con su copia editable.",
     "choose": "Elegir un archivo…",
     "or_paste": "O pega aquí su contenido, por ejemplo la respuesta de una IA:",
     "area": "Pega o suelta aquí el contenido del archivo .pmap",
@@ -192,7 +224,52 @@
     "target_name": "{{name}} (estado objetivo)",
     "target_label": "Etiqueta de la referencia",
     "target_label_default": "Estado actual",
-    "target_button": "Crear"
+    "target_button": "Crear",
+    "map_download": "Guardar el mapa abierto (.pmap)",
+    "map_downloaded": "Mapa guardado con sus mapas detallados, sus fichas y sus comentarios: el archivo .pmap está en la carpeta Descargas.",
+    "insert": "Insertar un archivo como paso detallado…",
+    "insert_here": "Insertar un archivo aquí…",
+    "insert_title": "Insertar un archivo como paso detallado",
+    "insert_help": "El archivo se convierte en un nuevo paso detallado de este mapa. Es una copia: modificar el archivo después no cambia el mapa. Un archivo .pmap, una tabla Excel o CSV, un diagrama Mermaid o una imagen SVG con su copia.",
+    "replace_title": "Sustituir el detalle por un archivo",
+    "replace_help": "El detalle de «{{label}}» va a la papelera y el archivo ocupa su lugar. Ctrl+Z lo deshace todo.",
+    "insert_counts": "Pasos: {{steps}} · Carriles: {{lanes}} · Conexiones: {{flows}} · Mapas: {{maps}} · Fichas: {{sheets}}",
+    "insert_too_deep": "Este archivo tiene {{depth}} niveles de mapas; bajo este mapa, puede tener {{room}} como máximo.",
+    "insert_too_large": "Este archivo supera {{max}} MB: no se puede insertar.",
+    "insert_package": "Es un paquete de intercambio: se importa como proyecto, no se inserta.",
+    "insert_dropped": "Traducciones descartadas (idiomas no configurados aquí): {{languages}}",
+    "insert_label": "Texto del paso",
+    "insert_lane": "Carril",
+    "insert_after": "Colocar después de",
+    "insert_at_start": "Al principio del mapa",
+    "insert_sheets": "Incluir las fichas",
+    "insert_sheets_help": "Las fichas, sus documentos y sus puntos de dolor llegan como borrador, para revisar y luego validar.",
+    "insert_button": "Insertar",
+    "replace_button": "Sustituir",
+    "inserted": "Archivo insertado. Pasos: {{steps}} · Mapas: {{maps}}",
+    "insert_on_flow": "En la flecha {{from}} → {{to}}",
+    "insert_on_flow_here": "Insertar un archivo en esta flecha…",
+    "collection_title": "Colección «{{name}}»",
+    "collection_help": "Se crea un proyecto por cada proceso marcado. No se escribe nada antes de «Crear los proyectos».",
+    "collection_all": "Marcar todo",
+    "collection_ticked": "Marcados: {{count}} de {{total}}",
+    "collection_points": "Puntos por revisar: {{count}}",
+    "collection_details": "Descripción y puntos por revisar",
+    "collection_code_free": "{{code}} ya está en uso.",
+    "collection_invalid": "No se puede abrir:",
+    "collection_create": "Crear los proyectos",
+    "collection_creating": "Creando {{done}} de {{total}}…",
+    "collection_done": "Proyectos creados",
+    "collection_created": "{{code}} creado.",
+    "collection_failed": "No creado: {{reason}}",
+    "collection_retry": "Reintentar",
+    "collection_unnamed": "Proceso {{rank}}",
+    "insert_collection": "Una colección se abre con «Abrir un archivo…». Inserte uno de sus modelos por separado.",
+    "open_too_large": "Este archivo supera {{max}} MB: no se puede abrir.",
+    "collection_none": "Ningún proyecto creado",
+    "collection_code_twice": "{{code}} también está asignado a otra línea.",
+    "collection_fix": "Corregir el texto",
+    "remote_locations": "Direcciones de red o web en las fichas: {{count}}, por revisar antes de abrir un documento."
   },
   "package": {
     "export": "Exportar el proyecto ({{extension}})…",
@@ -369,7 +446,13 @@
       "due": "Fecha límite",
       "status": "Estado",
       "lost": "Horas perdidas al mes"
-    }
+    },
+    "copy_image": "Copiar el mapa como imagen",
+    "copying": "Copiando la imagen…",
+    "copied": "Imagen copiada: pégala (Ctrl+V) en un correo o una diapositiva.",
+    "copy_failed": "No se pudo copiar la imagen.",
+    "copy_as_png": "Exportar como PNG",
+    "project_pdf": "Exportar el proyecto a PDF…"
   },
   "classification": {
     "internal": "Interno",
@@ -498,7 +581,8 @@
     "breadcrumb": "Ruta de navegación",
     "file": "Archivo",
     "file_help": "Abrir un archivo, descargar una copia, duplicar, exportar",
-    "members": "Miembros"
+    "members": "Miembros",
+    "fit": "Ver todo"
   },
   "ribbon": {
     "name": "Cinta del mapa",
@@ -596,6 +680,27 @@
       "necessary": "Necesario sin valor",
       "waste": "Desperdicio",
       "none": "Sin clasificar"
+    },
+    "replace_detail": "Sustituir el detalle por un archivo…",
+    "copy_selection_image": "Copiar la selección como imagen",
+    "file_cascade": {
+      "export": "Exportar el mapa",
+      "project": "Proyecto",
+      "package": "Paquete de intercambio",
+      "assistant": "Asistente IA"
+    },
+    "file_short": {
+      "pdf": "PDF (A3 horizontal)",
+      "png": "Imagen PNG",
+      "svg": "Imagen SVG…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Todo el proyecto en PDF…",
+      "import": "Importar un paquete…",
+      "replace": "Reemplazar por un paquete…",
+      "report": "Informe contado (Markdown)",
+      "comments": "Comentarios de presentación…"
     }
   },
   "deletion": {
@@ -646,7 +751,8 @@
       "retracer_liens": "trazado automático de las flechas",
       "inserer_rangees": "inserción de filas",
       "retirer_rangee": "retirada de fila",
-      "proposition_ia": "propuesta de la IA"
+      "proposition_ia": "propuesta de la IA",
+      "inserer_fichier": "inserción de un archivo"
     }
   },
   "command": {
@@ -769,9 +875,6 @@
     "duration_max": "Duración más larga",
     "duration_bounds_order": "Más corta ≤ duración ≤ más larga",
     "minutes": "minutos",
-    "duration_between": "de {{min}} a {{max}} minutos",
-    "duration_at_least": "al menos {{min}} minutos",
-    "duration_at_most": "como máximo {{max}} minutos",
     "duration_value_one": "{{count}} minuto",
     "duration_value_other": "{{count}} minutos",
     "fold": "Contraer «{{section}}»",
@@ -832,6 +935,7 @@
     "clarification_withdrawn": "Pregunta retirada.",
     "read_empty": "Todavía no hay ninguna ficha validada para este paso.",
     "read_validated": "Versión validada el {{date}} por {{name}}.",
+    "read_draft": "Borrador en curso, todavía sin validar.",
     "document": {
       "add_output": "Añadir una salida",
       "new_output": "Nueva salida",
@@ -895,7 +999,8 @@
         "file": "Archivo",
         "software": "Software",
         "other": "Otro"
-      }
+      },
+      "edit_pain": "Modificar en {{code}}"
     },
     "pain_point": {
       "title": "Punto de dolor",
@@ -924,7 +1029,21 @@
         "implemented": "implantado",
         "adopted": "adoptado",
         "dropped": "descartado"
-      }
+      },
+      "status": "Estado",
+      "status_of": "Estado del punto de fricción {{code}}",
+      "status_help": "Implantado, adoptado o descartado: el punto de fricción sale del mapa y sus horas dejan de contar.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "problema detectado, acción por planificar",
+        "scored": "punto de fricción evaluado, acción por decidir",
+        "under_review": "acción en estudio, aún sin decidir",
+        "in_progress": "acción en curso de ejecución",
+        "implemented": "acción realizada, resultado por verificar",
+        "adopted": "verificado, es la nueva forma de trabajar",
+        "dropped": "se decide no tratarlo"
+      },
+      "status_now": "Estado del punto de fricción {{code}}: {{status}}"
     },
     "lead_time": "Plazo",
     "lead_time_help": "Tiempo transcurrido entre la llegada de un expediente y su salida del paso, esperas incluidas; no cuenta para la completitud.",
@@ -941,7 +1060,18 @@
       "minute": "minutos",
       "hour": "horas",
       "day": "días laborables"
-    }
+    },
+    "duration_between_one": "de {{min}} a {{max}} minuto",
+    "duration_between_other": "de {{min}} a {{max}} minutos",
+    "duration_at_least_one": "al menos {{min}} minuto",
+    "duration_at_least_other": "al menos {{min}} minutos",
+    "duration_at_most_one": "como máximo {{max}} minuto",
+    "duration_at_most_other": "como máximo {{max}} minutos",
+    "step_pain_points": "Puntos de dolor del paso",
+    "step_pain_points_help": "Puntos de dolor vinculados al paso, sin documento. Su descripción y su plan solo se leen.",
+    "pain_points_one": "{{count}} punto de dolor",
+    "pain_points_other": "{{count}} puntos de dolor",
+    "step_pain_points_help_fill": "Puntos de dolor vinculados al paso, sin documento. Su estado se cambia aquí; su descripción y su plan solo se leen."
   },
   "translations": {
     "title": "Traducir el proyecto",
@@ -1188,6 +1318,12 @@
         },
         "summaries": {
           "title": "Resúmenes"
+        },
+        "comments": {
+          "title": "Comentarios de presentación",
+          "text": "Lo que la presentación dice de las etapas y los traspasos.",
+          "example": "Escribe los comentarios de las etapas y los traspasos de este mapa y de sus mapas detallados.",
+          "example_empty": "Escribe los comentarios de las etapas y los traspasos de este mapa y de sus mapas detallados."
         }
       },
       "thread": "Conversación con el asistente",
@@ -1245,7 +1381,8 @@
         "findings": "Análisis",
         "report": "Informe",
         "summaries": "Resúmenes",
-        "proposal": "Propuesta"
+        "proposal": "Propuesta",
+        "comments": "Comentarios de presentación"
       },
       "pasted": "Respuesta pegada",
       "copy_reply": "Copiar la respuesta",
@@ -1401,7 +1538,19 @@
     "resource": "Recurso de Azure",
     "resource_help": "El nombre del recurso: contoso para contoso.openai.azure.com.",
     "port": "Puerto",
-    "port_help": "Vacío: el puerto predeterminado (Ollama 11434, LM Studio 1234)."
+    "port_help": "Vacío: el puerto predeterminado (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Escribe los comentarios de presentación de las etapas y los traspasos de este mapa y de sus mapas detallados que no tienen.",
+      "menu": "Escribir los comentarios de presentación (IA)…",
+      "intro": "Relee cada comentario: consérvalo, corrígelo o descártalo. Se dirá durante la presentación.",
+      "flow": "Traspaso {{labels}}",
+      "map": "Mapa: {{name}}",
+      "current": "Comentario actual: {{text}}",
+      "typed": "Sustituye un comentario escrito a mano: {{text}}",
+      "save": "Guardar los comentarios conservados ({{n}})",
+      "saved": "Comentarios guardados: {{n}}",
+      "done": "Comentarios de presentación guardados: {{n}}"
+    }
   },
   "interface_language": {
     "help": "El idioma de los menús y los mensajes, solo para ti. El idioma en el que se muestran los mapas se elige en la parte superior de la ventana, cuando hay un proyecto abierto."
@@ -1856,5 +2005,174 @@
       "closing_lost": "Tiempo perdido: {{lost}} al mes.",
       "arrow": "hacia"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Exportar en BPMN 2.0 (.bpmn)…",
+    "export_title": "Exportar en BPMN 2.0",
+    "export_help": "El archivo .bpmn se abre en los modeladores BPMN (Camunda, Signavio, Bizagi…). Lleva toda la ficha de cada etapa, sin la ubicación de los documentos.",
+    "export_button": "Exportar",
+    "export_subprocesses": "Incluir los subprocesos detallados",
+    "export_subprocesses_help": "Cada etapa detallada se abre en el modelador como un subproceso.",
+    "export_subprocesses_none": "El mapa no tiene ninguna etapa detallada.",
+    "export_details": "Dibujar los documentos y los puntos de fricción",
+    "export_details_help": "Sin marcar, siguen escritos en la documentación del archivo.",
+    "toolbar": "Vista BPMN 2.0",
+    "badge": "Diagrama BPMN 2.0 · solo lectura",
+    "details": "Detalles en el diagrama",
+    "export": "Exportar (.bpmn)…",
+    "close": "Volver al mapa",
+    "close_help": "Volver al mapa (Alt+B)",
+    "failed": "No se pudo leer el diagrama.",
+    "loading": "Leyendo el diagrama…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Evento de inicio",
+      "endEvent": "Evento de fin",
+      "intermediateCatchEvent": "Espera",
+      "manualTask": "Tarea manual",
+      "userTask": "Tarea de usuario",
+      "serviceTask": "Tarea automatizada",
+      "subProcess": "Subproceso",
+      "exclusiveGateway": "Compuerta exclusiva",
+      "parallelGateway": "Compuerta paralela",
+      "inclusiveGateway": "Compuerta inclusiva"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "«{{text}}»",
+      "map": "Mapa: {{name}}",
+      "classification": "Clasificación: {{value}}",
+      "language": "Idioma: {{language}}",
+      "work_time": "Jornada laboral: {{workday}} h; horas de un ETC al mes: {{fte}} h",
+      "description": "Descripción",
+      "wait": "espera de {{hours}} h",
+      "from": "de {{code}}",
+      "volume": "Volumen de entrada: {{quantity}} por {{period}}",
+      "periods": {
+        "day": "día laborable",
+        "week": "semana",
+        "month": "mes",
+        "year": "año"
+      },
+      "lane_system": "Carril de un software que actúa solo",
+      "headcount": "Plantilla: {{number}}"
+    },
+    "fit": "Ver todo",
+    "fit_help": "Mostrar todo el diagrama en la ventana"
+  },
+  "shortcuts": {
+    "title": "Atajos de teclado",
+    "sections": {
+      "move": "Moverse",
+      "choose": "Elegir",
+      "edit": "Modificar el mapa",
+      "display": "Mostrar",
+      "present": "Presentar",
+      "help": "Ayuda"
+    },
+    "edit_note": "Reservado al facilitador del proyecto.",
+    "or": "o",
+    "move_selection": "Mover la selección",
+    "escape": "Cerrar un menú, un panel o una ficha; detener «Conectar»",
+    "space_held": "Herramienta Mano mientras se mantiene pulsada",
+    "enter": "Abrir la ficha del paso elegido",
+    "type": "Empezar el nombre del paso elegido",
+    "menu_key": "Menú del objeto elegido",
+    "wheel": "Desplazar; con Mayús, en horizontal",
+    "zoom": "Ampliar",
+    "saved": "Recordar que todo está guardado",
+    "alone_note": "Sin un único paso elegido (si no, la tecla empieza su nombre)",
+    "type_key": "una letra",
+    "search_keys": "En la búsqueda: siguiente; con Mayús, anterior; Esc cierra"
+  },
+  "search": {
+    "command_help": "Buscar en el proyecto",
+    "title": "Buscar",
+    "field": "Palabra que buscar",
+    "placeholder": "Paso, documento, herramienta…",
+    "previous": "Anterior (Mayús+Intro)",
+    "next": "Siguiente (Intro)",
+    "position": "{{index}} de {{count}}",
+    "searching": "Buscando…",
+    "none": "Sin resultados.",
+    "too_many": "Los primeros {{shown}} de {{total}} resultados: afina la búsqueda.",
+    "short": "Al menos dos caracteres, o Intro.",
+    "this_map": "Este mapa",
+    "level": "Nivel {{level}}",
+    "origin": "Idioma de origen: {{language}}",
+    "kinds": {
+      "step": "Paso",
+      "lane": "Carril",
+      "document": "Documento",
+      "tool": "Herramienta",
+      "pain_point": "Punto de dolor",
+      "action": "Acción"
+    },
+    "results_one": "{{count}} resultado",
+    "results_other": "{{count}} resultados"
+  },
+  "action_plan": {
+    "command": "Plan de acción",
+    "title": "Plan de acción",
+    "total": "{{hours}} h perdidas al mes en los puntos de dolor abiertos",
+    "late_count": "Vencidos: {{count}}",
+    "count": "Puntos de dolor mostrados: {{shown}} de {{total}}",
+    "sort": "Ordenar por",
+    "sorts": {
+      "project": "Orden del proyecto",
+      "lost": "Horas perdidas",
+      "due": "Fecha límite"
+    },
+    "filters": "Filtros",
+    "filter_open": "Abiertos",
+    "filter_late": "Vencidos",
+    "filter_no_action": "Sin acción",
+    "late": "Vencido",
+    "no_action": "Ninguna acción decidida",
+    "map": "Mapa: {{name}}",
+    "lane": "Carril: {{name}}",
+    "go_to": "Ir a {{code}}",
+    "edit": "Editar el plan",
+    "edit_of": "Editar el plan de {{code}}",
+    "loading": "Cargando el plan…",
+    "empty": "No hay puntos de dolor en este proyecto.",
+    "none": "Ningún punto de dolor coincide con los filtros.",
+    "status_since": "{{status}} desde el {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Deshacer",
+    "undo_of": "Deshacer: devolver {{code}} al estado «{{status}}»"
+  },
+  "project_pdf": {
+    "sheet_state": "Estado de la ficha: {{state}}",
+    "continued": "{{title}} (continuación)",
+    "file": "proyecto",
+    "contents": "Índice",
+    "page": "Página {{page}} de {{total}}",
+    "scope_line": "Mapa «{{name}}» y sus niveles",
+    "empty_map": "Mapa sin pasos.",
+    "depth_cut": "Los mapas más allá de {{max}} niveles no están en este documento.",
+    "sheets_of": "Fichas · {{map}}",
+    "reading": "Lectura de los mapas: {{count}}",
+    "reading_sheets": "Lectura de las fichas…",
+    "drawing": "Mapa {{index}} de {{total}}",
+    "writing": "Escritura del documento: página {{page}}",
+    "too_many_maps": "Más de {{max}} mapas: elige «{{scope}}».",
+    "too_many_pages": "Más de {{max}} páginas: desmarca las fichas o exporta un mapa detallado y sus niveles.",
+    "cancelled": "Exportación cancelada.",
+    "title": "Exportar el proyecto a PDF",
+    "help": "Todos los mapas en un solo archivo, nivel por nivel, para quien no tiene la aplicación.",
+    "scope": "Alcance",
+    "scope_project": "Todo el proyecto",
+    "scope_branch": "Este mapa y sus niveles",
+    "with_sheets": "Con las fichas",
+    "with_raci": "Con la matriz RACI",
+    "with_stream": "Con el flujo de valor",
+    "with_plan": "Con el plan de acción",
+    "sheets_help": "Las fichas son las que ves: envía el documento solo a quien pueda leerlas.",
+    "button": "Crear el PDF",
+    "progress": "Progreso",
+    "too_many_maps_below": "Más de {{max}} mapas: abre un mapa detallado de un nivel inferior y elige «{{scope}}».",
+    "too_many_pages_top": "Más de {{max}} páginas: desmarca las fichas."
   }
 }

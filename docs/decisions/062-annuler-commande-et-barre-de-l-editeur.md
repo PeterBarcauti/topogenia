@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-Le lot 3 de P6-T04 ferme l'éditeur de carte (`plan.md`, phase 6 ; ADR 060 § 9, ADR 061) : annuler et rétablir côté
+Le lot 3 de P6-T04 ferme l'éditeur de carte (`plan.md` (non publié), phase 6 ; ADR 060 § 9, ADR 061) : annuler et rétablir côté
 interface (annexe B 2.6, AR-05, AR-108), bouton Commande et barre Ctrl+K (B 2.13, B-2.5-06, 33, 34), barre de l'éditeur
 dans l'en-tête de l'application (fil d'Ariane, Fichier, Membres, B-2.1-01 à 06), menu Fichier (B-2.4-52 à 58) sur les
 dialogues de P6-T03 (ADR 058 § 8), dernier projet ouvert mémorisé par le profil (AR-49). Référence 1.x : `historique.ts`,

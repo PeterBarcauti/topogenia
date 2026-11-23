@@ -1,5 +1,5 @@
 // vite.config.ts
-// Build of the interface into the host's static files, its version, the proxy of development to the API, and the unit test settings (vitest, jsdom).
+// Build of the interface into the host's static files, its version and the day of its release, the proxy of development to the API, and the unit test settings (vitest, jsdom).
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Agent } from 'node:http';
@@ -58,12 +58,32 @@ function servedPackages(): Plugin {
  */
 export const API_PROXY_AGENT = new Agent({ keepAlive: true, maxSockets: 1, keepAliveMsecs: 60_000 });
 
+const MANIFEST = JSON.parse(readFileSync(join(import.meta.dirname, 'package.json'), 'utf8')) as { version: string; releaseDate?: unknown };
+
 /** B-0-10: the version of the application, read from package.json and written into the bundle as `__APP_VERSION__`. */
-export const APP_VERSION = (JSON.parse(readFileSync(join(import.meta.dirname, 'package.json'), 'utf8')) as { version: string }).version;
+export const APP_VERSION = MANIFEST.version;
+
+/**
+ * ADR 111: the day of the release, `releaseDate` of package.json, written by hand at the publication (`yyyy-mm-dd`, a day
+ * of the calendar, no hour nor zone); anything else stops the build, which never takes the day from its clock.
+ */
+export function releaseDayOf(manifest: { readonly releaseDate?: unknown }): string {
+  const day = manifest.releaseDate;
+  const parts = typeof day === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(day) : null;
+  const [year = NaN, month = NaN, date = NaN] = (parts ?? []).slice(1).map(Number);
+  const read = new Date(Date.UTC(year, month - 1, date));
+  if (parts === null || read.getUTCFullYear() !== year || read.getUTCMonth() !== month - 1 || read.getUTCDate() !== date) {
+    throw new Error(`The releaseDate of package.json is not a day written yyyy-mm-dd: ${String(day)}.`);
+  }
+  return day as string;
+}
+
+/** ADR 111: the day of the release, written into the bundle as `__APP_RELEASE_DATE__`. */
+export const APP_RELEASE_DATE = releaseDayOf(MANIFEST);
 
 export default defineConfig({
   plugins: [react(), servedPackages()],
-  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION), __APP_RELEASE_DATE__: JSON.stringify(APP_RELEASE_DATE) },
   build: {
     outDir: '../src/Topogenia.Host/wwwroot',
     emptyOutDir: true,

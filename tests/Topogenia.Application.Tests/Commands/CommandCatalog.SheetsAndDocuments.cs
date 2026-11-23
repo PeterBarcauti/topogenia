@@ -22,6 +22,8 @@ internal static partial class CommandCatalog
         [typeof(DeleteDocumentCommand)] = "sheet_fill",
         [typeof(UseDocumentCommand)] = "sheet_fill",
         [typeof(StopUsingDocumentCommand)] = "sheet_fill",
+        // The status of a pain point received (ADR 116): the right of every document of the sheet of the receiving step.
+        [typeof(ChangePainPointStatusCommand)] = "sheet_fill",
         [typeof(GetAvailableDocumentsQuery)] = "reader",
         [typeof(GetStepDocumentQuery)] = "reader",
         [typeof(GetActionPlanQuery)] = "reader",

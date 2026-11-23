@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { messageOf } from '../../shared/i18n/errorMessage.ts';
+import { useUnsavedForm } from '../../shared/state/useUnsavedForm.ts';
 import { Button } from '../../shared/ui/Button.tsx';
 import { Dialog } from '../../shared/ui/Dialog.tsx';
 import { notify } from '../../shared/ui/toasts.ts';
@@ -88,6 +89,8 @@ export function AssistantSettingsDialog({ onClose }: { onClose: () => void }) {
   const test = () => run(async () => {
     if (form !== null) setOutcome(await testConnection(form));
   });
+  // A setting changed and not saved is a form not validated, for « Quit » (R12).
+  useUnsavedForm(view !== null && form !== null && changed(view, form));
   const calls = form !== null && CALLS_A_MODEL.includes(form.connector);
   const footer = (
     <>

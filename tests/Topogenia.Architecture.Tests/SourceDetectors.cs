@@ -92,7 +92,8 @@ internal static partial class SourceDetectors
         RegexOptions.IgnoreCase)]
     private static partial Regex SystemDatabase();
 
-    [GeneratedRegex(@"(https?|wss?|ftp)://(?!(localhost|127\.0\.0\.1)([:/""'\s]|$)|www\.w3\.org/)|(?<![\w:])//[a-z0-9-]+\.[a-z]{2,}(\.[a-z]{2,})?/", RegexOptions.IgnoreCase)]
+    // The namespaces of the W3C and of the specifications of the OMG (BPMN 2.0.2, ADR 106) are names that no reader fetches.
+    [GeneratedRegex(@"(https?|wss?|ftp)://(?!(localhost|127\.0\.0\.1)([:/""'\s]|$)|www\.w3\.org/|www\.omg\.org/spec/)|(?<![\w:])//[a-z0-9-]+\.[a-z]{2,}(\.[a-z]{2,})?/", RegexOptions.IgnoreCase)]
     private static partial Regex ExternalUrl();
 
     private static SyntaxNode Parse(string text) =>

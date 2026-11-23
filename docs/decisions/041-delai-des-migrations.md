@@ -90,7 +90,7 @@ Mutations (chacune constatée rouge, code remis) : contextes ordinaires dans `Sc
 tests rouges sur les deux moteurs, avec l'erreur du constat en SQL Server : `BASE_OCCUPEE` ← `Execution Timeout
 Expired`) ; attente du verrou non bornée (troisième test rouge en SQLite, attente annulée au bout de 60 s) ;
 intercepteur SQLite du délai de connexion retiré (deuxième test rouge en SQLite). Trois exécutions simultanées de la
-suite de persistance : `docs/couverture-p3/delai-migrations.md`.
+suite de persistance : `docs/couverture-p3/delai-migrations.md` (non publié).
 
 ## Révision (23/10/2026) : réglages de l'ouverture et migrations des tests
 

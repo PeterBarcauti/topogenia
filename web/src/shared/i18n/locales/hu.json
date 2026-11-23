@@ -26,7 +26,14 @@
     "quit_failed": "A $t(app.name) nem állt le. Próbálja újra, vagy zárja be a konzolablakot.",
     "quit_unsaved": "Az adatlap egyik bejegyzése még nincs mentve: a $t(app.name) nyitva marad. Próbálja újra, amint az adatlap mentése megtörtént.",
     "stopped": "A $t(app.name) leállt. Ez a lap bezárható.",
-    "stopped_help": "Ha ismét használni szeretné, nyissa meg újra."
+    "stopped_help": "Ha ismét használni szeretné, nyissa meg újra.",
+    "help_menu": "Súgó menü",
+    "help_online": "Online súgó (angol nyelven)",
+    "update_check": "Frissítések keresése",
+    "update_check_help": "Megnyitja a webhely verzióoldalát. Telepítve: {{version}}, {{date}}.",
+    "update_check_store_help": "Megnyitja a Microsoft Store-oldalt, amely telepíti a frissítéseket.",
+    "quit_text_unsaved": "Egy megnyitott űrlap nincs mentve: a beírt adatok elvesznek.",
+    "quit_anyway": "Kilépés mégis"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "Szóköz",
     "Enter": "Enter",
-    "ArrowUp": "Fel"
+    "ArrowUp": "Fel",
+    "ArrowLeft": "Balra",
+    "ArrowRight": "Jobbra",
+    "ArrowDown": "Le",
+    "Backspace": "Backspace",
+    "Wheel": "Görgő"
   },
   "errors": {
     "RESEAU": "A $t(app.name) nem válaszol. Ellenőrizze, hogy a $t(app.name) még fut-e (vagy a hálózati kapcsolatot, ha szerveren fut).",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "Váratlan válasz érkezett a szervertől. Töltse be újra az oldalt.",
     "ACCES_REFUSE": "Nincs jogosultsága ehhez az oldalhoz.",
     "UNKNOWN": "Váratlan hiba történt.",
-    "RESUMES_A_JOUR": "Minden térképnek naprakész összefoglalója van. Egy újraírásához nyissa meg a térképet, és kattintson a címe melletti „i”-re."
+    "RESUMES_A_JOUR": "Minden térképnek naprakész összefoglalója van. Egy újraírásához nyissa meg a térképet, és kattintson a címe melletti „i”-re.",
+    "COLLECTION_TROP_DE_PROCESSUS": "A gyűjtemény túl sok folyamatot tartalmaz."
   },
   "home": {
     "eyebrow": "Ha az MI-vel szeretné fellendíteni folyamatait, először írja le őket.",
@@ -79,7 +92,24 @@
     "sample_title": "Mintaprojekt",
     "sample_text": "Kitalált, már leírt projekt, amelyen megismerhet egy teljes térképet: sávok, döntések, altérkép, adatlapok, dokumentumok és problémák. Bármely más projekthez hasonlóan törölhető.",
     "sample_create": "Mintaprojekt létrehozása",
-    "sample_created": "Mintaprojekt létrehozva: {{code}}."
+    "sample_created": "Mintaprojekt létrehozva: {{code}}.",
+    "filter": "Projektek szűrése",
+    "filter_placeholder": "Kód vagy név",
+    "filter_count": "{{shown}} / {{total}}",
+    "filter_none": "Egy projekt sem egyezik.",
+    "update_line": "Ez a verzió {{date}} napi.",
+    "update_link": "Megnézem, van-e újabb",
+    "update_close": "Emlékeztető bezárása",
+    "button_start_help": "Válasszon kiindulópontot.",
+    "start_menu": "Projekt indítása",
+    "start_sample": "Mintaprojekt",
+    "start_gallery": "Sablongaléria",
+    "start_gallery_help": "Megnyílik a böngészőben.",
+    "start_blank": "Üres térkép…",
+    "new_project_help": "Indulás üres térképpel, mintával vagy sablonnal.",
+    "new_project_help_no_sample": "Indulás üres térképpel vagy sablonnal.",
+    "new_project_help_no_gallery": "Indulás üres térképpel vagy mintával.",
+    "new_project_help_blank": "Indulás üres térképpel."
   },
   "roles": {
     "facilitator": "Facilitátor",
@@ -112,7 +142,7 @@
     "properties": "Projekt tulajdonságai…",
     "properties_title": "Projekt tulajdonságai: {{code}}",
     "sharing_group": "Dokumentummegosztási csoport",
-    "sharing_group_help": "Megosztott bemenet esetén ez a név szerepel az adatlapokon (pl. Pénzügyi csapat). Ha üres: „a projekt megosztási csoportja”.",
+    "sharing_group_help": "A projekt dokumentumait olvasni jogosult személyek csoportjának neve. Az adatlapokon minden dokumentum „Megosztva a csoporttal” jelölőnégyzetén jelenik meg. Ha üres: „a projekt megosztási csoportja”.",
     "properties_read_only": "Ezeket a tulajdonságokat csak a projekt facilitátora módosíthatja.",
     "properties_saved": "Projekt tulajdonságai mentve.",
     "language": "A folyamat nyelve",
@@ -121,12 +151,14 @@
     "workday_hours": "Munkanap (óra)",
     "workday_hours_help": "1 és 24 óra között, alapértelmezés: 7; az átfutási időket munkanapra számítja át.",
     "fte_hours": "Havi óraszám FTE-nként",
-    "fte_hours_help": "1 és 744 óra között, alapértelmezés: 151,67; a munkaterhelést teljes munkaidős egyenértékre (FTE) számítja át."
+    "fte_hours_help": "1 és 744 óra között, alapértelmezés: 151,67; a munkaterhelést teljes munkaidős egyenértékre (FTE) számítja át.",
+    "code_proposed": "A név alapján javasolva.",
+    "more_options": "További lehetőségek"
   },
   "files": {
     "open": "Fájl megnyitása…",
     "open_title": "Fájl megnyitása",
-    "open_help": "A fájlból új projekt lesz: .pmap fájl (letöltött másolat vagy egy vázlatot elolvasó MI válasza), Excel- vagy CSV-táblázat, Mermaid-ábra (.mmd, .md) vagy szerkeszthető másolattal exportált SVG-kép.",
+    "open_help": "A fájlból új projekt lesz: .pmap fájl (letöltött másolat vagy egy vázlatot elolvasó MI válasza), modellgyűjtemény (.pmaps), Excel- vagy CSV-táblázat, Mermaid-ábra (.mmd, .md) vagy szerkeszthető másolattal exportált SVG-kép.",
     "choose": "Fájl kiválasztása…",
     "or_paste": "Vagy illessze be ide a tartalmát, például egy MI válaszát:",
     "area": "Illessze be vagy húzza ide a .pmap fájl tartalmát",
@@ -192,7 +224,52 @@
     "target_name": "{{name}} (célállapot)",
     "target_label": "A viszonyítási alap címkéje",
     "target_label_default": "Jelenlegi állapot",
-    "target_button": "Létrehozás"
+    "target_button": "Létrehozás",
+    "map_download": "A megnyitott térkép mentése (.pmap)",
+    "map_downloaded": "A térkép elmentve a részletes térképeivel, adatlapjaival és megjegyzéseivel: a .pmap fájl a Letöltések mappában van.",
+    "insert": "Fájl beszúrása részletezett lépésként…",
+    "insert_here": "Fájl beszúrása ide…",
+    "insert_title": "Fájl beszúrása részletezett lépésként",
+    "insert_help": "A fájl a térkép új részletezett lépése lesz. Ez másolat: a fájl későbbi módosítása nem változtatja meg a térképet. .pmap fájl, Excel- vagy CSV-táblázat, Mermaid-diagram vagy SVG-kép a másolatával.",
+    "replace_title": "Részletezés cseréje fájlra",
+    "replace_help": "A(z) „{{label}}” részletezése a Lomtárba kerül, és a fájl lép a helyére. A Ctrl+Z mindent visszavon.",
+    "insert_counts": "Lépések: {{steps}} · Sávok: {{lanes}} · Kapcsolatok: {{flows}} · Térképek: {{maps}} · Adatlapok: {{sheets}}",
+    "insert_too_deep": "A fájlnak {{depth}} térképszintje van; e térkép alatt legfeljebb {{room}} lehet.",
+    "insert_too_large": "Ez a fájl nagyobb {{max}} MB-nál: nem szúrható be.",
+    "insert_package": "Ez egy cserecsomag: projektként importálható, nem szúrható be.",
+    "insert_dropped": "Kihagyott fordítások (itt nem beállított nyelvek): {{languages}}",
+    "insert_label": "A lépés neve",
+    "insert_lane": "Sáv",
+    "insert_after": "Elhelyezés ez után:",
+    "insert_at_start": "A térkép elejére",
+    "insert_sheets": "Adatlapok átvétele",
+    "insert_sheets_help": "Az adatlapok, dokumentumaik és problémapontjaik piszkozatként érkeznek, átnézésre, majd jóváhagyásra.",
+    "insert_button": "Beszúrás",
+    "replace_button": "Csere",
+    "inserted": "Fájl beszúrva. Lépések: {{steps}} · Térképek: {{maps}}",
+    "insert_on_flow": "A nyílra: {{from}} → {{to}}",
+    "insert_on_flow_here": "Fájl beszúrása erre a nyílra…",
+    "collection_title": "„{{name}}” gyűjtemény",
+    "collection_help": "Minden megjelölt folyamathoz létrejön egy projekt. A „Projektek létrehozása” előtt semmi sem íródik.",
+    "collection_all": "Összes kijelölése",
+    "collection_ticked": "Kijelölve: {{count}} / {{total}}",
+    "collection_points": "Ellenőrzendő pontok: {{count}}",
+    "collection_details": "Leírás és ellenőrzendő pontok",
+    "collection_code_free": "A(z) {{code}} már foglalt.",
+    "collection_invalid": "Nem nyitható meg:",
+    "collection_create": "Projektek létrehozása",
+    "collection_creating": "Létrehozás: {{done}} / {{total}}…",
+    "collection_done": "Projektek létrehozva",
+    "collection_created": "{{code}} létrehozva.",
+    "collection_failed": "Nem jött létre: {{reason}}",
+    "collection_retry": "Újra",
+    "collection_unnamed": "{{rank}}. folyamat",
+    "insert_collection": "A gyűjtemény a „Fájl megnyitása…” paranccsal nyílik meg. A modelljei közül egyet külön szúrhat be.",
+    "open_too_large": "Ez a fájl nagyobb {{max}} MB-nál: nem nyitható meg.",
+    "collection_none": "Egy projekt sem jött létre",
+    "collection_code_twice": "A(z) {{code}} egy másik sorhoz is meg van adva.",
+    "collection_fix": "Szöveg javítása",
+    "remote_locations": "Hálózati vagy webes címek az adatlapokon: {{count}}, dokumentum megnyitása előtt ellenőrizendők."
   },
   "package": {
     "export": "Projekt exportálása ({{extension}})…",
@@ -369,7 +446,13 @@
       "due": "Határidő",
       "status": "Állapot",
       "lost": "Elvesztett óra havonta"
-    }
+    },
+    "copy_image": "A térkép másolása képként",
+    "copying": "Kép másolása…",
+    "copied": "A kép átmásolva: illessze be (Ctrl+V) e-mailbe vagy diára.",
+    "copy_failed": "A képet nem sikerült átmásolni.",
+    "copy_as_png": "Exportálás PNG-ként",
+    "project_pdf": "Projekt exportálása PDF-be…"
   },
   "classification": {
     "internal": "Belső",
@@ -498,7 +581,8 @@
     "breadcrumb": "Navigációs útvonal",
     "file": "Fájl",
     "file_help": "Fájl megnyitása, másolat letöltése, duplikálás, exportálás",
-    "members": "Tagok"
+    "members": "Tagok",
+    "fit": "Összes mutatása"
   },
   "ribbon": {
     "name": "A térkép menüszalagja",
@@ -596,6 +680,27 @@
       "necessary": "Szükséges, érték nélkül",
       "waste": "Veszteség",
       "none": "Nincs besorolva"
+    },
+    "replace_detail": "Részletezés cseréje fájlra…",
+    "copy_selection_image": "A kijelölés másolása képként",
+    "file_cascade": {
+      "export": "Térkép exportálása",
+      "project": "Projekt",
+      "package": "Cserecsomag",
+      "assistant": "MI-asszisztens"
+    },
+    "file_short": {
+      "pdf": "PDF (A3, fekvő)",
+      "png": "PNG-kép",
+      "svg": "SVG-kép…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "Teljes projekt PDF-ben…",
+      "import": "Csomag importálása…",
+      "replace": "Csere csomaggal…",
+      "report": "Elmesélt jelentés (Markdown)",
+      "comments": "Bemutatási megjegyzések…"
     }
   },
   "deletion": {
@@ -646,7 +751,8 @@
       "retracer_liens": "a nyilak automatikus útvonala",
       "inserer_rangees": "sorok beszúrása",
       "retirer_rangee": "sor eltávolítása",
-      "proposition_ia": "MI-javaslat"
+      "proposition_ia": "MI-javaslat",
+      "inserer_fichier": "fájl beszúrása"
     }
   },
   "command": {
@@ -769,9 +875,6 @@
     "duration_max": "Leghosszabb időtartam",
     "duration_bounds_order": "Legrövidebb ≤ időtartam ≤ leghosszabb",
     "minutes": "perc",
-    "duration_between": "{{min}}–{{max}} perc",
-    "duration_at_least": "legalább {{min}} perc",
-    "duration_at_most": "legfeljebb {{max}} perc",
     "duration_value_one": "{{count}} perc",
     "duration_value_other": "{{count}} perc",
     "fold": "„{{section}}” összecsukása",
@@ -832,6 +935,7 @@
     "clarification_withdrawn": "Kérdés eltávolítva.",
     "read_empty": "Ehhez a lépéshez még nincs véglegesített adatlap.",
     "read_validated": "Véglegesített változat: {{name}} ({{date}}).",
+    "read_draft": "Folyamatban lévő piszkozat, még nincs véglegesítve.",
     "document": {
       "add_output": "Kimenet hozzáadása",
       "new_output": "Új kimenet",
@@ -895,7 +999,8 @@
         "file": "Fájl",
         "software": "Szoftver",
         "other": "Egyéb"
-      }
+      },
+      "edit_pain": "Szerkesztés itt: {{code}}"
     },
     "pain_point": {
       "title": "Probléma",
@@ -924,7 +1029,21 @@
         "implemented": "megvalósítva",
         "adopted": "bevezetve",
         "dropped": "elvetve"
-      }
+      },
+      "status": "Állapot",
+      "status_of": "A(z) {{code}} problémapont állapota",
+      "status_help": "Megvalósítva, bevezetve vagy elvetve: a problémapont lekerül a térképről, és órái már nem számítanak.",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "a probléma azonosítva, intézkedést kell tervezni",
+        "scored": "a problémapont értékelve, intézkedésről kell dönteni",
+        "under_review": "az intézkedés vizsgálat alatt, még nincs döntés",
+        "in_progress": "az intézkedés végrehajtás alatt",
+        "implemented": "az intézkedés kész, az eredményt ellenőrizni kell",
+        "adopted": "ellenőrizve, ez az új munkamód",
+        "dropped": "úgy döntünk, nem foglalkozunk vele"
+      },
+      "status_now": "A(z) {{code}} problémapont állapota: {{status}}"
     },
     "lead_time": "Átfutási idő",
     "lead_time_help": "Az ügy beérkezésétől a lépés elhagyásáig eltelt idő, a várakozásokkal együtt; a kitöltöttségbe nem számít bele.",
@@ -941,7 +1060,18 @@
       "minute": "perc",
       "hour": "óra",
       "day": "munkanap"
-    }
+    },
+    "duration_between_one": "{{min}}–{{max}} perc",
+    "duration_between_other": "{{min}}–{{max}} perc",
+    "duration_at_least_one": "legalább {{min}} perc",
+    "duration_at_least_other": "legalább {{min}} perc",
+    "duration_at_most_one": "legfeljebb {{max}} perc",
+    "duration_at_most_other": "legfeljebb {{max}} perc",
+    "step_pain_points": "A lépés problémái",
+    "step_pain_points_help": "A lépéshez kötött, dokumentum nélküli problémák. Leírásuk és tervük csak olvasható.",
+    "pain_points_one": "{{count}} probléma",
+    "pain_points_other": "{{count}} probléma",
+    "step_pain_points_help_fill": "A lépéshez kötött, dokumentum nélküli problémák. Állapotuk itt módosítható; leírásuk és tervük csak olvasható."
   },
   "translations": {
     "title": "A projekt fordítása",
@@ -1188,6 +1318,12 @@
         },
         "summaries": {
           "title": "Összefoglalók"
+        },
+        "comments": {
+          "title": "Bemutatási megjegyzések",
+          "text": "Amit a bemutatás a lépésekről és az átadásokról mond.",
+          "example": "Írd meg a térkép és részletes térképei lépéseinek és átadásainak megjegyzéseit.",
+          "example_empty": "Írd meg a térkép és részletes térképei lépéseinek és átadásainak megjegyzéseit."
         }
       },
       "thread": "Beszélgetés az asszisztenssel",
@@ -1245,7 +1381,8 @@
         "findings": "Elemzés",
         "report": "Jelentés",
         "summaries": "Összefoglalók",
-        "proposal": "Javaslat"
+        "proposal": "Javaslat",
+        "comments": "Bemutatási megjegyzések"
       },
       "pasted": "Beillesztett válasz",
       "copy_reply": "Válasz másolása",
@@ -1401,7 +1538,19 @@
     "resource": "Azure-erőforrás",
     "resource_help": "Az erőforrás neve: contoso a contoso.openai.azure.com esetén.",
     "port": "Port",
-    "port_help": "Üres: az alapértelmezett port (Ollama 11434, LM Studio 1234)."
+    "port_help": "Üres: az alapértelmezett port (Ollama 11434, LM Studio 1234).",
+    "comments": {
+      "request": "Írd meg a bemutatási megjegyzéseket a térkép és részletes térképei azon lépéseihez és átadásaihoz, amelyeknek még nincs.",
+      "menu": "Bemutatási megjegyzések írása (MI)…",
+      "intro": "Olvassa el újra az egyes megjegyzéseket: tartsa meg, javítsa vagy vesse el. A bemutatás alatt hangzik el.",
+      "flow": "Átadás {{labels}}",
+      "map": "Térkép: {{name}}",
+      "current": "Jelenlegi megjegyzés: {{text}}",
+      "typed": "Kézzel beírt megjegyzést cserél le: {{text}}",
+      "save": "Megtartott megjegyzések mentése ({{n}})",
+      "saved": "Mentett megjegyzések: {{n}}",
+      "done": "Mentett bemutatási megjegyzések: {{n}}"
+    }
   },
   "interface_language": {
     "help": "A menük és az üzenetek nyelve, csak az Ön számára. Azt, hogy a térképek milyen nyelven jelenjenek meg, az ablak tetején választhatja ki, ha meg van nyitva egy projekt."
@@ -1856,5 +2005,174 @@
       "closing_lost": "Elvesztegetett idő: havonta {{lost}}.",
       "arrow": "majd"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "Exportálás BPMN 2.0 formátumba (.bpmn)…",
+    "export_title": "Exportálás BPMN 2.0 formátumba",
+    "export_help": "A .bpmn fájl BPMN-modellezőkben nyílik meg (Camunda, Signavio, Bizagi…). Minden lépés teljes adatlapját tartalmazza, a dokumentumok helye nélkül.",
+    "export_button": "Exportálás",
+    "export_subprocesses": "A részletes alfolyamatok belefoglalása",
+    "export_subprocesses_help": "Minden részletezett lépés alfolyamatként nyílik meg a modellezőben.",
+    "export_subprocesses_none": "A térképnek nincs részletezett lépése.",
+    "export_details": "A dokumentumok és a problémák megrajzolása",
+    "export_details_help": "Bejelöletlenül a fájl dokumentációjában maradnak leírva.",
+    "toolbar": "BPMN 2.0 nézet",
+    "badge": "BPMN 2.0 diagram · csak olvasható",
+    "details": "Részletek a diagramon",
+    "export": "Exportálás (.bpmn)…",
+    "close": "Vissza a térképhez",
+    "close_help": "Vissza a térképhez (Alt+B)",
+    "failed": "A diagramot nem sikerült beolvasni.",
+    "loading": "A diagram beolvasása…",
+    "node_label": "{{kind}}: {{name}}",
+    "kinds": {
+      "startEvent": "Kezdő esemény",
+      "endEvent": "Záró esemény",
+      "intermediateCatchEvent": "Várakozás",
+      "manualTask": "Kézi feladat",
+      "userTask": "Felhasználói feladat",
+      "serviceTask": "Automatizált feladat",
+      "subProcess": "Alfolyamat",
+      "exclusiveGateway": "Kizáró átjáró",
+      "parallelGateway": "Párhuzamos átjáró",
+      "inclusiveGateway": "Megengedő átjáró"
+    },
+    "doc": {
+      "field": "{{label}}: {{value}}",
+      "quote": "„{{text}}”",
+      "map": "Térkép: {{name}}",
+      "classification": "Besorolás: {{value}}",
+      "language": "Nyelv: {{language}}",
+      "work_time": "Munkanap: {{workday}} óra; egy FTE havi órái: {{fte}} óra",
+      "description": "Leírás",
+      "wait": "{{hours}} óra várakozás",
+      "from": "innen: {{code}}",
+      "volume": "Bejövő mennyiség: {{quantity}} / {{period}}",
+      "periods": {
+        "day": "munkanap",
+        "week": "hét",
+        "month": "hónap",
+        "year": "év"
+      },
+      "lane_system": "Önállóan működő szoftver sávja",
+      "headcount": "Létszám: {{number}}"
+    },
+    "fit": "Összes mutatása",
+    "fit_help": "A teljes diagram megjelenítése az ablakban"
+  },
+  "shortcuts": {
+    "title": "Billentyűparancsok",
+    "sections": {
+      "move": "Mozgás",
+      "choose": "Választás",
+      "edit": "A térkép módosítása",
+      "display": "Megjelenítés",
+      "present": "Bemutatás",
+      "help": "Súgó"
+    },
+    "edit_note": "Csak a projekt facilitátora számára.",
+    "or": "vagy",
+    "move_selection": "A kijelölés mozgatása",
+    "escape": "Menü, panel vagy adatlap bezárása; az „Összekötés” leállítása",
+    "space_held": "Kéz eszköz, amíg a billentyű le van nyomva",
+    "enter": "A kiválasztott lépés adatlapjának megnyitása",
+    "type": "A kiválasztott lépés nevének megkezdése",
+    "menu_key": "A kiválasztott objektum menüje",
+    "wheel": "Görgetés; Shifttel vízszintesen",
+    "zoom": "Nagyítás",
+    "saved": "Emlékeztető, hogy minden mentve van",
+    "alone_note": "Egyetlen kiválasztott lépés nélkül (különben a billentyű megkezdi a nevét)",
+    "type_key": "egy betű",
+    "search_keys": "A keresésben: következő; Shifttel előző; az Esc bezárja"
+  },
+  "search": {
+    "command_help": "Keresés a projektben",
+    "title": "Keresés",
+    "field": "Keresett szó",
+    "placeholder": "Lépés, dokumentum, eszköz…",
+    "previous": "Előző (Shift+Enter)",
+    "next": "Következő (Enter)",
+    "position": "{{index}} / {{count}}",
+    "searching": "Keresés…",
+    "none": "Nincs találat.",
+    "too_many": "Az első {{shown}} találat a(z) {{total}} közül: szűkítse a keresést.",
+    "short": "Legalább két karakter, vagy Enter.",
+    "this_map": "Ez a térkép",
+    "level": "{{level}}. szint",
+    "origin": "Eredeti nyelv: {{language}}",
+    "kinds": {
+      "step": "Lépés",
+      "lane": "Sáv",
+      "document": "Dokumentum",
+      "tool": "Eszköz",
+      "pain_point": "Probléma",
+      "action": "Intézkedés"
+    },
+    "results_one": "{{count}} találat",
+    "results_other": "{{count}} találat"
+  },
+  "action_plan": {
+    "command": "Intézkedési terv",
+    "title": "Intézkedési terv",
+    "total": "havonta {{hours}} óra veszteség a nyitott problémákon",
+    "late_count": "Lejárt: {{count}}",
+    "count": "Megjelenített problémák: {{shown}} / {{total}}",
+    "sort": "Rendezés",
+    "sorts": {
+      "project": "Projekt sorrendje",
+      "lost": "Elvesztett órák",
+      "due": "Határidő"
+    },
+    "filters": "Szűrők",
+    "filter_open": "Nyitott",
+    "filter_late": "Lejárt",
+    "filter_no_action": "Intézkedés nélkül",
+    "late": "Lejárt",
+    "no_action": "Nincs eldöntött intézkedés",
+    "map": "Térkép: {{name}}",
+    "lane": "Sáv: {{name}}",
+    "go_to": "Ugrás ide: {{code}}",
+    "edit": "Terv szerkesztése",
+    "edit_of": "{{code}} tervének szerkesztése",
+    "loading": "Terv betöltése…",
+    "empty": "Ebben a projektben nincs probléma.",
+    "none": "Egyetlen probléma sem felel meg a szűrőknek.",
+    "status_since": "{{status}} ettől: {{date}}",
+    "status_changed": "{{code}}: {{status}}.",
+    "undo": "Visszavonás",
+    "undo_of": "Visszavonás: {{code}} visszaállítása erre: „{{status}}”"
+  },
+  "project_pdf": {
+    "sheet_state": "Az adatlap állapota: {{state}}",
+    "continued": "{{title}} (folytatás)",
+    "file": "projekt",
+    "contents": "Tartalom",
+    "page": "{{page}}. oldal / {{total}}",
+    "scope_line": "„{{name}}” térkép és szintjei",
+    "empty_map": "Lépések nélküli térkép.",
+    "depth_cut": "A(z) {{max}} szint alatti térképek nem szerepelnek ebben a dokumentumban.",
+    "sheets_of": "Adatlapok · {{map}}",
+    "reading": "Térképek beolvasása: {{count}}",
+    "reading_sheets": "Adatlapok beolvasása…",
+    "drawing": "{{index}}. térkép / {{total}}",
+    "writing": "A dokumentum írása: {{page}}. oldal",
+    "too_many_maps": "Több mint {{max}} térkép: válassza a(z) „{{scope}}” lehetőséget.",
+    "too_many_pages": "Több mint {{max}} oldal: törölje az adatlapok jelölését, vagy exportáljon egy részletes térképet és a szintjeit.",
+    "cancelled": "Az exportálás megszakítva.",
+    "title": "Projekt exportálása PDF-be",
+    "help": "Az összes térkép egy fájlban, szintenként, azoknak, akiknek nincs meg az alkalmazás.",
+    "scope": "Terjedelem",
+    "scope_project": "A teljes projekt",
+    "scope_branch": "Ez a térkép és a szintjei",
+    "with_sheets": "Adatlapokkal",
+    "with_raci": "RACI-mátrixszal",
+    "with_stream": "Értékárammal",
+    "with_plan": "Intézkedési tervvel",
+    "sheets_help": "Az adatlapok azok, amelyeket Ön lát: a dokumentumot csak olyannak küldje el, aki olvashatja őket.",
+    "button": "PDF létrehozása",
+    "progress": "Előrehaladás",
+    "too_many_maps_below": "Több mint {{max}} térkép: nyisson meg egy lejjebb lévő részletes térképet, majd válassza a(z) „{{scope}}” lehetőséget.",
+    "too_many_pages_top": "Több mint {{max}} oldal: törölje az adatlapok jelölését."
   }
 }

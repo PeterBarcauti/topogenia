@@ -31,7 +31,7 @@ remonte en erreur 500 (faiblesse 12 de la spec 5.6).
 
 ## Vérification
 
-- `tests/Topogenia.Domain.Tests/` (phase 2) : chaque règle de l'annexe A a au moins un test.
+- `tests/Topogenia.Domain.Tests/` (non publié) (phase 2) : chaque règle de l'annexe A a au moins un test.
 - `tests/Topogenia.Architecture.Tests/SourceRulesTests.cs` :
   `No_trigger_procedure_or_function_anywhere_including_migrations` (aucun `CREATE TRIGGER`,
   `PROCEDURE` ni `FUNCTION` dans `src`, migrations comprises) et

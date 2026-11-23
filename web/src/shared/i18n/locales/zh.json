@@ -26,7 +26,14 @@
     "quit_failed": "$t(app.name) 未能停止。请重试，或关闭控制台窗口。",
     "quit_unsaved": "说明卡中有输入内容尚未保存：$t(app.name) 保持打开。请在说明卡保存后重试。",
     "stopped": "$t(app.name) 已停止。可以关闭此标签页。",
-    "stopped_help": "如需再次使用，请重新打开。"
+    "stopped_help": "如需再次使用，请重新打开。",
+    "help_menu": "帮助菜单",
+    "help_online": "在线帮助（英语）",
+    "update_check": "检查更新",
+    "update_check_help": "打开网站的版本页面。已安装：{{date}} 的 {{version}}。",
+    "update_check_store_help": "打开 Microsoft Store 页面，更新由 Microsoft Store 安装。",
+    "quit_text_unsaved": "打开的表单尚未保存：其中输入的内容将会丢失。",
+    "quit_anyway": "仍然退出"
   },
   "keys": {
     "Shift": "Shift",
@@ -34,7 +41,12 @@
     "Escape": "Esc",
     "Space": "空格",
     "Enter": "Enter",
-    "ArrowUp": "上箭头"
+    "ArrowUp": "上箭头",
+    "ArrowLeft": "左箭头",
+    "ArrowRight": "右箭头",
+    "ArrowDown": "下箭头",
+    "Backspace": "Backspace",
+    "Wheel": "滚轮"
   },
   "errors": {
     "RESEAU": "$t(app.name) 没有响应。请检查 $t(app.name) 是否仍在运行（如果它在服务器上，请检查网络连接）。",
@@ -42,7 +54,8 @@
     "REPONSE_INVALIDE": "服务器返回了意外的响应。请重新加载页面。",
     "ACCES_REFUSE": "您没有访问此页面的权限。",
     "UNKNOWN": "发生意外错误。",
-    "RESUMES_A_JOUR": "所有流程图都已有最新概述。如需重写，请打开该流程图并点击标题旁的“i”。"
+    "RESUMES_A_JOUR": "所有流程图都已有最新概述。如需重写，请打开该流程图并点击标题旁的“i”。",
+    "COLLECTION_TROP_DE_PROCESSUS": "该集合包含的流程过多。"
   },
   "home": {
     "eyebrow": "要用 AI 提升流程，请先描述流程。",
@@ -79,7 +92,24 @@
     "sample_title": "示例项目",
     "sample_text": "一个已描述好的虚构项目，用于了解完整的流程图：泳道、判断、细化流程图、说明卡、文档和痛点。可以像其他项目一样删除。",
     "sample_create": "创建示例项目",
-    "sample_created": "示例项目 {{code}} 已创建。"
+    "sample_created": "示例项目 {{code}} 已创建。",
+    "filter": "筛选项目",
+    "filter_placeholder": "代码或名称",
+    "filter_count": "第 {{shown}} 个，共 {{total}} 个",
+    "filter_none": "没有匹配的项目。",
+    "update_line": "此版本发布于 {{date}}。",
+    "update_link": "查看是否有更新版本",
+    "update_close": "关闭提醒",
+    "button_start_help": "选择起点。",
+    "start_menu": "开始项目",
+    "start_sample": "示例项目",
+    "start_gallery": "模板库",
+    "start_gallery_help": "在浏览器中打开。",
+    "start_blank": "空白流程图…",
+    "new_project_help": "从空白流程图、示例或模板开始。",
+    "new_project_help_no_sample": "从空白流程图或模板开始。",
+    "new_project_help_no_gallery": "从空白流程图或示例开始。",
+    "new_project_help_blank": "从空白流程图开始。"
   },
   "roles": {
     "facilitator": "协调人",
@@ -112,7 +142,7 @@
     "properties": "项目属性…",
     "properties_title": "项目 {{code}} 的属性",
     "sharing_group": "文档共享组",
-    "sharing_group_help": "在说明卡中作为共享输入的组名（例如 财务团队）。留空时显示为“项目共享组”。",
+    "sharing_group_help": "可以阅读项目文档的人员组的名称。显示在说明卡中每个文档的“与该组共享”复选框上。留空时显示为“项目共享组”。",
     "properties_read_only": "只有项目协调人可以修改这些属性。",
     "properties_saved": "项目属性已保存。",
     "language": "流程语言",
@@ -121,12 +151,14 @@
     "workday_hours": "工作日时长（小时）",
     "workday_hours_help": "1 到 24 小时，默认 7：用于将前置时间换算为工作日。",
     "fte_hours": "每 FTE 每月小时数",
-    "fte_hours_help": "1 到 744 小时，默认 151.67：用于将工作量换算为全职当量（FTE）。"
+    "fte_hours_help": "1 到 744 小时，默认 151.67：用于将工作量换算为全职当量（FTE）。",
+    "code_proposed": "根据名称提出的建议。",
+    "more_options": "更多选项"
   },
   "files": {
     "open": "打开文件…",
     "open_title": "打开文件",
-    "open_help": "该文件将成为一个新项目：可以是 .pmap 文件（下载的副本，或读取草图的 AI 给出的回答）、Excel 或 CSV 表格、Mermaid 图（.mmd、.md），或带可编辑副本导出的 SVG 图像。",
+    "open_help": "该文件将成为一个新项目：可以是 .pmap 文件（下载的副本，或读取草图的 AI 给出的回答）、模板集合（.pmaps）、Excel 或 CSV 表格、Mermaid 图（.mmd、.md），或带可编辑副本导出的 SVG 图像。",
     "choose": "选择文件…",
     "or_paste": "或在此粘贴其内容，例如 AI 的回复：",
     "area": "在此粘贴或拖放 .pmap 文件的内容",
@@ -192,7 +224,52 @@
     "target_name": "{{name}}（目标状态）",
     "target_label": "基准标签",
     "target_label_default": "现状",
-    "target_button": "创建"
+    "target_button": "创建",
+    "map_download": "保存当前地图 (.pmap)",
+    "map_downloaded": "地图已连同其详细地图、卡片和备注一起保存：.pmap 文件位于“下载”文件夹中。",
+    "insert": "将文件插入为细化步骤…",
+    "insert_here": "在此插入文件…",
+    "insert_title": "将文件插入为细化步骤",
+    "insert_help": "文件成为此流程图的一个新细化步骤。这是一份副本：之后修改文件不会改变流程图。可以是 .pmap 文件、Excel 或 CSV 表格、Mermaid 图，或带副本的 SVG 图片。",
+    "replace_title": "用文件替换细化",
+    "replace_help": "“{{label}}”的细化将移入回收站，由文件取而代之。Ctrl+Z 可全部撤销。",
+    "insert_counts": "步骤：{{steps}} · 泳道：{{lanes}} · 连线：{{flows}} · 流程图：{{maps}} · 卡片：{{sheets}}",
+    "insert_too_deep": "此文件有 {{depth}} 层流程图；在此流程图下最多只能有 {{room}} 层。",
+    "insert_too_large": "此文件超过 {{max}} MB，无法插入。",
+    "insert_package": "这是交换项目包：请作为项目导入，不能插入。",
+    "insert_dropped": "已略去的翻译（此处未配置的语言）：{{languages}}",
+    "insert_label": "步骤名称",
+    "insert_lane": "泳道",
+    "insert_after": "放在其后",
+    "insert_at_start": "流程图开头",
+    "insert_sheets": "一并导入卡片",
+    "insert_sheets_help": "卡片及其文件和痛点以草稿形式导入，需审阅后再确认。",
+    "insert_button": "插入",
+    "replace_button": "替换",
+    "inserted": "文件已插入。步骤：{{steps}} · 流程图：{{maps}}",
+    "insert_on_flow": "在箭头上 {{from}} → {{to}}",
+    "insert_on_flow_here": "在此箭头上插入文件…",
+    "collection_title": "集合“{{name}}”",
+    "collection_help": "每个勾选的流程会创建一个项目。在点击“创建项目”之前不会写入任何内容。",
+    "collection_all": "全选",
+    "collection_ticked": "已勾选：{{count}} / {{total}}",
+    "collection_points": "待核对项：{{count}}",
+    "collection_details": "说明和待核对项",
+    "collection_code_free": "{{code}} 已被占用。",
+    "collection_invalid": "无法打开：",
+    "collection_create": "创建项目",
+    "collection_creating": "正在创建 {{done}} / {{total}}…",
+    "collection_done": "项目已创建",
+    "collection_created": "已创建 {{code}}。",
+    "collection_failed": "未创建：{{reason}}",
+    "collection_retry": "重试",
+    "collection_unnamed": "流程 {{rank}}",
+    "insert_collection": "集合通过“打开文件…”打开。可单独插入其中一个模板。",
+    "open_too_large": "此文件超过 {{max}} MB，无法打开。",
+    "collection_none": "未创建任何项目",
+    "collection_code_twice": "{{code}} 也分配给了另一行。",
+    "collection_fix": "更正文本",
+    "remote_locations": "卡片中的网络或网页地址：{{count}} 个，打开文档前请核对。"
   },
   "package": {
     "export": "导出项目（{{extension}}）…",
@@ -367,7 +444,13 @@
       "due": "截止日期",
       "status": "状态",
       "lost": "每月损失工时"
-    }
+    },
+    "copy_image": "将流程图复制为图片",
+    "copying": "正在复制图片…",
+    "copied": "图片已复制：可粘贴（Ctrl+V）到邮件或幻灯片中。",
+    "copy_failed": "无法复制图片。",
+    "copy_as_png": "导出为 PNG",
+    "project_pdf": "将项目导出为 PDF…"
   },
   "classification": {
     "internal": "内部",
@@ -496,7 +579,8 @@
     "breadcrumb": "导航路径",
     "file": "文件",
     "file_help": "打开文件、下载副本、创建副本、导出",
-    "members": "成员"
+    "members": "成员",
+    "fit": "显示全部"
   },
   "ribbon": {
     "name": "流程图功能区",
@@ -594,6 +678,27 @@
       "necessary": "必要但无价值",
       "waste": "浪费",
       "none": "未分类"
+    },
+    "replace_detail": "用文件替换细化…",
+    "copy_selection_image": "将所选内容复制为图片",
+    "file_cascade": {
+      "export": "导出地图",
+      "project": "项目",
+      "package": "交换包",
+      "assistant": "AI 助手"
+    },
+    "file_short": {
+      "pdf": "PDF（A3 横向）",
+      "png": "PNG 图片",
+      "svg": "SVG 图片…",
+      "xlsx": "Excel",
+      "md": "Markdown (Mermaid)",
+      "bpmn": "BPMN 2.0 (.bpmn)…",
+      "project_pdf": "整个项目导出为 PDF…",
+      "import": "导入项目包…",
+      "replace": "用项目包替换…",
+      "report": "讲述式报告（Markdown）",
+      "comments": "演示备注…"
     }
   },
   "deletion": {
@@ -644,7 +749,8 @@
       "retracer_liens": "箭头的自动路线",
       "inserer_rangees": "插入行",
       "retirer_rangee": "移除行",
-      "proposition_ia": "AI 建议"
+      "proposition_ia": "AI 建议",
+      "inserer_fichier": "插入文件"
     }
   },
   "command": {
@@ -767,9 +873,6 @@
     "duration_max": "最长耗时",
     "duration_bounds_order": "最短 ≤ 耗时 ≤ 最长",
     "minutes": "分钟",
-    "duration_between": "{{min}} 至 {{max}} 分钟",
-    "duration_at_least": "至少 {{min}} 分钟",
-    "duration_at_most": "至多 {{max}} 分钟",
     "duration_value_one": "{{count}} 分钟",
     "duration_value_other": "{{count}} 分钟",
     "fold": "折叠“{{section}}”",
@@ -830,6 +933,7 @@
     "clarification_withdrawn": "问题已撤回。",
     "read_empty": "此步骤暂无已确认的说明卡。",
     "read_validated": "{{date}} 由 {{name}} 确认的版本。",
+    "read_draft": "草稿编辑中，尚未确认。",
     "document": {
       "add_output": "添加输出",
       "new_output": "新输出",
@@ -893,7 +997,8 @@
         "file": "文件",
         "software": "软件",
         "other": "其他"
-      }
+      },
+      "edit_pain": "在 {{code}} 中编辑"
     },
     "pain_point": {
       "title": "痛点",
@@ -922,7 +1027,21 @@
         "implemented": "已实施",
         "adopted": "已采纳",
         "dropped": "已放弃"
-      }
+      },
+      "status": "状态",
+      "status_of": "问题 {{code}} 的状态",
+      "status_help": "已实施、已采纳或已放弃：该问题将从地图中移除，其工时不再计入。",
+      "status_choice": "{{status}} — {{help}}",
+      "status_helps": {
+        "reported": "已发现问题，待规划措施",
+        "scored": "问题已评估，待决定措施",
+        "under_review": "措施研究中，尚未决定",
+        "in_progress": "措施正在实施",
+        "implemented": "措施已完成，待验证结果",
+        "adopted": "已验证，成为新的工作方式",
+        "dropped": "决定不予处理"
+      },
+      "status_now": "问题 {{code}} 的状态：{{status}}"
     },
     "lead_time": "前置时间",
     "lead_time_help": "单件从到达至离开该步骤所经过的时间，含等待时间；不计入完成度。",
@@ -939,7 +1058,15 @@
       "minute": "分钟",
       "hour": "小时",
       "day": "工作日"
-    }
+    },
+    "duration_between_other": "{{min}} 至 {{max}} 分钟",
+    "duration_at_least_other": "至少 {{min}} 分钟",
+    "duration_at_most_other": "至多 {{max}} 分钟",
+    "step_pain_points": "步骤的痛点",
+    "step_pain_points_help": "与该步骤关联、没有文档的痛点。描述和计划仅供阅读。",
+    "pain_points_one": "{{count}} 个痛点",
+    "pain_points_other": "{{count}} 个痛点",
+    "step_pain_points_help_fill": "与该步骤关联、没有文档的痛点。其状态在此更改；描述和计划仅供阅读。"
   },
   "translations": {
     "title": "翻译项目",
@@ -1185,6 +1312,12 @@
         },
         "summaries": {
           "title": "概述"
+        },
+        "comments": {
+          "title": "演示备注",
+          "text": "演示对步骤和交接所说的内容。",
+          "example": "为此地图及其详细地图的步骤和交接撰写备注。",
+          "example_empty": "为此地图及其详细地图的步骤和交接撰写备注。"
         }
       },
       "thread": "与助手的对话",
@@ -1242,7 +1375,8 @@
         "findings": "分析",
         "report": "报告",
         "summaries": "概述",
-        "proposal": "建议"
+        "proposal": "建议",
+        "comments": "演示备注"
       },
       "pasted": "已粘贴的回复",
       "copy_reply": "复制回复",
@@ -1398,7 +1532,19 @@
     "resource": "Azure 资源",
     "resource_help": "资源名称：contoso.openai.azure.com 对应 contoso。",
     "port": "端口",
-    "port_help": "留空：默认端口（Ollama 11434，LM Studio 1234）。"
+    "port_help": "留空：默认端口（Ollama 11434，LM Studio 1234）。",
+    "comments": {
+      "request": "为此地图及其详细地图中尚无备注的步骤和交接撰写演示备注。",
+      "menu": "撰写演示备注（AI）…",
+      "intro": "请逐条审阅：保留、修改或舍弃。它将在演示时朗读。",
+      "flow": "交接 {{labels}}",
+      "map": "地图：{{name}}",
+      "current": "当前备注：{{text}}",
+      "typed": "替换手动输入的备注：{{text}}",
+      "save": "保存保留的备注（{{n}}）",
+      "saved": "已保存备注：{{n}}",
+      "done": "已保存演示备注：{{n}}"
+    }
   },
   "interface_language": {
     "help": "菜单和消息所用的语言，仅对您本人生效。流程图的显示语言需在打开项目后于窗口顶部选择。"
@@ -1842,5 +1988,174 @@
       "closing_lost": "损失时间：每月 {{lost}}。",
       "arrow": "到"
     }
+  },
+  "bpmn": {
+    "view": "BPMN 2.0",
+    "export_menu": "导出为 BPMN 2.0 (.bpmn)…",
+    "export_title": "导出为 BPMN 2.0",
+    "export_help": ".bpmn 文件可在 BPMN 建模工具（Camunda、Signavio、Bizagi 等）中打开。它包含每个步骤的完整卡片，但不含文档的位置。",
+    "export_button": "导出",
+    "export_subprocesses": "包含详细的子流程",
+    "export_subprocesses_help": "每个详细步骤在建模工具中以子流程打开。",
+    "export_subprocesses_none": "该地图没有详细步骤。",
+    "export_details": "绘制文档和痛点",
+    "export_details_help": "不勾选时，它们仍写在文件的说明中。",
+    "toolbar": "BPMN 2.0 视图",
+    "badge": "BPMN 2.0 图 · 只读",
+    "details": "在图上显示详情",
+    "export": "导出 (.bpmn)…",
+    "close": "返回地图",
+    "close_help": "返回地图 (Alt+B)",
+    "failed": "无法读取该图。",
+    "loading": "正在读取图…",
+    "node_label": "{{kind}}：{{name}}",
+    "kinds": {
+      "startEvent": "开始事件",
+      "endEvent": "结束事件",
+      "intermediateCatchEvent": "等待",
+      "manualTask": "手工任务",
+      "userTask": "用户任务",
+      "serviceTask": "自动化任务",
+      "subProcess": "子流程",
+      "exclusiveGateway": "排他网关",
+      "parallelGateway": "并行网关",
+      "inclusiveGateway": "包容网关"
+    },
+    "doc": {
+      "field": "{{label}}：{{value}}",
+      "quote": "“{{text}}”",
+      "map": "地图：{{name}}",
+      "classification": "密级：{{value}}",
+      "language": "语言：{{language}}",
+      "work_time": "工作日：{{workday}} 小时；每个全职人力每月工时：{{fte}} 小时",
+      "description": "描述",
+      "wait": "等待 {{hours}} 小时",
+      "from": "来自 {{code}}",
+      "volume": "输入量：每{{period}} {{quantity}}",
+      "periods": {
+        "day": "工作日",
+        "week": "周",
+        "month": "月",
+        "year": "年"
+      },
+      "lane_system": "独立运行的软件泳道",
+      "headcount": "人数：{{number}}"
+    },
+    "fit": "显示全部",
+    "fit_help": "在窗口中显示整个图"
+  },
+  "shortcuts": {
+    "title": "键盘快捷键",
+    "sections": {
+      "move": "移动",
+      "choose": "选择",
+      "edit": "修改流程图",
+      "display": "显示",
+      "present": "演示",
+      "help": "帮助"
+    },
+    "edit_note": "仅限项目协调人使用。",
+    "or": "或",
+    "move_selection": "移动所选内容",
+    "escape": "关闭菜单、面板或说明卡；停止“连接”",
+    "space_held": "按住时为抓手工具",
+    "enter": "打开所选步骤的说明卡",
+    "type": "开始输入所选步骤的名称",
+    "menu_key": "所选对象的菜单",
+    "wheel": "滚动；按住 Shift 为水平滚动",
+    "zoom": "缩放",
+    "saved": "提醒一切已保存",
+    "alone_note": "未单独选中某一步骤时（否则该键会开始输入其名称）",
+    "type_key": "一个字符",
+    "search_keys": "搜索中：下一个；按 Shift 为上一个；按 Esc 关闭"
+  },
+  "search": {
+    "command_help": "在项目中搜索",
+    "title": "搜索",
+    "field": "要搜索的词",
+    "placeholder": "步骤、文档、工具…",
+    "previous": "上一个（Shift+Enter）",
+    "next": "下一个（Enter）",
+    "position": "第 {{index}} 个，共 {{count}} 个",
+    "searching": "正在搜索…",
+    "none": "没有结果。",
+    "too_many": "共 {{total}} 条结果，仅显示前 {{shown}} 条：请缩小搜索范围。",
+    "short": "至少两个字符，或按 Enter。",
+    "this_map": "此流程图",
+    "level": "层级 {{level}}",
+    "origin": "原始语言：{{language}}",
+    "kinds": {
+      "step": "步骤",
+      "lane": "泳道",
+      "document": "文档",
+      "tool": "工具",
+      "pain_point": "痛点",
+      "action": "措施"
+    },
+    "results_one": "{{count}} 条结果",
+    "results_other": "{{count}} 条结果"
+  },
+  "action_plan": {
+    "command": "行动计划",
+    "title": "行动计划",
+    "total": "未解决痛点每月损失 {{hours}} 小时",
+    "late_count": "已逾期：{{count}}",
+    "count": "显示的痛点：{{shown}} 项，共 {{total}} 项",
+    "sort": "排序方式",
+    "sorts": {
+      "project": "项目顺序",
+      "lost": "损失工时",
+      "due": "截止日期"
+    },
+    "filters": "筛选",
+    "filter_open": "未解决",
+    "filter_late": "已逾期",
+    "filter_no_action": "无措施",
+    "late": "已逾期",
+    "no_action": "尚未确定措施",
+    "map": "流程图：{{name}}",
+    "lane": "泳道：{{name}}",
+    "go_to": "转到 {{code}}",
+    "edit": "编辑计划",
+    "edit_of": "编辑 {{code}} 的计划",
+    "loading": "正在加载计划…",
+    "empty": "此项目中没有痛点。",
+    "none": "没有符合筛选条件的痛点。",
+    "status_since": "自 {{date}} 起{{status}}",
+    "status_changed": "{{code}}：{{status}}。",
+    "undo": "撤销",
+    "undo_of": "撤销：将 {{code}} 恢复为“{{status}}”"
+  },
+  "project_pdf": {
+    "sheet_state": "说明卡状态：{{state}}",
+    "continued": "{{title}}（续）",
+    "file": "项目",
+    "contents": "目录",
+    "page": "第 {{page}} 页，共 {{total}} 页",
+    "scope_line": "流程图“{{name}}”及其层级",
+    "empty_map": "没有步骤的流程图。",
+    "depth_cut": "超过 {{max}} 层的流程图不在本文档中。",
+    "sheets_of": "说明卡 · {{map}}",
+    "reading": "正在读取流程图：{{count}}",
+    "reading_sheets": "正在读取说明卡…",
+    "drawing": "流程图 {{index}} / {{total}}",
+    "writing": "正在写入文档：第 {{page}} 页",
+    "too_many_maps": "流程图超过 {{max}} 个：请选择“{{scope}}”。",
+    "too_many_pages": "页数超过 {{max}} 页：请取消勾选说明卡，或导出某个细化流程图及其层级。",
+    "cancelled": "导出已取消。",
+    "title": "将项目导出为 PDF",
+    "help": "所有流程图合并为一个文件，逐层排列，供没有本应用的人查看。",
+    "scope": "范围",
+    "scope_project": "整个项目",
+    "scope_branch": "此流程图及其层级",
+    "with_sheets": "包含说明卡",
+    "with_raci": "包含 RACI 矩阵",
+    "with_stream": "包含价值流",
+    "with_plan": "包含行动计划",
+    "sheets_help": "说明卡即您所见的内容：请仅将文档发给有权阅读的人。",
+    "button": "生成 PDF",
+    "progress": "进度",
+    "too_many_maps_below": "流程图超过 {{max}} 个：请打开下层的某个细化流程图，然后选择“{{scope}}”。",
+    "too_many_pages_top": "页数超过 {{max}} 页：请取消勾选说明卡。"
   }
 }

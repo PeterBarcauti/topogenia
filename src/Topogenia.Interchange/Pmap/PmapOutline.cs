@@ -1,6 +1,8 @@
 // PmapOutline.cs
 // A project read as a .pmap document: the copy of a reader and the model of a duplication (A-2.17-43 to 49, AR-10, AR-93).
 
+using Topogenia.Application.Ports;
+using Topogenia.Application.Presentation;
 using Topogenia.Domain.Documents;
 using Topogenia.Domain.Model;
 using Topogenia.Domain.Raci;
@@ -22,7 +24,27 @@ namespace Topogenia.Interchange.Pmap;
 /// What the document of a project holds: the sheets, as a viewer sees them, the depth of its sub-maps, and the routes chosen
 /// by the users (ADR 091), left out of the map the assistant rewrites, which never sets them.
 /// </summary>
-public sealed record PmapOutlineOptions(bool WithSheets, Func<Step, SheetViewer>? ViewerOf = null, int DepthMax = PmapFormat.DepthMax, bool WithRoutes = true);
+public sealed record PmapOutlineOptions(bool WithSheets, Func<Step, SheetViewer>? ViewerOf = null, int DepthMax = PmapFormat.DepthMax, bool WithRoutes = true)
+{
+    /// <summary>
+    /// What a whole copy carries beside the structure (1.5, ADR 105): given, the comments of presentation of the steps and
+    /// the flows written, the glossary of the project and the code and the status of each pain point; null, none of them.
+    /// </summary>
+    public PmapExtras? Extras { get; init; }
+
+    /// <summary>
+    /// The place of each document (a path, an address) written; false for the copy read by the view in BPMN 2.0, which
+    /// never writes it (ADR 106; audit of the copy 64, P2-03).
+    /// </summary>
+    public bool WithLocations { get; init; } = true;
+
+    /// <summary>
+    /// The code and the status of each pain point written without the other extras: the copy read by the view in BPMN 2.0
+    /// shows them as the map does (a pain point dealt with is not drawn as open), and writes neither comment nor glossary
+    /// (audit of the copy 65, NEW-P2-01). Implied by <see cref="Extras"/>.
+    /// </summary>
+    public bool WithPainPointStates { get; init; }
+}
 
 /// <summary>A project as a document, and whether its sub-maps went deeper than the level asked (12 for a file, A-2.17-47).</summary>
 public sealed record PmapOutlined(PmapDocument Document, bool DepthCut);
@@ -39,12 +61,7 @@ public static class PmapOutline
         ArgumentNullException.ThrowIfNull(workspace);
         ArgumentNullException.ThrowIfNull(options);
         var reading = new Reading(workspace, options);
-        var project = workspace.Project;
-        var document = new PmapDocument(
-            new PmapProject(project.Code, project.Name, project.SourceLanguage, project.Description,
-                reading.Translations(TranslationObject.Project, project.Id)) { WorkdayHours = project.WorkdayHours, FteHoursPerMonth = project.FteHoursPerMonth },
-            reading.Map(workspace.RootMap.Id, 1),
-            []);
+        var document = new PmapDocument(reading.Project(), reading.Map(workspace.RootMap.Id, 1), []);
         return new PmapOutlined(document, reading.DepthCut);
     }
 
@@ -59,18 +76,44 @@ public static class PmapOutline
         ArgumentNullException.ThrowIfNull(options);
         var map = workspace.LiveMap(mapId);
         var reading = new Reading(workspace, options);
-        var project = workspace.Project;
-        var document = new PmapDocument(
-            new PmapProject(project.Code, project.Name, project.SourceLanguage, project.Description,
-                reading.Translations(TranslationObject.Project, project.Id)) { WorkdayHours = project.WorkdayHours, FteHoursPerMonth = project.FteHoursPerMonth },
-            reading.Map(map.Id, 1),
-            []);
+        var document = new PmapDocument(reading.Project(), reading.Map(map.Id, 1), []);
         return new PmapOutlined(document, reading.DepthCut);
     }
 
     private sealed class Reading(ProjectWorkspace workspace, PmapOutlineOptions options)
     {
+        /// <summary>The lines of the comments of the steps, by step, when a whole copy is asked (1.5).</summary>
+        private readonly ILookup<Guid, CommentLine> stepLines = (options.Extras?.StepComments ?? []).Select(line => line.AsLine()).ToLookup(line => line.SubjectId);
+
+        /// <summary>The lines of the comments of the flows, by flow, when a whole copy is asked (1.5).</summary>
+        private readonly ILookup<Guid, CommentLine> flowLines = (options.Extras?.FlowComments ?? []).Select(line => line.AsLine()).ToLookup(line => line.SubjectId);
+
         public bool DepthCut { get; private set; }
+
+        /// <summary>The project of the document; its glossary only in a whole copy (1.5).</summary>
+        public PmapProject Project()
+        {
+            var project = workspace.Project;
+            return new PmapProject(project.Code, project.Name, project.SourceLanguage, project.Description, Translations(TranslationObject.Project, project.Id))
+            {
+                WorkdayHours = project.WorkdayHours,
+                FteHoursPerMonth = project.FteHoursPerMonth,
+                Glossary = options.Extras is null ? null : project.TranslationGlossary,
+            };
+        }
+
+        /// <summary>
+        /// The comment of a step or of a flow from its lines (1.5): the line in the language of origin of its subject as its
+        /// text, the others as its translations; null without any line.
+        /// </summary>
+        private static PmapComment? CommentOf(IEnumerable<CommentLine> lines, string origin)
+        {
+            var kept = lines.ToList();
+            if (kept.Count == 0)
+                return null;
+            return new PmapComment(kept.FirstOrDefault(line => line.Language == origin)?.Text,
+                kept.Where(line => line.Language != origin).ToDictionary(line => line.Language, line => line.Text, StringComparer.Ordinal));
+        }
 
         public PmapMap Map(Guid mapId, int depth)
         {
@@ -89,6 +132,8 @@ public static class PmapOutline
                 {
                     Share = flow.SharePercent,
                     Route = options.WithRoutes ? RouteOf(flow, laneCodes) : null,
+                    // A flow has no language of its own: the original of its comment is in the language of its source step.
+                    Comment = CommentOf(flowLines[flow.Id], order[rank[flow.SourceStepId]].SourceLanguage),
                 })
                 .ToList();
             return new PmapMap(
@@ -129,6 +174,7 @@ public static class PmapOutline
                 // The class of a step whose detail has steps sleeps: never written, so that a copy or the context of the AI
                 // carries none on it (ADR 095 point 9, audit 3.1 V2 4.5.3).
                 ValueClass = step.ValueClass is { } value && !workspace.IsMacro(step.Id) ? Codes.Of(value) : null,
+                Comment = CommentOf(stepLines[step.Id], step.SourceLanguage),
             };
         }
 
@@ -170,6 +216,9 @@ public static class PmapOutline
         /// <summary>The medium of a document as its code (1.4, Makigami M3), null when not given.</summary>
         private static string? MediumOf(Document document) => document.Medium is { } medium ? Codes.Of(medium) : null;
 
+        /// <summary>The place of a document, unless the options leave the places out.</summary>
+        private string? LocationOf(Document document) => options.WithLocations ? document.Location : null;
+
         private PmapSheet? Sheet(Step step, Dictionary<Guid, string> outputIds)
         {
             if (!options.WithSheets || StepTypes.HasNoContent(step.StepType))
@@ -177,9 +226,9 @@ public static class PmapOutline
             var viewer = options.ViewerOf?.Invoke(step) ?? new SheetViewer(false, false);
             var content = SheetVisibility.VisibleContent(workspace, step.Id, viewer) ?? SheetContent.Empty;
             var outputs = Documents(step.Id, DocumentDirection.Output)
-                .Select(document => new PmapDocumentEntry(outputIds[document.Id], document.Name, document.Location, document.ShareConfirmed, null) { Medium = MediumOf(document) }).ToList();
+                .Select(document => new PmapDocumentEntry(outputIds[document.Id], document.Name, LocationOf(document), document.ShareConfirmed, null) { Medium = MediumOf(document) }).ToList();
             var inputs = Documents(step.Id, DocumentDirection.Input)
-                .Select(document => new PmapDocumentEntry(null, document.Name, document.Location, document.ShareConfirmed, document.WaitHours) { Medium = MediumOf(document) }).ToList();
+                .Select(document => new PmapDocumentEntry(null, document.Name, LocationOf(document), document.ShareConfirmed, document.WaitHours) { Medium = MediumOf(document) }).ToList();
             var uses = workspace.All<DocumentUse>()
                 .Where(use => use.StepId == step.Id && outputIds.ContainsKey(use.DocumentId))
                 .OrderBy(use => outputIds[use.DocumentId], StringComparer.Ordinal)
@@ -198,11 +247,16 @@ public static class PmapOutline
         private PmapUse Use(DocumentUse use, string document)
         {
             var painPoint = use.PainPointId is { } id ? workspace.Find<PainPoint>(PainPoint.KeyOf(id)) : null;
+            var whole = options.Extras is not null || options.WithPainPointStates;
             return new PmapUse(document, use.WaitHours, use.PercentCompleteAccurate, painPoint?.Description, painPoint?.LostHoursPerMonth)
             {
                 Action = painPoint?.Action,
                 Owner = painPoint?.Owner,
                 DueDate = painPoint?.DueDate,
+                // Its code and its status in a whole copy and in the view (1.5): an opening does not raise again a pain point
+                // dealt with, the view does not draw it as open.
+                PainPointCode = whole ? painPoint?.Code : null,
+                PainPointStatus = whole && painPoint is not null ? Codes.Of(painPoint.Status) : null,
             };
         }
 

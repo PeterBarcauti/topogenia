@@ -1,6 +1,7 @@
 // PmapBuild.cs
 // A new project built from a .pmap document by the rules of the domain: what an opening and a duplication write (A-2.17-38 to 42).
 
+using Topogenia.Application.Presentation;
 using Topogenia.Domain.Errors;
 using Topogenia.Domain.Flows;
 using Topogenia.Domain.Lanes;
@@ -23,8 +24,16 @@ namespace Topogenia.Interchange.Pmap;
 /// </summary>
 public sealed record PmapCounts(int Maps, int Lanes, int Steps, int Flows, int Sheets);
 
-/// <summary>A project built from a document: its records as changes to write, its project, its root map and what it holds.</summary>
-public sealed record PmapBuilt(Project Project, Guid RootMapId, ChangeSet Changes, PmapCounts Counts);
+/// <summary>
+/// A project built from a document: its records as changes to write, its project, its root map and what it holds; the
+/// lines of the comments of presentation of its new steps and flows (1.5), which the application writes beside the core.
+/// </summary>
+public sealed record PmapBuilt(Project Project, Guid RootMapId, ChangeSet Changes, PmapCounts Counts)
+{
+    public IReadOnlyList<PresentationComment> Comments { get; init; } = [];
+
+    public IReadOnlyList<FlowPresentationComment> FlowComments { get; init; } = [];
+}
 
 /// <summary>
 /// Builds the records of a new project from a document (the 1.x `ServiceFichiers.Creer` and `CreerContenu`), through
@@ -46,7 +55,7 @@ public static partial class PmapBuild
         // A project renamed at the opening loses the translations of the name of the file (A-2.17-39).
         var translations = name == file.Name ? file.Translations.ToDictionary(pair => pair.Key, pair => (string?)pair.Value, StringComparer.Ordinal) : null;
         var created = ProjectCreation.Create(context, new CreateProjectRequest(code, name, file.Language, translations, file.Description), inputs);
-        var project = WithWorkTime(created.Project, file);
+        var project = WithGlossary(WithWorkTime(created.Project, file), file);
         var workspace = new ProjectWorkspace(project.Id, [project]);
         foreach (var record in created.Records.Skip(1))
             workspace.Put(record);
@@ -57,7 +66,11 @@ public static partial class PmapBuild
         if (violations.Count > 0)
             throw new InvalidOperationException("A checked file built a project that breaks the rules of the structure: " + string.Join(", ", violations));
         var counts = new PmapCounts(builder.Maps, builder.Lanes, builder.Steps, builder.Flows, builder.SheetCount);
-        return new PmapBuilt(project, created.RootMap.Id, workspace.Commit(context), counts);
+        return new PmapBuilt(project, created.RootMap.Id, workspace.Commit(context), counts)
+        {
+            Comments = builder.StepComments(),
+            FlowComments = builder.FlowComments(),
+        };
     }
 
     /// <summary>
@@ -125,17 +138,20 @@ public static partial class PmapBuild
             {
                 var stepPath = $"{path}.steps[{index}]";
                 foreach (var (lane, role) in step.Raci)
-                    Rule($"{stepPath}.raci", () => RaciRules.SetRole(workspace, context, new SetRaciRequest(steps[step.Id], lanes[lane], role)));
+                    Role(steps[step.Id], lanes[lane], role, $"{stepPath}.raci");
                 built.Add((step, steps[step.Id], stepPath));
                 if (step.SubMap is { } subMap)
                     SubMap(steps[step.Id], step, subMap, $"{stepPath}.sub_map");
             }
             // The summary of the map (1.4, ADR 094), once its levels are built: it describes the map as opened; the file is the
-            // person's, who chose to open it.
+            // person's, who chose to open it. Written in the language of the file, before its translations: one into the
+            // language of the project is a translation, not the text itself (audit of the copy 64, P1-04).
             if (map.Summary is { } summary)
                 Rule($"{path}.summary", () =>
                 {
                     MapSummaryRules.Write(workspace, context, new WriteMapSummariesRequest([new MapSummaryEntry(mapId, summary.Text, SummaryOrigin.Manual, null)]));
+                    if (workspace.SummaryOf(mapId) is { } written && written.SourceLanguage != language)
+                        workspace.Put(written with { SourceLanguage = language });
                     return TranslationRules.WriteManual(workspace, context, TranslationObject.Summary, mapId, Optional(summary.Translations), languages);
                 });
         }
@@ -179,6 +195,7 @@ public static partial class PmapBuild
                 var flow = map.Flows[i];
                 var flowPath = $"{path}.flows[{i}]";
                 var created = Rule(flowPath, () => StructureEdits.NewFlow(workspace, context, mapId, steps[flow.Source], steps[flow.Target], flow.Label, flow.Share));
+                builtFlows.Add((flow, created.Id));
                 if (flow.Route is { } route)
                     Rule($"{flowPath}.route", () => FlowRoutes.Set(workspace, context, RouteRequest(created, route, lanes)));
                 Rule($"{flowPath}.translations", () => TranslationRules.WriteManual(workspace, context, TranslationObject.Flow, created.Id, Optional(flow.Translations), languages));
@@ -215,6 +232,21 @@ public static partial class PmapBuild
             var lane = StructureEdits.NewLane(workspace, context, map.Id, file.Name, language, Codes.Parse<LaneType>(file.Type, "type"),
                 file.Color ?? LaneColors.ForIndex(0), 0);
             Fill(map.Id, lane, subMap, path);
+        }
+
+        /// <summary>
+        /// A role of the RACI of the file: a letter the installation offers goes through the rule of the domain; a letter of
+        /// the RACI it does not offer (S where only A, C and I are offered) is kept as the record that rule writes, as the
+        /// package keeps it (decision of the owner of the project, 16/11/2026: a copy opens again as it was). The reader
+        /// already checked the lane, the type of the step and the single A, and the built project passes the rules of the
+        /// structure (`ImportedProjects.Violations`).
+        /// </summary>
+        private void Role(Guid stepId, Guid laneId, string role, string path)
+        {
+            if (RaciRules.Letters(context.Settings).Contains(role, StringComparison.Ordinal))
+                Rule(path, () => RaciRules.SetRole(workspace, context, new SetRaciRequest(stepId, laneId, role)));
+            else
+                workspace.Put(new StepRaci(stepId, laneId, Codes.Parse<RaciRole>(role, "role"), context.Now, context.ActorId));
         }
 
         /// <summary>The headcount of a lane of the file (1.2), by the rule of the domain: never on a system lane.</summary>

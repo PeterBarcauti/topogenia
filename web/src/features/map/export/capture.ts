@@ -1,7 +1,9 @@
 // capture.ts
-// The image of the whole map for the PNG and PDF exports: the bounds of its nodes without the frame, the margin, the pixel ratio, the elements left out, the wait for the steps drawn, the fonts of the page, the capture by html-to-image loaded on demand (annex B 2.14, S-5.4-04, ADR 066).
+// The image of the map for the PNG and PDF exports and its copy: the bounds of its nodes without the frame, or of the steps of a selection and the flows between them, the margin, the pixel ratio, the elements left out, the wait for the steps drawn, the fonts of the page, the capture by html-to-image loaded on demand (annex B 2.14, S-5.4-04, ADR 066, ADR 109).
 
-import type { MapNode } from '../canvas/flowElements.ts';
+import { cardIdOf, LEFT_OUT_CLASS, type MapNode, type StepNode } from '../canvas/flowElements.ts';
+import { UNDER_STEP } from '../model/geometry/constants.ts';
+import type { RoutedFlow } from '../model/geometry/routing/model.ts';
 
 /** A box on the map, in its own coordinates. */
 export interface Bounds {
@@ -32,13 +34,55 @@ export interface CaptureTarget {
 
 /** The box of the nodes drawn, the frame left out (B-2.9-20): the lanes from the margin of their headers, the steps; null without any. */
 export function mapBounds(nodes: readonly MapNode[]): Bounds | null {
-  const drawn = nodes.filter((node) => node.type !== 'frame');
-  if (drawn.length === 0) return null;
-  const left = Math.min(...drawn.map((node) => node.position.x));
-  const top = Math.min(...drawn.map((node) => node.position.y));
-  const right = Math.max(...drawn.map((node) => node.position.x + (node.width ?? 0)));
-  const bottom = Math.max(...drawn.map((node) => node.position.y + (node.height ?? 0)));
+  return boxOf(nodes.filter((node) => node.type !== 'frame'));
+}
+
+/** The box of a node. */
+const nodeBox = (node: MapNode): Bounds => ({ x: node.position.x, y: node.position.y, width: node.width ?? 0, height: node.height ?? 0 });
+
+/** The box round boxes; null without any. */
+function around(boxes: readonly Bounds[]): Bounds | null {
+  if (boxes.length === 0) return null;
+  const left = Math.min(...boxes.map((box) => box.x));
+  const top = Math.min(...boxes.map((box) => box.y));
+  const right = Math.max(...boxes.map((box) => box.x + box.width));
+  const bottom = Math.max(...boxes.map((box) => box.y + box.height));
   return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+/** The box of a set of nodes; null without any. */
+const boxOf = (nodes: readonly MapNode[]): Bounds | null => around(nodes.map(nodeBox));
+
+/** The pitch of the rows of RACI badges under a step, as the image SVG draws them (`svgSteps.ts`): a badge of 16, a gap. */
+const RACI_ROW = 20;
+
+/**
+ * A step with what hangs under it: the label of a gateway, the frequency of a detailed step, then its RACI badges when
+ * shown, counted one row each (they may share a row: never cut, at worst a little room left under them).
+ */
+function stepBox(node: StepNode): Bounds {
+  const { raciTop, raci } = node.data.figure;
+  const badges = node.data.showRaci && raci !== null ? raci.badges.length : 0;
+  const under = badges === 0 ? raciTop - UNDER_STEP.gap : raciTop + badges * RACI_ROW;
+  return { ...nodeBox(node), height: (node.height ?? 0) + under };
+}
+
+/** What a flow routed gives the box of a selection: its ends, its points and its label. */
+export type SelectionFlow = Pick<RoutedFlow, 'sourceId' | 'targetId' | 'points' | 'label'>;
+
+/**
+ * The box of the steps of a selection (ADR 109, R8): the steps chosen and what hangs under them, their cartouches of the
+ * value stream, the flows between two of them and their labels; nothing else of their lanes, the rest of the map being
+ * left out of the image. The margin of the lanes, where their names stand, stays out. Null when none of the steps is drawn.
+ */
+export function selectionBounds(nodes: readonly MapNode[], steps: readonly string[], flows: readonly SelectionFlow[] = []): Bounds | null {
+  const chosen = new Set(steps);
+  const cards = new Set(steps.map(cardIdOf));
+  const boxes = nodes.flatMap((node) => (node.type === 'step' && chosen.has(node.id) ? [stepBox(node)] : node.type === 'card' && cards.has(node.id) ? [nodeBox(node)] : []));
+  if (boxes.length === 0) return null;
+  const between = flows.filter((flow) => chosen.has(flow.sourceId) && chosen.has(flow.targetId));
+  const lines = between.flatMap((flow) => [...flow.points.map((point) => ({ ...point, width: 0, height: 0 })), ...(flow.label === null ? [] : [flow.label])]);
+  return around([...boxes, ...lines]);
 }
 
 /** The size of the image and the move of the view that brings the bounds into it past the margin; the caption adds its line. */
@@ -48,10 +92,13 @@ export interface CaptureFrame {
   readonly transform: string;
 }
 
-/** The frame of the image: the bounds, a margin of 24 round them, 20 more pixels in height (B-2.14-05). */
-export function captureFrame(bounds: Bounds, caption = false): CaptureFrame {
+/**
+ * The frame of the image: the bounds, a margin of 24 round them, 20 more pixels in height (B-2.14-05); as wide as the line
+ * of the caption at least, which starts at their left edge (R8: a selection of one step is narrower than its caption).
+ */
+export function captureFrame(bounds: Bounds, caption = false, captionWidth = 0): CaptureFrame {
   return {
-    width: Math.ceil(bounds.width + 2 * CAPTURE_MARGIN),
+    width: Math.ceil(Math.max(bounds.width, caption ? captionWidth : 0) + 2 * CAPTURE_MARGIN),
     height: Math.ceil(bounds.height + 2 * CAPTURE_MARGIN + EXTRA_HEIGHT + (caption ? CAPTION_HEIGHT : 0)),
     transform: `translate(${String(CAPTURE_MARGIN - bounds.x)}px, ${String(CAPTURE_MARGIN - bounds.y)}px) scale(1)`,
   };
@@ -60,16 +107,24 @@ export function captureFrame(bounds: Bounds, caption = false): CaptureFrame {
 /** Where the line of the classification stands: under the map, from its left edge (S-4.1-08). */
 export const captionPosition = (bounds: Bounds): { readonly x: number; readonly y: number } => ({ x: bounds.x, y: bounds.y + bounds.height + EXTRA_HEIGHT });
 
-/** Twice the resolution, bounded to stay under the limit of the canvases of the browsers (B-2.14-06). */
-export function pixelRatio(width: number, height: number, target = 2, maximum = 12_000): number {
+/** The longest side of the image of an export, in pixels: under the limit of the canvases of the browsers (B-2.14-06). */
+const EXPORT_MAXIMUM = 12_000;
+
+/** Twice the resolution, bounded to stay under the limit of the canvases of the browsers (B-2.14-06), or under the maximum given. */
+export function pixelRatio(width: number, height: number, target = 2, maximum = EXPORT_MAXIMUM): number {
   return Math.max(0.5, Math.min(target, maximum / width, maximum / height));
 }
 
 /** The elements left out of the image: the « + » and their hover zone, the handles, the gauges, the frame (B-2.14-07, B-2.10-26, B-2.9-20). */
 export const LEFT_OUT: readonly string[] = ['quick-add', 'quick-add-bridge', 'react-flow__handle', 'step-gauge', 'react-flow__node-frame'];
 
-/** Whether an element of the view goes into the image. */
-export const keptInCapture = (node: Node): boolean => !(node instanceof HTMLElement && LEFT_OUT.some((name) => node.classList.contains(name)));
+/**
+ * Whether an element of the view goes into the image: not one of {@link LEFT_OUT}, nor a node or a flow left out of the
+ * image of a selection (ADR 109). Those are not copied at all: hiding them by the style sheet is not enough, React Flow
+ * writing `visibility: visible` in the style of each node it has measured, which wins over the sheet (R8).
+ */
+export const keptInCapture = (node: Node): boolean =>
+  !(node instanceof Element && node.classList.contains(LEFT_OUT_CLASS)) && !(node instanceof HTMLElement && LEFT_OUT.some((name) => node.classList.contains(name)));
 
 /** The clock of the wait: the page's by default, the tests give theirs. */
 export interface WaitClock {
@@ -158,11 +213,17 @@ export async function fontFaces(sheets: Iterable<CSSStyleSheet> = document.style
   return embedded.filter((face): face is string => face !== null).join('\n');
 }
 
-/** What the capture needs besides the view: the background of the charter (`--surface`), the fonts of the page, whether the caption has its line. */
+/**
+ * What the capture needs besides the view: the background of the charter (`--surface`), the fonts of the page, whether the
+ * caption has its line, the longest side of the image ({@link EXPORT_MAXIMUM} by default; less for a copy, ADR 109).
+ */
 export interface CaptureOptions {
   readonly background: string;
   readonly fonts: string;
   readonly caption: boolean;
+  readonly maximum?: number;
+  /** The width of the line of the caption drawn, which the image keeps whole (R8). */
+  readonly captionWidth?: number;
 }
 
 /**
@@ -171,13 +232,13 @@ export interface CaptureOptions {
  * {@link fontFaces} (B-2.14-04 to B-2.14-07, S-5.4-04).
  */
 export async function captureView(view: HTMLElement, bounds: Bounds, options: CaptureOptions): Promise<Captured> {
-  const frame = captureFrame(bounds, options.caption);
+  const frame = captureFrame(bounds, options.caption, options.captionWidth);
   const { toCanvas } = await import('html-to-image');
   const canvas = await toCanvas(view, {
     ...(options.background.trim() === '' ? {} : { backgroundColor: options.background.trim() }),
     width: frame.width,
     height: frame.height,
-    pixelRatio: pixelRatio(frame.width, frame.height),
+    pixelRatio: pixelRatio(frame.width, frame.height, 2, options.maximum ?? EXPORT_MAXIMUM),
     style: { width: `${String(frame.width)}px`, height: `${String(frame.height)}px`, transform: frame.transform },
     filter: keptInCapture,
     fontEmbedCSS: options.fonts,

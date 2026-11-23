@@ -21,19 +21,25 @@ public sealed partial class RouteTableTests(ApiHosts hosts) : IClassFixture<ApiH
     [
         "GET /api/me", "PATCH /api/me", "PUT /api/me/last-project",
         "GET /api/projects", "POST /api/projects", "GET /api/projects/{id}", "DELETE /api/projects/{id}",
+        // The code proposed from the name of a new project (3.4, lot 3, ADR 111 point 7): the name in the body, never in the address.
+        "POST /api/projects/code-proposal",
         "PUT /api/projects/{id}/members", "GET /api/projects/{id}/participants", "PUT /api/projects/{id}/sharing-group-label",
         "PUT /api/projects/{id}/classification", "PUT /api/projects/{id}/translation-glossary", "PUT /api/projects/{id}/work-time",
         "PUT /api/projects/{id}/origin-language",
         "GET /api/projects/{id}/presentation-voices", "PUT /api/projects/{id}/presentation-voices/{language}",
         "POST /api/projects/{id}/export",
+        // The search of a word in the whole project (3.4, lot 2, ADR 110): the word in the body, never in the address.
+        "POST /api/projects/{id}/search",
         "POST /api/projects/import/preview", "POST /api/projects/import", "POST /api/projects/{id}/import/preview", "POST /api/projects/{id}/import",
         "GET /api/projects/{id}/pmap", "POST /api/projects/import-pmap", "POST /api/projects/{id}/duplicate",
+        // The preview of a template collection (3.4, lot 6, ADR 114): read only, the administrator alone.
+        "POST /api/projects/import-collection/preview",
         "GET /api/projects/{id}/translations", "PUT /api/projects/{id}/translations",
         "GET /api/projects/{id}/snapshots", "POST /api/projects/{id}/snapshots", "DELETE /api/projects/{id}/snapshots/{snapshotId}",
         "POST /api/projects/{id}/target", "POST /api/projects/{id}/baseline",
         "GET /api/trash", "POST /api/trash/{id}/restore", "DELETE /api/trash/{id}",
         "GET /api/maps/{id}", "DELETE /api/maps/{id}", "GET /api/maps/{id}/pmap", "PUT /api/maps/{id}/summaries", "GET /api/maps/{id}/history","POST /api/maps/{id}/undo", "POST /api/maps/{id}/redo",
-        "GET /api/maps/{id}/action-plan", "GET /api/maps/{id}/presentation-comments", "GET /api/maps/{id}/flow-presentation-comments",
+        "GET /api/maps/{id}/action-plan", "GET /api/maps/{id}/presentation-comments", "POST /api/maps/{id}/presentation-comments", "GET /api/maps/{id}/flow-presentation-comments",
         "POST /api/maps/{id}/lanes", "PUT /api/maps/{id}/lane-order", "POST /api/maps/{id}/steps", "PUT /api/maps/{id}/layout",
         "POST /api/maps/{id}/move", "POST /api/maps/{id}/flows", "POST /api/maps/{id}/routes/auto", "POST /api/maps/{id}/command", "POST /api/maps/{id}/deletion",
         "POST /api/maps/{id}/reattach", "POST /api/maps/{id}/paste", "POST /api/maps/{id}/transfer", "POST /api/maps/{id}/group",
@@ -44,14 +50,20 @@ public sealed partial class RouteTableTests(ApiHosts hosts) : IClassFixture<ApiH
         "POST /api/steps/{id}/documents", "PUT /api/steps/{id}/documents/{documentId}", "DELETE /api/steps/{id}/documents/{documentId}",
         "POST /api/steps/{id}/documents/{documentId}/folder",
         "GET /api/steps/{id}/documents/available", "PUT /api/steps/{id}/uses/{documentId}", "DELETE /api/steps/{id}/uses/{documentId}",
+        // The status of a pain point chosen on the sheet of the receiving step (3.4, lot 4b, ADR 116): the only route of a pain point.
+        "PUT /api/steps/{id}/pain-points/{painPointId}/status",
         "POST /api/dissolutions/{id}/assign", "POST /api/dissolutions/{id}/remove", "POST /api/dissolutions/{id}/finish",
         "PATCH /api/flows/{id}", "PUT /api/flows/{id}/share", "PUT /api/flows/{id}/route", "POST /api/flows/{id}/reverse", "DELETE /api/flows/{id}", "PUT /api/flows/{id}/translations",
         "PUT /api/flows/{id}/presentation-comment",
         "GET /api/health", "POST /api/desktop/quit", "POST /api/desktop/sample-project", "GET /api/admin/audit",
+        // What a page of the desktop mode still has to send, waited for by « Quit » of the icon near the clock (3.4, lot 7, ADR 115).
+        "POST /api/desktop/writes",
         "GET /api/admin/assistant", "PUT /api/admin/assistant", "POST /api/admin/assistant/test",
         "GET /api/maps/{id}/assistant", "POST /api/maps/{id}/assistant/exchanges", "POST /api/maps/{id}/assistant/prompt", "POST /api/maps/{id}/assistant/replies",
         "POST /api/assistant/exchanges", "POST /api/assistant/prompt", "POST /api/assistant/replies",
         "POST /api/maps/{id}/assistant/preview", "POST /api/maps/{id}/assistant/apply",
+        // A .pmap file inserted as a detailed step, or replacing the detail of a step (3.3, F-208, ADR 108).
+        "POST /api/maps/{id}/insert-pmap/preview", "POST /api/maps/{id}/insert-pmap", "POST /api/steps/{id}/replace-pmap",
     ];
 
     [GeneratedRegex(@":[a-z]+\}")]
@@ -68,6 +80,15 @@ public sealed partial class RouteTableTests(ApiHosts hosts) : IClassFixture<ApiH
                 .Select(method => $"{method} {Constraint().Replace(endpoint.RoutePattern.RawText!.TrimEnd('/'), "}")}"))
             .Order(StringComparer.Ordinal);
         Assert.Equal(ExpectedRoutes.Order(StringComparer.Ordinal), routes);
+    }
+
+    /// <summary>A-0-03 revised (ADR 116): a pain point has no route of its own but the one that chooses its status, and no other route carries a status.</summary>
+    [Fact]
+    public void The_status_of_a_pain_point_is_the_only_route_under_pain_points_and_the_only_status_route()
+    {
+        string[] expected = ["PUT /api/steps/{id}/pain-points/{painPointId}/status"];
+        Assert.Equal(expected, ExpectedRoutes.Where(route => route.Contains("pain-points", StringComparison.Ordinal)));
+        Assert.Equal(expected, ExpectedRoutes.Where(route => route.EndsWith("/status", StringComparison.Ordinal)));
     }
 
     [Theory]

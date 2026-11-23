@@ -220,15 +220,25 @@ public sealed partial class SourceRulesTests
     /// </summary>
     private const string ProviderTable = "src/Topogenia.Assistant/AssistantProviders.cs";
 
+    /// <summary>
+    /// The identity of the product (ADR 111 point 2): the only other file of the shipped code where an address is written,
+    /// the site and the page of the Store, which the browser opens on a click and the application never calls; two hosts,
+    /// in HTTPS, each one listed in `docs/securite.md` (the rule below).
+    /// </summary>
+    private const string SiteFile = "src/Topogenia.Application/ProductIdentity.cs";
+
+    /// <summary>The files, by their path from the root, that write an external address: every file but the two named exceptions.</summary>
+    private static IReadOnlyList<string> ExternalAddressOffenders(IEnumerable<(string Relative, string Text)> files) =>
+        [.. files.Where(file => file.Relative != ProviderTable && file.Relative != SiteFile && SourceDetectors.ContainsExternalUrl(file.Text))
+            .Select(file => file.Relative)];
+
     [Fact]
     public void Shipped_code_calls_no_external_address()
     {
-        var offenders = RepositoryFiles.ProductionCSharp()
+        var offenders = ExternalAddressOffenders(RepositoryFiles.ProductionCSharp()
             .Concat(RepositoryFiles.Enumerate(["web/src"], ".ts", ".tsx", ".css", ".html"))
             .Concat(RepositoryFiles.Shallow(["web"], ".html"))
-            .Where(file => RepositoryFiles.Relative(file) != ProviderTable && SourceDetectors.ContainsExternalUrl(File.ReadAllText(file)))
-            .Select(RepositoryFiles.Relative)
-            .ToList();
+            .Select(file => (RepositoryFiles.Relative(file), File.ReadAllText(file))));
         Assert.Empty(offenders);
         // The table is not spared whole: its addresses in HTTPS are held to the list of the security document (the rule
         // below), and it writes no address in clear but the loopback of the machine.
@@ -285,6 +295,33 @@ public sealed partial class SourceRulesTests
         var security = File.ReadAllText(Path.Combine(RepositoryFiles.Root, "docs", "securite.md"));
         Assert.All(hosts, host => Assert.Contains($"`{host}`", security, StringComparison.Ordinal));
         Assert.Equal(["{settings.Resource}"], Regex.Matches(table, @"https://(\{[^}]+\})").Select(match => match.Groups[1].Value).Distinct());
+    }
+
+    /// <summary>
+    /// ADR 111 point 2: the exception of the identity of the product is narrow. The file does write addresses (the rule above
+    /// is not blind to it), all in HTTPS and none built from a text, on two hosts exactly, each one in the list of the
+    /// security document; they are the two constants that the host gives in the profile. And the exception holds to the
+    /// file alone: the same address written in another file of the shipped code is refused by the rule.
+    /// </summary>
+    [Fact]
+    public void The_addresses_of_the_site_are_written_in_the_identity_of_the_product_alone_and_listed_by_the_security_document()
+    {
+        var identity = File.ReadAllText(Path.Combine(RepositoryFiles.Root, SiteFile));
+        Assert.True(SourceDetectors.ContainsExternalUrl(identity));
+        var addresses = Regex.Matches(identity, @"\b[a-z][a-z0-9+.-]*://[^""\s]*", RegexOptions.IgnoreCase).Select(match => match.Value).ToList();
+        Assert.All(addresses, address => Assert.StartsWith("https://", address, StringComparison.Ordinal));
+        Assert.All(addresses, address => Assert.DoesNotContain("{", address, StringComparison.Ordinal));
+        Assert.Equal(addresses.Order(StringComparer.Ordinal),
+            new[] { Topogenia.Application.ProductIdentity.Site, Topogenia.Application.ProductIdentity.StorePage }.Order(StringComparer.Ordinal));
+        var hosts = addresses.Select(address => new Uri(address).Host).Distinct(StringComparer.Ordinal).ToList();
+        Assert.Equal(2, hosts.Count);
+        var security = File.ReadAllText(Path.Combine(RepositoryFiles.Root, "docs", "securite.md"));
+        Assert.All(hosts, host => Assert.Contains($"`{host}`", security, StringComparison.Ordinal));
+
+        // The faulty example: the address of the identity copied into the profile of the host is an offender, the identity is not.
+        const string elsewhere = "src/Topogenia.Host/Api/Profile/ProfileApi.cs";
+        foreach (var address in addresses)
+            Assert.Equal([elsewhere], ExternalAddressOffenders([(elsewhere, $"    private const string Site = \"{address}\";\n"), (SiteFile, identity)]));
     }
 
     /// <summary>

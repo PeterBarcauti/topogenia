@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from '../../../shared/ui/Icon.tsx';
 import { Toolbar } from '../../../shared/ui/Toolbar.tsx';
 import { useShortcutLabel } from '../../../shared/ui/useShortcutLabel.ts';
+import { bpmnView } from '../bpmn/bpmnState.ts';
 import { ribbonGroups } from '../state/commands/mapCommands.ts';
 import { runMapCommand, useCommandContext, useEditor, useMapState } from '../state/EditorContext.tsx';
 
@@ -72,6 +73,7 @@ function PresentButton() {
 export function Ribbon() {
   const editor = useEditor();
   const context = useCommandContext();
+  const bpmn = useStore(bpmnView, (state) => state.open);
   if (context === null) return null;
   if (context.preferences.ribbonCollapsed)
     return (
@@ -82,7 +84,7 @@ export function Ribbon() {
       </div>
     );
   return (
-    <Toolbar label="ribbon.name" testId="ribbon" groups={ribbonGroups(context)} end={<><PresentButton /><AssistantButton /><FoldButton folded={false} /></>}
+    <Toolbar label="ribbon.name" testId="ribbon" groups={ribbonGroups(context, bpmn)} end={<><PresentButton /><AssistantButton /><FoldButton folded={false} /></>}
       onRun={(id) => {
         runMapCommand(editor, id);
       }} />

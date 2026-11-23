@@ -14,6 +14,7 @@ import './styles/map.css';
 import './styles/sheet.css';
 import './styles/assistant.css';
 import './styles/presenter.css';
+import './styles/bpmn.css';
 import { App } from './app/App.tsx';
 
 const root = document.getElementById('root');

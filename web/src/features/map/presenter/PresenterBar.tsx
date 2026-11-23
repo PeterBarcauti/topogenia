@@ -168,7 +168,7 @@ export function PresenterBar({ editor, presentation, fullscreen, voice }: { edit
       <div className="presenter-bar-group">
         <button type="button" className="presenter-button presenter-speed" title={`${t('presenter.bar.speed')} (+ −)`} aria-label={t('presenter.bar.speed')} data-testid="presenter-speed"
           onClick={() => {
-            if (speed >= (SPEEDS[SPEEDS.length - 1] ?? 2)) for (let index = 0; index < SPEEDS.length; index++) presenter().slower();
+            if (speed >= (SPEEDS[SPEEDS.length - 1] ?? 1)) for (let index = 0; index < SPEEDS.length; index++) presenter().slower();
             else presenter().faster();
           }}>
           {`×${speedText}`}

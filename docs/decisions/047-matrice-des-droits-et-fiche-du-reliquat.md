@@ -26,9 +26,9 @@ d'entrée et par rôle (A-4-07). Le portage a révélé deux défauts du produit
   acceptés (toute réponse sauf 401, 403, 404) ; annuler et rétablir reçoivent d'abord une opération dans la pile du rôle
   (pile vide : 404, ADR 042). La table est comparée à celle des routes de l'hôte : une route nouvelle sans ligne fait
   échouer le test.
-- **Portage** : chaque test 1.x de cible `Host.Tests` (190 lignes de `portage-tests.md`) renvoie à un test 2.0 qui le
+- **Portage** : chaque test 1.x de cible `Host.Tests` (190 lignes de `portage-tests.md` (non publié)) renvoie à un test 2.0 qui le
   prouve par HTTP sur les deux bases, ou à la phase 5 (`.pmap`, duplication), ou au niveau qui le prouve quand aucune
-  route ne l'atteint ; les renvois sont dans `docs/couverture-p4/portage-*.md`. Les nouveaux tests sont dans
+  route ne l'atteint ; les renvois sont dans `docs/couverture-p4/portage-*.md` (non publié). Les nouveaux tests sont dans
   `tests/Topogenia.Host.Tests/Ported/`.
 - **Fiche du reliquat** : la vue de la carte porte `dissolution_sheet` à côté de `dissolution` (nulle sans cadre ouvert) :
   état, contenu, brouillon ou non, dernière version validée, demande de précision, telle que le lecteur a le droit de la
@@ -44,7 +44,7 @@ d'entrée et par rôle (A-4-07). Le portage a révélé deux défauts du produit
 
 ## Vérification
 
-`Api/RightsMatrixTests` (117 cas), `Ported/*` (portage, voir les quatre documents `docs/couverture-p4/portage-*.md`),
+`Api/RightsMatrixTests` (117 cas), `Ported/*` (portage, voir les quatre documents `docs/couverture-p4/portage-*.md` (non publié)),
 `Ported/DissolutionPortedTests.The_sheet_of_the_remainder_is_seen_as_a_draft_by_the_facilitator_and_as_validated_only_by_a_reader`,
 `Errors/ErrorResponsesTests.A_message_that_names_an_author_says_someone_when_the_refusal_knows_none`,
 `Api/ContractCodesTests` (codes du contrat sans test HTTP jusque-là).

@@ -3,7 +3,7 @@
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
-import { DEFAULT_PREFERENCES, PREFERENCE_KEYS, VOICE_NAME_KEY, browserStorage, createPreferencesStore, readPreferences, type PreferenceStorage } from './preferences.ts';
+import { DEFAULT_PREFERENCES, PREFERENCE_KEYS, UPDATE_REMINDER_CLOSED_KEY, VOICE_NAME_KEY, browserStorage, createPreferencesStore, readPreferences, readReminderClosed, writeReminderClosed, type PreferenceStorage } from './preferences.ts';
 
 /** A storage held in a map, which records what it is given. */
 function memory(initial: Record<string, string> = {}): PreferenceStorage & { readonly values: Map<string, string> } {
@@ -37,7 +37,7 @@ describe('the keys and defaults (B-7-01 to B-7-03, AR-28, AR-90, AR-91)', () => 
       showCodes: 'app.showCodes', alwaysShowPictos: 'app.alwaysShowPictos', showRaci: 'app.showRaci', showValueStream: 'app.showValueStream',
       showAnalysis: 'app.showAnalysis', ribbonCollapsed: 'app.ribbonCollapsed',
       showSummaryOnOpen: 'app.showSummaryOnOpen', presenterSubtitles: 'app.presenterSubtitles', presenterVoice: 'app.presenterVoice', presenterOnlineVoices: 'app.presenterOnlineVoices', presenterVoiceAsked: 'app.presenterVoiceAsked',
-      presenterStepMessages: 'app.presenterStepMessages', presenterFlowMessages: 'app.presenterFlowMessages',
+      presenterStepMessages: 'app.presenterStepMessages', presenterFlowMessages: 'app.presenterFlowMessages', showBpmnDetails: 'app.bpmnShowDetails',
     });
   });
 
@@ -45,7 +45,7 @@ describe('the keys and defaults (B-7-01 to B-7-03, AR-28, AR-90, AR-91)', () => 
     expect(DEFAULT_PREFERENCES).toEqual({
       showCodes: true, alwaysShowPictos: true, showRaci: false, showValueStream: false, showAnalysis: false, ribbonCollapsed: false,
       showSummaryOnOpen: true, presenterSubtitles: true, presenterVoice: false, presenterOnlineVoices: false, presenterVoiceAsked: false,
-      presenterStepMessages: true, presenterFlowMessages: true,
+      presenterStepMessages: true, presenterFlowMessages: true, showBpmnDetails: true,
     });
     expect(readPreferences(memory())).toEqual(DEFAULT_PREFERENCES);
     expect(readPreferences(null)).toEqual(DEFAULT_PREFERENCES);
@@ -56,7 +56,7 @@ describe('the keys and defaults (B-7-01 to B-7-03, AR-28, AR-90, AR-91)', () => 
     expect(readPreferences(stored)).toEqual({
       showCodes: false, alwaysShowPictos: true, showRaci: true, showValueStream: false, showAnalysis: false, ribbonCollapsed: true,
       showSummaryOnOpen: true, presenterSubtitles: true, presenterVoice: false, presenterOnlineVoices: false, presenterVoiceAsked: false,
-      presenterStepMessages: true, presenterFlowMessages: true,
+      presenterStepMessages: true, presenterFlowMessages: true, showBpmnDetails: true,
     });
   });
 
@@ -152,14 +152,15 @@ describe('a storage that throws (B-7-04)', () => {
 });
 
 describe('nothing else is stored (B-7-05)', () => {
-  it('the preferences write only their sixteen switches and the name of the voice of a presentation', () => {
+  it('the preferences write only their switches, the name of the voice and the day a reminder was closed', () => {
     const storage = memory();
     const store = createPreferencesStore(storage);
     const names = ['showCodes', 'alwaysShowPictos', 'showRaci', 'showValueStream', 'showAnalysis', 'ribbonCollapsed',
-      'showSummaryOnOpen', 'presenterSubtitles', 'presenterVoice', 'presenterOnlineVoices', 'presenterVoiceAsked', 'presenterStepMessages', 'presenterFlowMessages'] as const;
+      'showSummaryOnOpen', 'presenterSubtitles', 'presenterVoice', 'presenterOnlineVoices', 'presenterVoiceAsked', 'presenterStepMessages', 'presenterFlowMessages', 'showBpmnDetails'] as const;
     for (const name of names) store.getState().set(name, !store.getState()[name]);
     store.getState().setVoiceName('Hortense');
-    expect([...storage.values.keys()].sort()).toEqual([...Object.values(PREFERENCE_KEYS), VOICE_NAME_KEY].sort());
+    writeReminderClosed('2027-02-20', storage);
+    expect([...storage.values.keys()].sort()).toEqual([...Object.values(PREFERENCE_KEYS), VOICE_NAME_KEY, UPDATE_REMINDER_CLOSED_KEY].sort());
   });
 
   it('no other module of the interface uses the storage of the browser; the last project opened lives in the profile (AR-49)', () => {
@@ -173,5 +174,26 @@ describe('nothing else is stored (B-7-05)', () => {
       .filter((file) => /\b(localStorage|sessionStorage|indexedDB)\b/.test(readFileSync(file, 'utf8')))
       .map((file) => relative(src, file).split(sep).join('/'));
     expect(users).toEqual(['features/map/state/preferences.ts']);
+  });
+});
+
+describe('the day a reminder was closed (ADR 111)', () => {
+  it('is written under a neutral key and read back', () => {
+    const storage = memory();
+    expect(UPDATE_REMINDER_CLOSED_KEY).toBe('app.updateReminderClosed');
+    expect(readReminderClosed(storage)).toBeNull();
+    writeReminderClosed('2027-02-20', storage);
+    expect(storage.values.get('app.updateReminderClosed')).toBe('2027-02-20');
+    expect(readReminderClosed(storage)).toBe('2027-02-20');
+  });
+
+  it('is none when absent, too long, or when the storage throws; writing to a storage that throws does not throw', () => {
+    expect(readReminderClosed(memory({ 'app.updateReminderClosed': 'x'.repeat(50) }))).toBeNull();
+    expect(readReminderClosed(throwing)).toBeNull();
+    expect(readReminderClosed(null)).toBeNull();
+    expect(() => {
+      writeReminderClosed('2027-02-20', throwing);
+      writeReminderClosed('2027-02-20', null);
+    }).not.toThrow();
   });
 });

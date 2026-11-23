@@ -26,6 +26,12 @@ const MARKERS: Partial<Record<Schema<'StepType'>, LucideIcon>> = { decision: X, 
 /** The diamond of a gateway, drawn in the box of a step, one pixel inside for its contour. */
 const DIAMOND = `1,${String(STEP_HEIGHT / 2)} ${String(STEP_WIDTH / 2)},1 ${String(STEP_WIDTH - 1)},${String(STEP_HEIGHT / 2)} ${String(STEP_WIDTH / 2)},${String(STEP_HEIGHT - 1)}`;
 
+/** The lower contour of the diamond, from its left point by its bottom point to its right point: where the gauge of a gateway runs (R14). */
+const DIAMOND_BOTTOM = {
+  box: `0 0 ${String(STEP_WIDTH)} ${String(STEP_HEIGHT)}`,
+  points: `1,${String(STEP_HEIGHT / 2)} ${String(STEP_WIDTH / 2)},${String(STEP_HEIGHT - 1)} ${String(STEP_WIDTH - 1)},${String(STEP_HEIGHT / 2)}`,
+} as const;
+
 /**
  * The classes of a step: its type, gateway, chosen, cut, source of a link, detailed, with pictograms (the label moves up
  * when they are always shown, B-2.10-14), what hangs under it aside of the axis of its bottom point (AR-58, AR-128),
@@ -104,7 +110,7 @@ export const StepNodeView = memo(function StepNodeView({ data, selected }: NodeP
       {marker && <span className="gateway-marker" aria-hidden="true"><Icon icon={marker} size={16} strokeWidth={2.5} /></span>}
       <StepLabel data={data} />
       <Pictos step={step} />
-      {gauge !== null && <SheetGauge gauge={gauge} completeness={step.sheet.completeness} />}
+      {gauge !== null && <SheetGauge gauge={gauge} completeness={step.sheet.completeness} contour={marker ? DIAMOND_BOTTOM : undefined} />}
       {warnings.length > 0 && <LayoutWarning codes={warnings} />}
       {macro && !data.showStream && data.handoffs === null && <DetailedBadge />}
       {data.handoffs !== null && <HandoffBadge count={data.handoffs} />}

@@ -1,5 +1,5 @@
 // DesktopTray.cs
-// In desktop mode without a console: the icon of the application near the clock, with « Open » and « Quit », and the clean stop at the end of the session of Windows (F-69, ADR 090).
+// In desktop mode without a console: the icon of the application near the clock, with « Open » and « Quit » (after the writes the pages declare waiting, asking at once for a form not validated), and the clean stop at the end of the session of Windows (F-69, ADR 090, ADR 115, R11).
 
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Options;
@@ -14,7 +14,7 @@ public enum TrayCommand
     /// <summary>Opens the browser on the application, with a new launch token, as a second start does (spec 6.1).</summary>
     Open = 1,
 
-    /// <summary>Stops the application, as the command « Quit » of the interface (spec 5.2).</summary>
+    /// <summary>Stops the application, as the command « Quit » of the interface, once the writes of the pages are sent (spec 5.2, ADR 115).</summary>
     Quit = 2,
 }
 
@@ -25,11 +25,26 @@ public enum TrayCommand
 /// readable by others, a restored backup) are shown once in a box of Windows. At the end of the session of Windows, the
 /// application stops cleanly before the process ends (the data file closed, ADR 029). The icon lives on a thread of its
 /// own, with a hidden window that receives its messages; the icon comes back when Explorer restarts. Without a shell to
-/// hold it, the application runs on and « Quit » stays in the interface.
+/// hold it, the application runs on and « Quit » stays in the interface. « Quit » first waits for the writes that the pages
+/// declare waiting (<see cref="DesktopWrites"/>, ADR 115): none, the application stops at once; else it waits off the
+/// thread of the icon, whose messages are never held, <see cref="WritesBound"/> at most; a write still waiting then, a box
+/// of Windows asks whether to quit anyway, No by default. A form changed and not validated never leaves by itself (R11):
+/// the box asks at once, its own question; Yes still lets the writes waiting reach the host, within the same bound, then
+/// stops without a second question. One wait at a time: « Quit » chosen again meanwhile joins it.
 /// </summary>
 public sealed partial class DesktopTrayService(IHostApplicationLifetime lifetime, IOptions<ProductOptions> options, DesktopAddress address,
-    DesktopSession session, IBrowserLauncher browser, StartupConsole console, ILogger<DesktopTrayService> logger) : IHostedService, IDisposable
+    DesktopSession session, IBrowserLauncher browser, StartupConsole console, DesktopWrites writes, ILogger<DesktopTrayService> logger)
+    : IHostedService, IDisposable
 {
+    /// <summary>The question of the box when a write still waits after <see cref="WritesBound"/> (ADR 115).</summary>
+    public const string WaitingQuestion = "ICONE_QUITTER_ATTENTE";
+
+    /// <summary>The question of the box when a page holds a form changed and not validated, asked at once (R11).</summary>
+    public const string UnsavedQuestion = "ICONE_QUITTER_NON_VALIDE";
+
+    /// <summary>How long « Quit » waits at most for the writes that the pages declare waiting (ADR 115).</summary>
+    public static readonly TimeSpan WritesBound = TimeSpan.FromSeconds(5);
+
     private const uint Callback = 0x8001;
     private static readonly TimeSpan EndOfSession = TimeSpan.FromSeconds(10);
 
@@ -41,6 +56,7 @@ public sealed partial class DesktopTrayService(IHostApplicationLifetime lifetime
     private bool ownIcon;
     private uint taskbarCreated;
     private volatile bool ending;
+    private int quitting;
 
     /// <summary>True once the icon is in the notification area.</summary>
     public bool Shown { get; private set; }
@@ -88,10 +104,66 @@ public sealed partial class DesktopTrayService(IHostApplicationLifetime lifetime
                 browser.Open(address.LaunchAddress(session.Renew()));
                 break;
             case TrayCommand.Quit:
-                lifetime.StopApplication();
+                Quit();
                 break;
         }
     }
+
+    /// <summary>Stops at once when no page waits nor holds a form; else starts the wait for the pages off the thread of the icon, once.</summary>
+    private void Quit()
+    {
+        if (writes.Waiting == 0 && writes.Unsaved == 0)
+        {
+            lifetime.StopApplication();
+            return;
+        }
+        if (Interlocked.Exchange(ref quitting, 1) == 1)
+            return;
+        _ = Task.Run(QuitAfterWritesAsync);
+    }
+
+    private async Task QuitAfterWritesAsync()
+    {
+        try
+        {
+            if (await QuitsAsync())
+                lifetime.StopApplication();
+        }
+        catch (OperationCanceledException)
+        {
+            // The application stopped otherwise meanwhile (the interface, the end of the session).
+        }
+        catch (Exception failure) when (failure is not OutOfMemoryException)
+        {
+            LogFailed(logger, failure.GetType().FullName ?? failure.GetType().Name);
+        }
+        finally
+        {
+            Volatile.Write(ref quitting, 0);
+        }
+    }
+
+    /// <summary>
+    /// A form not validated: the question at once, then, Yes, the writes waiting let through within the bound. Else the
+    /// writes waited for, then the question when one still waits or a form was left not validated meanwhile.
+    /// </summary>
+    private async Task<bool> QuitsAsync()
+    {
+        if (writes.Unsaved > 0)
+        {
+            if (!QuitAnyway(UnsavedQuestion))
+                return false;
+            await writes.WaitAsync(WritesBound, lifetime.ApplicationStopping);
+            return true;
+        }
+        if (await writes.WaitAsync(WritesBound, lifetime.ApplicationStopping) && writes.Unsaved == 0)
+            return true;
+        return QuitAnyway(writes.Unsaved > 0 ? UnsavedQuestion : WaitingQuestion);
+    }
+
+    /// <summary>The box of Windows: Yes quits, No (the default) and a box that cannot be shown keep the application running.</summary>
+    private bool QuitAnyway(string question) =>
+        console.Window is { } box && box.Confirm([console.Messages.Format(question, console.Language, null)]);
 
     /// <summary>The text of a choice in the language of the start.</summary>
     public string TextOf(TrayCommand command) =>

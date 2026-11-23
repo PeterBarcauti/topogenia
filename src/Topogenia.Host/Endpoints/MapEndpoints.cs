@@ -23,6 +23,9 @@ public static class MapEndpoints
         maps.MapGet("/action-plan", async (Guid id, MapApi api, CancellationToken token) => TypedResults.Ok(await api.ActionPlanAsync(id, token)));
         // The comments of presentation of its steps (3.2, ADR 099), read by a presentation when it starts and when it dives.
         maps.MapGet("/presentation-comments", async (Guid id, PresentationApi api, CancellationToken token) => TypedResults.Ok(await api.ReadAsync(id, token)));
+        // The comments written by the assistant for its steps and its flows, kept after review (3.3, lot 3, F-130).
+        maps.MapPost("/presentation-comments", async (Guid id, CommentDraftsBody body, PresentationApi api, CancellationToken token) =>
+            TypedResults.Ok(await api.WriteDraftsAsync(id, body, token)));
         // The comments of presentation of its flows (3.2, ADR 099, lot J10), read with those of its steps.
         maps.MapGet("/flow-presentation-comments", async (Guid id, PresentationApi api, CancellationToken token) =>
             TypedResults.Ok(await api.ReadFlowsAsync(id, token)));
@@ -35,13 +38,20 @@ public static class MapEndpoints
         // The copy of the map and of the maps below it that an image carries (plan 3.1, L7), as the copy of a project.
         maps.MapPut("/summaries", async (Guid id, MapSummariesBody body, MapSummaryApi api, CancellationToken token) =>
             TypedResults.Ok(await api.WriteAsync(id, body, token)));
-        maps.MapGet("/pmap", async (Guid id, PmapApi api, HttpResponse response, CancellationToken token) =>
+        maps.MapGet("/pmap", async (Guid id, string? purpose, PmapApi api, HttpResponse response, CancellationToken token) =>
         {
-            var copy = await api.MapCopyAsync(id, token);
+            var copy = await api.MapCopyAsync(id, purpose, token);
             if (copy.DepthCut)
                 response.Headers[PmapApi.WarningHeader] = WarningCodes.PmapDepthTruncated;
             return TypedResults.File(System.Text.Encoding.UTF8.GetBytes(copy.Content), "text/plain; charset=utf-8", copy.FileName);
         }).Produces(StatusCodes.Status200OK, typeof(Stream), "text/plain");
+        // A .pmap file inserted as a detailed step (3.3, F-208): its preview, then its copy in one operation with If-Match.
+        var opening = new RequestSizeLimitAttribute(PmapApi.OpeningLimit);
+        // The body is read only once the right is granted (independent review of the 3.3, as the opening of a file).
+        maps.MapPost("/insert-pmap/preview", async (Guid id, HttpRequest request, PmapInsertionApi api, CancellationToken token) =>
+            TypedResults.Ok(await api.PreviewAsync(id, request, token))).WithMetadata(opening).Accepts<InsertPmapPreviewBody>("application/json");
+        maps.MapPost("/insert-pmap", async (Guid id, HttpRequest request, [FromHeader(Name = "If-Match")] string? ifMatch, PmapInsertionApi api,
+            CancellationToken token) => TypedResults.Ok(await api.InsertAsync(id, request, ifMatch, token))).WithMetadata(opening).Accepts<InsertPmapBody>("application/json");
         maps.MapPost("/lanes", async (Guid id, AddLaneBody body, LaneApi api, CancellationToken token) => TypedResults.Ok(await api.AddAsync(id, body, token)));
         maps.MapPut("/lane-order", async (Guid id, [FromBody] List<Guid> order, LaneApi api, CancellationToken token) =>
             TypedResults.Ok(await api.ReorderAsync(id, order, token)));

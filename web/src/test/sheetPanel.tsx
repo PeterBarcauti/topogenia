@@ -1,11 +1,11 @@
 // sheetPanel.tsx
-// The sheet panel shown in a test: the sheet answered by a fake API, the step VIS-E002 of the lane Commercial, the project of two members, and what the panel asked of the map.
+// The sheet panel shown in a test: the sheet answered by a fake API, the step VIS-E002 of the lane Commercial, the project of two members, the steps whose sheet the map lets the person reach, and what the panel asked of the map.
 
 import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import type { Schema } from '../api/client.ts';
 import { SheetPanel } from '../features/sheet/SheetPanel.tsx';
-import type { SheetPanelProps, SheetSection } from '../features/sheet/SheetContext.tsx';
+import { ReportTargets, type SheetPanelProps, type SheetSection } from '../features/sheet/SheetContext.tsx';
 import { KeyboardProvider } from '../shared/keyboard/KeyboardContext.tsx';
 import type { ToastKind } from '../shared/ui/toasts.ts';
 import { fakeApi, type FakeRoutes } from './fakeApi.ts';
@@ -20,7 +20,7 @@ export interface SheetRecord {
 }
 
 /** Every section of the sheet folded, or every one unfolded. */
-export const allSections = (folded: boolean): Record<SheetSection, boolean> => ({ facts: folded, inputs: folded, procedure: folded, outputs: folded, tools: folded });
+export const allSections = (folded: boolean): Record<SheetSection, boolean> => ({ facts: folded, inputs: folded, procedure: folded, outputs: folded, pain_points: folded, tools: folded });
 
 /** The folded sections held by the test, as the panel of the map holds them for a sheet open. */
 function Harness({ props }: { props: SheetPanelProps }) {
@@ -38,8 +38,8 @@ function Harness({ props }: { props: SheetPanelProps }) {
 
 export const STEP = { id: 's2', code: 'VIS-E002', label: 'Vérifier la demande', laneName: 'Commercial', assigneeUserId: null };
 
-/** Shows the panel of the step s2 on the routes given, without waiting for anything. */
-export function mountSheet(routes: FakeRoutes, overrides: Partial<SheetPanelProps> = {}) {
+/** Shows the panel of the step s2 on the routes given, without waiting for anything; every step reachable unless told (`ReportTargets`). */
+export function mountSheet(routes: FakeRoutes, overrides: Partial<SheetPanelProps> = {}, reachable: (stepId: string) => boolean = () => true) {
   const sent = fakeApi(routes);
   const record: SheetRecord = { summaries: [], notes: [], assigned: [], events: [] };
   const props: SheetPanelProps = {
@@ -60,13 +60,13 @@ export function mountSheet(routes: FakeRoutes, overrides: Partial<SheetPanelProp
     notify: (text, kind) => record.notes.push([text, kind]),
     ...overrides,
   };
-  const rendered = render(<KeyboardProvider><Harness props={props} /></KeyboardProvider>);
+  const rendered = render(<KeyboardProvider><ReportTargets.Provider value={reachable}><Harness props={props} /></ReportTargets.Provider></KeyboardProvider>);
   return { ...rendered, sent, record, props };
 }
 
 /** Shows the panel of the sheet given (read by `GET /api/steps/s2/sheet`), with the other routes given; waits for the sheet. */
-export async function renderSheet(view: Schema<'SheetView'>, routes: FakeRoutes = {}, overrides: Partial<SheetPanelProps> = {}) {
-  const shown = mountSheet({ 'GET /api/steps/s2/sheet': { json: view }, ...routes }, overrides);
+export async function renderSheet(view: Schema<'SheetView'>, routes: FakeRoutes = {}, overrides: Partial<SheetPanelProps> = {}, reachable?: (stepId: string) => boolean) {
+  const shown = mountSheet({ 'GET /api/steps/s2/sheet': { json: view }, ...routes }, overrides, reachable);
   await screen.findByTestId(view.is_draft ? 'sheet-body' : 'sheet-read');
   return shown;
 }

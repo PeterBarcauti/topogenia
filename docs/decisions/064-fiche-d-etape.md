@@ -7,7 +7,7 @@ Statut : acceptée (date 28/10/2026)
 
 ## Contexte
 
-P6-T07 (`plan.md`, phase 6) porte l'interface de l'annexe B 4 : 81 lignes, dont 75 « à faire », avec AR-89 (poignée de
+P6-T07 (`plan.md` (non publié), phase 6) porte l'interface de l'annexe B 4 : 81 lignes, dont 75 « à faire », avec AR-89 (poignée de
 glissement du déroulé) et AR-91 (sections pliables), plus les lignes que les tâches précédentes lui ont laissées (B-2.1-39,
 B-2.1-40, B-2.6-11, B-8.1-34, B-8.1-35). Les routes de l'hôte sont faites depuis la phase 4 (`GET/PUT
 /api/steps/{id}/sheet`, `/validate`, `/clarification`, `/documents`, `/documents/available`, `/uses/{documentId}`,

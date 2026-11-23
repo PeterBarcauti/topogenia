@@ -40,29 +40,32 @@ scripts n'est livré ni exécuté par l'application (AR-37).
   nom de l'éditeur, `CN=` de l'identité) : le paquet remis au Store part sans signature, Microsoft le signe.
 - `archive.proj` : les archives par les tâches `ZipDirectory` et `Unzip` de MSBuild, code signé de Microsoft :
   `dotnet msbuild build/archive.proj -t:Zip -p:Folder=<dossier> -p:Archive=<fichier.zip>`, ou `-t:Unzip`.
-- `sbom.mjs` : la SBOM CycloneDX 1.5 d'une publication, depuis son `deps.json` et les composants de l'interface.
-- `components.mjs`, `third-party-notices.mjs` (`--check`) : les composants tiers tels qu'ils sont livrés et
-  `THIRD-PARTY-NOTICES.md` ; `security-list.mjs` (`--check`, chez le porteur du projet) : la liste de `docs/securite.md` depuis sa couverture.
+- `archive-dates.mjs` (`--check`) : la date de toutes les entrées d'un ZIP ou d'un MSIX, le jour de la version à minuit
+  UTC ; appelé par `package.mjs`, pour qu'aucune date ne dise l'heure ni le fuseau du poste (ADR 076, révision).
+- `sbom.mjs` : la SBOM CycloneDX 1.5 d'une publication, depuis son `deps.json` et les composants de l'interface ; elle
+  échoue si un composant livré des mentions lui manque (ADR 073, révision).
+- `components.mjs`, `third-party-notices.mjs` (`--check`), `licence-texts.mjs`, `licences/` : les composants tiers tels
+  qu'ils sont livrés et `THIRD-PARTY-NOTICES.md`, avec le texte de licence de chacun ; `security-list.mjs` (non publié) (`--check`, chez le porteur du projet) : la liste de `docs/securite.md` depuis sa couverture.
 - `codeql-local.mjs` (`node build/codeql-local.mjs`) : CodeQL quand sa CLI est déjà installée, sinon il le dit sans
   rien installer.
 - `load/ServerLoad.cs` : la charge de 30 clients sur un hôte publié du mode Serveur (ADR 072), jamais livrée.
 
 ## Cœur fermé (ADR 048, ADR 074, ADR 087)
 
-- `core/licence.mjs` : le seul point d'entrée du cœur. `node build/core/licence.mjs secret --secret <fichier>` crée,
+- `core/licence.mjs` : le seul point d'entrée du cœur. `node build/core/licence.mjs secret --secret <fichier>` (non publié) crée,
   une fois, le secret des empreintes ; `node build/core/licence.mjs pack --key <clé> --secret <fichier> --archive
   <dossier> [--licence <numéro> --licensee "<nom>"]` construit le cœur pour une licence (sans `--licence` : `HOLDER`, le
   paquet du titulaire, écrit dans `artifacts/core-feed` pour le ZIP et le dépôt public ; avec : le paquet du licencié,
   écrit dans son entrée d'archive), vérifie son empreinte dans l'assemblage obscurci et archive le paquet, les deux
   assemblages, la carte des noms, une copie des sources et un manifeste, plus le registre `licences.json` ;
-  `node build/core/licence.mjs verify <.dll ou .nupkg> --secret <fichier> --archive <dossier>` lit et authentifie
+  `node build/core/licence.mjs verify <.dll ou .nupkg> --secret <fichier> --archive <dossier>` (non publié) lit et authentifie
   l'empreinte d'un cœur trouvé et nomme son licencié. La clé, le secret et l'archive sont refusés dans le dépôt.
 - `core/Topogenia.Core.csproj` : la chaîne que `licence.mjs` lance (elle refuse un `dotnet pack` sans licence ni
   empreinte). La clé du nom fort est celle du titulaire, créée par `sn.exe -k 2048`. Le domaine construit en Release,
   signé et marqué (attributs `Licence` et `LicenceMark`), obscurci par Obfuscar (`core/obfuscar.xml`), la documentation
   réduite à son API publique (`core/public-docs.mjs`), le paquet `Topogenia.Core` et son empreinte SHA-256, la carte des
   noms dans `artifacts/core/out/Mapping.txt` (gardée dans l'archive).
-- `split.mjs` : `node build/split.mjs <destination>` écrit le dépôt public hors de la copie de travail (sans le domaine,
+- `split.mjs` (non publié) : `node build/split.mjs <destination>` (non publié) écrit le dépôt public hors de la copie de travail (sans le domaine,
   ses tests, `core/` ni lui-même ; le paquet dans son `artifacts/core-feed`) et prouve qu'il compile et passe ses tests
   avec le seul paquet (`--no-proof` : écrire sans prouver). Il refuse, sans rien effacer, une destination qui n'est ni
   vide ni une copie publique écrite par lui (même solution, bascule du cœur, aucune source du cœur, en haut seulement ce

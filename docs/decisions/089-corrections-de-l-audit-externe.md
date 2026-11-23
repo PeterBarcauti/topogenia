@@ -67,6 +67,6 @@ Quatre constats touchent des choix écrits, qu'une décision change :
 - En mode Serveur, un dossier de plus à créer et à protéger ; la clé de l'assistant survit aux recyclages et aux
   redémarrages ; un dossier de clés perdu rend la clé illisible (`key_unreadable`), à saisir de nouveau.
 - Le domaine change (contrôle de l'import) : le paquet du cœur est à reconstruire pour la prochaine version publiée.
-- Gardés et inscrits dans `docs/a-peaufiner.md` : la fenêtre de la console (F-69, à juger à la réponse de la
+- Gardés et inscrits dans `docs/a-peaufiner.md` (non publié) : la fenêtre de la console (F-69, à juger à la réponse de la
   certification), le proxy local d'un antivirus sur la boucle locale (F-73), l'aperçu d'une carte détaillée nouvelle
   (F-74), la colonne 10 000 (F-75), la relecture après écriture (F-76), le coût estimé sur Bedrock (F-77).

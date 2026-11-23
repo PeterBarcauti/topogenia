@@ -18,10 +18,13 @@ import { GATEWAYS, SHAPES, TOOL_COMMANDS } from './toolCommands.ts';
 import { TRANSLATE_COMMANDS } from './translateCommands.ts';
 import { ASSISTANT_COMMAND } from './assistantCommand.ts';
 import { PRESENT_COMMANDS } from './presentCommands.ts';
+import { BPMN_COMMANDS } from './bpmnCommands.ts';
+import { PLAN_COMMAND } from './planCommand.ts';
+import { VIEW_COMMANDS } from './viewCommands.ts';
 
 /** Every command of the map: one definition an action, for the ribbon, the menus and the keyboard. */
 export const MAP_COMMANDS: readonly Command<MapContext>[] = [
-  ...TOOL_COMMANDS, ...EDIT_COMMANDS, ...MENU_COMMANDS, ...STREAM_COMMANDS, ...TRANSLATE_COMMANDS, ...FILE_COMMANDS, ASSISTANT_COMMAND, ...PRESENT_COMMANDS,
+  ...TOOL_COMMANDS, ...EDIT_COMMANDS, ...MENU_COMMANDS, ...STREAM_COMMANDS, ...TRANSLATE_COMMANDS, ...FILE_COMMANDS, ASSISTANT_COMMAND, ...PRESENT_COMMANDS, ...BPMN_COMMANDS, ...VIEW_COMMANDS, PLAN_COMMAND,
 ];
 
 /**
@@ -31,7 +34,7 @@ export const MAP_COMMANDS: readonly Command<MapContext>[] = [
  */
 const KEY_IDS = [
   'level.up', 'tool.select', 'tool.hand', 'ribbon', 'command', 'assistant', 'undo.keys', 'redo.keys', 'cut', 'copy', 'paste.keys', 'duplicate', 'group', 'ungroup', 'selectAll', 'delete', 'rename', 'escape',
-  'move.Left', 'move.Right', 'move.Up', 'move.Down', 'present', 'present.from',
+  'move.Left', 'move.Right', 'move.Up', 'move.Down', 'present', 'present.from', 'bpmn', 'fit', 'help.keys', 'find',
 ];
 
 export const KEY_COMMANDS: readonly Command<MapContext>[] = KEY_IDS.map((id) => MAP_COMMANDS.find((command) => command.id === id) as Command<MapContext>);
@@ -41,6 +44,20 @@ export function mapKeyHandler(editor: MapEditor, pointer: () => Point | null = (
   return (event, chord) => {
     const context = contextOf(editor, null, pointer());
     return context !== null && keyHandlerOf(KEY_COMMANDS, () => context)(event, chord);
+  };
+}
+
+/**
+ * The keys that change nothing, kept in the view in BPMN 2.0, read only (ADR 106; audit of the copy 64, P1-03): up a level,
+ * the ribbon folded, the assistant, the presentation, Show all, the shortcuts and the search (ADR 110); Alt+B is the view's own.
+ */
+const BPMN_KEY_COMMANDS: readonly Command<MapContext>[] = KEY_COMMANDS.filter((command) => ['level.up', 'ribbon', 'assistant', 'present', 'present.from', 'fit', 'help.keys', 'find'].includes(command.id));
+
+/** The handler of the layer of the view in BPMN 2.0: only the keys that change nothing. */
+export function bpmnKeyHandler(editor: MapEditor): KeyHandler {
+  return (event, chord) => {
+    const context = contextOf(editor);
+    return context !== null && keyHandlerOf(BPMN_KEY_COMMANDS, () => context)(event, chord);
   };
 }
 
@@ -56,7 +73,8 @@ export interface RibbonZone {
 }
 
 /**
- * The zones Level, Shapes, Gateways, Links, Edit, Display and Tools (B-2.1-08 to B-2.1-32): « Remonter d'un niveau » first
+ * The zones Level, Shapes, Gateways, Links, Edit, Display and Tools (B-2.1-08 to B-2.1-32), « Rechercher » heading Display (ADR 110),
+ * « Plan d'actions » after « Analyse » (ADR 112): « Remonter d'un niveau » first
  * and the tools last, next to the display, by the choice of the owner of the product (AR-155); Grouper and Dissocier next to
  * Détailler (AR-154).
  */
@@ -66,7 +84,7 @@ export const RIBBON: readonly RibbonZone[] = [
   { id: 'gateways', label: 'ribbon.gateways', choice: 'ribbon.gateway_choice', ids: [...GATEWAYS.map((type) => `shape.${type}`), 'branch'], forEditors: true },
   { id: 'links', label: 'ribbon.links', ids: ['link', 'command'], forEditors: true },
   { id: 'edit', label: 'ribbon.edit', ids: ['undo', 'redo', 'cut', 'copy', 'paste', 'detail', 'group', 'ungroup', 'align'], breaks: ['cut', 'detail'], forEditors: true },
-  { id: 'display', label: 'ribbon.display', ids: ['codes', 'pictos', 'raci', 'stream', 'analysis', 'matrix'], forEditors: false },
+  { id: 'display', label: 'ribbon.display', ids: ['find', 'codes', 'pictos', 'raci', 'stream', 'analysis', 'plan', 'matrix', 'bpmn'], forEditors: false },
   { id: 'tools', label: 'ribbon.tools', choice: 'ribbon.tool_choice', ids: ['tool.select', 'tool.hand'], forEditors: false },
 ];
 
@@ -74,31 +92,31 @@ const editor = (context: MapContext) => context.canEdit;
 const reader = (context: MapContext) => !context.canEdit;
 const line = (id: string, group: number, when?: (context: MapContext) => boolean): MenuLine<MapContext> => (when === undefined ? { id, group } : { id, group, when });
 
-/** The menu of a step, in the order of annex B 2.4-10 to 2.4-29; its sheet and its RACI roles come after its detailed map (NF08). */
+/** The menu of a step, in the order of annex B 2.4-10 to 2.4-29; its sheet and its RACI roles come after its detailed map (NF08), then « Présenter depuis cette étape » (ADR 097). */
 export const STEP_MENU: readonly MenuLine<MapContext>[] = [
-  line('step.open', 1), line('step.sheet', 1), line('step.raci', 1), line('rename', 1, editor), line('step.translate', 1), line('step.volume', 1, editor),
+  line('step.open', 1), line('step.sheet', 1), line('step.raci', 1), line('present.from', 1), line('rename', 1, editor), line('step.translate', 1), line('step.volume', 1, editor),
   line('step.insert-before', 1, editor), line('step.insert-after', 1, editor), line('branch', 1, editor),
-  line('step.detail', 1, editor), line('step.dissolve', 1, editor), line('step.delete-detail', 1, editor),
+  line('step.detail', 1, editor), line('step.dissolve', 1, editor), line('step.delete-detail', 1, editor), line('step.replace-detail', 1, editor),
   line('cut', 2, editor), line('copy', 2, editor), line('duplicate', 2, editor), line('paste.before', 2, editor), line('paste.after', 2, editor),
   ...STEP_TYPES.map((type) => line(`step.type.${type}`, 3, editor)),
   ...VALUE_CHOICES.map((choice) => line(`step.value.${choice}`, 4, editor)),
   line('step.copy-code', 5), line('copy', 5, reader), line('step.delete', 5, editor),
 ];
 
-/** The menu of several steps chosen (B-2.4-31 to B-2.4-37), « Grouper en sous-processus » in the place of « Détailler la sélection » (AR-154). */
+/** The menu of several steps chosen (B-2.4-31 to B-2.4-37), « Grouper en sous-processus » in the place of « Détailler la sélection » (AR-154), the selection copied as an image after its copy (ADR 109). */
 export const SELECTION_MENU: readonly MenuLine<MapContext>[] = [
-  line('cut', 1, editor), line('copy', 1), line('duplicate', 1, editor), line('selection.group', 2, editor), line('selection.route.auto', 3, editor), line('selection.delete', 4, editor),
+  line('cut', 1, editor), line('copy', 1), line('selection.copy-image', 1), line('duplicate', 1, editor), line('selection.group', 2, editor), line('selection.route.auto', 3, editor), line('selection.delete', 4, editor),
 ];
 
-/** The menu of the background (B-2.4-38 to B-2.4-40). */
-export const PANE_MENU: readonly MenuLine<MapContext>[] = [line('paste.here', 1, editor), line('selectAll', 1)];
+/** The menu of the background (B-2.4-38 to B-2.4-40), then the map copied as an image (ADR 109). */
+export const PANE_MENU: readonly MenuLine<MapContext>[] = [line('paste.here', 1, editor), line('pane.insert-pmap', 1, editor), line('selectAll', 1), line('pane.copy-image', 2)];
 
 /**
  * The menu of a flow, only for who may change the map (B-2.4-42 to B-2.4-44), « Inverser le sens » before the deletion
  * (AR-155); its departure and its arrival, then « Tracé automatique » (ADR 091).
  */
 export const FLOW_MENU: readonly MenuLine<MapContext>[] = [
-  line('flow.label', 1), line('flow.translate', 1), line('flow.share', 1), line('flow.reverse', 1),
+  line('flow.label', 1), line('flow.translate', 1), line('flow.share', 1), line('flow.reverse', 1), line('flow.insert-pmap', 1),
   ...ROUTE_CHOICES.map((side) => line(`flow.from.${side}`, 2)), ...ROUTE_CHOICES.map((side) => line(`flow.to.${side}`, 3)), line('flow.route.auto', 4),
   line('flow.delete', 5),
 ];
@@ -139,19 +157,28 @@ export const LANE_MENU_GROUPS: readonly MenuGroup[] = [
 ];
 
 /**
- * The File menu, opened under its button in the header: the files that make a project (.pmap, package, as on the home
- * page, AR-154), the copy and the target state (P3e), the exports of the map, the package of exchange, then the properties of the project
- * (B-2.4-52 to B-2.4-58, ADR 058, spec 4.1).
+ * The File menu, opened under its button in the header (B-2.4-52 to B-2.4-58, ADR 058, spec 4.1), in cascade (ADR 117): the
+ * commands that open, save and copy the map, at a click (group 1); the groups of {@link FILE_SUBMENUS} (groups 2 and 3:
+ * the exports of the map, then the commands of the project, of the package of exchange and of the assistant, no separator
+ * between the rows of a cascade, the print for a wall set apart in its submenu); the properties of the project (group 4).
+ * The lines stay flat and each role keeps the commands it sees; a group none of whose commands is shown has no row.
  */
 export const FILE_MENU: readonly MenuLine<MapContext>[] = [
-  line('file.open', 1), line('file.import', 1), line('file.download', 1), line('file.duplicate', 1), line('file.target', 1), line('file.pdf', 2), line('file.wall', 2), line('file.png', 2), line('file.svg', 2), line('file.xlsx', 2), line('file.md', 2), line('file.report', 2),
-  line('file.summaries', 2),
-  line('file.export', 3), line('file.replace', 3), line('file.properties', 4),
+  line('file.open', 1), line('file.map_pmap', 1), line('file.copy-image', 1),
+  line('file.pdf', 2), line('file.png', 2), line('file.svg', 2), line('file.xlsx', 2), line('file.md', 2), line('file.bpmn', 2), line('file.wall', 3),
+  line('file.project-pdf', 3), line('file.download', 3), line('file.insert', 3), line('file.duplicate', 3), line('file.target', 3),
+  line('file.export', 3), line('file.import', 3), line('file.replace', 3),
+  line('file.report', 3), line('file.summaries', 3), line('file.comments', 3),
+  line('file.properties', 4),
 ];
 
-/** The groups of the ribbon for the context of the moment: a reader sees only Tools and Display (B-2.1-09, B-2.1-14, B-2.1-31). */
-export function ribbonGroups(context: MapContext): ToolbarGroup[] {
-  return RIBBON.filter((zone) => !zone.forEditors || context.canEdit).map((zone) => ({
+/**
+ * The groups of the ribbon for the context of the moment: a reader sees only Tools and Display (B-2.1-09, B-2.1-14,
+ * B-2.1-31). Over the view in BPMN 2.0, read only, only Level and Display: nothing that changes the map nor acts on its
+ * canvas, taken away while the view is shown (ADR 106; audit of the copy 64, P1-03).
+ */
+export function ribbonGroups(context: MapContext, bpmn = false): ToolbarGroup[] {
+  return RIBBON.filter((zone) => (bpmn ? zone.id === 'level' || zone.id === 'display' : !zone.forEditors || context.canEdit)).map((zone) => ({
     id: zone.id, label: zone.label, ...(zone.choice === undefined ? {} : { choice: zone.choice }),
     items: itemsOf(MAP_COMMANDS, zone.ids, context).map((item) => (zone.breaks?.includes(item.id) === true ? { ...item, separatorBefore: true } : item)),
   }));

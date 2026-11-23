@@ -95,3 +95,26 @@ export const frameOf = (stepIds: readonly string[], overrides: Partial<Schema<'F
 export const replyOf = (map: MapView | null, overrides: Partial<Schema<'StructureReply'>> = {}): Schema<'StructureReply'> => ({
   id: null, code: null, ids: [], operation_id: 'op1', warnings: [], structure_version: 8, map, history: { undo: [], redo: [] }, ...overrides,
 });
+
+/**
+ * The selection of the trial of the 3.4 (R8): three steps chosen in a staircase over three lanes (`c1`, `c2`, `c3`, the
+ * last one detailed with its frequency under it), and steps not chosen on their left, their right, under them in the lane
+ * of the last one, and above the second one, detailed with its frequency hanging towards it.
+ */
+export const staircaseMap = (): MapView => mapOf({
+  lanes: [laneOf('l1', 0), laneOf('l2', 1), laneOf('l3', 2)],
+  steps: [
+    stepOf('left', 'l1', 0, { code: 'VIS-E001' }),
+    stepOf('c1', 'l1', 1, { code: 'VIS-E002' }),
+    stepOf('above', 'l1', 2, { code: 'VIS-E003', sub_map_id: 'm3', sub_map_empty: false, sheet: sheetOf({ frequency: 'weekly' }) }),
+    stepOf('c2', 'l2', 2, { code: 'VIS-E004' }),
+    stepOf('c3', 'l3', 3, { code: 'VIS-E005', sub_map_id: 'm5', sub_map_empty: false, sheet: sheetOf({ frequency: 'monthly' }) }),
+    stepOf('right', 'l3', 4, { code: 'VIS-E006' }),
+    stepOf('lowLeft', 'l3', 1, { code: 'VIS-E007', row: 1 }),
+    stepOf('below', 'l3', 3, { code: 'VIS-E008', row: 1 }),
+  ],
+  flows: [
+    flowOf('f1', 'left', 'c1'), flowOf('f2', 'c1', 'c2', { documents: ['Facture'] }), flowOf('f3', 'c2', 'c3', { documents: ['Facture'] }),
+    flowOf('f4', 'c3', 'right'), flowOf('f5', 'c3', 'below'), flowOf('f6', 'lowLeft', 'below'),
+  ],
+});

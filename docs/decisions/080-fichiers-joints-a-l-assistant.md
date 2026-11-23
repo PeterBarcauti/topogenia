@@ -60,7 +60,7 @@ d'enregistré ni de journalisé.
 
 - Pas de migration ; le contrat de l'API gagne les fichiers des corps d'échange et les bornes des vues.
 - Par `Converse`, Bedrock lit un PDF en texte seulement : la lecture visuelle demande les citations, incompatibles avec
-  la sortie structurée (`docs/a-peaufiner.md`, F-54).
+  la sortie structurée (`docs/a-peaufiner.md` (non publié), F-54).
 - Le cœur fermé ne change pas : son paquet n'est pas refait.
 - Essai réel du 30/10/2026 : une procédure Word et un PDF joints sur l'accueil donnent un projet de 2 cartes et
   17 étapes, le circuit du PDF en sous-carte (73 s, environ 0,35 $) ; la relance d'une question sur une carte relit la

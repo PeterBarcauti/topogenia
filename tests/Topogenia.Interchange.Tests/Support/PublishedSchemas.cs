@@ -11,7 +11,7 @@ namespace Topogenia.Interchange.Tests.Support;
 /// </summary>
 public static class PublishedSchemas
 {
-    /// <summary>The file of the schema of the current version, `pmap-1.4.schema.json` (the 1.3, 1.2 and 1.1 ones stay published beside it).</summary>
+    /// <summary>The file of the schema of the current version, `pmap-1.5.schema.json` (the 1.4, 1.3, 1.2 and 1.1 ones stay published beside it).</summary>
     public static string PmapFile { get; } = For(PmapFormat.Version);
 
     /// <summary>The file of the schema of a version: a file follows the schema of the version it declares (ADR 091).</summary>
