@@ -3,6 +3,10 @@
 
 # Topogenia
 
+**[topogenia.com](https://topogenia.com)** · [English](https://topogenia.com/en/)
+
+<a href="https://www.saashub.com/topogenia?utm_source=badge&utm_campaign=badge&utm_content=topogenia&badge_variant=color&badge_kind=approved"><img src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1" alt="Topogenia on SaaSHub" width="150"></a>
+
 ## Français
 
 Topogenia décrit un processus avec ceux qui le font : carte en couloirs (un couloir par
